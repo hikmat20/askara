@@ -16,7 +16,7 @@ class Auth
             'users/users_model',
             'users/user_groups_model'
         ));
-
+        $this->ci->config->load('recaptcha');
         $this->user = $this->ci->session->userdata('app_session');
     }
 
@@ -69,6 +69,7 @@ class Auth
             redirect('/');
         }
 
+
         $company        = $this->ci->db->get_where('companies', ['inisial' => $inisial]);
         $existComapny   = $company->num_rows();
         $dataCompany    = $company->row();
@@ -89,6 +90,36 @@ class Auth
             }
 
             if (password_verify($password, $existUser->password)) {
+
+                /* Verifikasi re-Captcha */
+                $recaptchaResponse = $this->ci->input->post('g-recaptcha-response');
+                $secretKey = $this->ci->config->item('recaptcha')['secret_key'];
+                $threshold = $this->ci->config->item('recaptcha')['threshold'];
+
+                $url = 'https://www.google.com/recaptcha/api/siteverify';
+                $data = [
+                    'secret' => $secretKey,
+                    'response' => $recaptchaResponse,
+                    'remoteip' => $this->ci->input->ip_address()
+                ];
+              
+                $options = [
+                    'http' => [
+                        'header'  => "Content-type: application/x-www-form-urlencoded\r\n",
+                        'method'  => 'POST',
+                        'content' => http_build_query($data)
+                    ]
+                ];
+                $context  = stream_context_create($options);
+                $response = file_get_contents($url, false, $context);
+                $responseKeys = json_decode($response, true);
+                log_message('info', 'reCAPTCHA score: ' . $existUser->username . ' - ' . $responseKeys['score']);
+                if (!$responseKeys["success"]  && floatval($responseKeys['score']) >= $threshold) {
+                    $this->ci->template->set_message('reCAPTCHA verification failed. Please try again.', 'error');
+                    return FALSE;
+                }
+
+                // End verifikasi re-Captcha */
 
                 $existUserInComapny     = $this->ci->db->get_where('user_groups', ['user_id' => $existUser->id_user, 'company_id' => $dataCompany->id_perusahaan, 'default' => 'Y']);
 

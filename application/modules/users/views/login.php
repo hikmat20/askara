@@ -8,6 +8,7 @@
     <link href="https://fonts.googleapis.com/css?family=Roboto:300,400&amp;display=swap" rel="stylesheet">
     <link rel="stylesheet" href="<?= base_url(); ?>assets/login/css/fonts%2c_icomoon%2c_style.css%2bcss%2c_owl.carousel.min.css%2bcss%2c_bootstrap.min.css%2bcss%2c_style.css.pagespeed.cc.WuwWHFx2BT.css" />
     <title>SentralDocs</title>
+    <?php echo recaptcha_script('login_form'); ?>
 </head>
 
 <body>
@@ -49,6 +50,7 @@
                                     </label> -->
                                 <!-- <span class="ml-auto"><a href="#" class="forgot-pass">Forgot Password</a></span> -->
                             </div>
+                            <?php echo recaptcha_div('login_form'); ?>
                             <button type="submit" name="login" class="btn text-white btn-block btn-primary">Login</button>
                             </form>
                         </div>
@@ -60,6 +62,12 @@
     <script src="<?= base_url(); ?>assets/login/js/jquery-3.3.1.min.js"></script>
     <script src="<?= base_url(); ?>assets/login/js/popper.min.js%2bbootstrap.min.js%2bmain.js.pagespeed.jc.AM7zHOnWML.js"></script>
     <script defer src="https://static.cloudflareinsights.com/beacon.min.js" data-cf-beacon='{"rayId":"67e0441d4d13103f","token":"cd0b4b3a733644fc843ef0b185f98241","version":"2021.8.0","si":10}'></script>
+    <script src="https://www.google.com/recaptcha/api.js" async defer></script>
+
+    <script>
+        getToken('login_form');
+    </script>
+
 </body>
 
 </html>
