@@ -10,7 +10,9 @@
 application/logs/*
 !application/logs/index.html
 !application/logs/.htaccess
+
 #/vendor/
-directory/*
+directory/
+
 assets/images/directory/checksheet/*
 
