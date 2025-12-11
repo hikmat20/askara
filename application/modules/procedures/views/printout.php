@@ -87,7 +87,7 @@
   <table border="1" width="100%">
     <tr>
       <td rowspan="3" width="50%" class="text-center">
-        <h2><?= $company_name; ?></h2>
+        <h2><?= $this->session->company->nm_perusahaan; ?></h2>
       </td>
       <td width="120px">Nomor Dokumen</td>
       <td><?= $procedure->nomor; ?></td>

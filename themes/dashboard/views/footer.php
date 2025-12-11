@@ -240,7 +240,7 @@
          })
 
          $('textarea.summernote').summernote({
-             height: 150, // set editor height
+             height: 250, // set editor height
              minHeight: null, // set minimum height of editor
              maxHeight: null,
              inheritPlaceholder: true,

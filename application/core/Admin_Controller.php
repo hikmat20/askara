@@ -29,9 +29,9 @@ class Admin_Controller extends Base_Controller
         $this->user_data    = $this->auth->userdata();
         $this->company      = $this->session->company->id_perusahaan;
         $this->group_id     = $this->session->group->id_group;
-        $this->form_validation->set_error_delimiters('', '');
         $companies          = $this->db->get_where('companies')->result();
-
+        
+        $this->form_validation->set_error_delimiters('', '');
         $positions = $this->db->get_where('positions', ['assign_user' => $this->auth->user_id(), 'company_id' => $this->company])->result();
         $ArrPos = [];
         foreach ($positions as $pos) {
@@ -63,7 +63,7 @@ class Admin_Controller extends Base_Controller
         $this->template->set('userData', $this->user_data);
         $this->template->set('idt', $idt);
         $this->template->set('companies', $companies);
-        $this->template->set('company_name', 'PT. SENTRAL TEHNOLOGI MANAGEMEN');
+        $this->template->set('company_name', $this->session->company->nm_perusahaan);
 
         // $this->template->set_theme('admin');
         $this->template->set_theme('dashboard');
