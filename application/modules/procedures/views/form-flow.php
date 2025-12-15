@@ -15,18 +15,45 @@
 			<small class="text-danger invalid-feedback">PIC</small>
 		</div>
 	</div>
-	<div class="form-group">
-		<label for="description" class="">Deskripsi <span class="text-danger">*</span></label>
-		<div class="">
-			<textarea rows="5" name="flow[description]" id="description" class="form-control" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description : ''; ?></textarea>
-			<small class="text-danger invalid-feedback">Deskripsi</small>
+
+	<ul class="nav nav-tabs border-0" id="myTab" role="tablist">
+		<li class="nav-item" role="presentation">
+			<button class="nav-link active p-3" id="flow-local-tab" data-toggle="tab" data-target="#flow-local" type="button" role="tab" aria-controls="local" aria-selected="true">Indonesia</button>
+		</li>
+		<?php if ($language) foreach ($language as $lang): ?>
+			<li class="nav-item" role="presentation">
+				<button class="nav-link p-3" id="flow-<?= $lang; ?>-tab" data-toggle="tab" data-target="#flow-<?= $lang; ?>" type="button" role="tab" aria-controls="<?= $lang; ?>" aria-selected="false"><?= ucfirst($lang); ?></button>
+			</li>
+		<?php endforeach; ?>
+	</ul>
+
+	<div class="tab-content rounded-bottom rounded-bottom-xl border">
+		<div class="tab-pane fade show active p-3" id="flow-local" role="tabpanel" aria-labelledby="local-tab">
+			<div class="form-group">
+				<label for="description" class="">Deskripsi <span class="text-danger">*</span></label>
+				<div class="">
+					<textarea rows="5" name="flow[description]" id="description" class="form-control summernote" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description : ''; ?></textarea>
+					<small class="text-danger invalid-feedback">Deskripsi</small>
+				</div>
+			</div>
 		</div>
+		<?php if ($language) foreach ($language as $lang): ?>
+			<div class="tab-pane fade p-3" id="flow-<?= $lang; ?>" role="tabpanel" aria-labelledby="flow-<?= $lang; ?>-tab">
+				<div class="form-group">
+					<label for="description_2" class="">Description <span class="text-danger">*</span></label>
+					<div class="">
+						<textarea rows="5" name="flow[description_2]" id="description_2" class="form-control summernote" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description_2 : ''; ?></textarea>
+						<small class="text-danger invalid-feedback">Deskripsi</small>
+					</div>
+				</div>
+			</div>
+		<?php endforeach; ?>
 	</div>
+
 	<div class="form-group">
 		<label class="">Dok. Terkait</label>
 		<h5 class="">Form</h5>
 		<div class="mb-3">
-			<!-- <textarea rows="5" name="flow[relate_doc]" id="relate_doc" class="form-control" required placeholder="Dokumen terkait" aria-describedby="helpId" /></textarea> -->
 			<select multiple name="flow[relate_doc][]" class="select2 form-control">
 				<?php $relDocs = json_decode($flow->relate_doc); ?>
 				<?php if ($forms) : ?>
@@ -42,10 +69,10 @@
 		<div class="mb-3">
 			<!-- <textarea rows="5" name="flow[relate_doc]" id="relate_doc" class="form-control" required placeholder="Dokumen terkait" aria-describedby="helpId" /></textarea> -->
 			<select multiple name="flow[relate_ik_doc][]" class="select2 form-control">
-				<?php $relDocs = json_decode($flow->relate_ik_doc); ?>
+				<?php $relDocs = json_decode($flow->relate_ik_doc, true); ?>
 				<?php if ($guides) : ?>
 					<?php foreach ($guides as $guide) : ?>
-						<option value="<?= $guide->id; ?>" <?= ($relDocs) ? (in_array($guide->id, $relDocs) ? 'selected' : '') : ''; ?>><?= $guide->name; ?></option>
+						<option value="<?= $guide->id; ?>" <?= ($relDocs) ? (in_array($guide->id, $relDocs)): ''; ?>><?= $guide->name; ?></option>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</select>
@@ -65,4 +92,9 @@
 		width: '100%',
 		allowClear: true
 	})
+
+	// $('.summernote').summernote({
+	// 	height: 350,
+	// 	tabsize: 1,
+	// });
 </script>

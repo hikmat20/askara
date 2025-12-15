@@ -47,12 +47,12 @@ class Procedures extends Admin_Controller
 		$dataDel		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'HLD', 'deletion_status' => 'APV'])->result();
 		$dataRvi		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'RVI'])->result();
 		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('directory_log', ['doc_type' => 'Procedure', 'new_status' => 'RVI'])->result();
-		
+
 		$ArrReason = [];
 		foreach (array_reverse($noteRevision) as $rvi) {
 			$ArrReason[$rvi->directory_id] = $rvi;
 		};
-		
+
 
 		$this->template->set('title', 'List of Procedures');
 		$this->template->set([
@@ -74,11 +74,13 @@ class Procedures extends Admin_Controller
 		$grProcess	= $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
 		$users 		= $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 		$jabatan 	= $this->db->get_where('positions', ['company_id' => $this->company])->result();
+		$depts 	= $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
 
 		$this->template->set([
 			'grProcess' 	=> $grProcess,
 			'users' 		=> $users,
 			'jabatan' 		=> $jabatan,
+			'depts' 		=> $depts,
 		]);
 
 		$this->template->set('title', 'Add Procedures');
@@ -88,15 +90,23 @@ class Procedures extends Admin_Controller
 	public function edit($id = '')
 	{
 		$Data 			= $this->db->get_where('procedures', ['company_id' => $this->company, 'id' => $id])->row();
+		$languange 		= ['english'];
 
 		if ($Data) {
-			$Data_detail 	= $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
-			$grProcess	= $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
-			$getForms	= $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-			$getGuides	= $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-			$getRecords	= $this->db->get_where('dir_records', ['procedure_id' => $id, 'status !=' => 'DEL', 'flag_type' => 'FOLDER', 'parent_id' => null])->result();
-			$users 		= $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
-			$jabatan 	= $this->db->get_where('positions', ['company_id' => $this->company])->result();
+			$Data_detail = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$grProcess   = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
+			$getForms    = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getGuides   = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getRecords  = $this->db->get_where('dir_records', ['procedure_id' => $id, 'status !=' => 'DEL', 'flag_type' => 'FOLDER', 'parent_id' => null])->result();
+			$users       = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
+			$jabatan     = $this->db->get_where('positions', ['company_id' => $this->company])->result();
+			$depts       = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+			$bilingual   = $this->db->get_where('procedure_bilingual', ['procedure_id' => $Data->id])->result();
+
+			$bilingualArr = [];
+			foreach ($bilingual as $bilingualItem) {
+				$bilingualArr[$bilingualItem->language] = $bilingualItem;
+			}
 
 			$ArrForms = [];
 			foreach ($getForms as $frm) {
@@ -108,20 +118,23 @@ class Procedures extends Admin_Controller
 			}
 
 			$this->template->set([
-				'title' 		=> 'Edit Procedures',
-				'data' 			=> $Data,
-				'users' 		=> $users,
-				'detail' 		=> $Data_detail,
-				'getForms' 		=> $getForms,
-				'getGuides' 	=> $getGuides,
-				'getRecords' 	=> $getRecords,
-				'jabatan' 		=> $jabatan,
-				'ArrForms' 		=> $ArrForms,
-				'ArrGuides' 	=> $ArrGuides,
-				'sts' 			=> $this->sts,
+				'title'      => 'Edit Procedures',
+				'data'       => $Data,
+				'users'      => $users,
+				'grProcess'  => $grProcess,
+				'detail'     => $Data_detail,
+				'getForms'   => $getForms,
+				'getGuides'  => $getGuides,
+				'getRecords' => $getRecords,
+				'jabatan'    => $jabatan,
+				'ArrForms'   => $ArrForms,
+				'ArrGuides'  => $ArrGuides,
+				'depts'      => $depts,
+				'languange'  => $languange,
+				'bilingualArr'  => $bilingualArr,
+				'sts'        => $this->sts,
 			]);
 
-			$this->template->set('grProcess', $grProcess);
 			$this->template->render('edit');
 		} else {
 			$data = [
@@ -181,9 +194,11 @@ class Procedures extends Admin_Controller
 
 	public function save()
 	{
-		$Data 			= $this->input->post();
-		$Data_flow 		= $this->input->post('flow');
+		$Data      = $this->input->post();
+		$Data_flow = $this->input->post('flow');
+		$bilingual = $Data['bilingual'];
 
+		unset($Data['bilingual']);
 		unset($Data['DataTables_Table_0_length']);
 		unset($Data['DataTables_Table_1_length']);
 		unset($Data['DataTables_Table_2_length']);
@@ -232,6 +247,26 @@ class Procedures extends Admin_Controller
 				];
 				$this->_update_history($dataLog);
 			}
+
+
+			// if bilingual
+			if ($bilingual) {
+				if (count($bilingual) > 0) {
+					foreach ($bilingual as $lang => $dt_lang) {
+						$dt_lang['procedure_id'] = ($this->db->insert_id() ? $this->db->insert_id() : $pro_id);
+						$dt_lang['language'] = $lang;
+
+						// update if exists
+						$check_bilingual = $this->db->get_where('procedure_bilingual', ['procedure_id' => $pro_id, 'language' => $lang])->num_rows();
+
+						if ($check_bilingual) {
+							$this->db->update('procedure_bilingual', $dt_lang, ['procedure_id' => $pro_id, 'language' => $lang]);
+						} else {
+							$this->db->insert('procedure_bilingual', $dt_lang);
+						}
+					}
+				}
+			}
 		}
 
 		if ($Data_flow) {
@@ -272,6 +307,12 @@ class Procedures extends Admin_Controller
 	{
 		$Data 			= $this->input->post('flow');
 		$pro_id 		= $this->input->post('procedure_id');
+
+		// echo '<pre>';
+		// print_r($Data);
+		// echo '</pre>';
+		// exit;
+
 		if ($Data) {
 			$Data['procedure_id'] = $pro_id;
 			if (isset($Data['id']) && $Data['id']) {
@@ -425,15 +466,17 @@ class Procedures extends Admin_Controller
 
 	public function add_flow($id = null)
 	{
-		$flow 		= '';
-		$forms 		= $this->db->get_where('dir_forms', ['procedure_id' => $id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
-		$guides 	= $this->db->get_where('dir_guides', ['procedure_id' => $id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
+		$flow 	   = '';
+		$forms     = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
+		$guides    = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
+		$language = ['english'];
 
 		$this->template->set([
-			'procedure_id' 	=>$id,
-			'flow' 			=> $flow,
-			'forms' 		=> $forms,
-			'guides' 		=> $guides,
+			'procedure_id' => $id,
+			'flow'         => $flow,
+			'forms'        => $forms,
+			'guides'       => $guides,
+			'language'    => $language,
 		]);
 
 		$this->template->render('form-flow');
@@ -441,6 +484,7 @@ class Procedures extends Admin_Controller
 
 	public function edit_flow($proc_id = null, $id = null)
 	{
+		$language = ['english'];
 		if ($proc_id && $id) {
 			$flow 		= $this->db->get_where('procedure_details', ['id' => $id])->row();
 			$forms 		= $this->db->get_where('dir_forms', ['procedure_id' => $proc_id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
@@ -451,7 +495,8 @@ class Procedures extends Admin_Controller
 			'procedure_id' => $proc_id,
 			'flow' 		=> $flow,
 			'forms' 	=> $forms,
-			'guides' 	=> $guides
+			'guides' 	=> $guides,
+			'language' 	=> $language,
 		]);
 		$this->template->render('form-flow');
 	}
@@ -644,7 +689,7 @@ class Procedures extends Admin_Controller
 		$this->db->trans_begin();
 		if (($id)) {
 			$thisData = $this->db->get_where('procedures', ['id' => $id])->row();
-			if($thisData->reviewer_id == '' || $thisData->reviewer_id == null ||$thisData->approval_id == '' || $thisData->approval_id == null){
+			if ($thisData->reviewer_id == '' || $thisData->reviewer_id == null || $thisData->approval_id == '' || $thisData->approval_id == null) {
 				$Return		= array(
 					'status'		=> 0,
 					'msg'			=> 'Please select Reviewer User And Approval User first to go to the next process.',
@@ -657,8 +702,8 @@ class Procedures extends Admin_Controller
 			$data['modified_at'] = date('Y-m-d H:i:s');
 			$data['status'] = 'REV';
 
-			if($thisData->status == 'RVI'){
-				$data['revision'] = $thisData->revision +1;
+			if ($thisData->status == 'RVI') {
+				$data['revision'] = $thisData->revision + 1;
 				$data['revision_date'] = date('Y-m-d H:i:s');
 			}
 
@@ -1480,56 +1525,20 @@ class Procedures extends Admin_Controller
 		$this->template->render('data-records');
 	}
 
-
-	// $mpdf 				= new Mpdf();
-	// $procedure 			= $this->db->get_where('procedures', ['id' => $id])->row();
-	// $flowDetail 		= $this->db->get_where('procedure_details', ['procedure_id' => $id])->result();
-	// $getForms			= $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-	// $getGuides			= $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-	// $users 				= $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
-	// $jabatan 			= $this->db->get('positions')->result();
-	// $ArrUsr 			= $ArrJab = $ArrForms = $ArrGuides = [];
-
-	// foreach ($getForms as $frm) {
-	// 	$ArrForms[$frm->id] = $frm;
-	// }
-	// foreach ($users as $usr) {
-	// 	$ArrUsr[$usr->id_user] = $usr;
-	// }
-
-	// foreach ($jabatan as $jab) {
-	// 	$ArrJab[$jab->id] = $jab;
-	// }
-
-	// foreach ($getGuides as $gui) {
-	// 	$ArrGuides[$gui->id] = $gui;
-	// }
-
-	// $Data = [
-	// 	'procedure' => $procedure,
-	// 	'detail' 	=> $flowDetail,
-	// 	'ArrUsr' 	=> $ArrUsr,
-	// 	'ArrJab' 	=> $ArrJab,
-	// 	'ArrForms' 	=> $ArrForms,
-	// 	'ArrGuides' 	=> $ArrGuides,
-	// ];
-
-	// $data = $this->load->view('printout', $Data, TRUE);
-	// $mpdf->WriteHTML($data);
-	// $mpdf->Output();
 	/* PRINTOUT */
 	public function printOut($id = null)
 	{
 		$mpdf 				= new Mpdf();
 		// $mpdf->showImageErrors = true;
 		$mpdf->curlAllowUnsafeSslRequests = true;
-		$procedure 			= $this->db->get_where('procedures', ['id' => $id])->row();
-		$flowDetail 		= $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
-		$getForms			= $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-		$getGuides			= $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-		$users 				= $this->db->get_where('view_users', ['company_id' => $this->company])->result();
-		$jabatan 			= $this->db->get('positions')->result();
-		$ArrUsr 			= $ArrJab = $ArrForms = $ArrGuides = [];
+		$procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
+		$flowDetail          = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+		$getForms            = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+		$getGuides           = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+		$users               = $this->db->get_where('view_users', ['company_id' => $this->company])->result();
+		$jabatan             = $this->db->get('positions')->result();
+		$ArrUsr              = $ArrJab = $ArrForms = $ArrGuides = [];
+		$procedure_bilingual = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 
 		foreach ($getForms as $frm) {
 			$ArrForms[$frm->id] = $frm;
@@ -1561,21 +1570,23 @@ class Procedures extends Admin_Controller
 			$ArrStd[$dtstd->requirement_id] = $dtstd;
 		}
 
-		$allProcedure 		= $this->db->get_where('procedures', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
+		$allProcedure 		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
 
 		$Data = [
-			'procedure' => $procedure,
-			'detail' 	=> $flowDetail,
-			'ArrUsr' 	=> $ArrUsr,
-			'ArrJab' 	=> $ArrJab,
-			'ArrForms' 	=> $ArrForms,
-			'ArrGuides' 	=> $ArrGuides,
-			'Data' 			=> $Data,
-			'ArrData' 		=> $ArrData,
-			'ArrStd' 		=> $ArrStd,
-			'allProcedure' 	=> $allProcedure,
+			'procedure'           => $procedure,
+			'detail'              => $flowDetail,
+			'ArrUsr'              => $ArrUsr,
+			'ArrJab'              => $ArrJab,
+			'ArrForms'            => $ArrForms,
+			'ArrGuides'           => $ArrGuides,
+			'Data'                => $Data,
+			'ArrData'             => $ArrData,
+			'ArrStd'              => $ArrStd,
+			'allProcedure'        => $allProcedure,
+			'procedure_bilingual' => $procedure_bilingual,
 		];
 
+		$mpdf->AddPage('P', '', '', '', '', 5, 5, 5, 5, 5, '', '', '');
 		$this->template->set($Data);
 		$data = $this->template->load_view('printout');
 		$mpdf->WriteHTML($data);

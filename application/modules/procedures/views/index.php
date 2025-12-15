@@ -38,7 +38,7 @@
 					</ul>
 
 					<!-- Tab panes -->
-					<div class="tab-content ">
+					<div class="tab-content">
 
 						<!-- Draft -->
 						<div class="tab-pane fade active show" id="draft" role="tabpanel" aria-labelledby="draft-tab">
@@ -481,6 +481,7 @@
 
 <script>
 	$(document).ready(function() {
+
 		$('a[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 			$.fn.dataTable.tables({
 				visible: true,
@@ -502,7 +503,7 @@
 			
 			`;
 			$('.modal-body').html(html);
-			load_tinymce('textarea')
+			// load_tinymce('textarea')
 
 		})
 
@@ -590,7 +591,7 @@
 						`;
 						$('.modal-body').html(html);
 
-						load_tinymce('textarea')
+						// load_tinymce('textarea')
 					} else {
 						Swal.fire('Warning', 'Data not valid. Please try again!', 'warning', 3000)
 					}
@@ -865,36 +866,36 @@
 	})
 
 	function load_tinymce(el) {
-		tinymce.init({
-			selector: el, // change this value according to the HTML
-			resize: false,
-			autosave_ask_before_unload: false,
-			powerpaste_allow_local_images: true,
-			plugins: [
-				'a11ychecker', 'advcode', 'advlist', 'anchor', 'autolink', 'codesample', 'fullscreen', 'help',
-				'image', 'tinydrive', 'lists', 'link', 'media', 'powerpaste', 'preview',
-				'searchreplace', 'template', 'tinymcespellchecker', 'visualblocks', 'wordcount'
-			],
-			templates: [{
-					title: 'Non-editable Example',
-					description: 'Non-editable example.',
-				},
-				{
-					title: 'Simple Table Example',
-					description: 'Simple Table example.',
-				}
-			],
-			toolbar: 'insertfile a11ycheck undo redo | bold italic | forecolor backcolor | template codesample | alignleft aligncenter alignright alignjustify | bullist numlist | link image',
-			spellchecker_dialog: true,
-			spellchecker_ignore_list: ['Ephox', 'Moxiecode'],
-			tinydrive_demo_files_url: '../_images/tiny-drive-demo/demo_files.json',
-			tinydrive_token_provider: (success, failure) => {
-				success({
-					token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.Ks_BdfH4CWilyzLNk8S2gDARFhuxIauLa8PwhdEQhEo'
-				});
-			},
-			content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
+		// 	tinymce.init({
+		// 		selector: el, // change this value according to the HTML
+		// 		resize: false,
+		// 		autosave_ask_before_unload: false,
+		// 		powerpaste_allow_local_images: true,
+		// 		plugins: [
+		// 			'a11ychecker', 'advcode', 'advlist', 'anchor', 'autolink', 'codesample', 'fullscreen', 'help',
+		// 			'image', 'tinydrive', 'lists', 'link', 'media', 'powerpaste', 'preview',
+		// 			'searchreplace', 'template', 'tinymcespellchecker', 'visualblocks', 'wordcount'
+		// 		],
+		// 		templates: [{
+		// 				title: 'Non-editable Example',
+		// 				description: 'Non-editable example.',
+		// 			},
+		// 			{
+		// 				title: 'Simple Table Example',
+		// 				description: 'Simple Table example.',
+		// 			}
+		// 		],
+		// 		toolbar: 'insertfile a11ycheck undo redo | bold italic | forecolor backcolor | template codesample | alignleft aligncenter alignright alignjustify | bullist numlist | link image',
+		// 		spellchecker_dialog: true,
+		// 		spellchecker_ignore_list: ['Ephox', 'Moxiecode'],
+		// 		tinydrive_demo_files_url: '../_images/tiny-drive-demo/demo_files.json',
+		// 		tinydrive_token_provider: (success, failure) => {
+		// 			success({
+		// 				token: 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJzdWIiOiJqb2huZG9lIiwibmFtZSI6IkpvaG4gRG9lIiwiaWF0IjoxNTE2MjM5MDIyfQ.Ks_BdfH4CWilyzLNk8S2gDARFhuxIauLa8PwhdEQhEo'
+		// 			});
+		// 		},
+		// 		content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
 
-		});
-	}
+		// 	});
+		// }
 </script>

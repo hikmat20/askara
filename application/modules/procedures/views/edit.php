@@ -10,6 +10,33 @@
 	tr:hover .text-name {
 		color: #0bb783;
 	}
+
+	ol {
+		list-style-type: none;
+		counter-reset: item;
+		margin: 0;
+		padding: 0;
+	}
+
+	/* li {
+		display: table;
+		counter-increment: item;
+		margin-bottom: 0.6em;
+	}
+
+	li:before {
+		content: counters(item, ".") ". ";
+		display: table-cell;
+		padding-right: 0.6em;
+	}
+
+	li li {
+		margin: 0;
+	}
+
+	li li:before {
+		content: counters(item, ".") " ";
+	} */
 </style>
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 	<div class="d-flex flex-column-fluid">
@@ -39,7 +66,7 @@
 						</ul>
 
 						<!-- Tab panes -->
-						<div class="tab-content p-3 rounded-lg border">
+						<div class="tab-content">
 							<div class="tab-pane fade show active" id="procedures" role="tabpanel" aria-labelledby="procedures-tab">
 								<div id="accProcedure" role="tablist" aria-multiselectable="true">
 
@@ -53,6 +80,20 @@
 										<div id="detailProcess" class="collapse in show" role="tabpanel" aria-labelledby="sectionDetail">
 											<div class="card-body">
 												<div class="row">
+													<div class="col-md-6">
+														<div class="form-group">
+															<label class="font-size-h5"><strong><span class="text-danger">*</span> Departement</strong></label>
+															<div class="">
+																<select name="departement_id" id="departement_id" class="form-control select2">
+																	<option value=""></option>
+																	<?php foreach ($depts as $dept) : ?>
+																		<option value="<?= $dept->id; ?>" <?= ($dept->id == $data->departement_id) ? 'selected' : ''; ?>><?= $dept->name; ?></option>
+																	<?php endforeach; ?>
+																</select>
+																<small class="text-danger invalid-feedback">Departement</small>
+															</div>
+														</div>
+													</div>
 													<div class="col-md-6">
 														<div class="form-group">
 															<label class="font-size-h5"><strong><span class="text-danger">*</span> Kelompok Proses</strong></label>
@@ -69,6 +110,15 @@
 													</div>
 													<div class="col-md-6">
 														<div class="form-group">
+															<label class="font-size-h5"><strong><span class="text-danger">*</span> Nomor</strong></label>
+															<div class="">
+																<input name="nomor" id="nomor" required class="form-control" placeholder="Nomor" aria-describedby="helpId" value="<?= $data->nomor; ?>">
+																<small class="text-danger invalid-feedback">Nomor</small>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6">
+														<div class="form-group">
 															<label class="font-size-h5"><strong><span class="text-danger">*</span> Status</strong></label>
 															<div class="">
 																<select name="status" id="status" class="form-control select2" <?= ($data->status == 'DFT') ? '' : 'disabled'; ?>>
@@ -78,58 +128,134 @@
 														</div>
 													</div>
 												</div>
-												<hr>
-												<div class="row">
-													<div class="col-md-6">
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Nama Proses</strong></label>
-															<div class="">
-																<input type="hidden" name="id" id="procedure_id" value="<?= $data->id; ?>">
-																<input name="name" id="name" required class="form-control" placeholder="Nama Proses" aria-describedby="helpId" value="<?= $data->name; ?>">
-																<small class="text-danger invalid-feedback">Nama Proses</small>
-															</div>
-														</div>
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Objektif Proses</strong></label>
-															<div class="">
-																<textarea name="object" id="object" rows="5" required class="form-control summernote" placeholder="Objektif Proses" aria-describedby="helpId"><?= $data->object; ?></textarea>
-																<small class="text-danger invalid-feedback">Objektif Proses</small>
-															</div>
-														</div>
-													</div>
-													<div class="col-md-6">
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Nomor</strong></label>
-															<div class="">
-																<input name="nomor" id="nomor" required class="form-control" placeholder="Nomor" aria-describedby="helpId" value="<?= $data->nomor; ?>">
-																<small class="text-danger invalid-feedback">Nomor</small>
-															</div>
-														</div>
-														<div class="form-group">
-															<label class="font-size-h5"><strong>Ruang Lingkup</strong></label>
-															<div class="">
-																<textarea name="scope" id="scope" rows="5" class="form-control summernote" placeholder="Ruang Lingkup" aria-describedby="helpId"><?= $data->scope; ?></textarea>
-																<small class="text-danger invalid-feedback">Ruang Lingkup</small>
-															</div>
-														</div>
-													</div>
-													<div class="col-md-12">
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Performa Indikator</strong></label>
-															<div class="">
-																<textarea name="performance" rows="5" id="performance" class="form-control summernote" placeholder="Performa Indikator" aria-describedby="helpId"><?= $data->performance; ?></textarea>
-																<small class="text-danger invalid-feedback">Performa Indikator</small>
-															</div>
-														</div>
-														<div class="form-group">
-															<label class="font-size-h5"><strong>Definisi</strong></label>
-															<div class="">
-																<textarea name="define" id="define" class="form-control summernote" placeholder="Definisi" aria-describedby="helpId"><?= $data->define; ?></textarea>
-																<small class="text-danger invalid-feedback">Definisi Proses</small>
-															</div>
-														</div>
-													</div>
 
+
+												<!-- Bilingual -->
+
+												<ul class="nav nav-tabs border-0" id="myTab" role="tablist">
+													<li class="nav-item" role="presentation">
+														<button class="nav-link active p-3" id="local-tab" data-toggle="tab" data-target="#local" type="button" role="tab" aria-controls="local" aria-selected="true">Indonesia</button>
+													</li>
+													<?php if ($languange) foreach ($languange as $lang): ?>
+														<li class="nav-item" role="presentation">
+															<button class="nav-link p-3" id="<?= $lang; ?>-tab" data-toggle="tab" data-target="#<?= $lang; ?>" type="button" role="tab" aria-controls="<?= $lang; ?>" aria-selected="false"><?= ucfirst($lang); ?></button>
+														</li>
+													<?php endforeach; ?>
+												</ul>
+												<div class="tab-content rounded-bottom rounded-bottom-xl border">
+													<div class="tab-pane fade show active p-3" id="local" role="tabpanel" aria-labelledby="local-tab">
+														<div class="row">
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Nama Proses</strong></label>
+																	<div class="">
+																		<input type="hidden" name="id" id="procedure_id" value="<?= $data->id; ?>">
+																		<input name="name" id="name" required class="form-control" placeholder="Nama Proses" aria-describedby="helpId" value="<?= $data->name; ?>">
+																		<small class="text-danger invalid-feedback">Nama Proses</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Objektif Proses</strong></label>
+																	<div class="">
+																		<textarea name="object" id="object" rows="5" required class="form-control summernote" placeholder="Objektif Proses" aria-describedby="helpId"><?= $data->object; ?></textarea>
+																		<small class="text-danger invalid-feedback">Objektif Proses</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Ruang Lingkup</strong></label>
+																	<div class="">
+																		<textarea name="scope" id="scope" rows="5" class="form-control summernote" placeholder="Ruang Lingkup" aria-describedby="helpId"><?= $data->scope; ?></textarea>
+																		<small class="text-danger invalid-feedback">Ruang Lingkup</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Performa Indikator</strong></label>
+																	<div class="">
+																		<textarea name="performance" rows="5" id="performance" class="form-control summernote" placeholder="Performa Indikator" aria-describedby="helpId"><?= $data->performance; ?></textarea>
+																		<small class="text-danger invalid-feedback">Performa Indikator</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Definisi</strong></label>
+																	<div class="">
+																		<textarea name="define" id="define" class="form-control summernote" placeholder="Definisi" aria-describedby="helpId"><?= $data->define; ?></textarea>
+																		<small class="text-danger invalid-feedback">Definisi Proses</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Tanggung Jawab</strong></label>
+																	<div class="">
+																		<textarea name="responsibility" id="responsibility" class="form-control summernote " placeholder="Tanggung Jawab" aria-describedby="helpId"><?= $data->responsibility; ?></textarea>
+																		<small class="text-danger invalid-feedback">Tanggung Jawab</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Ketentuan Umum</strong></label>
+																	<div class="">
+																		<textarea name="general_requirement" id="general_requirement" class="form-control summernote " placeholder="Ketentuan Umum" aria-describedby="helpId"><?= $data->general_requirement; ?></textarea>
+																		<small class="text-danger invalid-feedback">Ketentuan Umum</small>
+																	</div>
+																</div>
+															</div>
+														</div>
+													</div>
+													<?php if ($languange) foreach ($languange as $lang): ?>
+														<div class="tab-pane fade p-3" id="<?= $lang; ?>" role="tabpanel" aria-labelledby="<?= $lang; ?>-tab">
+															<div class="row">
+																<div class="col-md-12">
+																	<div class="form-group">
+																		<label class="font-size-h5"><strong><span class="text-danger">*</span> Process Name</strong></label>
+																		<div class="">
+																			<input name="bilingual[<?= $lang; ?>][name]" value="<?= isset($bilingualArr[$lang]->name) ? $bilingualArr[$lang]->name : ''; ?>" class="form-control" placeholder="Process Name" aria-describedby="helpId"></input>
+																			<small class="text-danger invalid-feedback">Process Name</small>
+																		</div>
+																	</div>
+																	<div class="form-group">
+																		<label class="font-size-h5"><strong><span class="text-danger">*</span> Objektive Process</strong></label>
+																		<div class="">
+																			<textarea name="bilingual[<?= $lang; ?>][object]" class="form-control summernote" placeholder="Objektive Process" aria-describedby="helpId"><?= isset($bilingualArr[$lang]->object) ? $bilingualArr[$lang]->object : ''; ?></textarea>
+																			<small class="text-danger invalid-feedback">Objektive Process</small>
+																		</div>
+																	</div>
+																	<div class="form-group">
+																		<label class="font-size-h5"><strong><span class="text-danger">*</span> Scope</strong></label>
+																		<div class="">
+																			<textarea name="bilingual[<?= $lang; ?>][scope]" class="form-control summernote" placeholder="Scope" aria-describedby="helpId"><?= isset($bilingualArr[$lang]->scope) ? $bilingualArr[$lang]->scope : ''; ?></textarea>
+																			<small class="text-danger invalid-feedback">Scope</small>
+																		</div>
+																	</div>
+																	<div class="form-group">
+																		<label class="font-size-h5"><strong><span class="text-danger">*</span> Indicator Performance</strong></label>
+																		<div class="">
+																			<textarea name="bilingual[<?= $lang; ?>][performance]" class="form-control summernote" placeholder="Indicator Performance" aria-describedby="helpId"><?= isset($bilingualArr[$lang]->performance) ? $bilingualArr[$lang]->performance : ''; ?></textarea>
+																			<small class="text-danger invalid-feedback">Indicator Performance</small>
+																		</div>
+																	</div>
+																	<div class="form-group">
+																		<label class="font-size-h5"><strong>Define</strong></label>
+																		<div class="">
+																			<textarea name="bilingual[<?= $lang; ?>][define]" class="form-control summernote " placeholder="Define" aria-describedby="helpId"><?= isset($bilingualArr[$lang]->define) ? $bilingualArr[$lang]->define : ''; ?></textarea>
+																			<small class="text-danger invalid-feedback">Define Proses</small>
+																		</div>
+																	</div>
+																	<div class="form-group">
+																		<label class="font-size-h5"><strong>Responsibility</strong></label>
+																		<div class="">
+																			<textarea name="bilingual[<?= $lang; ?>][responsibility]" class="form-control summernote " placeholder="Responsibility" aria-describedby="helpId"><?= isset($bilingualArr[$lang]->responsibility) ? $bilingualArr[$lang]->responsibility : ''; ?></textarea>
+																			<small class="text-danger invalid-feedback">Responsibility</small>
+																		</div>
+																	</div>
+																	<div class="form-group">
+																		<label class="font-size-h5"><strong>General Requirement</strong></label>
+																		<div class="">
+																			<textarea name="bilingual[<?= $lang; ?>][general_requirement]" class="form-control summernote " placeholder="General Requirement" aria-describedby="helpId"><?= isset($bilingualArr[$lang]->general_requirement) ? $bilingualArr[$lang]->general_requirement : ''; ?></textarea>
+																			<small class="text-danger invalid-feedback">General Requirement</small>
+																		</div>
+																	</div>
+																</div>
+															</div>
+														</div>
+													<?php endforeach; ?>
 												</div>
 											</div>
 										</div>
@@ -359,10 +485,10 @@
 												<table class="table table-sm table-bordered">
 													<thead class="text-center ">
 														<tr class="table-light">
-															<th width="80">No</th>
+															<th width="50">No</th>
 															<th width="15%">PIC</th>
-															<th width="">Deskripsi</th>
-															<th width="35%">Dokumen Terkait</th>
+															<th width="" colspan="2">Deskripsi</th>
+															<th width="30%">Dokumen Terkait</th>
 															<th width="100">Action</th>
 														</tr>
 													</thead>
@@ -375,6 +501,7 @@
 																	<td style="vertical-align:middle;" class="text-center"><?= $dtl->number; ?></td>
 																	<td style="vertical-align:middle;" class="text-center"><?= $dtl->pic; ?></td>
 																	<td><?= $dtl->description; ?></td>
+																	<td><?= $dtl->description_2; ?></td>
 																	<td style="vertical-align: middle;">
 																		<?php $relDocs = json_decode($dtl->relate_doc); ?>
 																		<?php if (is_array($relDocs)) : ?>
@@ -390,8 +517,8 @@
 																		<?php endif; ?>
 																	</td>
 																	<td class="text-center" style="vertical-align: middle;">
-																		<button type="button" data-proc_id="<?= $data->id; ?>" class="btn btn-warning btn-icon rounded-circle btn-sm edit_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-edit"></i></button>
-																		<button type="button" class="btn btn-danger btn-icon rounded-circle btn-sm delete_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-trash"></i></button>
+																		<button type="button" data-proc_id="<?= $data->id; ?>" class="btn btn-warning btn-icon rounded-circle btn-xs edit_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-edit"></i></button>
+																		<button type="button" class="btn btn-danger btn-icon rounded-circle btn-xs delete_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-trash"></i></button>
 																	</td>
 																</tr>
 															<?php endforeach;
@@ -524,7 +651,7 @@
 								</div>
 								<hr>
 								<div class="mb-6 d-flex justify-content-between align-items-center">
-									<button class="btn btn-primary w-100px" id="save"><i class="fa fa-save"></i>Save</button>
+									<button class="btn btn-primary min-w-100px" id="save"><i class="fa fa-save"></i>Save</button>
 									<a href="<?= base_url($this->uri->segment(1)); ?>" class="btn btn-danger"><i class="fa fa-reply"></i>Back</a>
 								</div>
 
@@ -774,25 +901,6 @@
 			return Promise.all(handlePromise(promiseList))
 		}
 
-
-		// tinymce.init({
-		// 	selector: 'textarea',
-		// 	height: 100,
-		// 	resize: true,
-		// 	fontsize_formats: "6pt 8pt 10pt 12pt 14pt 16pt 18pt 20pt 22pt 24pt 28pt 30pt 32pt 34pt 36pt 38pt 40pt",
-		// 	plugins: 'autoresize autosave emoticons preview importcss searchreplace autolink autosave save ' +
-		// 		'directionality  visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
-		// 	toolbar: 'restoredraft preview searchreplace | undo redo | blocks ' +
-		// 		'fontsizeselect bold italic backcolor forecolor | alignleft aligncenter ' +
-		// 		'alignright alignjustify | template codesample bullist numlist outdent indent | link image ' +
-		// 		'table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol' +
-		// 		'removeformat emoticons | help',
-		// 	content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
-		// 	autoresize_bottom_margin: 50,
-		// 	link_default_protocol: 'https'
-		// 	// 	content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-		// });
-
 		$(document).on('click', '#add_flow', function() {
 			const proc_id = $(this).data('id')
 			const url = siteurl + active_controller + 'add_flow/' + proc_id
@@ -851,7 +959,7 @@
 		$(document).on('submit', '#form-procedure', function(e) {
 			e.preventDefault();
 			let formdata = new FormData($(this)[0])
-			let btn = $('.save')
+			let btn = $('#save')
 
 			$('#description').removeClass('is-invalid')
 			$('#prepared_by').removeClass('is-invalid')
@@ -936,7 +1044,6 @@
 					btn.attr('disabled', false)
 					btn.html('<i class="fa fa-save"></i>Save')
 				},
-
 				success: function(result) {
 					if (result.status == 1) {
 						Swal.fire({
@@ -949,7 +1056,6 @@
 							$('#modelId').modal('hide')
 							$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + result.id)
 						})
-
 					} else {
 						Swal.fire({
 							title: 'Warning!',

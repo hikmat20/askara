@@ -10,8 +10,6 @@
 
 					<div class="card-body">
 						<div id="accProcedure" role="tablist" aria-multiselectable="true">
-
-							<!-- Nav tabs -->
 							<ul class="nav nav-tabs nav-pills border-0 mb-5" id="myTab" role="tablist">
 								<li class="nav-item" role="presentation">
 									<button class="nav-link active" id="procedures-tab" data-toggle="tab" data-target="#procedures" type="button" role="tab" aria-controls="procedures" aria-selected="true">PROCEDURE</button>
@@ -26,9 +24,8 @@
 									<button class="nav-link" disabled id="records-tab" data-toggle="tab" data-target="#records" type="button" role="tab" aria-controls="records" aria-selected="false">RECORD</button>
 								</li> -->
 							</ul>
-
 							<!-- Tab panes -->
-							<div class="tab-content p-3 rounded-lg border">
+							<div class="tab-content rounded-lg">
 								<div class="tab-pane fade show active" id="procedures" role="tabpanel" aria-labelledby="procedures-tab">
 									<!-- DETAIL PROSES -->
 									<div class="card shadow- mb-3 border-0 " style="border-radius: 10px;">
@@ -41,6 +38,19 @@
 										<div id="detailProcess" class="collapse in show" role="tabpanel" aria-labelledby="sectionDetail">
 											<div class="card-body">
 												<div class="row">
+													<div class="col-md-6">
+														<div class="form-group">
+															<label class="font-size-h5"><strong><span class="text-danger"></span> Departement</strong></label>
+															<div class="">
+																<select name="departement_id" class="form-control select2">
+																	<option value=""></option>
+																	<?php foreach ($depts as $dept) : ?>
+																		<option value="<?= $dept->id; ?>"><?= $dept->name; ?></option>
+																	<?php endforeach; ?>
+																</select>
+															</div>
+														</div>
+													</div>
 													<div class="col-md-6">
 														<div class="form-group">
 															<label class="font-size-h5"><strong><span class="text-danger">*</span> Kelompok Proces</strong></label>
@@ -57,6 +67,15 @@
 
 													<div class="col-md-6">
 														<div class="form-group">
+															<label class="font-size-h5"><strong><span class="text-danger">*</span> Nomor</strong></label>
+															<div class="">
+																<input name="nomor" id="nomor" class="form-control" placeholder="Nomor" aria-describedby="helpId"></input>
+																<small class="text-danger invalid-feedback">Nomor</small>
+															</div>
+														</div>
+													</div>
+													<div class="col-md-6">
+														<div class="form-group">
 															<label class="font-size-h5"><strong><span class="text-danger">*</span> Status</strong></label>
 															<div class="">
 																<select name="status" id="status" class="form-control select2">
@@ -65,62 +84,149 @@
 															</div>
 														</div>
 													</div>
+
 												</div>
 
-												<div class="row">
-													<div class="col-md-6">
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Nama Proses</strong></label>
-															<div class="">
-																<input name="name" id="name" class="form-control" placeholder="Nama Proses" aria-describedby="helpId"></input>
-																<small class="text-danger invalid-feedback">Nama Proses</small>
+												<!-- indonesia - english -->
+												<ul class="nav nav-tabs border-0" id="myTab" role="tablist">
+													<li class="nav-item" role="presentation">
+														<button class="nav-link active p-3" id="local-tab" data-toggle="tab" data-target="#local" type="button" role="tab" aria-controls="local" aria-selected="true">Indonesia</button>
+													</li>
+													<li class="nav-item" role="presentation">
+														<button class="nav-link p-3" id="asing-tab" data-toggle="tab" data-target="#asing" type="button" role="tab" aria-controls="asing" aria-selected="false">English</button>
+													</li>
+												</ul>
+
+												<div class="tab-content rounded-bottom rounded-bottom-xl border">
+													<div class="tab-pane fade show active p-3" id="local" role="tabpanel" aria-labelledby="local-tab">
+														<div class="row">
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Nama Proses</strong></label>
+																	<div class="">
+																		<input name="name" id="name" class="form-control" placeholder="Nama Proses" aria-describedby="helpId"></input>
+																		<small class="text-danger invalid-feedback">Nama Proses</small>
+																	</div>
+																</div>
+															</div>
+
+														</div>
+														<div class="row">
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Objektif Proses</strong></label>
+																	<div class="">
+																		<textarea name="object" id="object" class="form-control summernote" placeholder="Objektif Proses" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Objektif Proses</small>
+																	</div>
+																</div>
+															</div>
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Ruang Lingkup</strong></label>
+																	<div class="">
+																		<textarea name="scope" id="scope" class="form-control summernote" placeholder="Ruang Lingkup" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Ruang Lingkup</small>
+																	</div>
+																</div>
+															</div>
+														</div>
+														<div class="row">
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Performa Indikator</strong></label>
+																	<div class="">
+																		<textarea name="performance" id="performance" class="form-control summernote" placeholder="Performa Indikator" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Performa Indikator</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Definisi</strong></label>
+																	<div class="">
+																		<textarea name="define" id="define" class="form-control summernote " placeholder="Definisi" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Definisi Proses</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Tanggung Jawab</strong></label>
+																	<div class="">
+																		<textarea name="responsibility" id="responsibility" class="form-control summernote " placeholder="Tanggung Jawab" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Tanggung Jawab</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Ketentuan Umum</strong></label>
+																	<div class="">
+																		<textarea name="general_requirement" id="general_requirement" class="form-control summernote " placeholder="Ketentuan Umum" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Ketentuan Umum</small>
+																	</div>
+																</div>
 															</div>
 														</div>
 													</div>
-													<div class="col-md-6">
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Nomor</strong></label>
-															<div class="">
-																<input name="nomor" id="nomor" class="form-control" placeholder="Nomor" aria-describedby="helpId"></input>
-																<small class="text-danger invalid-feedback">Nomor</small>
+													<div class="tab-pane fade p-3" id="asing" role="tabpanel" aria-labelledby="asing-tab">
+														<div class="row">
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Process Name</strong></label>
+																	<div class="">
+																		<input name="bilingual[english][name]" class="form-control" placeholder="Process Name" aria-describedby="helpId"></input>
+																		<small class="text-danger invalid-feedback">Process Name</small>
+																	</div>
+																</div>
+															</div>
+
+														</div>
+														<div class="row">
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Objektive Process</strong></label>
+																	<div class="">
+																		<textarea name="bilingual[english][object]" class="form-control summernote" placeholder="Objektive Process" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Objektive Process</small>
+																	</div>
+																</div>
+															</div>
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Scope</strong></label>
+																	<div class="">
+																		<textarea name="bilingual[english][scope]" class="form-control summernote" placeholder="Scope" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Scope</small>
+																	</div>
+																</div>
 															</div>
 														</div>
-													</div>
-												</div>
-												<div class="row">
-													<div class="col-md-6">
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Objektif Proses</strong></label>
-															<div class="">
-																<textarea rows="5" name="object" id="object" class="form-control summernote" rows="5" placeholder="Objektif Proses" aria-describedby="helpId"></textarea>
-																<small class="text-danger invalid-feedback">Objektif Proses</small>
-															</div>
-														</div>
-													</div>
-													<div class="col-md-6">
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Ruang Lingkup</strong></label>
-															<div class="">
-																<textarea rows="5" name="scope" id="scope" class="form-control summernote" rows="5" placeholder="Ruang Lingkup" aria-describedby="helpId"></textarea>
-																<small class="text-danger invalid-feedback">Ruang Lingkup</small>
-															</div>
-														</div>
-													</div>
-												</div>
-												<div class="row">
-													<div class="col-md-12">
-														<div class="form-group">
-															<label class="font-size-h5"><strong><span class="text-danger">*</span> Performa Indikator</strong></label>
-															<div class="">
-																<textarea rows="5" name="performance" id="performance" class="form-control summernote" rows="5" placeholder="Performa Indikator" aria-describedby="helpId"></textarea>
-																<small class="text-danger invalid-feedback">Performa Indikator</small>
-															</div>
-														</div>
-														<div class="form-group">
-															<label class="font-size-h5"><strong>Definisi</strong></label>
-															<div class="">
-																<textarea name="define" id="define" class="form-control summernote " placeholder="Definisi" aria-describedby="helpId"></textarea>
-																<small class="text-danger invalid-feedback">Definisi Proses</small>
+														<div class="row">
+															<div class="col-md-12">
+																<div class="form-group">
+																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Indicator Performance</strong></label>
+																	<div class="">
+																		<textarea name="bilingual[english][performance]" class="form-control summernote" placeholder="Indicator Performance" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Indicator Performance</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Define</strong></label>
+																	<div class="">
+																		<textarea name="bilingual[english][define]" class="form-control summernote " placeholder="Define" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Define Proses</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>Responsibility</strong></label>
+																	<div class="">
+																		<textarea name="bilingual[english][responsibility]" class="form-control summernote " placeholder="Responsibility" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">Responsibility</small>
+																	</div>
+																</div>
+																<div class="form-group">
+																	<label class="font-size-h5"><strong>General Requirement</strong></label>
+																	<div class="">
+																		<textarea name="bilingual[english][general_requirement]" class="form-control summernote " placeholder="General Requirement" aria-describedby="helpId"></textarea>
+																		<small class="text-danger invalid-feedback">General Requirement</small>
+																	</div>
+																</div>
 															</div>
 														</div>
 													</div>
@@ -144,28 +250,28 @@
 														<div class="form-group">
 															<label for="Supplier" class="font-weight-bold font-size-"><strong>1. Supplier</strong></label>
 															<div class="">
-																<textarea rows="5" name="supplier" id="supplier" class="form-control summernote" placeholder="Supplier" aria-describedby="helpId"></textarea>
+																<textarea name="supplier" id="supplier" class="form-control summernote" placeholder="Supplier" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Supplier</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Proses" class="font-weight-bold font-size-"><strong>3. Proses</strong></label>
 															<div class="">
-																<textarea rows="5" name="process" id="process" class="form-control summernote" placeholder="Proses" aria-describedby="helpId"></textarea>
+																<textarea name="process" id="process" class="form-control summernote" placeholder="Proses" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Proses</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Customer" class="font-weight-bold font-size-"><strong>5. Customer</strong></label>
 															<div class="">
-																<textarea rows="5" name="customer" id="customer" class="form-control summernote" placeholder="Customer" aria-describedby="helpId"></textarea>
+																<textarea name="customer" id="customer" class="form-control summernote" placeholder="Customer" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Customer</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Risk" class="font-weight-bold font-size-"><strong>7. Risk</strong></label>
 															<div class="">
-																<textarea rows="5" name="risk" id="risk" class="form-control summernote" placeholder="Risk" aria-describedby="helpId"></textarea>
+																<textarea name="risk" id="risk" class="form-control summernote" placeholder="Risk" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Risk</small>
 															</div>
 														</div>
@@ -322,11 +428,11 @@
 												<table class="table table-sm table-condensed table-bordered">
 													<thead class="text-center ">
 														<tr class="table-light">
-															<th width="80">No</th>
+															<th width="50">No</th>
 															<th>PIC</th>
-															<th>Deskripsi</th>
+															<th colspan="2">Deskripsi</th>
 															<th>Dokumen Terkait</th>
-															<th>Action</th>
+															<th width="80">Action</th>
 														</tr>
 													</thead>
 													<tbody>
@@ -394,7 +500,7 @@
 														</div>
 
 														<div class="form-group row">
-															<label class="col-lg-3"> Distribusi</label>
+															<label class="col-lg-3">Distribusi</label>
 															<div class="col-lg-9">
 																<select name="distribute_id[]" multiple id="distribute_id" data-placeholder="Choose an options" class="form-control select2">;
 																	<option value=""></option>
@@ -405,50 +511,7 @@
 																<span class="form-text text-danger invalid-feedback">Distribusi By harus di isi</span>
 															</div>
 														</div>
-
 													</div>
-													<!-- 
-													<div class="col-6">
-														<div class="row">
-															<label class="col-12 col-form-label">Nomor :</label>
-															<div class="col-12">
-																<input type="text" name="number" id="number" class="form-control" placeholder="Nomor" value="">
-																<span class="form-text text-danger invalid-feedback">Prepared By harus di isi</span>
-															</div>
-														</div>
-
-														<div class="row">
-															<label class="col-12 col-form-label">Determination Date :</label>
-															<div class="col-12">
-																<input type="date" name="determination_date" id="determination_date" class="form-control datepicker" placeholder="<?= date('Y-m-d'); ?>" value="">
-																<span class="form-text text-danger invalid-feedback">Prepared By harus di isi</span>
-															</div>
-														</div>
-
-														<div class="row">
-															<label class="col-12 col-form-label">About :</label>
-															<div class="col-12">
-																<input type="text" name="about" id="about" class="form-control" placeholder="About" value="">
-																<span class="form-text text-danger invalid-feedback">Prepared By harus di isi</span>
-															</div>
-														</div>
-
-														<div class="row">
-															<label class="col-12 col-form-label">Status :</label>
-															<div class="col-12">
-																<input type="text" name="doc_status" id="doc_status" class="form-control" placeholder="Doc. Status" value="">
-																<span class="form-text text-danger invalid-feedback">Prepared By harus di isi</span>
-															</div>
-														</div>
-
-														<div class="row">
-															<label class="col-12 col-form-label">Publisher :</label>
-															<div class="col-12">
-																<input type="text" name="publisher" id="publisher" class="form-control" placeholder="Publisher" value="">
-																<span class="form-text text-danger invalid-feedback">Prepared By harus di isi</span>
-															</div>
-														</div>
-													</div> -->
 												</div>
 											</div>
 										</div>
