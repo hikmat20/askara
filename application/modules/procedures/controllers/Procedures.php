@@ -308,11 +308,6 @@ class Procedures extends Admin_Controller
 		$Data 			= $this->input->post('flow');
 		$pro_id 		= $this->input->post('procedure_id');
 
-		// echo '<pre>';
-		// print_r($Data);
-		// echo '</pre>';
-		// exit;
-
 		if ($Data) {
 			$Data['procedure_id'] = $pro_id;
 			if (isset($Data['id']) && $Data['id']) {

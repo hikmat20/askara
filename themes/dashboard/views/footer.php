@@ -210,16 +210,16 @@
      };
  </script>
  <!-- REQUIRED JS SCRIPTS -->
- <script src="<?= base_url('assets/plugins/jQuery/jquery-2.2.3.min.js'); ?>"></script>
+ <!-- <script src="<?= base_url('assets/plugins/jQuery/jquery-2.2.3.min.js'); ?>"></script> -->
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/global/plugins.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/scripts.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/fullcalendar/fullcalendar.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.bundle1036.js"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jstree/jstree.bundle.js?"></script>
- <script src="<?= base_url(); ?>assets/js/scripts.js" type="text/javascript"></script>
- <script src="<?= base_url(); ?>assets/plugins/jqueryform/jquery.form.js"></script>
- <script src="<?= base_url(); ?>assets/dist/sweetalert.min.js"></script>
+ <!-- <script src="<?= base_url(); ?>assets/js/scripts.js" type="text/javascript"></script> -->
+ <!-- <script src="<?= base_url(); ?>assets/plugins/jqueryform/jquery.form.js"></script> -->
+ <!-- <script src="<?= base_url(); ?>assets/dist/sweetalert.min.js"></script> -->
  <script src="<?= base_url('themes\dashboard\assets\plugins\custom\select2\select21036.js'); ?>"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/pages/widgets1036.js?"></script>
  <script src="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\summernote\summernote-bs4.min.js"></script>

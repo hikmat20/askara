@@ -12,7 +12,7 @@
 
     body {
       font-family: 'Calibri', Helvetica, sans-serif;
-      font-size: 8pt;
+      font-size: 10pt;
       margin: 0;
       padding: 0;
       box-sizing: border-box;
@@ -295,6 +295,7 @@
       </div>
     </div>
 
+    <?php if($procedure->supplier): ?>
     <div class="" style="padding:10px">
       <h4><strong>SIPOCOR</strong></h4>
       <table width="100%" class="">
@@ -330,6 +331,7 @@
         </tr>
       </table>
     </div>
+    <?php endif; ?>
 
     <!-- Deskripsi Procedure -->
     <div class="" style="padding:10px">
@@ -349,25 +351,25 @@
               <tr>
                 <td class="text-center"><?= $dtl->number; ?></td>
                 <td class="text-center"><?= $dtl->pic; ?></td>
-                <td style="border-right: 0px ;"><?= $dtl->description; ?></td>
-                <td style="border-left: 0px ;"><i><?= $dtl->description_2; ?></i></td>
+                <td style=""><?= $dtl->description; ?></td>
+                <td style=""><i><?= $dtl->description_2; ?></i></td>
                 <td class="">
-                  <?php $relDocs = json_decode($dtl->relate_doc); ?>
+                  <?php $relDocs = json_decode($dtl->relate_doc, true); ?>
                   <?php if (is_array($relDocs)) : ?>
                     <ul>
                       <?php foreach ($relDocs as $relDoc) { ?>
                         <li><?= $ArrForms[$relDoc]->name; ?></li>
                       <?php } ?>
                     </ul>
+                  <?php endif; ?>
 
-                    <?php $relIk = json_decode($dtl->relate_ik_doc); ?>
-                    <?php if (is_array($relIk)) : ?>
-                      <ul>
-                        <?php foreach ($relIk as $ik) { ?>
-                          <li><?= $ArrGuides[$ik]->name; ?></li>
-                        <?php } ?>
-                      </ul>
-                    <?php endif; ?>
+                  <?php $relIk = json_decode($dtl->relate_ik_doc, true); 
+                  if (is_array($relIk) && count($relIk) > 0) :?>
+                    <ul>
+                      <?php foreach ($relIk as $ik) {?>
+                        <li><?= $ArrGuides[$ik]->name; ?></li>
+                      <?php } ?>
+                    </ul>
                   <?php endif; ?>
                 </td>
               </tr>
@@ -417,5 +419,4 @@
     <?php endif; ?>
   </div>
 </body>
-
 </html>
