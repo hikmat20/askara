@@ -68,15 +68,14 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId">
-															<button type="button" class="dropdown-item view text-info" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search mr-2 text-info"></i>View</button>
-															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item text-warning" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
+															<a href="javascript:void(0)" class="dropdown-item view" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search mr-2 text-info"></i>View</a>
+															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
-															<button type="button" class="dropdown-item text-primary review" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</button>
+															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
 															<div class="dropdown-divider my-0"></div>
-															<button type="button" class="dropdown-item delete text-danger" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash mr-2 text-danger"></i>Delete</button>
+															<a href="javascript:void(0)" class="dropdown-item delete" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash mr-2 text-danger"></i>Delete</a>
 														</div>
 													</div>
-
 												</td>
 											</tr>
 									<?php endforeach;

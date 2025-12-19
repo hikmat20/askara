@@ -10,11 +10,11 @@
   <link rel="shortcut icon" href="<?= base_url(); ?>assets/img/logo.png" />
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/global/plugins.bundle1036.css?v=2.1.1" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.css?v=2.1.1" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/fullcalendar/fullcalendar.bundle1036.css?v=2.1.1" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/css/style.bundle1036.css?v=2.1.1" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jstree/jstree.bundle.css?v=2.1.1" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/global/plugins.bundle1036.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/css/style.bundle1036.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/fullcalendar/fullcalendar.bundle1036.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jstree/jstree.bundle.css" rel="stylesheet" type="text/css" />
   <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.bundle1036.css" rel="stylesheet" type="text/css" />
   <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/monthpicker/MonthPicker.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
@@ -143,7 +143,7 @@
       left: -300px;
       width: 300px;
     }
- 
+
     .loaders {
       display: -webkit-box;
       display: -ms-flexbox;
@@ -215,6 +215,10 @@
         transform: scale(0.5);
         opacity: 0.5;
       }
+    }
+
+    .tox-tinymce {
+      height: 0px;
     }
   </style>
 </head>

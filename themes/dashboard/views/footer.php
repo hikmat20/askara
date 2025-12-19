@@ -223,9 +223,11 @@
  <script src="<?= base_url('themes\dashboard\assets\plugins\custom\select2\select21036.js'); ?>"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/pages/widgets1036.js?"></script>
  <script src="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\summernote\summernote-bs4.min.js"></script>
- <!-- <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jstree/treeview.js?"></script> -->
- <!-- <script src="https://cdn.tiny.cloud/1/jou4no6cbvv6kyct0kcjoumfc81n00cy2rnwk7wbidnj1d57/tinymce/5/tinymce.min.js" referrerpolicy="origin"></script> -->
+ <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/tinymce/tinymce.min.js"></script>
+ <!-- <script src="https://cdn.tiny.cloud/1/jou4no6cbvv6kyct0kcjoumfc81n00cy2rnwk7wbidnj1d57/tinymce/8/tinymce.min.js" referrerpolicy="origin"></script> -->
  <!-- <script src="<?= base_url('assets\plugins\tinymce\tinymce.js'); ?>"></script> -->
+
+
  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jquery-ui/jquery-ui.min.js"></script>
  <script src="<?= base_url('themes/dashboard/assets/plugins/custom/monthpicker/MonthPicker.js'); ?>"></script>
@@ -233,6 +235,28 @@
 
  <script>
      $(document).ready(function() {
+         tinymce.init({
+             selector: '.editor',
+             height: 250,
+             resize: true,
+             indent: '10px',
+             toolbar_mode: 'sliding',
+             statusbar: true,
+             branding: false,
+             promotion: false,
+             autoresize_bottom_margin: 50,
+             link_default_protocol: 'https',
+             menubar: false,
+             plugins: [
+                 'preview', 'anchor', 'accordion', 'advlist', 'paste', 'anchor', 'code', 'image', 'link', 'lists', 'table',
+             ],
+             toolbar: 'undo redo | paste pastetext fontsize| ' +
+                 'bold italic backcolor forecolor | alignleft aligncenter ' +
+                 'alignright alignjustify | bullist numlist outdent indent | table tabledelete | link ' +
+                 'removeformat | help',
+             content_style: `body { font-family:Helvetica,Arial,sans-serif; font-size:14px }`
+         });
+
          $('.select2').select2({
              placeholder: 'Choose an options',
              width: '100%',

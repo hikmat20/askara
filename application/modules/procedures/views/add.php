@@ -116,7 +116,7 @@
 																<div class="form-group">
 																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Objektif Proses</strong></label>
 																	<div class="">
-																		<textarea name="object" id="object" class="form-control summernote" placeholder="Objektif Proses" aria-describedby="helpId"></textarea>
+																		<textarea name="object" id="object" class="form-control editor" placeholder="Objektif Proses" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Objektif Proses</small>
 																	</div>
 																</div>
@@ -125,7 +125,7 @@
 																<div class="form-group">
 																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Ruang Lingkup</strong></label>
 																	<div class="">
-																		<textarea name="scope" id="scope" class="form-control summernote" placeholder="Ruang Lingkup" aria-describedby="helpId"></textarea>
+																		<textarea name="scope" id="scope" class="form-control editor" placeholder="Ruang Lingkup" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Ruang Lingkup</small>
 																	</div>
 																</div>
@@ -136,28 +136,28 @@
 																<div class="form-group">
 																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Performa Indikator</strong></label>
 																	<div class="">
-																		<textarea name="performance" id="performance" class="form-control summernote" placeholder="Performa Indikator" aria-describedby="helpId"></textarea>
+																		<textarea name="performance" id="performance" class="form-control editor" placeholder="Performa Indikator" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Performa Indikator</small>
 																	</div>
 																</div>
 																<div class="form-group">
 																	<label class="font-size-h5"><strong>Definisi</strong></label>
 																	<div class="">
-																		<textarea name="define" id="define" class="form-control summernote " placeholder="Definisi" aria-describedby="helpId"></textarea>
+																		<textarea name="define" id="define" class="form-control editor " placeholder="Definisi" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Definisi Proses</small>
 																	</div>
 																</div>
 																<div class="form-group">
 																	<label class="font-size-h5"><strong>Tanggung Jawab</strong></label>
 																	<div class="">
-																		<textarea name="responsibility" id="responsibility" class="form-control summernote " placeholder="Tanggung Jawab" aria-describedby="helpId"></textarea>
+																		<textarea name="responsibility" id="responsibility" class="form-control editor " placeholder="Tanggung Jawab" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Tanggung Jawab</small>
 																	</div>
 																</div>
 																<div class="form-group">
 																	<label class="font-size-h5"><strong>Ketentuan Umum</strong></label>
 																	<div class="">
-																		<textarea name="general_requirement" id="general_requirement" class="form-control summernote " placeholder="Ketentuan Umum" aria-describedby="helpId"></textarea>
+																		<textarea name="general_requirement" id="general_requirement" class="form-control editor " placeholder="Ketentuan Umum" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Ketentuan Umum</small>
 																	</div>
 																</div>
@@ -182,7 +182,7 @@
 																<div class="form-group">
 																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Objektive Process</strong></label>
 																	<div class="">
-																		<textarea name="bilingual[english][object]" class="form-control summernote" placeholder="Objektive Process" aria-describedby="helpId"></textarea>
+																		<textarea name="bilingual[english][object]" class="form-control editor" placeholder="Objektive Process" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Objektive Process</small>
 																	</div>
 																</div>
@@ -191,7 +191,7 @@
 																<div class="form-group">
 																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Scope</strong></label>
 																	<div class="">
-																		<textarea name="bilingual[english][scope]" class="form-control summernote" placeholder="Scope" aria-describedby="helpId"></textarea>
+																		<textarea name="bilingual[english][scope]" class="form-control editor" placeholder="Scope" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Scope</small>
 																	</div>
 																</div>
@@ -202,28 +202,28 @@
 																<div class="form-group">
 																	<label class="font-size-h5"><strong><span class="text-danger">*</span> Indicator Performance</strong></label>
 																	<div class="">
-																		<textarea name="bilingual[english][performance]" class="form-control summernote" placeholder="Indicator Performance" aria-describedby="helpId"></textarea>
+																		<textarea name="bilingual[english][performance]" class="form-control editor" placeholder="Indicator Performance" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Indicator Performance</small>
 																	</div>
 																</div>
 																<div class="form-group">
 																	<label class="font-size-h5"><strong>Define</strong></label>
 																	<div class="">
-																		<textarea name="bilingual[english][define]" class="form-control summernote " placeholder="Define" aria-describedby="helpId"></textarea>
+																		<textarea name="bilingual[english][define]" class="form-control editor " placeholder="Define" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Define Proses</small>
 																	</div>
 																</div>
 																<div class="form-group">
 																	<label class="font-size-h5"><strong>Responsibility</strong></label>
 																	<div class="">
-																		<textarea name="bilingual[english][responsibility]" class="form-control summernote " placeholder="Responsibility" aria-describedby="helpId"></textarea>
+																		<textarea name="bilingual[english][responsibility]" class="form-control editor " placeholder="Responsibility" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">Responsibility</small>
 																	</div>
 																</div>
 																<div class="form-group">
 																	<label class="font-size-h5"><strong>General Requirement</strong></label>
 																	<div class="">
-																		<textarea name="bilingual[english][general_requirement]" class="form-control summernote " placeholder="General Requirement" aria-describedby="helpId"></textarea>
+																		<textarea name="bilingual[english][general_requirement]" class="form-control editor " placeholder="General Requirement" aria-describedby="helpId"></textarea>
 																		<small class="text-danger invalid-feedback">General Requirement</small>
 																	</div>
 																</div>
@@ -250,28 +250,28 @@
 														<div class="form-group">
 															<label for="Supplier" class="font-weight-bold font-size-"><strong>1. Supplier</strong></label>
 															<div class="">
-																<textarea name="supplier" id="supplier" class="form-control summernote" placeholder="Supplier" aria-describedby="helpId"></textarea>
+																<textarea name="supplier" id="supplier" class="form-control editor" placeholder="Supplier" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Supplier</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Proses" class="font-weight-bold font-size-"><strong>3. Proses</strong></label>
 															<div class="">
-																<textarea name="process" id="process" class="form-control summernote" placeholder="Proses" aria-describedby="helpId"></textarea>
+																<textarea name="process" id="process" class="form-control editor" placeholder="Proses" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Proses</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Customer" class="font-weight-bold font-size-"><strong>5. Customer</strong></label>
 															<div class="">
-																<textarea name="customer" id="customer" class="form-control summernote" placeholder="Customer" aria-describedby="helpId"></textarea>
+																<textarea name="customer" id="customer" class="form-control editor" placeholder="Customer" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Customer</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Risk" class="font-weight-bold font-size-"><strong>7. Risk</strong></label>
 															<div class="">
-																<textarea name="risk" id="risk" class="form-control summernote" placeholder="Risk" aria-describedby="helpId"></textarea>
+																<textarea name="risk" id="risk" class="form-control editor" placeholder="Risk" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Risk</small>
 															</div>
 														</div>
@@ -280,28 +280,28 @@
 														<div class="form-group">
 															<label for="Input" class="font-weight-bold font-size-"><strong>2. Input</strong></label>
 															<div class="">
-																<textarea rows="5" name="input" id="input" class="form-control summernote" placeholder="Input" aria-describedby="helpId"></textarea>
+																<textarea rows="5" name="input" id="input" class="form-control editor" placeholder="Input" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Input</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Output" class="font-weight-bold font-size-"><strong>4. Output</strong></label>
 															<div class="">
-																<textarea rows="5" name="output" id="output" class="form-control summernote" placeholder="Output" aria-describedby="helpId"></textarea>
+																<textarea rows="5" name="output" id="output" class="form-control editor" placeholder="Output" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Output</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Objective" class="font-weight-bold font-size-"><strong>6. Objective</strong></label>
 															<div class="">
-																<textarea rows="5" name="objective" id="objective" class="form-control summernote" placeholder="Objective" aria-describedby="helpId"></textarea>
+																<textarea rows="5" name="objective" id="objective" class="form-control editor" placeholder="Objective" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Order</small>
 															</div>
 														</div>
 														<div class="form-group">
 															<label for="Objective" class="font-weight-bold font-size-"><strong>8. Mitigation</strong></label>
 															<div class="">
-																<textarea rows="5" name="mitigation" id="mitigation" class="form-control summernote" placeholder="Mitigation" aria-describedby="helpId"></textarea>
+																<textarea rows="5" name="mitigation" id="mitigation" class="form-control editor" placeholder="Mitigation" aria-describedby="helpId"></textarea>
 																<small class="text-danger invalid-feedback">Mitigation</small>
 															</div>
 														</div>
@@ -631,23 +631,6 @@
 		Promise.allSettled = function(promiseList) {
 			return Promise.all(handlePromise(promiseList))
 		}
-
-		// tinymce.init({
-		// 	selector: 'textarea',
-		// 	height: 100,
-		// 	resize: true,
-		// 	plugins: 'autoresize autosave emoticons preview importcss searchreplace autolink autosave save ' +
-		// 		'directionality  visualblocks visualchars fullscreen image link media template codesample table charmap pagebreak nonbreaking anchor insertdatetime advlist lists wordcount help charmap quickbars emoticons',
-		// 	toolbar: 'restoredraft preview searchreplace | undo redo | blocks ' +
-		// 		'bold italic backcolor forecolor | alignleft aligncenter ' +
-		// 		'alignright alignjustify | template codesample bullist numlist outdent indent | link image ' +
-		// 		'table tabledelete | tableprops tablerowprops tablecellprops | tableinsertrowbefore tableinsertrowafter tabledeleterow | tableinsertcolbefore tableinsertcolafter tabledeletecol' +
-		// 		'removeformat emoticons | help',
-		// 	content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:16px }',
-		// 	autoresize_bottom_margin: 50,
-		// 	link_default_protocol: 'https'
-		// 	// 	content_style: 'body { font-family:Helvetica,Arial,sans-serif; font-size:14px }'
-		// });
 
 		$(document).on('click', '#add_flow', function() {
 			const proc_id = $(this).data('id')
