@@ -239,7 +239,7 @@
              selector: '.editor',
              height: 250,
              resize: true,
-             indent: '10px',
+             max_indent: 3,
              toolbar_mode: 'sliding',
              statusbar: true,
              branding: false,
@@ -254,7 +254,28 @@
                  'bold italic backcolor forecolor | alignleft aligncenter ' +
                  'alignright alignjustify | bullist numlist outdent indent | table tabledelete | link ' +
                  'removeformat | help',
-             content_style: `body { font-family:Helvetica,Arial,sans-serif; font-size:14px }`
+             content_style: `body { font-family:Calibri,Arial,sans-serif; font-size:14pt }
+                    ol, ul {
+                        padding-left: 1rem;
+                        margin-left: 0;
+                    }
+                    ol ol, ul ul {
+                        padding-left: 1.25rem;
+                    }
+                    ol ol ol, ul ul ul {
+                        padding-left: 1.25rem;
+                    }
+                    .editor ol,
+                    .editor ul {
+                        padding-left: 1.5rem;
+                        margin-left: 0;
+                    }
+
+                    .editor ol ol,
+                    .editor ul ul {
+                        padding-left: 1.25rem;
+                    }
+             `
          });
 
          $('.select2').select2({
