@@ -32,7 +32,7 @@
 			<div class="form-group">
 				<label for="description" class="">Deskripsi <span class="text-danger">*</span></label>
 				<div class="">
-					<textarea rows="5" name="flow[description]" id="description" class="form-control summernote" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description : ''; ?></textarea>
+					<textarea rows="5" name="flow[description]" id="description" class="form-control editor" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description : ''; ?></textarea>
 					<small class="text-danger invalid-feedback">Deskripsi</small>
 				</div>
 			</div>
@@ -42,7 +42,7 @@
 				<div class="form-group">
 					<label for="description_2" class="">Description <span class="text-danger">*</span></label>
 					<div class="">
-						<textarea rows="5" name="flow[description_2]" id="description_2" class="form-control summernote" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description_2 : ''; ?></textarea>
+						<textarea rows="5" name="flow[description_2]" id="description_2" class="form-control editor" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description_2 : ''; ?></textarea>
 						<small class="text-danger invalid-feedback">Deskripsi</small>
 					</div>
 				</div>
@@ -72,7 +72,7 @@
 				<?php $relDocs = json_decode($flow->relate_ik_doc, true); ?>
 				<?php if ($guides) : ?>
 					<?php foreach ($guides as $guide) : ?>
-						<option value="<?= $guide->id; ?>" <?= ($relDocs) ? (in_array($guide->id, $relDocs)): ''; ?>><?= $guide->name; ?></option>
+						<option value="<?= $guide->id; ?>" <?= ($relDocs) ? (in_array($guide->id, $relDocs)) : ''; ?>><?= $guide->name; ?></option>
 					<?php endforeach; ?>
 				<?php endif; ?>
 			</select>
@@ -93,8 +93,46 @@
 		allowClear: true
 	})
 
-	// $('.summernote').summernote({
-	// 	height: 350,
-	// 	tabsize: 1,
-	// });
+	tinymce.init({
+		selector: '.editor',
+		height: 250,
+		resize: true,
+		max_indent: 3,
+		toolbar_mode: 'sliding',
+		statusbar: true,
+		branding: false,
+		promotion: false,
+		autoresize_bottom_margin: 50,
+		link_default_protocol: 'https',
+		menubar: false,
+		plugins: [
+			'preview', 'anchor', 'accordion', 'advlist', 'paste', 'anchor', 'code', 'image', 'link', 'lists', 'table',
+		],
+		toolbar: 'undo redo | paste pastetext fontsize| ' +
+			'bold italic backcolor forecolor | alignleft aligncenter ' +
+			'alignright alignjustify | bullist numlist outdent indent | table tabledelete | link ' +
+			'removeformat | help',
+		content_style: `body { font-family:Calibri,Arial,sans-serif; font-size:14pt }
+                    ol, ul {
+                        padding-left: 1rem;
+                        margin-left: 0;
+                    }
+                    ol ol, ul ul {
+                        padding-left: 1.25rem;
+                    }
+                    ol ol ol, ul ul ul {
+                        padding-left: 1.25rem;
+                    }
+                    .editor ol,
+                    .editor ul {
+                        padding-left: 1.5rem;
+                        margin-left: 0;
+                    }
+
+                    .editor ol ol,
+                    .editor ul ul {
+                        padding-left: 1.25rem;
+                    }
+             `
+	});
 </script>

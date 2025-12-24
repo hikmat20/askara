@@ -517,7 +517,7 @@
 																		<?php endif; ?>
 																	</td>
 																	<td class="text-center" style="vertical-align: middle;">
-																		<button type="button" data-proc_id="<?= $data->id; ?>" class="btn btn-warning btn-icon rounded-circle btn-xs edit_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-edit"></i></button>
+																		<button type="button" data-proc_id="<?= $data->id; ?>"  class="btn btn-warning btn-icon rounded-circle btn-xs edit_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-edit"></i></button>
 																		<button type="button" class="btn btn-danger btn-icon rounded-circle btn-xs delete_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-trash"></i></button>
 																	</td>
 																</tr>

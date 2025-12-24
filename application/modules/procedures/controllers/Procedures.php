@@ -1581,7 +1581,7 @@ class Procedures extends Admin_Controller
 			'procedure_bilingual' => $procedure_bilingual,
 		];
 
-		$mpdf->AddPage('P', '', '', '', '', 5, 5, 5, 5, 5, '', '', '');
+		$mpdf->AddPage('P', '', '', '', '', 7, 7, 7, 7, 5, '', '', '');
 		$this->template->set($Data);
 		$data = $this->template->load_view('printout');
 		$mpdf->WriteHTML($data);
