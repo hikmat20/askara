@@ -107,12 +107,14 @@
   <!-- header -->
   <table class="table-data" cellpadding="2" cellspacing="0" style="font-size: 10pt;">
     <tr>
-      <td rowspan="5" class="text-center" style="vertical-align: middle;">
-        Logo
+      <td rowspan="5" class="text-right" style="vertical-align: middle;border-right:0px">
+        <img width="80" src="assets/<?= $this->session->company->logo ; ?>" alt="">
+      </td>
+      <td rowspan="5" class="text-left" style="vertical-align: middle;border-left:0px">
         <h2><?= $company_name; ?></h2>
       </td>
-      <td width="140">Dept</td>
-      <td><?= isset($procedure->departement_id) ? $procedure->departement_id : ''; ?></td>
+      <td width="200">Dept</td>
+      <td width=""><?= isset($procedure->departement_id) ? $procedure->departement_id : ''; ?></td>
     </tr>
     <tr>
       <td>No. Dok</td>
@@ -137,7 +139,7 @@
       <!-- <td class="text-center"><?= ($procedure->prepare_name) ? $procedure->prepare_name : '~'; ?></td> -->
     </tr>
     <tr>
-      <td colspan="3" class="text-center" style="vertical-align: middle;">
+      <td colspan="4" class="text-center" style="vertical-align: middle;">
         <h2><?= strtoupper($procedure->name); ?></h2>
         <h3 style="color: #0088ffff;">(<?= isset($procedure_bilingual->name) ? strtoupper($procedure_bilingual->name) : ''; ?>)</h3>
       </td>
@@ -390,10 +392,9 @@
     </div>
   </div>
 
-  <pagebreak></pagebreak>
-
-  <div style="border: 0px solid;height:100%;">
-    <?php if ($procedure->image_flow_1 || $procedure->image_flow_2 || $procedure->image_flow_3) : ?>
+  <?php if ($procedure->image_flow_1 || $procedure->image_flow_2 || $procedure->image_flow_3) : ?>
+    <pagebreak></pagebreak>
+    <div style="border: 0px solid;height:100%;">
       <h4>9. FLOW PROCEDURE</h4>
       <?php if ($procedure->image_flow_1) : ?>
         <img width="100%" src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_1"); ?>"
@@ -407,8 +408,7 @@
         <img width="100%" src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_3"); ?>"
           alt="image_flow_3" class="img-fluid">
       <?php endif; ?>
-    <?php endif; ?>
-  </div>
+    </div>
+  <?php endif; ?>
 </body>
-
 </html>

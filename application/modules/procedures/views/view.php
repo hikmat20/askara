@@ -1,3 +1,32 @@
+<style>
+  ol,
+  ul {
+    padding-left: 1rem;
+    margin-left: 0;
+  }
+
+  ol ol,
+  ul ul {
+    padding-left: 1.25rem;
+  }
+
+  ol ol ol,
+  ul ul ul {
+    padding-left: 1.25rem;
+  }
+
+  .editor ol,
+  .editor ul {
+    padding-left: 1.5rem;
+    margin-left: 0;
+  }
+
+  .editor ol ol,
+  .editor ul ul {
+    padding-left: 1.25rem;
+  }
+</style>
+
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
   <div class="d-flex flex-column-fluid">
     <div class="">
@@ -5,112 +34,139 @@
       <!-- DEFINE -->
       <table class="table table-bordered rounded-lg mb-6">
         <tr>
-          <th class="table-dark text-center">
+          <th colspan="2" class="table-dark text-center">
             <h1><?= $data->name; ?></h1>
+            <h3 class="font-italic">(<?= $bilingual->name; ?>)</h3>
           </th>
         </tr>
         <tr>
-          <td class="py-6">
-            <h2 class="fw-extra-bold"><strong><u>Tujuan</u></strong></h2>
-            <di class="font-size-h4">
+          <td class="py-6 w-50">
+            <h3 class="fw-extra-bold"><strong><u>TUJUAN</u></strong></h3>
+            <div class="font-size-h6">
               <?= $data->object; ?>
-            </di>
+            </div>
+          </td>
+          <td style="color:#0088ffff">
+            <h3 class="fw-extra-bold"><strong><u>OBJECT</u></strong></h3>
+            <div class="font-size-h6">
+              <?= $bilingual->object; ?>
+            </div>
           </td>
         </tr>
         <tr>
           <td class="py-6">
-            <h2 class="fw-extra-bold"><strong><u>RUANG LINGKUP</u></strong></h2>
-            <di class="font-size-h4">
+            <h3 class="fw-extra-bold"><strong><u>RUANG LINGKUP</u></strong></h3>
+            <div class="font-size-h6">
               <?= $data->scope; ?>
-            </di>
+            </div>
+          </td>
+          <td style="color:#0088ffff" class="py-6">
+            <h3 class="fw-extra-bold"><strong><u>SCOPE</u></strong></h3>
+            <div class="font-size-h6">
+              <?= $bilingual->scope; ?>
+            </div>
           </td>
         </tr>
         <tr>
           <td class="py-6">
-            <h2 class="fw-extra-bold"><strong><u>DEFINISI</u></strong></h2>
-            <di class="font-size-h4">
+            <h3 class="fw-extra-bold"><strong><u>DEFINISI</u></strong></h3>
+            <div class="font-size-h6">
               <?= $data->define; ?>
-            </di>
+            </div>
+          </td>
+          <td style="color:#0088ffff" class="py-6">
+            <h3 class="fw-extra-bold"><strong><u>DEFINE</u></strong></h3>
+            <div class="font-size-h6">
+              <?= $bilingual->define; ?>
+            </div>
           </td>
         </tr>
         <tr>
           <td class="py-6">
-            <h2 class="fw-extra-bold"><strong><u>Performa Indikator</u></strong></h2>
-            <di class="font-size-h4">
+            <h3 class="fw-extra-bold"><strong><u>Performa Indikator</u></strong></h3>
+            <div class="font-size-h6">
               <?= $data->performance; ?>
-            </di>
+            </div>
+          </td>
+          <td style="color:#0088ffff" class="py-6">
+            <h3 class="fw-extra-bold"><strong><u>INDICATOR PERFORMANCE</u></strong></h3>
+            <div class="font-size-h6">
+              <?= $bilingual->performance; ?>
+            </div>
           </td>
         </tr>
       </table>
 
       <!-- SIPOCOR -->
-      <table class="table table-bordered mb-6">
-        <thead>
-          <tr class="table-secondary">
-            <th colspan="2">
-              <h3>SIPOCOR</h3>
-            </th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr>
-            <td width="50%">
-              <label for="Supplier" class="font-weight-bold font-size-"><strong>1. Supplier</strong></label>
-              <div class="">
-                <?= $data->supplier; ?>
-              </div>
-            </td>
-            <td>
-              <label for="Input" class="font-weight-bold font-size-"><strong>2. Input</strong></label>
-              <div class="">
-                <?= $data->input; ?>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label for="Proses" class="font-weight-bold font-size-"><strong>3. Proses</strong></label>
-              <div class="">
-                <?= $data->process; ?>
-              </div>
-            </td>
-            <td>
-              <label for="Output" class="font-weight-bold font-size-"><strong>4. Output</strong></label>
-              <div class="">
-                <?= $data->output; ?>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label for="Customer" class="font-weight-bold font-size-"><strong>5. Customer</strong></label>
-              <div class="">
-                <?= $data->customer; ?>
-              </div>
-            </td>
-            <td>
-              <label for="Objective" class="font-weight-bold font-size-"><strong>6. Objective</strong></label>
-              <div class="">
-                <?= $data->objective; ?>
-              </div>
-            </td>
-          </tr>
-          <tr>
-            <td>
-              <label for="Risk" class="font-weight-bold font-size-"><strong>7. Risk</strong></label>
-              <div class="">
-                <?= $data->risk; ?>
-              </div>
-            </td>
-            <td>
-              <label for="mitigation" class="font-weight-bold font-size-"><strong>8. Mitigation</strong></label>
-              <div class="">
-                <?= $data->mitigation; ?>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <?php if ($data->supplier): ?>
+        <table class="table table-bordered mb-6">
+          <thead>
+            <tr class="table-secondary">
+              <th colspan="2">
+                <h3>SIPOCOR</h3>
+              </th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td width="50%">
+                <label for="Supplier" class="font-weight-bold font-size-"><strong>1. Supplier</strong></label>
+                <div class="">
+                  <?= $data->supplier; ?>
+                </div>
+              </td>
+              <td>
+                <label for="Input" class="font-weight-bold font-size-"><strong>2. Input</strong></label>
+                <div class="">
+                  <?= $data->input; ?>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="Proses" class="font-weight-bold font-size-"><strong>3. Proses</strong></label>
+                <div class="">
+                  <?= $data->process; ?>
+                </div>
+              </td>
+              <td>
+                <label for="Output" class="font-weight-bold font-size-"><strong>4. Output</strong></label>
+                <div class="">
+                  <?= $data->output; ?>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="Customer" class="font-weight-bold font-size-"><strong>5. Customer</strong></label>
+                <div class="">
+                  <?= $data->customer; ?>
+                </div>
+              </td>
+              <td>
+                <label for="Objective" class="font-weight-bold font-size-"><strong>6. Objective</strong></label>
+                <div class="">
+                  <?= $data->objective; ?>
+                </div>
+              </td>
+            </tr>
+            <tr>
+              <td>
+                <label for="Risk" class="font-weight-bold font-size-"><strong>7. Risk</strong></label>
+                <div class="">
+                  <?= $data->risk; ?>
+                </div>
+              </td>
+              <td>
+                <label for="mitigation" class="font-weight-bold font-size-"><strong>8. Mitigation</strong></label>
+                <div class="">
+                  <?= $data->mitigation; ?>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+      <?php endif; ?>
 
       <!-- FLOW IMAGE -->
       <table class="table table-bordered mb-6">
@@ -235,7 +291,7 @@
                   <tr class="table-secondary">
                     <th class="py-1 text-center">No.</th>
                     <th class="py-1 text-center">PIC/TANGGUNG JAWAB</th>
-                    <th class="py-1 text-center">DESKRIPSI</th>
+                    <th class="py-1 text-center" colspan="2">DESKRIPSI</th>
                     <th class="py-1 text-center">DOKUMEN TERKAIT</th>
                   </tr>
                 </thead>
@@ -245,19 +301,20 @@
                       <tr>
                         <td class="text-center"><?= $dtl->number; ?></td>
                         <td class="text-center"><?= $dtl->pic; ?></td>
-                        <td><?= $dtl->description; ?></td>
+                        <td class="wd-25"><?= $dtl->description; ?></td>
+                        <td class="wd-25" style="color:#0088ffff"><?= $dtl->description_2; ?></td>
                         <td class="">
                           <?php $relDocs = json_decode($dtl->relate_doc); ?>
                           <?php if (is_array($relDocs)) : ?>
                             <?php foreach ($relDocs as $relDoc) { ?>
-                              <span class="badge btn <?= ($ArrForms[$relDoc]->status == 'DEL') ? 'btn-light' : 'bg-success btn-success'; ?>  view-form mb-1" data-id="<?= $relDoc; ?>"><?= $ArrForms[$relDoc]->name; ?> <?= ($ArrForms[$relDoc]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger" title="File has been deleted!"></i>' : ''; ?></span>
+                              <span class="d-block badge btn <?= ($ArrForms[$relDoc]->status == 'DEL') ? 'btn-light' : 'bg-success btn-success'; ?>  view-form mb-1" data-id="<?= $relDoc; ?>"><?= $ArrForms[$relDoc]->name; ?> <?= ($ArrForms[$relDoc]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger" title="File has been deleted!"></i>' : ''; ?></span>
                             <?php } ?>
                           <?php endif; ?>
 
                           <?php $relIk = json_decode($dtl->relate_ik_doc); ?>
                           <?php if (is_array($relIk)) : ?>
                             <?php foreach ($relIk as $ik) { ?>
-                              <span class="badge btn <?= ($ArrGuides[$ik]->status == 'DEL') ? 'btn-light' : 'bg-danger btn-danger'; ?> view-guide mb-1" data-id="<?= $ik; ?>"><?= $ArrGuides[$ik]->name; ?> <?= ($ArrGuides[$ik]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger"  title="File has been deleted!"></i>' : ''; ?></span>
+                              <span class="d-block badge btn <?= ($ArrGuides[$ik]->status == 'DEL') ? 'btn-light' : 'bg-danger btn-danger'; ?> view-guide mb-1" data-id="<?= $ik; ?>"><?= $ArrGuides[$ik]->name; ?> <?= ($ArrGuides[$ik]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger"  title="File has been deleted!"></i>' : ''; ?></span>
                             <?php } ?>
                           <?php endif; ?>
                         </td>

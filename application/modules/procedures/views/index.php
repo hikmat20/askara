@@ -68,12 +68,12 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId">
-															<a href="javascript:void(0)" class="dropdown-item view" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search mr-2 text-info"></i>View</a>
-															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
+															<a href="javascript:void(0)" class="dropdown-item view" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" title="View Data"><i class="fa fa-search mr-2 text-info"></i>View</a>
+															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item" data-id="<?= $draft->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
-															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
+															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $draft->id; ?>" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
 															<div class="dropdown-divider my-0"></div>
-															<a href="javascript:void(0)" class="dropdown-item delete" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash mr-2 text-danger"></i>Delete</a>
+															<a href="javascript:void(0)" class="dropdown-item delete" data-id="<?= $draft->id; ?>" title="Delete Data"><i class="fa fa-trash mr-2 text-danger"></i>Delete</a>
 														</div>
 													</div>
 												</td>
@@ -317,8 +317,8 @@
 	</div>
 </div>
 
-<div class="modal fade" id="modalView" data-keyboard="false" tabindex="-1" aria-labelledby="modal-view" aria-hidden="true">
-	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
+<div class="modal fade" id="modalView" data-keyboard="true" tabindex="-1" aria-labelledby="modal-view" aria-hidden="true">
+	<div class="modal-dialog modal-xl modal-dialog-scrollable" style="min-width: 90%;" role="document">
 		<div class="modal-content" data-scroll="true" data-height="700">
 			<form class="form-horiontal" id="form-input">
 				<div class="modal-header">

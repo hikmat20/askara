@@ -148,6 +148,7 @@ class Procedures extends Admin_Controller
 	public function view($id = '', $status = '')
 	{
 		$Data 				= $this->db->get_where('procedures', ['id' => $id, 'company_id' => $this->company])->row();
+		$bilingual 			= $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users 				= $this->db->get_where('view_users')->result();
 		$getForms			= $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
 		$getGuides			= $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
@@ -172,15 +173,16 @@ class Procedures extends Admin_Controller
 		if ($Data) {
 			$Data_detail 		= $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$this->template->set([
-				'title' 		=> 'Procedures',
-				'data' 			=> $Data,
-				'detail' 		=> $Data_detail,
-				'users' 		=> $users,
-				'jabatan' 		=> $jabatan,
-				'ArrUsr' 		=> $ArrUsr,
-				'ArrJab' 		=> $ArrJab,
-				'ArrForms' 		=> $ArrForms,
-				'ArrGuides' 	=> $ArrGuides,
+				'title'	    => 'Procedures',
+				'data'      => $Data,
+				'bilingual' => $bilingual,
+				'detail'    => $Data_detail,
+				'users'	    => $users,
+				'jabatan'   => $jabatan,
+				'ArrUsr'    => $ArrUsr,
+				'ArrJab'    => $ArrJab,
+				'ArrForms'  => $ArrForms,
+				'ArrGuides' => $ArrGuides,
 			]);
 			$this->template->render('view');
 		} else {
