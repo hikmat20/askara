@@ -6,77 +6,81 @@
 					<h2 class="mt-5"><i class="<?= $icon; ?> mr-2"></i><?= $title; ?></h2>
 					<div class="mt-4 float-right ">
 						<?php if ($this->session->company->id_perusahaan == '1') : ?>
-							<button type="button" class="btn btn-primary" id="addCompany" title="Add New Company">
+							<!-- <button type="button" class="btn btn-primary" id="addCompany" title="Add New Company">
 								<i class="fa fa-plus mr-1"></i>Add New Company
-							</button>
+							</button> -->
 						<?php endif; ?>
 
 					</div>
 				</div>
 				<div class="card-body">
-					<!-- Nav tabs -->
-					<!-- <ul class="nav nav-tabs nav-pills pb-3" id="myTab" role="tablist">
-						<li class="nav-item" role="presentation">
-							<button class="nav-link active btn-sm" id="Published-tab" data-toggle="tab" data-target="#Published" type="button" role="tab" aria-controls="Published" aria-selected="true">Published <span class="badge badge-circle badge-white text-primary ml-2"></span></button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link btn-sm" id="Draft-tab" data-toggle="tab" data-target="#Draft" type="button" role="tab" aria-controls="Draft" aria-selected="false">Draft <span class="badge badge-circle badge-white text-primary ml-2"></span></button>
-						</li>
-					</ul> -->
-
-					<!-- Tab panes -->
-					<div class="tab-content mt-3">
-						<div class="tab-pane fade active show" id="Published" role="tabpanel" aria-labelledby="Published-tab">
-							<table id="example1" class="table table-bordered table-sm table-hover datatable">
-								<thead class="text-center table-light">
-									<tr class="text-center">
-										<th width="3%">No.</th>
-										<th class="text-left" width="200">Company Nama</th>
-										<th class="text-left">Address</th>
-										<th>City</th>
-										<th>Inisial</th>
-										<th width="150">Action</th>
+					<table id="example1" class="table table-bordered table-hover table-striped rounded-lg overflow-hidden border">
+						<thead class="text-center">
+							<tr class="text-center">
+								<th width="10">No.</th>
+								<th class="text-center no-sort" width="100">Logo</th>
+								<th class="text-center" width="200">Company Nama</th>
+								<th class="text-center">Address</th>
+								<th>City</th>
+								<th>Inisial</th>
+								<th width="150" class="text-center no-sort">Action</th>
+							</tr>
+						</thead>
+						<tbody>
+							<?php if (isset($data) && $data) :
+								$n = 0;
+								foreach ($data as $dt) : $n++; ?>
+									<tr class="">
+										<td><?= $n; ?></td>
+										<td class=""><img width="100" src="<?= base_url($dt->path_logo) . $dt->id_perusahaan . '/' . $dt->logo; ?>" alt=""></td>
+										<td class=""><?= $dt->nm_perusahaan; ?></td>
+										<td><?= $dt->alamat; ?></td>
+										<td><?= $dt->kota; ?></td>
+										<td class=""><?= $dt->inisial; ?></td>
+										<td class="text-center no-sort">
+											<button type="button" class="btn btn-xs btn-icon btn-info view" data-toggle="tooltip" data-id="<?= $dt->id_perusahaan; ?>" title="View Data"><i class="fa fa-search"></i></button>
+											<button type="button" class="btn btn-xs btn-icon btn-warning edit" data-toggle="tooltip" data-id="<?= $dt->id_perusahaan; ?>" title="Edit Data"><i class="fa fa-edit"></i></button>
+											<?php if ($this->session->company->id_perusahaan == '1') : ?>
+												<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-toggle="tooltip" data-id="<?= $dt->id_perusahaan; ?>" title="View Data"><i class="fa fa-trash"></i></button> -->
+											<?php endif; ?>
+										</td>
 									</tr>
-								</thead>
-								<tbody>
-									<?php if (isset($data) && $data) :
-										$n = 0;
-										foreach ($data as $dt) : $n++; ?>
-											<tr class="">
-												<td><?= $n; ?></td>
-												<td class="text-left"><?= $dt->nm_perusahaan; ?></td>
-												<td><?= $dt->alamat; ?></td>
-												<td><?= $dt->kota; ?></td>
-												<td><?= $dt->inisial; ?></td>
-												<td>
-													<button type="button" class="btn btn-sm btn-icon rounded-circle btn-info view" data-id="<?= $dt->id_perusahaan; ?>" title="View Data"><i class="fa fa-search"></i></button>
-													<button type="button" class="btn btn-sm btn-icon rounded-circle btn-warning edit" data-id="<?= $dt->id_perusahaan; ?>" title="Edit Data"><i class="fa fa-edit"></i></button>
-													<?php if ($this->session->company->id_perusahaan == '1') : ?>
-														<button type="button" class="btn btn-sm btn-icon rounded-circle btn-danger delete" data-id="<?= $dt->id_perusahaan; ?>" title="View Data"><i class="fa fa-trash"></i></button>
-													<?php endif; ?>
-												</td>
-											</tr>
-									<?php endforeach;
-									endif; ?>
-								</tbody>
-							</table>
-						</div>
-					</div>
+							<?php endforeach;
+							endif; ?>
+						</tbody>
+					</table>
 				</div>
 			</div>
+
+
 		</div>
 	</div>
 </div>
 <!-- Modal -->
 
-<div class="modal fade" id="modalView" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
-	<div class="modal-dialog modal-xl">
+<div class="modal fade" id="modalView" data-backdrop="static" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
 				<h5 class="modal-title" id="staticBackdropLabel"></h5>
 				<span class="close btn-cls" data-dismiss="modal" aria-label="Close"></span>
 			</div>
 			<div class="modal-body">
+				<div class="card" data-load-delay="800">
+					<div class="card-body">
+						<div class="card-content">
+							<div class="text-line" style="width: 95%"></div>
+							<!-- <div class="text-line" style="width: 90%"></div>
+						<div class="text-line" style="width: 60%"></div> -->
+						</div>
+						<div class="image-placeholder"></div>
+						<div class="card-actions">
+							<div class="action-btn"></div>
+							<div class="action-btn"></div>
+							<div class="action-btn"></div>
+						</div>
+					</div>
+				</div>
 			</div>
 			<div class="modal-footer">
 				<button type="button" class="btn btn-primary save min-w-100px"><i class="fa fa-save"></i>Save</button>
@@ -88,6 +92,7 @@
 
 <script>
 	$(document).ready(function() {
+
 		$('button[data-toggle="tab"]').on('shown.bs.tab', function(e) {
 			$.fn.dataTable.tables({
 				visible: true,
@@ -96,10 +101,10 @@
 		});
 
 		$('#example1').DataTable({
-			orderCellsTop: false,
+			// orderCellsTop: false,
 			// fixedHeader: true,
 			// scrollX: true,
-			ordering: false,
+			// ordering: false,
 			// info: false
 		});
 
@@ -143,7 +148,14 @@
 			const url = siteurl + active_controller + 'add';
 			$('.modal-title').html('<i class="fa fa-building text-dark" aria-hidden="true"></i> Add New Company')
 			$('#modalView').modal('show')
-			$('.modal-body').load(url)
+			$('#modalView .modal-body').html(loading())
+			$('.modal-body').load(url, function(response, status, xhr) {
+				if (status == "error") {
+					alert("Terjadi kesalahan: " + xhr.status + " " + xhr.statusText);
+				}
+			});
+
+			// $('.modal-body').load(url)
 		})
 
 		$(document).on('click', '.edit', function() {
@@ -151,15 +163,27 @@
 			const url = siteurl + active_controller + 'edit/' + id;
 			$('.modal-title').html('Edit Company')
 			$('#modalView').modal('show')
-			$('.modal-body').load(url)
+			$('#modalView .modal-body').html(loading())
+			$('.modal-body').load(url, function(response, status, xhr) {
+				if (status == "error") {
+					alert("Terjadi kesalahan: " + xhr.status + " " + xhr.statusText);
+				}
+			});
+			// $('.modal-body').load(url)
 		})
 
 		$(document).on('click', '.view', function() {
 			const id = $(this).data('id')
 			const url = siteurl + active_controller + 'view/' + id;
+			$('#modalView').modal()
 			$('.modal-title').html('Edit Company')
-			$('#modalView').modal('show')
-			$('.modal-body').load(url)
+			$('#modalView .modal-body').html(loading())
+			$('.modal-body').load(url, function(response, status, xhr) {
+				if (status == "error") {
+					alert("Terjadi kesalahan: " + xhr.status + " " + xhr.statusText);
+				}
+			});
+			// $('.modal-body').load(url)
 			$('.save').addClass('d-none')
 
 		})
@@ -285,7 +309,70 @@
 			})
 		})
 
+
+
+		$(document).on('change', ".dropzone", function() {
+			readFile(this);
+		});
+
+
 	})
+
+	function readFile(input) {
+		if (input.files && input.files[0]) {
+			var reader = new FileReader();
+
+			index = $(input).data('index')
+
+			reader.onload = function(e) {
+				console.log(e)
+				var htmlPreview = '<img width="150" src="' + e.target.result + '" />';
+
+				var overlay = `<div class="middle d-flex justify-content-center align-items-center">
+				<button type="button" onclick="$(this).parent().parent().find('.dropzone').click()" class="btn btn-sm mr-1 btn-icon btn-warning change-image rounded-circle"><i class="fa fa-edit"></i></button>
+				<button type="button" onclick="remove_image(this)" class="btn btn-sm mr-1 btn-icon btn-danger remove-image rounded-circle"><i class="fa fa-trash"></i></button>
+				</div>`;
+				var wrapperZone = $(input).parent();
+				var previewZone = $(input).parent().parent().find('.preview-zone');
+				var boxZone = $(input).parent().find('.dropzone-desc');
+
+				wrapperZone.removeClass('dragover');
+				previewZone.removeClass('hidden');
+				boxZone.html('');
+				boxZone.append(htmlPreview);
+				wrapperZone.find('.middle').remove();
+				wrapperZone.append(overlay);
+			};
+
+			reader.readAsDataURL(input.files[0]);
+		}
+	}
+
+	function remove_image(e) {
+		Swal.fire({
+			title: 'Are you sure to delete this data?',
+			icon: 'question',
+			showCancelButton: true,
+			confirmButtonColor: '#DD6B55',
+			confirmButtonText: 'Yes, Delete <i class="fa fa-trash text-white"></i>',
+		}).then((value) => {
+			if ($value.value) {
+				let srcFile = $(e).parent().parent().find('.dropzone-desc').find('img').attr('src')
+				$(e).parent().parent().find('input.dropzone').val();
+				$(e).parent().parent().find('input.dropzone').off();
+				$(e).parent().parent().find('.dropzone-desc').empty().append('<i class="fa fa-upload"></i><p> Choose an image file or drag it here. </p>');
+				// $(e).parent().parent().find('.for-delete').empty().append('<input type="hidden" name="delete_image[]" value="' + srcFile + '">');
+				$(e).parent().remove();
+			}
+		})
+
+		// $(e).parent().parent().find('input.dropzone').val();
+		// $(e).parent().parent().find('input.dropzone').off();
+		// $(e).parent().parent().find('.dropzone-desc').empty().append('<i class="fa fa-upload"></i><p> Choose an image file or drag it here. </p>');
+		// $(e).parent().remove();
+
+	}
+
 
 	function validation(field) {
 		let err = 0;
@@ -307,5 +394,36 @@
 			$(e).html('');
 
 		}, 500)
+	}
+
+	function loading() {
+		return `<div class="" data-load-delay="1000">
+					<div class="card-content">
+					<div class="row">
+						<div class="col-9">
+							<div class="row">
+								<div class="col-3"><div class="username" style="width: 100%"></div></div>
+								<div class="col-9"><div class="username" style="width: 100%"></div></div>
+							</div>
+							<div class="row">
+								<div class="col-3"><div class="username" style="width: 100%"></div></div>
+								<div class="col-9"><div class="image-placeholder mt-0 h-100px"></div></div>
+							</div>
+							<div class="row">
+								<div class="col-3"><div class="username" style="width: 100%"></div></div>
+								<div class="col-9"><div class="username" style="width: 100%"></div></div>
+							</div>
+							<div class="row">
+								<div class="col-3"><div class="username" style="width: 100%"></div></div>
+								<div class="col-9"><div class="username" style="width: 100%"></div></div>
+							</div>
+						</div>
+						<div class="col-3">
+							<div class="username" style="width: 100%"></div>
+							<div class="image-placeholder"></div>
+						</div>
+					</div>
+					</div>
+				</div>`
 	}
 </script>

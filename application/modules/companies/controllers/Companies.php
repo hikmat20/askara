@@ -1,20 +1,14 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
-/*
- * @author Syamsudin
- * @copyright Copyright (c) 2021, Syamsudin
- *
- * This is controller for Perusahaan
- */
-
 class Companies extends Admin_Controller
 {
 
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('Company_model', 'Comp');
         $this->template->set([
-            'title' => 'Companies',
+            'title' => 'Company',
             'icon' => 'fa fa-bulding'
         ]);
 
@@ -42,77 +36,10 @@ class Companies extends Admin_Controller
 
     public function save()
     {
-        try {
-            $post       = $this->input->post();
-            $data       = $post;
-            $branch     = isset($data['branch']) ? $data['branch'] : '';
-            unset($data['branch']);
-            $dataBranch = [];
-            $this->db->trans_begin();
-            if ($data) {
-                if (isset($data['id_perusahaan']) && $data['id_perusahaan']) {
-                    $data['modified_at'] = date('Y-m-d H:i:s');
-                    $data['modified_by'] = $this->auth->user_id();
-                    $this->db->update('companies', $data, ['id_perusahaan' => $data['id_perusahaan']]);
-                } else {
-                    $data['created_at'] = date('Y-m-d H:i:s');
-                    $data['created_by'] = $this->auth->user_id();
-                    $this->db->insert('companies', $data);
-                }
-
-                /* Branch */
-                if ($branch) foreach ($branch as $k => $val) {
-                    $dataBranch = [
-                        'branch_name' => $val['branch_name'],
-                        'branch_name' => $val['branch_name'],
-                        'branch_address' => $val['address'],
-                        'branch_city' => $val['city'],
-                    ];
-
-
-                    if (isset($val['id'])) {
-                        $dataBranch['company_id'] = $data['id_perusahaan'];
-                        $dataBranch['modified_at'] = date('Y-m-d H:i:s');
-                        $dataBranch['modified_by'] = $this->auth->user_id();
-                        $this->db->update('company_branch', $dataBranch, ['id' => $val['id']]);
-                    } else {
-                        $dataBranch['company_id'] = ($data['id_perusahaan']) ?: $this->db->insert_id('companies');
-                        $dataBranch['created_at'] = date('Y-m-d H:i:s');
-                        $dataBranch['created_by'] = $this->auth->user_id();
-                        $this->db->insert('company_branch', $dataBranch);
-                    }
-                }
-            } else {
-                $this->db->trans_rollback();
-                $return        = array(
-                    'status'        => 0,
-                    'msg'            => 'Data not valid. Please Try Again!'
-                );
-                echo json_encode($return);
-                return false;
-            }
-
-            if ($this->db->trans_status() === FALSE) {
-                $this->db->trans_rollback();
-                $return        = array(
-                    'status'        => 0,
-                    'msg'            => 'Data company Failed save. Please Try Again!'
-                );
-            } else {
-                $this->db->trans_commit();
-                $return        = array(
-                    'status'        => 1,
-                    'msg'            => 'Data company successfull saved. Thanks you.'
-                );
-            }
-        } catch (\Throwable $th) {
-            $this->db->trans_rollback();
-            $return        = array(
-                'status'        => 0,
-                'msg'            => $th->getMessage(),
-            );
+        $post       = $this->input->post();
+        if($post){
+            $return = $this->Comp->saveData();
         }
-
         echo json_encode($return);
     }
 

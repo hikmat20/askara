@@ -93,11 +93,11 @@
     ul,
     ol {
       margin: 0;
-      padding-left: 10px;
+      padding-left: 20px;
     }
 
     li {
-      padding-left: 10px;
+      padding-left: 20px;
       display: inline;
     }
   </style>
@@ -108,7 +108,7 @@
   <table class="table-data" cellpadding="2" cellspacing="0" style="font-size: 10pt;">
     <tr>
       <td rowspan="5" class="text-right" style="vertical-align: middle;border-right:0px">
-        <img width="80" src="assets/<?= $this->session->company->logo ; ?>" alt="">
+        <img width="80" src="<?= base_url($company->path_logo . $company->id_perusahaan . '/' . $company->logo); ?>" alt="">
       </td>
       <td rowspan="5" class="text-left" style="vertical-align: middle;border-left:0px">
         <h2><?= $company_name; ?></h2>
@@ -240,7 +240,7 @@
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>5. PERFORMANCE INDICTOR</strong></h4>
+        <h4><strong>5. INDICATOR PERFORMANCE</strong></h4>
         <i>
           <?php isset($procedure_bilingual->performance) ? $procedure_bilingual->performance : ''; ?>
         </i>
@@ -345,7 +345,7 @@
                 <td class="text-center"><?= $dtl->number; ?></td>
                 <td class="text-center"><?= $dtl->pic; ?></td>
                 <td style=""><?= $dtl->description; ?></td>
-                <td style=""><i><?= $dtl->description_2; ?></i></td>
+                <td style="color:#0088ffff"><i><?= $dtl->description_2; ?></i></td>
                 <td class="">
                   <?php $relDocs = json_decode($dtl->relate_doc, true); ?>
                   <?php if (is_array($relDocs)) : ?>
@@ -411,4 +411,5 @@
     </div>
   <?php endif; ?>
 </body>
+
 </html>

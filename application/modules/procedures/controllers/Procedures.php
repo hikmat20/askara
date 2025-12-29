@@ -11,9 +11,8 @@ class Procedures extends Admin_Controller
 		parent::__construct();
 		$this->load->helper('download');
 		$this->load->library(array('upload', 'Image_lib'));
-		$this->load->model(array(
-			'Aktifitas/aktifitas_model'
-		));
+		$this->load->model('companies/Company_model', 'Comp');
+
 
 		$this->template->set('title', 'List Procedures');
 		$this->template->set('icon', 'fa fa-cog');
@@ -1536,6 +1535,7 @@ class Procedures extends Admin_Controller
 		$jabatan             = $this->db->get('positions')->result();
 		$ArrUsr              = $ArrJab = $ArrForms = $ArrGuides = [];
 		$procedure_bilingual = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
+		$company = $this->Comp->find($this->company);
 
 		foreach ($getForms as $frm) {
 			$ArrForms[$frm->id] = $frm;
@@ -1571,6 +1571,7 @@ class Procedures extends Admin_Controller
 
 		$Data = [
 			'procedure'           => $procedure,
+			'company'           => $company,
 			'detail'              => $flowDetail,
 			'ArrUsr'              => $ArrUsr,
 			'ArrJab'              => $ArrJab,

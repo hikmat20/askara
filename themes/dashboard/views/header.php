@@ -15,12 +15,13 @@
   <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.css" rel="stylesheet" type="text/css" />
   <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/fullcalendar/fullcalendar.bundle1036.css" rel="stylesheet" type="text/css" />
   <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jstree/jstree.bundle.css" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.bundle1036.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.css" rel="stylesheet" type="text/css" />
   <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/monthpicker/MonthPicker.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
   <script src="<?= base_url('themes\dashboard\assets\plugins\global\jquery-3.3.1.min.js'); ?>"></script>
   <link href="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\jquery-ui\jquery-ui.min.css" rel="stylesheet" type="text/css" />
   <link href="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\summernote\summernote-bs4.min.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes\dashboard\assets\css\loading-skeleton.css" rel="stylesheet" type="text/css" />
 
   <script src="<?= base_url('themes/dashboard/assets/plugins/custom/pdf/pdf.js'); ?>"></script>
   <script src="<?= base_url('themes/dashboard/assets/plugins/custom/pdf/pdf.worker.js'); ?>"></script>
@@ -31,6 +32,84 @@
     var base_url = siteurl;
     var active_controller = '<?php echo $this->uri->segment(1); ?>' + '/';
     var active_function = '<?php echo $this->uri->segment(2); ?>' + '/';
+
+
+    $(document).ready(function() {
+      Object.assign(DataTable.defaults, {
+        responsive: true,
+        autoWidth: false,
+        destroy: true,
+        processing: true,
+        lengthChange: true,
+        stateSave: true,
+        stateDuration: 60,
+        deferLoading: 20,
+        layout: {
+          topEnd: {
+            search: {
+              placeholder: 'Search'
+            }
+          },
+          topStart: 'pageLength',
+          bottomStart: 'info',
+          bottomEnd: 'paging',
+        },
+        aaSorting: [
+          [0, "asc"]
+        ],
+        lengthMenu: [10, 20, 25, 50, 100, 250, 500, 1000, {
+          label: 'All',
+          value: 99999999
+        }],
+        pageLength: 20,
+        pagingType: 'simple_numbers',
+        language: {
+          search: "",
+          sLengthMenu: "_MENU_",
+          sInfo: "Showing <b>_START_</b> to <b>_END_</b> from <b>_TOTAL_</b> data",
+          sInfoFiltered: "(filtered from _MAX_ total entries)",
+          oPaginate: {
+            sPrevious: "<i class='fa fa-chevron-left' aria-hidden='true'></i>",
+            sNext: "<i class='fa fa-chevron-right' aria-hidden='true'></i>"
+          }
+        },
+        columnDefs: [{
+          "targets": 'no-sort',
+          "orderable": false,
+        }, {
+          "targets": 'text-center',
+          "className": 'text-center',
+        }, {
+          "targets": 'text-right',
+          "className": 'text-right',
+        }, {
+          "targets": 'fw-bold',
+          "className": 'font-wight-bold',
+        }, {
+          "targets": 'text-center-bold',
+          "className": 'text-center font-wight-bold',
+        }],
+        responsive: {
+          "breakpoints": [{
+              "name": 'desktop',
+              "width": Infinity
+            },
+            {
+              "name": 'tablet',
+              "width": 1148
+            },
+            {
+              "name": 'mobile',
+              "width": 680
+            },
+            {
+              "name": 'mobile-p',
+              "width": 320
+            }
+          ],
+        },
+      });
+    })
   </script>
 
 

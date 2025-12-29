@@ -215,18 +215,11 @@
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/scripts.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/fullcalendar/fullcalendar.bundle1036.js?"></script>
- <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.bundle1036.js"></script>
- <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jstree/jstree.bundle.js?"></script>
- <!-- <script src="<?= base_url(); ?>assets/js/scripts.js" type="text/javascript"></script> -->
- <!-- <script src="<?= base_url(); ?>assets/plugins/jqueryform/jquery.form.js"></script> -->
- <!-- <script src="<?= base_url(); ?>assets/dist/sweetalert.min.js"></script> -->
- <script src="<?= base_url('themes\dashboard\assets\plugins\custom\select2\select21036.js'); ?>"></script>
+ <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.js"></script>
+ <!-- <script src="<?= base_url('themes\dashboard\assets\plugins\custom\select2\select21036.js'); ?>"></script> -->
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/pages/widgets1036.js?"></script>
  <script src="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\summernote\summernote-bs4.min.js"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/tinymce/tinymce.min.js"></script>
- <!-- <script src="https://cdn.tiny.cloud/1/jou4no6cbvv6kyct0kcjoumfc81n00cy2rnwk7wbidnj1d57/tinymce/8/tinymce.min.js" referrerpolicy="origin"></script> -->
- <!-- <script src="<?= base_url('assets\plugins\tinymce\tinymce.js'); ?>"></script> -->
-
 
  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jquery-ui/jquery-ui.min.js"></script>
@@ -235,6 +228,9 @@
 
  <script>
      $(document).ready(function() {
+         
+
+
          tinymce.init({
              selector: '.editor',
              height: 250,
@@ -248,7 +244,7 @@
              link_default_protocol: 'https',
              menubar: false,
              plugins: [
-                 'preview', 'anchor', 'accordion', 'advlist', 'paste', 'anchor', 'code', 'image', 'link', 'lists', 'table',
+                 'preview', 'anchor', 'accordion', 'advlist', 'anchor', 'code', 'image', 'link', 'lists', 'table',
              ],
              toolbar: 'undo redo | paste pastetext fontsize| ' +
                  'bold italic backcolor forecolor | alignleft aligncenter ' +
@@ -278,11 +274,11 @@
              `
          });
 
-         $('.select2').select2({
-             placeholder: 'Choose an options',
-             width: '100%',
-             allowClear: true
-         })
+         //  $('.select2').select2({
+         //      placeholder: 'Choose an options',
+         //      width: '100%',
+         //      allowClear: true
+         //  })
 
          $('textarea.summernote').summernote({
              height: 250, // set editor height
