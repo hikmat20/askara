@@ -1546,8 +1546,8 @@ class Procedures extends Admin_Controller
 		$procedure_bilingual = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$company             = $this->Comp->find($this->company);
 		$depts               = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
-		$revision_logs = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'status' => '1'])->result();
-		
+		$revision_logs = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+
 		foreach ($depts as $dept) {
 			$ArrDept[$dept->id] = $dept;
 		}

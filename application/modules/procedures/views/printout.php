@@ -210,7 +210,7 @@
       <div class="box" style="color: #0088ffff;">
         <h4><strong>5. INDICATOR PERFORMANCE</strong></h4>
         <i>
-          <?php (isset($procedure_bilingual->performance) ? $procedure_bilingual->performance : ''); ?>
+          <?= (isset($procedure_bilingual->performance) ? $procedure_bilingual->performance : ''); ?>
         </i>
         <br>
       </div>
@@ -224,7 +224,7 @@
       <div class="box" style="color: #0088ffff;">
         <h4><strong>6. GENERAL REQUIREMENT</strong></h4>
         <i>
-          <?php (isset($procedure_bilingual->general_requirement) ? $procedure_bilingual->general_requirement : ''); ?>
+          <?= (isset($procedure_bilingual->general_requirement) ? $procedure_bilingual->general_requirement : ''); ?>
         </i>
         <br>
       </div>
