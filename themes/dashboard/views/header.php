@@ -112,10 +112,6 @@
 
 
     })
-
-      
-      
-   
   </script>
 
 
@@ -312,7 +308,7 @@
 <body id="kt_body" class="header-fixed header-mobile-fixed aside-enabled aside-static page-loading" style="background-image: url(<?= base_url('assets/images/bg-primary.png'); ?>);background-repeat:repeat-y;background-size:cover;background-position:top;background-attachment:cover">
   <div id="kt_header_mobile" class="header-mobile header-mobile-fixed">
     <a href="<?= base_url('/'); ?>">
-      <img alt="Logo" src="<?= base_url('assets/img/logo.png'); ?>" class="max-h-30px" />
+      <img alt="Logo" src="<?= base_url('assets/logo/') . $this->session->company->logo; ?>" class="max-h-30px" />
     </a>
     <div class="d-flex align-items-center">
       <button class=" btn btn-icon" onclick="$('#kt_aside_toggle').click()">
@@ -369,9 +365,9 @@
         <!--begin::Menu Nav-->
 
         <div class="text-center">
-          <img src="<?= base_url('assets/img/logo-2.png'); ?>" width="50px" class="img-fluid" alt="Logo">
+          <img src="<?= base_url('assets/logo/') . $this->session->company->id_perusahaan . '/' . $this->session->company->logo; ?>" width="100px" class="img-fluid" alt="Logo">
           <h5 for="" class="text-center"><strong>
-              <?= $this->session->company->nm_perusahaan ?>
+              <!-- <?= $this->session->company->nm_perusahaan ?> -->
             </strong></h5>
         </div>
         <hr class="mb-0">
