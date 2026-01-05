@@ -7,7 +7,7 @@
   <title><?= isset($idt->nm_perusahaan) ? $idt->nm_perusahaan : 'not-set'; ?><?= isset($template['title']) ? ' | ' . $template['title'] : ''; ?></title>
   <meta name="description" content="Updates and statistics" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <link rel="shortcut icon" href="<?= base_url(); ?>assets/img/logo.png" />
+  <link rel="shortcut icon" href="<?= base_url('assets/logo/'.$this->session->company->id_perusahaan.'/'.$this->session->company->logo); ?>" />
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
   <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/global/plugins.bundle1036.css" rel="stylesheet" type="text/css" />
