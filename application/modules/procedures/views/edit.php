@@ -622,8 +622,8 @@
 															<div class="col-lg-9">
 																<select name="distribute_id[]" multiple id="distribute_id" data-placeholder="Choose an options" class="form-control select2">;
 																	<option value=""></option>
-																	<?php foreach ($jabatan as $jbt) : ?>
-																		<option value="<?= $jbt->id; ?>" <?= isset($data) ? ((in_array($jbt->id, explode(',', $data->distribute_id))) ? 'selected' : '') : ''; ?>><?= $jbt->name; ?></option>
+																	<?php foreach ($depts as $dept) : ?>
+																		<option value="<?= $dept->id; ?>" <?= isset($data) ? ((in_array($dept->id, explode(',', $data->distribute_id))) ? 'selected' : '') : ''; ?>><?= $dept->name; ?></option>
 																	<?php endforeach; ?>
 																</select>
 																<span class="form-text text-danger invalid-feedback">Distribusi By harus di isi</span>

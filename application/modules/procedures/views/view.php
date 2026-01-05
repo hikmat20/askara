@@ -356,9 +356,9 @@
                 <tr>
                   <th style="vertical-align: middle;">Distribution By</th>
                   <td>
-                    <?php $lsJab = explode(',', $data->distribute_id);
-                    foreach ($lsJab as $jab) {
-                      echo ($jab) ? $ArrJab[$jab]->name . "<br>" : '-';
+                    <?php $lsDept = explode(',', $data->distribute_id);
+                    foreach ($lsDept as $dp) {
+                      echo (($dp) ? $ArrDept[$dp]->name . "<br>" : '-');
                     }
                     ?>
                   </td>

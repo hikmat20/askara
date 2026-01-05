@@ -220,7 +220,7 @@
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>6. GENERAL REQUIREMENT</strong></h4>
+        <h4><strong>GENERAL REQUIREMENT</strong></h4>
         <i>
           <?php isset($procedure_bilingual->general_requirement) ? $procedure_bilingual->general_requirement : ''; ?>
         </i>
@@ -358,17 +358,17 @@
 
     <div>
       <h4>DISTRIBUSI</h4>
-      <ul>
-        <?php $lsJab = explode(',', $procedure->distribute_id);
-        if (count($lsJab) > 1) :
-          foreach ($lsJab as $jab) {
-            echo "<li>" . isset($ArrJab[$jab]->id) && $ArrJab[$jab]->id ? $ArrJab[$jab]->name : '~'  . "</li>";
+      <ol>
+        <?php $lsDept = explode(',', $procedure->distribute_id);
+        if (count($lsDept) > 1) :
+          foreach ($lsDept as $dept) {
+            echo "<li>" . (isset($ArrDept[$dept]->id) && $ArrDept[$dept]->id ? $ArrDept[$dept]->name : '~')  . "</li>";
           }
         else:
           echo "~";
         endif;
         ?>
-      </ul>
+      </ol>
     </div>
   </div>
 

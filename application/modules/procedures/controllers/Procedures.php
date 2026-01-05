@@ -152,7 +152,8 @@ class Procedures extends Admin_Controller
 		$getForms			= $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
 		$getGuides			= $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
 		$jabatan 			= $this->db->get('positions')->result();
-		$ArrUsr 			= $ArrJab = $ArrForms = $ArrGuides = [];
+		$ArrUsr 			= $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
+		$depts 			= $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
 
 		foreach ($getForms as $frm) {
 			$ArrForms[$frm->id] = $frm;
@@ -169,6 +170,10 @@ class Procedures extends Admin_Controller
 			$ArrJab[$jab->id] = $jab;
 		}
 
+		foreach ($depts as $dept) {
+			$ArrDept[$dept->id] = $dept;
+		}
+
 		if ($Data) {
 			$Data_detail 		= $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$this->template->set([
@@ -180,6 +185,7 @@ class Procedures extends Admin_Controller
 				'jabatan'   => $jabatan,
 				'ArrUsr'    => $ArrUsr,
 				'ArrJab'    => $ArrJab,
+				'ArrDept'    => $ArrDept,
 				'ArrForms'  => $ArrForms,
 				'ArrGuides' => $ArrGuides,
 			]);
@@ -1536,9 +1542,14 @@ class Procedures extends Admin_Controller
 		$getGuides           = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 		$users               = $this->db->get_where('view_users', ['company_id' => $this->company])->result();
 		$jabatan             = $this->db->get('positions')->result();
-		$ArrUsr              = $ArrJab = $ArrForms = $ArrGuides = [];
+		$ArrUsr              = $ArrJab = $ArrDept = $ArrForms = $ArrGuides = [];
 		$procedure_bilingual = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
-		$company = $this->Comp->find($this->company);
+		$company             = $this->Comp->find($this->company);
+		$depts               = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		
+		foreach ($depts as $dept) {
+			$ArrDept[$dept->id] = $dept;
+		}
 
 		foreach ($getForms as $frm) {
 			$ArrForms[$frm->id] = $frm;
@@ -1581,6 +1592,7 @@ class Procedures extends Admin_Controller
 			'ArrForms'            => $ArrForms,
 			'ArrGuides'           => $ArrGuides,
 			'Data'                => $Data,
+			'ArrDept'             => $ArrDept,
 			'ArrData'             => $ArrData,
 			'ArrStd'              => $ArrStd,
 			'allProcedure'        => $allProcedure,
