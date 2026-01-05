@@ -38,13 +38,13 @@ class Procedures extends Admin_Controller
 	public function index()
 	{
 		// $data			= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => '1'])->result();
-		$dataDraft		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'DFT'])->result();
-		$dataRev		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'REV'])->result();
-		$dataCor		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'COR'])->result();
-		$dataApv		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'APV'])->result();
-		$dataPub		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'PUB'])->result();
-		$dataDel		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'HLD', 'deletion_status' => 'APV'])->result();
-		$dataRvi		= $this->db->get_where('procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'RVI'])->result();
+		$dataDraft		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'DFT'])->result();
+		$dataRev		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'REV'])->result();
+		$dataCor		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'COR'])->result();
+		$dataApv		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'APV'])->result();
+		$dataPub		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'PUB'])->result();
+		$dataDel		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'DEL'])->result();
+		$dataRvi		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'RVI'])->result();
 		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('directory_log', ['doc_type' => 'Procedure', 'new_status' => 'RVI'])->result();
 
 		$ArrReason = [];
@@ -1582,7 +1582,7 @@ class Procedures extends Admin_Controller
 			$ArrStd[$dtstd->requirement_id] = $dtstd;
 		}
 
-		$allProcedure 		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
+		// $allProcedure 		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
 
 		$Data = [
 			'procedure'           => $procedure,
@@ -1596,7 +1596,7 @@ class Procedures extends Admin_Controller
 			'ArrDept'             => $ArrDept,
 			'ArrData'             => $ArrData,
 			'ArrStd'              => $ArrStd,
-			'allProcedure'        => $allProcedure,
+			// 'allProcedure'        => $allProcedure,
 			'procedure_bilingual' => $procedure_bilingual,
 			'revision_logs'       => $revision_logs,
 		];

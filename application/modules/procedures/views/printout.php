@@ -6,7 +6,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
-  <title>Procedure</title>
+  <title><?= $procedure->name ; ?></title>
   <style>
     *,
 
@@ -130,13 +130,20 @@
           </tr>
         </thead>
         <tbody>
-          <?php if ($revision_logs) foreach ($revision_logs as $revisionLog): ?>
+          <?php if ($revision_logs): foreach ($revision_logs as $revisionLog): ?>
+              <tr>
+                <td class="text-center"><?= $revisionLog->revision_number; ?></td>
+                <td class="text-center"><?= $revisionLog->revision_date; ?></td>
+                <td><?= $revisionLog->description; ?></td>
+              </tr>
+            <?php endforeach; ?>
+          <?php else: ?>
             <tr>
-              <td class="text-center"><?= $revisionLog->revision_number; ?></td>
-              <td class="text-center"><?= $revisionLog->revision_date; ?></td>
-              <td><?= $revisionLog->description; ?></td>
+              <td class="text-center">~</td>
+              <td class="text-center">~</td>
+              <td>~</td>
             </tr>
-          <?php endforeach; ?>
+          <?php endif; ?>
         </tbody>
       </table>
     </div>

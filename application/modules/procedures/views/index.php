@@ -43,25 +43,29 @@
 						<!-- Draft -->
 						<div class="tab-pane fade active show" id="draft" role="tabpanel" aria-labelledby="draft-tab">
 							<table id="example2" class="table datatable table-bordered table-sm table-hover datatable">
-								<thead class="text-center table-light">
-									<tr class="text-center">
-										<th class="p-2" width="40">No.</th>
-										<th class="p-2 text-left">Nama</th>
-										<th class="p-2" width="130">Status</th>
-										<th class="p-2" width="70">Action</th>
+								<thead class="table-secondary">
+									<tr>
+										<th class="" width="40">No.</th>
+										<th class="">Nama</th>
+										<th class="">Nomor</th>
+										<th class="text-center">Departement</th>
+										<th class="text-center">Kelompok</th>
+										<th class="text-center" width="130">Status</th>
+										<th class="text-center" width="70">Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php if (isset($dataDraft) && $dataDraft) :
 										$n = 0;
 										foreach ($dataDraft as $draft) : $n++; ?>
-											<tr class="text-center">
-												<td class="p-2"><?= $n; ?></td>
-												<td class="p-2 text-left">
-													<h6 class="my-0"><?= $draft->name; ?></h6>
-												</td>
-												<td class="p-2"><?= $status[$draft->status]; ?></td>
-												<td class="p-2">
+											<tr>
+												<td class="text-center"><?= $n; ?> </td>
+												<td class="font-weight-bolder h6"><?= $draft->name; ?></td>
+												<td class=""><?= $draft->nomor; ?></td>
+												<td class=""><?= $draft->departement_name; ?></td>
+												<td class=""><?= $draft->group_name; ?></td>
+												<td class=""><?= $status[$draft->status]; ?></td>
+												<td class="">
 													<a href="<?= base_url($this->uri->segment(1) . '/printout/' . $draft->id); ?>" target="_blank" class="btn btn-xs btn-icon btn-light print" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Print Data"><i class="fa fa-print"></i></a>
 													<div class="dropdown open d-inline">
 														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
