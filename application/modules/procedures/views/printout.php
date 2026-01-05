@@ -361,8 +361,8 @@
       <ol>
         <?php $lsDept = explode(',', $procedure->distribute_id);
         if (count($lsDept) > 0) :
-          foreach ($lsDept as $dept) {
-            echo "<li>" . (isset($ArrDept[$dept]->id) && $ArrDept[$dept]->id ? $ArrDept[$dept]->name : '~')  . "</li>";
+          foreach ($lsDept as $dep) {
+            echo "<li>" . (isset($ArrDept[$dep]->id) && $ArrDept[$dep]->id ? $ArrDept[$dep]->name : '~')  . "</li>";
           }
         else:
           echo "~";
