@@ -145,91 +145,91 @@
   <div style="border-top: 0px solid;height:100%;">
     <div class="clearfix">
       <div class="box">
-        <h4><strong>TUJUAN</strong></h4>
+        <h4><strong>1. TUJUAN</strong></h4>
         <?= ($procedure->object); ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>OBJECT</strong></h4>
+        <h4><strong>1. OBJECT</strong></h4>
         <span style="font-style: italic;">
-          <?= isset($procedure_bilingual->object) ? $procedure_bilingual->object : ''; ?>
+          <?= (isset($procedure_bilingual->object) ? $procedure_bilingual->object : ''); ?>
         </span>
         <br>
       </div>
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4><strong>RUANG LINGKUP</strong></h4>
+        <h4><strong>2. RUANG LINGKUP</strong></h4>
         <?= $procedure->scope; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>SCOPE</strong></h4>
+        <h4><strong>2. SCOPE</strong></h4>
         <i>
-          <?= isset($procedure_bilingual->scope) ? $procedure_bilingual->scope : ''; ?>
+          <?= (isset($procedure_bilingual->scope) ? $procedure_bilingual->scope : ''); ?>
         </i>
         <br>
       </div>
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4><strong>TANGGUNG JAWAB</strong></h4>
+        <h4><strong>3. TANGGUNG JAWAB</strong></h4>
         <?= $procedure->responsibility; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>RESPONSIBILITY</strong></h4>
+        <h4><strong>3. RESPONSIBILITY</strong></h4>
         <i>
-          <?= isset($procedure_bilingual->responsibility) ? $procedure_bilingual->responsibility : ''; ?>
+          <?= (isset($procedure_bilingual->responsibility) ? $procedure_bilingual->responsibility : ''); ?>
         </i>
         <br>
       </div>
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4><strong>DEFINISI</strong></h4>
+        <h4><strong>4. DEFINISI</strong></h4>
         <?= $procedure->define; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>DEFINE</strong></h4>
+        <h4><strong>4. DEFINE</strong></h4>
         <i>
-          <?= isset($procedure_bilingual->define) ? $procedure_bilingual->define : ''; ?>
+          <?= (isset($procedure_bilingual->define) ? $procedure_bilingual->define : ''); ?>
         </i>
         <br>
       </div>
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4><strong>PERFORMA INDIKATOR</strong></h4>
+        <h4><strong>5. PERFORMA INDIKATOR</strong></h4>
         <?= $procedure->performance; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>INDICATOR PERFORMANCE</strong></h4>
+        <h4><strong>5. INDICATOR PERFORMANCE</strong></h4>
         <i>
-          <?php isset($procedure_bilingual->performance) ? $procedure_bilingual->performance : ''; ?>
+          <?php (isset($procedure_bilingual->performance) ? $procedure_bilingual->performance : ''); ?>
         </i>
         <br>
       </div>
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4><strong>KETENTUAN UMUM</strong></h4>
+        <h4><strong>6. KETENTUAN UMUM</strong></h4>
         <?= $procedure->general_requirement; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>GENERAL REQUIREMENT</strong></h4>
+        <h4><strong>6. GENERAL REQUIREMENT</strong></h4>
         <i>
-          <?php isset($procedure_bilingual->general_requirement) ? $procedure_bilingual->general_requirement : ''; ?>
+          <?php (isset($procedure_bilingual->general_requirement) ? $procedure_bilingual->general_requirement : ''); ?>
         </i>
         <br>
       </div>
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4>REFERENSI</h4>
+        <h4>7. REFERENSI</h4>
         <?php if ($ArrStd) : ?>
           <?php foreach ($ArrStd as $std) : ?>
             <h4><?= $std->name; ?></h4>
@@ -247,7 +247,7 @@
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4>REFERENCE</h4>
+        <h4>7. REFERENCE</h4>
         <?php if ($ArrStd) : ?>
           <?php foreach ($ArrStd as $std) : ?>
             <h4><?= $std->name; ?></h4>
@@ -307,7 +307,7 @@
     <pagebreak></pagebreak>
     <!-- Deskripsi Procedure -->
     <div>
-      <h4>DESKRIPSI PROSEDUR</h4>
+      <h4>8. DESKRIPSI PROSEDUR</h4>
       <table class="table-data" width="100%" cellpadding="5" cellspacing="0">
         <thead>
           <tr class="table-secondary">
@@ -357,10 +357,10 @@
     </div>
 
     <div>
-      <h4>DISTRIBUSI</h4>
+      <h4>9. DISTRIBUSI</h4>
       <ol>
         <?php $lsDept = explode(',', $procedure->distribute_id);
-        if (count($lsDept) > 1) :
+        if (count($lsDept) > 0) :
           foreach ($lsDept as $dept) {
             echo "<li>" . (isset($ArrDept[$dept]->id) && $ArrDept[$dept]->id ? $ArrDept[$dept]->name : '~')  . "</li>";
           }
@@ -375,7 +375,7 @@
   <?php if ($procedure->image_flow_1 || $procedure->image_flow_2 || $procedure->image_flow_3) : ?>
     <pagebreak></pagebreak>
     <div style="border: 0px solid;height:100%;">
-      <h4>9. FLOW PROCEDURE</h4>
+      <h4>10. FLOW PROCEDURE</h4>
       <?php if ($procedure->image_flow_1) : ?>
         <img width="100%" src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_1"); ?>"
           alt="image_flow_1" class="img-fluid">

@@ -14,7 +14,6 @@
   ul ul ul {
     padding-left: 20px;
   }
-
 </style>
 
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
@@ -31,13 +30,13 @@
         </tr>
         <tr>
           <td class="py-6 w-50">
-            <h3 class="fw-extra-bold"><strong><u>TUJUAN</u></strong></h3>
+            <h3 class="fw-extra-bold"><strong><u>1. TUJUAN</u></strong></h3>
             <div class="font-size-h6">
               <?= $data->object; ?>
             </div>
           </td>
           <td style="color:#0088ffff">
-            <h3 class="fw-extra-bold"><strong><u>OBJECT</u></strong></h3>
+            <h3 class="fw-extra-bold"><strong><u>1. OBJECT</u></strong></h3>
             <div class="font-size-h6">
               <?= $bilingual->object; ?>
             </div>
@@ -45,13 +44,13 @@
         </tr>
         <tr>
           <td class="py-6">
-            <h3 class="fw-extra-bold"><strong><u>RUANG LINGKUP</u></strong></h3>
+            <h3 class="fw-extra-bold"><strong><u>2. RUANG LINGKUP</u></strong></h3>
             <div class="font-size-h6">
               <?= $data->scope; ?>
             </div>
           </td>
           <td style="color:#0088ffff" class="py-6">
-            <h3 class="fw-extra-bold"><strong><u>SCOPE</u></strong></h3>
+            <h3 class="fw-extra-bold"><strong><u>2. SCOPE</u></strong></h3>
             <div class="font-size-h6">
               <?= $bilingual->scope; ?>
             </div>
@@ -59,13 +58,27 @@
         </tr>
         <tr>
           <td class="py-6">
-            <h3 class="fw-extra-bold"><strong><u>DEFINISI</u></strong></h3>
+            <h3 class="fw-extra-bold"><strong><u>3. TNGGUNG JAWAB</u></strong></h3>
+            <div class="font-size-h6">
+              <?= $data->responsibility; ?>
+            </div>
+          </td>
+          <td style="color:#0088ffff" class="py-6">
+            <h3 class="fw-extra-bold"><strong><u>3. RESPONSIBILITY</u></strong></h3>
+            <div class="font-size-h6">
+              <?= $bilingual->responsibility; ?>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="py-6">
+            <h3 class="fw-extra-bold"><strong><u>4. DEFINISI</u></strong></h3>
             <div class="font-size-h6">
               <?= $data->define; ?>
             </div>
           </td>
           <td style="color:#0088ffff" class="py-6">
-            <h3 class="fw-extra-bold"><strong><u>DEFINE</u></strong></h3>
+            <h3 class="fw-extra-bold"><strong><u>4. DEFINE</u></strong></h3>
             <div class="font-size-h6">
               <?= $bilingual->define; ?>
             </div>
@@ -73,15 +86,29 @@
         </tr>
         <tr>
           <td class="py-6">
-            <h3 class="fw-extra-bold"><strong><u>Performa Indikator</u></strong></h3>
+            <h3 class="fw-extra-bold"><strong><u>5. PERFORMA INDIKATOR</u></strong></h3>
             <div class="font-size-h6">
               <?= $data->performance; ?>
             </div>
           </td>
           <td style="color:#0088ffff" class="py-6">
-            <h3 class="fw-extra-bold"><strong><u>INDICATOR PERFORMANCE</u></strong></h3>
+            <h3 class="fw-extra-bold"><strong><u>5. INDICATOR PERFORMANCE</u></strong></h3>
             <div class="font-size-h6">
               <?= $bilingual->performance; ?>
+            </div>
+          </td>
+        </tr>
+        <tr>
+          <td class="py-6">
+            <h3 class="fw-extra-bold"><strong><u>6. KETENTUAN UMUM</u></strong></h3>
+            <div class="font-size-h6">
+              <?= $data->general_requirement; ?>
+            </div>
+          </td>
+          <td style="color:#0088ffff" class="py-6">
+            <h3 class="fw-extra-bold"><strong><u>6. GENERAL REQUIREMENT</u></strong></h3>
+            <div class="font-size-h6">
+              <?= $bilingual->general_requirement; ?>
             </div>
           </td>
         </tr>
