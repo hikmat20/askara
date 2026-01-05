@@ -1,30 +1,20 @@
 <style>
   ol,
   ul {
-    padding-left: 1rem;
+    padding-left: 20px;
     margin-left: 0;
   }
 
   ol ol,
   ul ul {
-    padding-left: 1.25rem;
+    padding-left: 20px;
   }
 
   ol ol ol,
   ul ul ul {
-    padding-left: 1.25rem;
+    padding-left: 20px;
   }
 
-  .editor ol,
-  .editor ul {
-    padding-left: 1.5rem;
-    margin-left: 0;
-  }
-
-  .editor ol ol,
-  .editor ul ul {
-    padding-left: 1.25rem;
-  }
 </style>
 
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">

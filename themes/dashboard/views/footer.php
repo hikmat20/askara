@@ -210,7 +210,6 @@
      };
  </script>
  <!-- REQUIRED JS SCRIPTS -->
- <!-- <script src="<?= base_url('assets/plugins/jQuery/jquery-2.2.3.min.js'); ?>"></script> -->
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/global/plugins.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/scripts.bundle1036.js?"></script>
@@ -219,60 +218,72 @@
  <!-- <script src="<?= base_url('themes\dashboard\assets\plugins\custom\select2\select21036.js'); ?>"></script> -->
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/pages/widgets1036.js?"></script>
  <script src="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\summernote\summernote-bs4.min.js"></script>
- <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/tinymce/tinymce.min.js"></script>
 
  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jquery-ui/jquery-ui.min.js"></script>
  <script src="<?= base_url('themes/dashboard/assets/plugins/custom/monthpicker/MonthPicker.js'); ?>"></script>
  <script src="https://cdn.rawgit.com/digitalBush/jquery.maskedinput/1.4.1/dist/jquery.maskedinput.min.js"></script>
+ <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/tinymce/tinymce.min.js"></script>
 
  <script>
+     window.TinyManager = {
+         init: function(selector = '.editor') {
+             if (!window.tinymce) return;
+
+             if (tinymce.get(selector)) return;
+
+             tinymce.init({
+                 selector: selector,
+                 height: 250,
+                 resize: true,
+                 max_indent: 3,
+                 toolbar_mode: 'sliding',
+                 statusbar: true,
+                 branding: false,
+                 promotion: false,
+                 autoresize_bottom_margin: 50,
+                 link_default_protocol: 'https',
+                 menubar: false,
+                 plugins: [
+                     'preview', 'anchor', 'accordion', 'advlist', 'anchor', 'code', 'image', 'link', 'lists', 'table',
+                 ],
+                 toolbar: 'undo redo | paste pastetext fontsize| ' +
+                     'bold italic backcolor forecolor | alignleft aligncenter ' +
+                     'alignright alignjustify | bullist numlist outdent indent | table tabledelete | link ' +
+                     'removeformat | help',
+                 content_style: `body { font-family:Calibri,Arial,sans-serif; font-size:14pt }
+                      ol, ul {
+                          padding-left: 1rem;
+                          margin-left: 0;
+                      }
+                      ol ol, ul ul {
+                          padding-left: 1.25rem;
+                      }
+                      ol ol ol, ul ul ul {
+                          padding-left: 1.25rem;
+                      }
+                      .editor ol,
+                      .editor ul {
+                          padding-left: 1.5rem;
+                          margin-left: 0;
+                      }
+  
+                      .editor ol ol,
+                      .editor ul ul {
+                          padding-left: 1.25rem;
+                      }
+               `
+             });
+         },
+
+         destroy: function(selector = '.editor') {
+             const inst = tinymce.get(selector);
+             if (inst) inst.remove();
+         }
+     };
+
      $(document).ready(function() {
-         
-
-
-         tinymce.init({
-             selector: '.editor',
-             height: 250,
-             resize: true,
-             max_indent: 3,
-             toolbar_mode: 'sliding',
-             statusbar: true,
-             branding: false,
-             promotion: false,
-             autoresize_bottom_margin: 50,
-             link_default_protocol: 'https',
-             menubar: false,
-             plugins: [
-                 'preview', 'anchor', 'accordion', 'advlist', 'anchor', 'code', 'image', 'link', 'lists', 'table',
-             ],
-             toolbar: 'undo redo | paste pastetext fontsize| ' +
-                 'bold italic backcolor forecolor | alignleft aligncenter ' +
-                 'alignright alignjustify | bullist numlist outdent indent | table tabledelete | link ' +
-                 'removeformat | help',
-             content_style: `body { font-family:Calibri,Arial,sans-serif; font-size:14pt }
-                    ol, ul {
-                        padding-left: 1rem;
-                        margin-left: 0;
-                    }
-                    ol ol, ul ul {
-                        padding-left: 1.25rem;
-                    }
-                    ol ol ol, ul ul ul {
-                        padding-left: 1.25rem;
-                    }
-                    .editor ol,
-                    .editor ul {
-                        padding-left: 1.5rem;
-                        margin-left: 0;
-                    }
-
-                    .editor ol ol,
-                    .editor ul ul {
-                        padding-left: 1.25rem;
-                    }
-             `
-         });
+         TinyManager.init('.editor');
 
          //  $('.select2').select2({
          //      placeholder: 'Choose an options',

@@ -96,6 +96,17 @@
       padding-left: 20px;
     }
 
+    ol ol,
+    ul ul {
+      padding-left: 20px;
+    }
+
+    ol ol ol,
+    ul ul ul {
+      padding-left: 20px;
+
+    }
+
     li {
       padding-left: 20px;
       display: inline;
@@ -105,57 +116,13 @@
 
 <body>
   <!-- header -->
-  <table class="table-data" cellpadding="2" cellspacing="0" style="font-size: 10pt;">
-    <tr>
-      <td rowspan="5" class="text-right" style="vertical-align: middle;border-right:0px">
-        <img width="80" src="<?= base_url($company->path_logo . $company->id_perusahaan . '/' . $company->logo); ?>" alt="">
-      </td>
-      <td rowspan="5" class="text-left" style="vertical-align: middle;border-left:0px">
-        <h2><?= $company_name; ?></h2>
-      </td>
-      <td width="200">Dept</td>
-      <td width=""><?= isset($procedure->departement_id) ? $procedure->departement_id : ''; ?></td>
-    </tr>
-    <tr>
-      <td>No. Dok</td>
-      <td><?= ($procedure->nomor) ?: '~'; ?></td>
-    </tr>
-    <tr>
-      <td>Revisi</td>
-      <td><?= ($procedure->revision) ?: '~'; ?></td>
-    </tr>
-    <tr>
-      <td>Tgl. Terbit</td>
-      <td><?= ($procedure->published_at) ?: '~'; ?></td>
-      <!-- <td class="text-center"><?= ($procedure->user_approved_name) ? $procedure->user_approved_name : '~'; ?></td> -->
-      <!-- <td class="text-center"><?= ($procedure->user_reviewed_name) ? $procedure->user_reviewed_name : '~'; ?></td> -->
-      <!-- <td class="text-center"><?= ($procedure->user_prepared_name) ? $procedure->user_prepared_name : '~'; ?></td> -->
-    </tr>
-    <tr>
-      <td>Halaman</td>
-      <td>{PAGENO} dari {nbpg}</td>
-      <!-- <td class="text-center"><?= ($procedure->approval_name) ? $procedure->approval_name : '~'; ?></td> -->
-      <!-- <td class="text-center"><?= ($procedure->reviewer_name) ? $procedure->reviewer_name : '~'; ?></td> -->
-      <!-- <td class="text-center"><?= ($procedure->prepare_name) ? $procedure->prepare_name : '~'; ?></td> -->
-    </tr>
-    <tr>
-      <td colspan="4" class="text-center" style="vertical-align: middle;">
-        <h2><?= strtoupper($procedure->name); ?></h2>
-        <h3 style="color: #0088ffff;">(<?= isset($procedure_bilingual->name) ? strtoupper($procedure_bilingual->name) : ''; ?>)</h3>
-      </td>
-    </tr>
-  </table>
-  <br>
-
   <div class="text-center">
-    <table width="100%">
-      <tr>
-        <th class="text-center"><b>RIWAYAT DOKUMEN</b></th>
-      </tr>
-    </table>
     <div>
       <table class="" width="100%" border="1">
         <thead>
+          <tr>
+            <th class="text-center" colspan="3"><b>RIWAYAT DOKUMEN</b></th>
+          </tr>
           <tr style="background-color: #c8c8c8ff;">
             <th>REVISI</th>
             <th>TANGGAL REVISI</th>
@@ -172,32 +139,32 @@
       </table>
     </div>
   </div>
-  <br>
+
+  <pagebreak></pagebreak>
 
   <div style="border-top: 0px solid;height:100%;">
     <div class="clearfix">
       <div class="box">
-        <h4><strong>1. TUJUAN</strong></h4>
+        <h4><strong>TUJUAN</strong></h4>
         <?= ($procedure->object); ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>1. OBJECT</strong></h4>
+        <h4><strong>OBJECT</strong></h4>
         <span style="font-style: italic;">
           <?= isset($procedure_bilingual->object) ? $procedure_bilingual->object : ''; ?>
         </span>
         <br>
       </div>
     </div>
-
     <div class="clearfix">
       <div class="box">
-        <h4><strong>2. RUANG LINGKUP</strong></h4>
+        <h4><strong>RUANG LINGKUP</strong></h4>
         <?= $procedure->scope; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>2. SCOPE</strong></h4>
+        <h4><strong>SCOPE</strong></h4>
         <i>
           <?= isset($procedure_bilingual->scope) ? $procedure_bilingual->scope : ''; ?>
         </i>
@@ -206,12 +173,12 @@
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4><strong>3. TANGGUNG JAWAB</strong></h4>
+        <h4><strong>TANGGUNG JAWAB</strong></h4>
         <?= $procedure->responsibility; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>3. RESPONSIBILITY</strong></h4>
+        <h4><strong>RESPONSIBILITY</strong></h4>
         <i>
           <?= isset($procedure_bilingual->responsibility) ? $procedure_bilingual->responsibility : ''; ?>
         </i>
@@ -220,12 +187,12 @@
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4><strong>4. DEFINISI</strong></h4>
+        <h4><strong>DEFINISI</strong></h4>
         <?= $procedure->define; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>4. DEFINE</strong></h4>
+        <h4><strong>DEFINE</strong></h4>
         <i>
           <?= isset($procedure_bilingual->define) ? $procedure_bilingual->define : ''; ?>
         </i>
@@ -234,13 +201,12 @@
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4><strong>5. PERFORMA INDIKATOR</strong></h4>
-        <?php //$procedure->performance; 
-        ?>
+        <h4><strong>PERFORMA INDIKATOR</strong></h4>
+        <?= $procedure->performance; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4><strong>5. INDICATOR PERFORMANCE</strong></h4>
+        <h4><strong>INDICATOR PERFORMANCE</strong></h4>
         <i>
           <?php isset($procedure_bilingual->performance) ? $procedure_bilingual->performance : ''; ?>
         </i>
@@ -249,26 +215,21 @@
     </div>
     <div class="clearfix">
       <div class="box">
-        <h4>6. REFERENSI</h4>
-        <?php if ($ArrStd) : ?>
-          <?php foreach ($ArrStd as $std) : ?>
-            <h4><?= $std->name; ?></h4>
-            <ul>
-              <?php if ($ArrData['standards'][$std->requirement_id]) : ?>
-                <?php $n = 0;
-                foreach ($ArrData['standards'][$std->requirement_id] as $dtStd) : $n++; ?>
-                  <li><?= $dtStd->chapter; ?></li>
-              <?php endforeach;
-              endif; ?>
-            </ul>
-            <br>
-          <?php endforeach; ?>
-        <?php endif; ?>
-        <br>
+        <h4><strong>KETENTUAN UMUM</strong></h4>
+        <?= $procedure->general_requirement; ?>
         <br>
       </div>
       <div class="box" style="color: #0088ffff;">
-        <h4>6. REFERENCE</h4>
+        <h4><strong>6. GENERAL REQUIREMENT</strong></h4>
+        <i>
+          <?php isset($procedure_bilingual->general_requirement) ? $procedure_bilingual->general_requirement : ''; ?>
+        </i>
+        <br>
+      </div>
+    </div>
+    <div class="clearfix">
+      <div class="box">
+        <h4>REFERENSI</h4>
         <?php if ($ArrStd) : ?>
           <?php foreach ($ArrStd as $std) : ?>
             <h4><?= $std->name; ?></h4>
@@ -284,12 +245,29 @@
           <?php endforeach; ?>
         <?php endif; ?>
         <br>
+      </div>
+      <div class="box" style="color: #0088ffff;">
+        <h4>REFERENCE</h4>
+        <?php if ($ArrStd) : ?>
+          <?php foreach ($ArrStd as $std) : ?>
+            <h4><?= $std->name; ?></h4>
+            <ul>
+              <?php if ($ArrData['standards'][$std->requirement_id]) : ?>
+                <?php $n = 0;
+                foreach ($ArrData['standards'][$std->requirement_id] as $dtStd) : $n++; ?>
+                  <li><?= $dtStd->chapter; ?></li>
+              <?php endforeach;
+              endif; ?>
+            </ul>
+            <br>
+          <?php endforeach; ?>
+        <?php endif; ?>
         <br>
       </div>
     </div>
 
     <?php if ($procedure->supplier): ?>
-      <div class="" style="padding:10px">
+      <div>
         <h4><strong>SIPOCOR</strong></h4>
         <table width="100%" class="">
           <tr>
@@ -326,9 +304,10 @@
       </div>
     <?php endif; ?>
 
+    <pagebreak></pagebreak>
     <!-- Deskripsi Procedure -->
-    <div class="" style="padding:10px">
-      <h4>7. DESKRIPSI PROSEDUR</h4>
+    <div>
+      <h4>DESKRIPSI PROSEDUR</h4>
       <table class="table-data" width="100%" cellpadding="5" cellspacing="0">
         <thead>
           <tr class="table-secondary">
@@ -374,10 +353,11 @@
           <?php endif; ?>
         </tbody>
       </table>
+      <br>
     </div>
 
-    <div class="" style="padding:10px">
-      <h4>8. DISTRIBUSI</h4>
+    <div>
+      <h4>DISTRIBUSI</h4>
       <ul>
         <?php $lsJab = explode(',', $procedure->distribute_id);
         if (count($lsJab) > 1) :

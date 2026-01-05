@@ -1524,8 +1524,11 @@ class Procedures extends Admin_Controller
 	/* PRINTOUT */
 	public function printOut($id = null)
 	{
-		$mpdf 				= new Mpdf();
-		// $mpdf->showImageErrors = true;
+		$mpdf = new Mpdf([
+			'margin_top' => 55,
+			'margin_bottom' => 15,
+		]);
+		$mpdf->showImageErrors = true;
 		$mpdf->curlAllowUnsafeSslRequests = true;
 		$procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
 		$flowDetail          = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
@@ -1571,7 +1574,7 @@ class Procedures extends Admin_Controller
 
 		$Data = [
 			'procedure'           => $procedure,
-			'company'           => $company,
+			'company'             => $company,
 			'detail'              => $flowDetail,
 			'ArrUsr'              => $ArrUsr,
 			'ArrJab'              => $ArrJab,
@@ -1583,11 +1586,53 @@ class Procedures extends Admin_Controller
 			'allProcedure'        => $allProcedure,
 			'procedure_bilingual' => $procedure_bilingual,
 		];
+		$header = $this->getheader($Data);
+		$mpdf->SetHTMLHeader($header);
 
-		$mpdf->AddPage('P', '', '', '', '', 7, 7, 7, 7, 5, '', '', '');
+		$mpdf->AddPage('P', '', '', '', '', 7, 7, 55, 7, 7, '', '', '');
+		// $mpdf->AddPage();
 		$this->template->set($Data);
 		$data = $this->template->load_view('printout');
 		$mpdf->WriteHTML($data);
 		$mpdf->Output();
+	}
+
+	public function getHeader($Data)
+	{
+		return '<div>
+		<table class="table-data" cellpadding="2" cellspacing="0" style="font-size: 10pt;">
+				<tr>
+				<td rowspan="5" width="100" class="text-right" style="vertical-align: middle;border-right:0px">
+					<img width="80" src="' . base_url($Data['company']->path_logo . $Data['company']->id_perusahaan . '/' . $Data['company']->logo) . '" alt="">
+				</td>
+				<td rowspan="5" width="250"  class="text-center" style="vertical-align: middle;border-left:0px">
+					<h2>' . $Data['company']->nm_perusahaan . '</h2>
+				</td>
+				<td width="150">Dept</td>
+				<td width="">' . (isset($Data['procedure']->departement_id) ? $Data['procedure']->departement_name : '') . '</td>
+				</tr>
+				<tr>
+				<td>No. Dok</td>
+				<td>' . (($Data['procedure']->nomor) ?: '~') . '</td>
+				</tr>
+				<tr>
+				<td>Revisi</td>
+				<td>' . (($Data['procedure']->revision) ?: '~') . '</td>
+				</tr>
+				<tr>
+				<td>Tgl. Terbit</td>
+				<td>' . (($Data['procedure']->published_at) ?: '~') . '</td>
+				</tr>
+				<tr>
+				<td>Halaman</td>
+				<td>{PAGENO} dari {nbpg}</td>
+				</tr>
+				<tr>
+				<td colspan="4" class="text-center" style="vertical-align: middle;">
+					<h2>' . strtoupper($Data['procedure']->name) . '</h2>
+					<h3 style="color: #0088ffff;">(' . (isset($Data['procedure_bilingual']->name) ? strtoupper($Data['procedure_bilingual']->name) : '') . ')</h3>
+				</td>
+				</tr>
+			</table></div>';
 	}
 }

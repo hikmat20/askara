@@ -36,7 +36,37 @@
 
 	li li:before {
 		content: counters(item, ".") " ";
-	} */
+	} 
+	 
+	ul,
+    ol {
+      margin: 0;
+      padding-left: 20px;
+    }
+
+   
+
+	
+	*/
+	ul,
+	ol {
+		padding-left: 20px;
+	}
+
+	ol ol,
+	ul ul {
+		padding-left: 20px;
+	}
+
+	ol ol ol,
+	ul ul ul {
+		padding-left: 20px;
+	}
+
+	ul li,
+	ol li {
+		padding-left: 5px;
+	}
 </style>
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 	<div class="d-flex flex-column-fluid">
@@ -488,7 +518,7 @@
 															<th width="50">No</th>
 															<th width="15%">PIC</th>
 															<th width="" colspan="2">Deskripsi</th>
-															<th width="30%">Dokumen Terkait</th>
+															<th width="">Dokumen Terkait</th>
 															<th width="100">Action</th>
 														</tr>
 													</thead>
@@ -517,7 +547,7 @@
 																		<?php endif; ?>
 																	</td>
 																	<td class="text-center" style="vertical-align: middle;">
-																		<button type="button" data-proc_id="<?= $data->id; ?>"  class="btn btn-warning btn-icon rounded-circle btn-xs edit_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-edit"></i></button>
+																		<button type="button" data-proc_id="<?= $data->id; ?>" class="btn btn-warning btn-icon rounded-circle btn-xs edit_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-edit"></i></button>
 																		<button type="button" class="btn btn-danger btn-icon rounded-circle btn-xs delete_flow" data-id="<?= $dtl->id; ?>"><i class="fa fa-trash"></i></button>
 																	</td>
 																</tr>
@@ -809,14 +839,16 @@
 <div class="modal fade" id="modelId" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 		<div class="modal-content">
-			<div class="modal-header">
-				<h5 class="modal-title">Modal title</h5>
-				<button type="button" class="close" onclick="$('#content_modal').html('')" data-dismiss="modal" aria-label="Close">
-					<span aria-hidden="true">&times;</span>
-				</button>
-			</div>
 			<form id="form-flow-detail">
-				<div id="content_modal">
+				<div class="modal-header">
+					<h5 class="modal-title">Modal title</h5>
+					<button type="button" class="btn btn-sm " data-dismiss="modal" data-target="#modalId" aria-label="Close">
+						<span aria-hidden="true"><i class="fa fa-times" aria-hidden="true"></i></span>
+					</button>
+				</div>
+				<div class="modal-body" id="content_modal"></div>
+				<div class="modal-footer">
+					<button type="button" class="btn btn-sm btn-danger w-100px close_modal" data-dismiss="modal" data-target="#modalId"><i class="fa fa-times"></i>Cancel</button>
 				</div>
 			</form>
 		</div>
@@ -904,9 +936,30 @@
 		$(document).on('click', '#add_flow', function() {
 			const proc_id = $(this).data('id')
 			const url = siteurl + active_controller + 'add_flow/' + proc_id
-			$('#content_modal').load(url)
-			$('#modelId').modal('show')
+			$('#content_modal').load(url, function() {
+				$('#modelId').modal('show');
+
+				// tunggu modal benar-benar tampil
+				// $('#modelId').on('shown.bs.modal', function() {
+
+				// });
+				
+			});
 		})
+
+		$(document).on('click', '.close_modal', function() {
+			alert('hidee')
+			// const $textarea = $('.editor');
+
+			if (tinymce.get('editor')) {
+				tinymce.get('editor').remove();
+				// TinyManager.destroy('.editor');
+			}
+
+			// restore textarea
+			// $textarea.val('');
+		});
+
 
 		$(document).on('click', '.edit_flow', function() {
 			let id = $(this).data('id')
@@ -2237,5 +2290,54 @@
 		$("#pdf-loader").css('display', 'none');
 		$("#cancel-pdf").addClass('d-none');
 		$("#upload-button").css('display', 'none');
+
+
+
 	});
+
+
+	// function load_tinymce(el) {
+	// 	tinymce.init({
+	// 		selector: '.editor',
+	// 		height: 250,
+	// 		resize: true,
+	// 		max_indent: 3,
+	// 		toolbar_mode: 'sliding',
+	// 		statusbar: true,
+	// 		branding: false,
+	// 		promotion: false,
+	// 		autoresize_bottom_margin: 50,
+	// 		link_default_protocol: 'https',
+	// 		menubar: false,
+	// 		plugins: [
+	// 			'preview', 'anchor', 'accordion', 'advlist', 'anchor', 'code', 'image', 'link', 'lists', 'table',
+	// 		],
+	// 		toolbar: 'undo redo | paste pastetext fontsize| ' +
+	// 			'bold italic backcolor forecolor | alignleft aligncenter ' +
+	// 			'alignright alignjustify | bullist numlist outdent indent | table tabledelete | link ' +
+	// 			'removeformat | help',
+	// 		content_style: `body { font-family:Calibri,Arial,sans-serif; font-size:14pt }
+	//                 ol, ul {
+	//                     padding-left: 1rem;
+	//                     margin-left: 0;
+	//                 }
+	//                 ol ol, ul ul {
+	//                     padding-left: 1.25rem;
+	//                 }
+	//                 ol ol ol, ul ul ul {
+	//                     padding-left: 1.25rem;
+	//                 }
+	//                 .editor ol,
+	//                 .editor ul {
+	//                     padding-left: 1.5rem;
+	//                     margin-left: 0;
+	//                 }
+
+	//                 .editor ol ol,
+	//                 .editor ul ul {
+	//                     padding-left: 1.25rem;
+	//                 }
+	//          `
+	// 	});
+	// }
 </script>

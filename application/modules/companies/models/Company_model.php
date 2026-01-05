@@ -164,9 +164,9 @@ class Company_model extends BF_Model
 
 
         if (!is_dir('./assets/logo/' . $company . '/')) {
+            chown('./assets/', 'www-data');
             mkdir('./assets/logo/' . $company . '/', 0755, TRUE);
             chmod('./assets/logo/' . $company . '/', 0755);  // octal; correct value of mode
-            chown('./assets/logo/' . $company . '/', 'www-data');
         }
 
         if ($_FILES['logo']['name']) {
