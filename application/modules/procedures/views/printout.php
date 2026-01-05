@@ -358,17 +358,20 @@
 
     <div>
       <h4>9. DISTRIBUSI</h4>
-      <ol>
-        <?php $lsDept = explode(',', $procedure->distribute_id);
-        if (count($lsDept) > 0) :
+      <?php $lsDept = explode(',', $procedure->distribute_id);
+      if (count($lsDept) > 0) : ?>
+        <ol>
+          <?php
           foreach ($lsDept as $dep) {
             echo "<li>" . (isset($ArrDept[$dep]->id) && $ArrDept[$dep]->id ? $ArrDept[$dep]->name : '~')  . "</li>";
           }
-        else:
-          echo "~";
-        endif;
-        ?>
-      </ol>
+          ?>
+        </ol>
+      <?php
+      else:
+        echo "~";
+      endif;
+      ?>
     </div>
   </div>
 
