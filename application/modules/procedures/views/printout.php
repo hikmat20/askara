@@ -118,23 +118,25 @@
   <!-- header -->
   <div class="text-center">
     <div>
-      <table class="" width="100%" border="1">
+      <table class="" width="100%" border="1" cellpadding="3">
         <thead>
           <tr>
             <th class="text-center" colspan="3"><b>RIWAYAT DOKUMEN</b></th>
           </tr>
           <tr style="background-color: #c8c8c8ff;">
-            <th>REVISI</th>
-            <th>TANGGAL REVISI</th>
+            <th width="100">REVISI</th>
+            <th width="150">TANGGAL REVISI</th>
             <th>URAIAN PERUBAHAN</th>
           </tr>
         </thead>
         <tbody>
-          <tr>
-            <td class="text-center">-</td>
-            <td class="text-center">-</td>
-            <td>-</td>
-          </tr>
+          <?php if ($revision_logs) foreach ($revision_logs as $revisionLog): ?>
+            <tr>
+              <td class="text-center"><?= $revisionLog->revision_number; ?></td>
+              <td class="text-center"><?= $revisionLog->revision_date; ?></td>
+              <td><?= $revisionLog->description; ?></td>
+            </tr>
+          <?php endforeach; ?>
         </tbody>
       </table>
     </div>
