@@ -15,4 +15,5 @@ application/logs/*
 directory/
 
 assets/images/directory/checksheet/*
-
+/vendor/
+composer.lock

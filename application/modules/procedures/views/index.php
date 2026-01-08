@@ -91,28 +91,31 @@
 						<!-- Review -->
 						<div class="tab-pane fade" id="review" role="tabpanel" aria-labelledby="review-tab">
 							<table id="tblReview" class="table datatable table-bordered table-sm table-condensed table-hover datatable">
-								<thead class="text-center table-light">
-									<tr class="text-center">
-										<th class="p-2" width="40">No.</th>
-										<th class="p-2 text-left">Nama</th>
-										<th class="p-2" width="130">Status</th>
-										<th class="p-2" width="70">Action</th>
+								<thead class="table-secondary">
+									<tr>
+										<th class="" width="40">No.</th>
+										<th class="">Nama</th>
+										<th class="">Nomor</th>
+										<th class="text-center">Departement</th>
+										<th class="text-center">Kelompok</th>
+										<th class="text-center" width="130">Status</th>
+										<th class="text-center" width="70">Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php if (isset($dataRev) && $dataRev) :
 										$n = 0;
 										foreach ($dataRev as $dt) : $n++; ?>
-											<tr class="text-center">
-												<td class="p-2"><?= $n; ?></td>
-												<td class="p-2 text-left">
-													<h6 class="my-0"><?= $dt->name; ?></h6>
-												</td>
-												<td class="p-2"><?= $status[$dt->status]; ?></td>
-												<td class="p-2">
-													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search"></i></button>
-													<button type="button" class="btn btn-xs btn-icon btn-light-danger cancle-review" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Cancel Review"><i class="fa fa-undo"></i></button>
-												</td>
+											<td class="text-center"><?= $n; ?> </td>
+											<td class="font-weight-bolder h6"><?= $dt->name; ?></td>
+											<td class=""><?= $dt->nomor; ?></td>
+											<td class=""><?= $dt->departement_name; ?></td>
+											<td class=""><?= $dt->group_name; ?></td>
+											<td class=""><?= $status[$dt->status]; ?></td>
+											<td class="">
+												<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search"></i></button>
+												<button type="button" class="btn btn-xs btn-icon btn-light-danger cancle-review" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Cancel Review"><i class="fa fa-undo"></i></button>
+											</td>
 											</tr>
 									<?php endforeach;
 									endif; ?>

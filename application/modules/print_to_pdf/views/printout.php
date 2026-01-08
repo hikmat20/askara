@@ -11,11 +11,11 @@
     * {
       margin: 0;
       box-sizing: border-box;
-      font-size: 11pt;
     }
 
     body {
       font-family: 'Calibri';
+      font-size: 11pt;
 
     }
 
