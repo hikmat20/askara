@@ -21,7 +21,7 @@
     <table class="table table-bordered rounded-lg mb-6">
       <tr>
         <th colspan="2" class="table-dark text-center">
-          <h1><?= (isset($data->name)?$data->name:''); ?></h1>
+          <h1><?= (isset($data->name) ? $data->name : ''); ?></h1>
           <h3 class="font-italic">(<?= isset($bilingual->name) ? $bilingual->name : ''; ?>)</h3>
         </th>
       </tr>
@@ -29,7 +29,7 @@
         <td class="py-6 w-50">
           <h3 class="fw-extra-bold"><strong><u>1. TUJUAN</u></strong></h3>
           <div class="font-size-h6">
-            <?= (isset($data->object)?$data->object:''); ?>
+            <?= (isset($data->object) ? $data->object : ''); ?>
           </div>
         </td>
         <td style="color:#0088ffff">
@@ -193,8 +193,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>
-            <?php if ($data->image_flow_1 || $data->image_flow_2 || $data->image_flow_3 || $data->flow_file) : ?>
+            <?php if ($data->image_flow_1 || $data->image_flow_2 || $data->image_flow_3) : ?>
               <div class="d-flex justify-content-start align-items-center">
                 <?php if ($data->image_flow_1) : ?>
                   <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
@@ -241,25 +240,23 @@
                   </div>
                 <?php endif; ?>
 
+              </div>
+            <?php endif; ?>
+            <?php if ($data->flow_file): ?>
+              <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+                <div class="dropzone-desc">
+                  <?php if ($data->flow_file) : ?>
+                    <canvas id="pdf-preview" class="" width="150"></canvas>
+                  <?php endif; ?>
+                </div>
                 <?php if ($data->flow_file) : ?>
-                  <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
-                    <div class="dropzone-desc">
-                      <?php if ($data->flow_file) : ?>
-                        <canvas id="pdf-preview" class="" width="150"></canvas>
-                      <?php endif; ?>
-                    </div>
-                    <?php if ($data->flow_file) : ?>
-                      <div class="middle d-flex justify-content-center align-items-center">
-                        <a target="_blank" href="<?= base_url("directory/FLOW_FILE/$data->company_id/$data->flow_file"); ?>" class="btn btn-sm mr-1 btn-icon btn-default rounded-circle"><i class="fa fa-eye"></i></a>
-                      </div>
-                    <?php endif; ?>
+                  <div class="middle d-flex justify-content-center align-items-center">
+                    <a target="_blank" href="<?= base_url("directory/FLOW_FILE/$data->company_id/$data->flow_file"); ?>" class="btn btn-sm mr-1 btn-icon btn-default rounded-circle"><i class="fa fa-eye"></i></a>
                   </div>
                 <?php endif; ?>
               </div>
-            <?php else : ?>
-              <span class="text-center">~ Not available data ~</span>
             <?php endif; ?>
-          </td>
+            </td>
         </tr>
       </tbody>
     </table>
