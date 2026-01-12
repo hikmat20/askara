@@ -133,7 +133,7 @@
 <body>
   <!-- header -->
   <div class="text-center">
-    <table class="" width="100%" border="1" cellpadding="3">
+    <table class="table-data" width="100%" border="1" cellpadding="3">
       <thead>
         <tr>
           <th class="text-center" colspan="3"><b>RIWAYAT DOKUMEN</b></th>

@@ -614,12 +614,12 @@ function process_lists(DOMDocument $dom, DOMNode $context, $level)
             if ($li->nodeName !== 'li') continue;
 
             $marker = $isOrdered
-                ? format_marker($index, $styleType)
+                ? format_marker($index, $styleType) . '.'
                 : '•';
 
             $tr = $dom->createElement('tr');
 
-            $tdNo = $dom->createElement('td', $marker . '.');
+            $tdNo = $dom->createElement('td', $marker);
             $tdNo->setAttribute(
                 'style',
                 'border:none;width:20px;vertical-align:top;font-weight:normal;'
