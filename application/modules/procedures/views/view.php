@@ -21,21 +21,21 @@
     <table class="table table-bordered rounded-lg mb-6">
       <tr>
         <th colspan="2" class="table-dark text-center">
-          <h1><?= $data->name; ?></h1>
-          <h3 class="font-italic">(<?= $bilingual->name; ?>)</h3>
+          <h1><?= (isset($data->name) ? $data->name : ''); ?></h1>
+          <h3 class="font-italic">(<?= isset($bilingual->name) ? $bilingual->name : ''; ?>)</h3>
         </th>
       </tr>
       <tr>
         <td class="py-6 w-50">
           <h3 class="fw-extra-bold"><strong><u>1. TUJUAN</u></strong></h3>
           <div class="font-size-h6">
-            <?= $data->object; ?>
+            <?= (isset($data->object) ? $data->object : ''); ?>
           </div>
         </td>
         <td style="color:#0088ffff">
           <h3 class="fw-extra-bold"><strong><u>1. OBJECT</u></strong></h3>
           <div class="font-size-h6">
-            <?= $bilingual->object; ?>
+            <?= (isset($bilingual->object) ? $bilingual->object : ''); ?>
           </div>
         </td>
       </tr>
@@ -43,13 +43,13 @@
         <td class="py-6">
           <h3 class="fw-extra-bold"><strong><u>2. RUANG LINGKUP</u></strong></h3>
           <div class="font-size-h6">
-            <?= $data->scope; ?>
+            <?= (isset($data->scope) ? $data->scope : ''); ?>
           </div>
         </td>
         <td style="color:#0088ffff" class="py-6">
           <h3 class="fw-extra-bold"><strong><u>2. SCOPE</u></strong></h3>
           <div class="font-size-h6">
-            <?= $bilingual->scope; ?>
+            <?= (isset($bilingual->scope) ? $bilingual->scope : ''); ?>
           </div>
         </td>
       </tr>
@@ -57,13 +57,13 @@
         <td class="py-6">
           <h3 class="fw-extra-bold"><strong><u>3. TANGGUNG JAWAB</u></strong></h3>
           <div class="font-size-h6">
-            <?= $data->responsibility; ?>
+            <?= (isset($data->responsibility) ? $data->responsibility : ''); ?>
           </div>
         </td>
         <td style="color:#0088ffff" class="py-6">
           <h3 class="fw-extra-bold"><strong><u>3. RESPONSIBILITY</u></strong></h3>
           <div class="font-size-h6">
-            <?= $bilingual->responsibility; ?>
+            <?= (isset($bilingual->responsibility) ? $bilingual->responsibility : ''); ?>
           </div>
         </td>
       </tr>
@@ -71,13 +71,13 @@
         <td class="py-6">
           <h3 class="fw-extra-bold"><strong><u>4. DEFINISI</u></strong></h3>
           <div class="font-size-h6">
-            <?= $data->define; ?>
+            <?= (isset($data->define) ? $data->define : ''); ?>
           </div>
         </td>
         <td style="color:#0088ffff" class="py-6">
           <h3 class="fw-extra-bold"><strong><u>4. DEFINE</u></strong></h3>
           <div class="font-size-h6">
-            <?= $bilingual->define; ?>
+            <?= (isset($bilingual->define) ? $bilingual->define : ''); ?>
           </div>
         </td>
       </tr>
@@ -85,13 +85,13 @@
         <td class="py-6">
           <h3 class="fw-extra-bold"><strong><u>5. PERFORMA INDIKATOR</u></strong></h3>
           <div class="font-size-h6">
-            <?= $data->performance; ?>
+            <?= (isset($data->performance) ? $data->performance : ''); ?>
           </div>
         </td>
         <td style="color:#0088ffff" class="py-6">
           <h3 class="fw-extra-bold"><strong><u>5. INDICATOR PERFORMANCE</u></strong></h3>
           <div class="font-size-h6">
-            <?= $bilingual->performance; ?>
+            <?= (isset($bilingual->performance) ? $bilingual->performance : ''); ?>
           </div>
         </td>
       </tr>
@@ -99,13 +99,13 @@
         <td class="py-6">
           <h3 class="fw-extra-bold"><strong><u>6. KETENTUAN UMUM</u></strong></h3>
           <div class="font-size-h6">
-            <?= $data->general_requirement; ?>
+            <?= (isset($data->general_requirement) ? $data->general_requirement : ''); ?>
           </div>
         </td>
         <td style="color:#0088ffff" class="py-6">
           <h3 class="fw-extra-bold"><strong><u>6. GENERAL REQUIREMENT</u></strong></h3>
           <div class="font-size-h6">
-            <?= $bilingual->general_requirement; ?>
+            <?= (isset($bilingual->general_requirement) ? $bilingual->general_requirement : ''); ?>
           </div>
         </td>
       </tr>
@@ -193,8 +193,7 @@
       </thead>
       <tbody>
         <tr>
-          <td>
-            <?php if ($data->image_flow_1 || $data->image_flow_2 || $data->image_flow_3 || $data->flow_file) : ?>
+            <?php if ($data->image_flow_1 || $data->image_flow_2 || $data->image_flow_3) : ?>
               <div class="d-flex justify-content-start align-items-center">
                 <?php if ($data->image_flow_1) : ?>
                   <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
@@ -241,25 +240,23 @@
                   </div>
                 <?php endif; ?>
 
+              </div>
+            <?php endif; ?>
+            <?php if ($data->flow_file): ?>
+              <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+                <div class="dropzone-desc">
+                  <?php if ($data->flow_file) : ?>
+                    <canvas id="pdf-preview" class="" width="150"></canvas>
+                  <?php endif; ?>
+                </div>
                 <?php if ($data->flow_file) : ?>
-                  <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
-                    <div class="dropzone-desc">
-                      <?php if ($data->flow_file) : ?>
-                        <canvas id="pdf-preview" class="" width="150"></canvas>
-                      <?php endif; ?>
-                    </div>
-                    <?php if ($data->flow_file) : ?>
-                      <div class="middle d-flex justify-content-center align-items-center">
-                        <a target="_blank" href="<?= base_url("directory/FLOW_FILE/$data->company_id/$data->flow_file"); ?>" class="btn btn-sm mr-1 btn-icon btn-default rounded-circle"><i class="fa fa-eye"></i></a>
-                      </div>
-                    <?php endif; ?>
+                  <div class="middle d-flex justify-content-center align-items-center">
+                    <a target="_blank" href="<?= base_url("directory/FLOW_FILE/$data->company_id/$data->flow_file"); ?>" class="btn btn-sm mr-1 btn-icon btn-default rounded-circle"><i class="fa fa-eye"></i></a>
                   </div>
                 <?php endif; ?>
               </div>
-            <?php else : ?>
-              <span class="text-center">~ Not available data ~</span>
             <?php endif; ?>
-          </td>
+            </td>
         </tr>
       </tbody>
     </table>

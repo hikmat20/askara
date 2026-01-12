@@ -531,3 +531,246 @@ function limit_text($x, $length)
         return $y;
     }
 }
+
+
+/**
+ * Convert SEMUA <ol>/<ul> menjadi table (mPDF-safe)
+ * Style KHUSUS hanya untuk yang berada di .mpdf-highlight
+ */
+
+function convert_ol_to_table($html)
+{
+    if (!$html) return $html;
+
+    libxml_use_internal_errors(true);
+
+    $dom = new DOMDocument('1.0', 'UTF-8');
+    $dom->loadHTML(
+        '<meta http-equiv="Content-Type" content="text/html; charset=utf-8">' .
+            '<div id="mpdf-wrapper">' . $html . '</div>',
+        LIBXML_HTML_NOIMPLIED | LIBXML_HTML_NODEFDTD
+    );
+  
+
+    process_lists($dom, $dom->getElementById('mpdf-wrapper'), 1);
+
+    $out = '';
+    foreach ($dom->getElementById('mpdf-wrapper')->childNodes as $node) {
+        $out .= $dom->saveHTML($node);
+    }
+
+    return $out;
+}
+
+function process_lists(DOMDocument $dom, DOMNode $context, $level)
+{
+    $xpath = new DOMXPath($dom);
+
+    // Cari SEMUA ol/ul di dalam context (recursive)
+    $lists = $xpath->query('.//ol | .//ul', $context);
+
+    foreach ($lists as $list) {
+
+        // Hindari double convert
+        if ($list->parentNode->nodeName === 'table') {
+            continue;
+        }
+
+        $isOrdered = ($list->nodeName === 'ol');
+        $styleType = get_list_style_type($list, $level);
+        $index = 1;
+
+        $table = $dom->createElement('table');
+        $table = $dom->createElement('table');
+
+        $MPDF_LIST_LEVEL_INDENT = 13;
+
+
+        // $marginLeft = $MPDF_LIST_BASE_INDENT + (($level - 1) * $MPDF_LIST_LEVEL_INDENT);
+        $marginLeft = ($level == 1) ? ($MPDF_LIST_LEVEL_INDENT) : 0;
+
+        $tableStyle = 'border:none;border-collapse:collapse;width:100%;padding-left:' . (($level - 1) * 10) . 'px;margin-left:' . $marginLeft . 'px';
+        $table->setAttribute('style', $tableStyle);
+
+        // 🔥 HIGHLIGHT DETECTION
+        if (is_inside_highlight($list)) {
+            $table->setAttribute('class', 'mpdf-list-highlight');
+        }
+
+        $manualPrefix = ($level === 1) ? get_manual_prefix($list) : '';
+
+        $finalNumber = '';
+        foreach ($list->childNodes as $li) {
+            $number = $index + 1;
+    
+            if ($level === 1 && $manualPrefix !== '') {
+                $finalNumber = $manualPrefix . '.' . $number;
+            } elseif ($manualPrefix !== '') {
+                $finalNumber = $manualPrefix . '.' . $number;
+            } else {
+                $finalNumber = $number;
+            }
+            
+            if ($li->nodeName !== 'li') continue;
+
+            $marker = $isOrdered
+                ? format_marker($index, $styleType)
+                : '•';
+
+            $tr = $dom->createElement('tr');
+
+            $tdNo = $dom->createElement('td', $marker . '.');
+            $tdNo->setAttribute(
+                'style',
+                'border:none;width:20px;vertical-align:top;font-weight:normal;'
+            );
+
+            $tdText = $dom->createElement('td');
+            $tdText->setAttribute(
+                'style',
+                'border:none;vertical-align:top;'
+            );
+
+            foreach ($li->childNodes as $child) {
+                $tdText->appendChild($child->cloneNode(true));
+            }
+
+            // 🔥 PROSES NESTED LIST DI SINI
+            process_lists($dom, $tdText, $level + 1);
+            process_lists( $dom, $tdText,$level + 1, $finalNumber);
+
+            $tr->appendChild($tdNo);
+            $tr->appendChild($tdText);
+            $table->appendChild($tr);
+
+            $index++;
+        }
+
+        $list->parentNode->replaceChild($table, $list);
+    }
+}
+
+function get_list_style_type($node, $level)
+{
+    // 1️⃣ style=""
+    if ($node->hasAttribute('style')) {
+        if (preg_match('/list-style-type\s*:\s*([^;]+)/i', $node->getAttribute('style'), $m)) {
+            return trim($m[1]);
+        }
+    }
+
+    // 2️⃣ TinyMCE
+    if ($node->hasAttribute('data-mce-style')) {
+        if (preg_match('/list-style-type\s*:\s*([^;]+)/i', $node->getAttribute('data-mce-style'), $m)) {
+            return trim($m[1]);
+        }
+    }
+
+    // 3️⃣ HTML attribute type=""
+    if ($node->hasAttribute('type')) {
+        switch ($node->getAttribute('type')) {
+            case 'a':
+                return 'lower-alpha';
+            case 'A':
+                return 'upper-alpha';
+            case 'i':
+                return 'lower-roman';
+            case 'I':
+                return 'upper-roman';
+        }
+    }
+
+    /**
+     * 4️⃣ FALLBACK (PENTING)
+     * - LEVEL 1 → JANGAN DIUBAH (decimal)
+     * - LEVEL 2 → roman
+     * - LEVEL >2 → decimal
+     */
+    if ($level === 1) {
+        return 'decimal';
+    }
+
+    if ($level === 2) {
+        return 'lower-roman';
+    }
+
+    return 'decimal';
+}
+
+
+function format_marker($index, $style)
+{
+    switch ($style) {
+        case 'lower-alpha':
+            return chr(96 + $index);
+        case 'upper-alpha':
+            return chr(64 + $index);
+        case 'lower-roman':
+            return to_roman($index, false);
+        case 'upper-roman':
+            return to_roman($index, true);
+        default:
+            return (string) $index;
+    }
+}
+
+function to_roman($num, $upper = true)
+{
+    $map = [
+        'M' => 1000,
+        'CM' => 900,
+        'D' => 500,
+        'CD' => 400,
+        'C' => 100,
+        'XC' => 90,
+        'L' => 50,
+        'XL' => 40,
+        'X' => 10,
+        'IX' => 9,
+        'V' => 5,
+        'IV' => 4,
+        'I' => 1
+    ];
+
+    $res = '';
+    foreach ($map as $r => $v) {
+        while ($num >= $v) {
+            $res .= $r;
+            $num -= $v;
+        }
+    }
+    return $upper ? $res : strtolower($res);
+}
+
+function is_inside_highlight(DOMNode $node)
+{
+    while ($node) {
+        if ($node->nodeType === XML_ELEMENT_NODE) {
+            $class = $node->getAttribute('class');
+            if ($class && strpos(' ' . $class . ' ', ' mpdf-highlight ') !== false) {
+                return true;
+            }
+        }
+        $node = $node->parentNode;
+    }
+    return false;
+}
+
+
+function get_manual_prefix(DOMNode $list)
+{
+    $parent = $list->parentNode;
+
+    while ($parent && $parent->nodeType === XML_ELEMENT_NODE) {
+        if (
+            $parent->nodeName === 'div' &&
+            $parent->attributes &&
+            $parent->hasAttribute('data-prefix')
+        ) {
+            return trim($parent->getAttribute('data-prefix'));
+        }
+        $parent = $parent->parentNode;
+    }
+
+    return '';
+}

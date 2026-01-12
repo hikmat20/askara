@@ -15,4 +15,5 @@ application/logs/*
 application/config/database.php
 directory/
 assets/images/directory/checksheet/*
-
+/vendor/
+composer.lock

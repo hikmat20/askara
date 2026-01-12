@@ -146,7 +146,7 @@ class Procedures extends Admin_Controller
 
 	public function view($id = '', $status = '')
 	{
-		$Data 				= $this->db->get_where('procedures', ['id' => $id, 'company_id' => $this->company])->row();
+		$Data 				= $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual 			= $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users 				= $this->db->get_where('view_users')->result();
 		$getForms			= $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
@@ -248,9 +248,9 @@ class Procedures extends Admin_Controller
 				$thisData = $this->db->get_where('procedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
 				$dataLog = [
 					'directory_id' 	=> $thisData->id,
-					'new_status' 	=> $thisData->status,
+					'new_status' 	=> (($thisData->status) ?: null),
 					'doc_type' 		=> 'Procedure',
-					'note' 			=> 'New input data procedure',
+					'note' 			=> 'Create New Procedure',
 				];
 				$this->_update_history($dataLog);
 			}
@@ -627,7 +627,6 @@ class Procedures extends Admin_Controller
 				return false;
 			endif;
 
-
 			if ($this->db->trans_status() === 'FALSE') {
 				$this->db->trans_rollback();
 				$Return = [
@@ -714,7 +713,7 @@ class Procedures extends Admin_Controller
 				'directory_id' 	=> $id,
 				'old_status'	=> $thisData->status,
 				'new_status' 	=> $data['status'],
-				'note' 			=> 'Update data procedure',
+				'note' 			=> 'Procesed to review procedure',
 				'doc_type' 		=> 'Procedure',
 			];
 
@@ -751,7 +750,7 @@ class Procedures extends Admin_Controller
 				'old_status' 	=> $thisData->status,
 				'new_status' 	=> $data['status'],
 				'doc_type' 		=> 'Procedure',
-				'note'			=> 'Cancel review data procdedure'
+				'note'			=> 'Cancel from data Review Procedure'
 			];
 
 			$this->_update_history($dataLog);
@@ -1528,12 +1527,11 @@ class Procedures extends Admin_Controller
 	}
 
 	/* PRINTOUT */
-	public function printOut($id = null)
+	public function printfile($id = null)
 	{
-		$mpdf = new Mpdf([
-			'margin_top' => 55,
-			'margin_bottom' => 15,
-		]);
+		$this->load->helper('app');
+		$this->load->library('PdfService');
+		$mpdf = $this->pdfservice->load();
 		$mpdf->showImageErrors = true;
 		$mpdf->curlAllowUnsafeSslRequests = true;
 		$procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
@@ -1582,9 +1580,7 @@ class Procedures extends Admin_Controller
 			$ArrStd[$dtstd->requirement_id] = $dtstd;
 		}
 
-		// $allProcedure 		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
-
-		$Data = [
+		$getData = [
 			'procedure'           => $procedure,
 			'company'             => $company,
 			'detail'              => $flowDetail,
@@ -1596,46 +1592,54 @@ class Procedures extends Admin_Controller
 			'ArrDept'             => $ArrDept,
 			'ArrData'             => $ArrData,
 			'ArrStd'              => $ArrStd,
-			// 'allProcedure'        => $allProcedure,
 			'procedure_bilingual' => $procedure_bilingual,
 			'revision_logs'       => $revision_logs,
 		];
-		$header = $this->getheader($Data);
-		$mpdf->SetHTMLHeader($header);
 
-		$mpdf->AddPage('P', '', '', '', '', 7, 7, 55, 7, 7, '', '', '');
-		// $mpdf->AddPage();
-		$this->template->set($Data);
-		$data = $this->template->load_view('printout');
-		$mpdf->WriteHTML($data);
-		$mpdf->Output();
+		$header = $this->getHeader($getData);
+		$mpdf->SetHTMLHeader($header);
+		$mpdf->AddPage('P', '',  '', '', '', 7, 7, 50, 7, 7, '', '', '');
+
+		$page = $this->load->view('printout', $getData, true);
+
+		// 🔥 WAJIB SETELAH HTML LENGKAP
+		$page = convert_ol_to_table($page);
+
+		$mpdf->WriteHTML($page);
+		$mpdf->Output('', 'I');
 	}
 
-	public function getHeader($Data)
+	public function printOut($id)
+	{
+		$data['url'] = site_url($this->uri->segment(1) . '/printfile/' . $id);
+		$this->template->load_view('printout2', $data);
+	}
+
+	public function getHeader($allData)
 	{
 		return '<div>
-		<table class="table-data" cellpadding="2" cellspacing="0" style="font-size: 10pt;">
+		<table class="table-data" cellpadding="1" cellspacing="0">
 				<tr>
 				<td rowspan="5" width="100" class="text-right" style="vertical-align: middle;border-right:0px">
-					<img width="80" src="' . base_url($Data['company']->path_logo . $Data['company']->id_perusahaan . '/' . $Data['company']->logo) . '" alt="">
+					<img width="80" src="' . base_url($allData['company']->path_logo . $allData['company']->id_perusahaan . '/' . $allData['company']->logo) . '" alt="">
 				</td>
-				<td rowspan="5" width="250"  class="text-center" style="vertical-align: middle;border-left:0px">
-					<h2>' . $Data['company']->nm_perusahaan . '</h2>
+				<td rowspan="5" width="280"  class="text-center" style="vertical-align: middle;border-left:0px">
+					<h2>' . $allData['company']->nm_perusahaan . '</h2>
 				</td>
 				<td width="150">Dept</td>
-				<td width="">' . (isset($Data['procedure']->departement_id) ? $Data['procedure']->departement_name : '') . '</td>
+				<td width="">' . (isset($allData['procedure']->departement_id) ? $allData['procedure']->departement_name : '') . '</td>
 				</tr>
 				<tr>
 				<td>No. Dok</td>
-				<td>' . (($Data['procedure']->nomor) ?: '~') . '</td>
+				<td>' . (($allData['procedure']->nomor) ?: '~') . '</td>
 				</tr>
 				<tr>
 				<td>Revisi</td>
-				<td>' . (($Data['procedure']->revision) ?: '~') . '</td>
+				<td>' . (($allData['procedure']->revision) ?: '~') . '</td>
 				</tr>
 				<tr>
 				<td>Tgl. Terbit</td>
-				<td>' . (($Data['procedure']->published_at) ?: '~') . '</td>
+				<td>' . (($allData['procedure']->published_at) ?: '~') . '</td>
 				</tr>
 				<tr>
 				<td>Halaman</td>
@@ -1643,8 +1647,8 @@ class Procedures extends Admin_Controller
 				</tr>
 				<tr>
 				<td colspan="4" class="text-center" style="vertical-align: middle;">
-					<h2>' . strtoupper($Data['procedure']->name) . '</h2>
-					<h3 style="color: #0088ffff;">(' . (isset($Data['procedure_bilingual']->name) ? strtoupper($Data['procedure_bilingual']->name) : '') . ')</h3>
+					<h2>' . strtoupper($allData['procedure']->name) . '</h2>
+					<h3 style="color: #0088ffff;">(' . (isset($allData['procedure_bilingual']->name) ? strtoupper($allData['procedure_bilingual']->name) : '') . ')</h3>
 				</td>
 				</tr>
 			</table></div>';
