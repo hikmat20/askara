@@ -12,8 +12,9 @@ application/logs/*
 !application/logs/.htaccess
 
 #/vendor/
+application/config/database.php
 directory/
-
 assets/images/directory/checksheet/*
 /vendor/
 composer.lock
+assets/logo/
