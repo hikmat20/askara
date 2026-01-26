@@ -13,7 +13,7 @@ class Work_instructions extends Admin_Controller
 		$this->load->model('Work_instruction_model', 'WiModel');
 		$this->load->model('Users_model', 'UserModel');
 		$this->load->model('Positions/Position_model', 'PositionModel');
-		$this->load->model('Procedures/Procedures_model', 'ProceduresModel');
+		$this->load->model('procedures/Procedure_model', 'ProcedureModel');
 
 		$this->template->title('Work Instructions');
 		$this->template->page_icon('fas fa-tasks');
@@ -45,7 +45,7 @@ class Work_instructions extends Admin_Controller
 		$departements = $this->db->get_where('departements', ['status' => '1'])->result_array();
 		$user         = $this->UserModel->find($this->auth->user_id());
 		$positions    = $this->PositionModel->find_all();
-		$procedures   = $this->ProceduresModel->as_array()->find_all_by('status !=', 'DEL');
+		$procedures   = $this->ProcedureModel->as_array()->find_all_by('status !=', 'DEL');
 
 		$this->template->title('Add New Work Instruction');
 		$this->template->render('add', compact('procedures','departements', 'user', 'positions'));
@@ -61,7 +61,7 @@ class Work_instructions extends Admin_Controller
 		$departements  = $this->db->get_where('departements', ['status' => '1'])->result_array();
 		$user          = $this->UserModel->find($this->auth->user_id());
 		$positions     = $this->PositionModel->find_all();
-		$procedures    = $this->ProceduresModel->as_array()->find_all_by('status !=', 'DEL');
+		$procedures    = $this->ProcedureModel->as_array()->find_all_by('status !=', 'DEL');
 
 		$this->template->render('edit', compact('dataWi', 'departements', 'user', 'positions', 'procedures'));
 	}
