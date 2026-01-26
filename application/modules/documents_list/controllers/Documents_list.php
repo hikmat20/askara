@@ -99,9 +99,9 @@ class Documents_list extends Admin_Controller
 	public function procedures($id = null)
 	{
 
-		
+
 		if (isset($id)) {
-			$procedures =$this->ProcedureModel->find_all_by(['status' =>'PUB']);
+			$procedures = $this->ProcedureModel->find_all_by(['status' => 'PUB']);
 			$forms        = $this->db->order_by('name', 'ASC')->get_where('forms', ['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL'])->result();
 			$ik          = $this->db->order_by('name', 'ASC')->get_where('work_instructions', ['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL'])->result();
 			$records      = $this->db->order_by('name', 'ASC')->get_where('dir_records', ['procedure_id' => $id, 'status' => 'PUB', 'flag_type' => 'FOLDER', 'company_id' => $this->company, 'parent_id' => null])->result();
@@ -118,13 +118,15 @@ class Documents_list extends Admin_Controller
 			$this->template->render('procedures/list-docs');
 		} else {
 			$groups        = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
-			$procedures    = $this->ProcedureModel->as_array()->find_all_by(['company_id' => $this->company,'status' => 'PUB', 'deleted_by' => null]);
+			$procedures    = $this->ProcedureModel->as_array()->find_all_by(['company_id' => $this->company, 'status' => 'PUB', 'deleted_by' => null]);
 
 			$ArrPro = [];
-			foreach ($procedures as $pro) {
-				$ArrPro[$pro['group_procedure']][] = $pro;
+			if ($procedures) {
+				foreach ($procedures as $pro) {
+					$ArrPro[$pro['group_procedure']][] = $pro;
+				}
 			}
-	
+
 			$this->template->set([
 				'groups' 		=> $groups,
 				'ArrPro' 		=> $ArrPro,
