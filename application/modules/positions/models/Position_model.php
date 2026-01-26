@@ -7,26 +7,26 @@
  * This is model class for table "Perusahaan"
  */
 
-class Perusahaan_model extends BF_Model
+class Position_model extends BF_Model
 {
 
     /**
      * @var string  User Table Name
      */
-    protected $table_name = 'perusahaan';
-    protected $key        = 'id_perusahaan';
+    protected $table_name = 'positions';
+    protected $key        = 'id';
 
     /**
      * @var string Field name to use for the created time column in the DB table
      * if $set_created is enabled.
      */
-    protected $created_field = 'created_on';
+    protected $created_field = 'created_id';
 
     /**
      * @var string Field name to use for the modified time column in the DB
      * table if $set_modified is enabled.
      */
-    protected $modified_field = 'modified_on';
+    protected $modified_field = 'modified_id';
 
     /**
      * @var bool Set the created time automatically on a new record (if true)
@@ -62,28 +62,5 @@ class Perusahaan_model extends BF_Model
     public function __construct()
     {
         parent::__construct();
-    }
-	
-	  function get_data($table)
-    {
-       return $this->db->get($table)->result();
-    }
-	
-	 function get_data_where($table,$where)
-    {
-       return $this->db->get_where($table,$where)->result();
-    }
-
-    function getById($id)
-    {
-       return $this->db->get_where('perusahaan',array('id' => $id))->row_array();
-    }
-
-    public function pilih_kota(){
-        $query="SELECT
-                kabupaten.nama
-                FROM
-                kabupaten";
-        return $this->db->query($query);
     }
 }

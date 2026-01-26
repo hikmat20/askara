@@ -7,7 +7,7 @@
 <div class="content d-flex flex-column flex-column-fluid p-0">
 	<div class="d-flex flex-column-fluid justify-content-between align-items-top">
 		<div class="container">
-			<div class="d-flex align-items-baseline flex-wrap mr-5">
+			<div class="d-flex align-items-center flex-wrap py-3">
 				<a href="<?= base_url('dashboard'); ?>">
 					<h4 class="text-dark font-weight-bold my-1 mr-2"><i class="fa fa-home"></i></h4>
 				</a>
@@ -16,226 +16,227 @@
 						<a href="<?= base_url('list/procedures/'); ?>" class="text-muted">PROSEDUR, FORM, IK DAN RECORD</a>
 					</li>
 					<li class="breadcrumb-item text-muted">
-						<span class="text-muted"><?= $procedure[0]->name; ?></span>
+						<span class="text-muted"><?= $procedures[0]->name; ?></span>
 					</li>
 				</ul>
 			</div>
-			<a href="#back" onclick="history.go(-1)" class="btn btn-primary btn-sm btn-icon mb-3"><i class="fa fa-arrow-left"></i></a>
-			<h1 class="text-white fa-3x"><?= $procedure[0]->name; ?></h1>
-			<div class="row mb-10">
+			<h1 class="text-white fa-3x mb-5"><?= $procedures[0]->name; ?></h1>
+			<div class="row mb-5">
 				<div class="col-md-4">
 					<input type="text" name="serarch" id="search" placeholder="Pencarian" class="form-control rounded form-control-sm">
 				</div>
 			</div>
-			<div class="row">
-				<div class="col-md-12">
-					<ul class="nav nav-warning nav-pills nav-bolder" id="myTab2" role="tablist">
-						<li class="nav-item mx-0">
-							<a class="rounded-bottom-0 nav-link active" id="tab_procedure" data-toggle="tab" href="#data_procedure">
-								<span class="nav-icon ">
-									<i class="fa fa-file-alt"></i>
-								</span>
-								<span class="text-white h5 my-0">Prosedur
-									<small class="">
-										<div class="badge bg-white rounded-circle text-warning"><?= (isset($procedure)) ? count($procedure) : '0'; ?></div>
-									</small>
-								</span>
-							</a>
-						</li>
-						<li class="nav-item mx-0">
-							<a class="rounded-bottom-0 nav-link" id="tab_form" data-toggle="tab" href="#data_form">
-								<span class="nav-icon ">
-									<i class="fa fa-file-alt"></i>
-								</span>
-								<span class="text-white h5 my-0">Form
-									<small class="">
-										<div class="badge bg-white rounded-circle text-warning"><?= (isset($forms)) ? count($forms) : '0'; ?></div>
-									</small>
-								</span>
-							</a>
-						</li>
-						<li class="nav-item mx-0">
-							<a class="rounded-bottom-0 nav-link" id="tab_guide" data-toggle="tab" href="#data_guide">
-								<span class="nav-icon ">
-									<i class="fa fa-file-alt"></i>
-								</span>
-								<span class="text-white h5 my-0">IK
-									<small class="">
-										<div class="badge bg-white rounded-circle text-warning"><?= (isset($guides)) ? count($guides) : '0'; ?></div>
-									</small>
-								</span>
-							</a>
-						</li>
-						<li class="nav-item mx-0">
-							<a class="rounded-bottom-0 nav-link" id="tab_record" data-toggle="tab" href="#data_record">
-								<span class="nav-icon ">
-									<i class="fa fa-file-alt"></i>
-								</span>
-								<span class="text-white h5 my-0">Records
-									<small class="">
-										<div class="badge bg-white rounded-circle text-warning"><?= (isset($countRecords)) ? ($countRecords) : '0'; ?></div>
-									</small>
-								</span>
-							</a>
-						</li>
-					</ul>
-					<div class="card rounded-top-0 border-0" style="background-color: zrgba(255,255,255,0.85);">
-						<div class="card-body py-3">
-							<div class="tab-content" id="myTabContent2">
-								<div class="tab-pane fade active show" id="data_procedure" role="tabpanel" aria-labelledby="tab_procedure">
-									<table class="table table-condensed table-hover">
-										<thead>
-											<tr class="">
-												<th class="h5 border-2 border-bottom-secondary" width="15px">No.</th>
-												<th class="h5 border-2 border-bottom-secondary text-center">File Name</th>
-												<th class="h5 border-2 border-bottom-secondary text-center" width="50px">View</th>
+			<ul class="nav nav-warning nav-pills nav-bolder" id="myTab2" role="tablist">
+				<li class="nav-item mx-0">
+					<a class="rounded-bottom-0 nav-link active" id="tab_procedure" data-toggle="tab" href="#data_procedure">
+						<span class="nav-icon ">
+							<i class="fa fa-file-alt"></i>
+						</span>
+						<span class="text-white h5 my-0">Prosedur
+							<small class="">
+								<div class="badge bg-white rounded-circle text-warning"><?= (isset($procedures)) ? count($procedures) : '0'; ?></div>
+							</small>
+						</span>
+					</a>
+				</li>
+				<li class="nav-item mx-0">
+					<a class="rounded-bottom-0 nav-link" id="tab_form" data-toggle="tab" href="#data_form">
+						<span class="nav-icon ">
+							<i class="fa fa-file-alt"></i>
+						</span>
+						<span class="text-white h5 my-0">Form
+							<small class="">
+								<div class="badge bg-white rounded-circle text-warning"><?= (isset($forms)) ? count($forms) : '0'; ?></div>
+							</small>
+						</span>
+					</a>
+				</li>
+				<li class="nav-item mx-0">
+					<a class="rounded-bottom-0 nav-link" id="tab_guide" data-toggle="tab" href="#data_guide">
+						<span class="nav-icon ">
+							<i class="fa fa-file-alt"></i>
+						</span>
+						<span class="text-white h5 my-0">IK
+							<small class="">
+								<div class="badge bg-white rounded-circle text-warning"><?= (isset($ik)) ? count($ik) : '0'; ?></div>
+							</small>
+						</span>
+					</a>
+				</li>
+				<li class="nav-item mx-0">
+					<a class="rounded-bottom-0 nav-link" id="tab_record" data-toggle="tab" href="#data_record">
+						<span class="nav-icon ">
+							<i class="fa fa-file-alt"></i>
+						</span>
+						<span class="text-white h5 my-0">Records
+							<small class="">
+								<div class="badge bg-white rounded-circle text-warning"><?= (isset($countRecords)) ? ($countRecords) : '0'; ?></div>
+							</small>
+						</span>
+					</a>
+				</li>
+			</ul>
+			<div class="card rounded-top-0 border-0" style="background-color: zrgba(255,255,255,0.85);">
+				<div class="card-body p-5">
+					<div class="tab-content" id="myTabContent2">
+						<div class="tab-pane fade active show" id="data_procedure" role="tabpanel" aria-labelledby="tab_procedure">
+							<table class="table datatable table-hover">
+								<thead>
+									<tr class="">
+										<th class="py-2" width="15px">No.</th>
+										<th class="py-2 px-3" width="200">Number</th>
+										<th class="py-2 px-3">File Name</th>
+										<th class="py-2 px-3 text-center" width="200">Published At</th>
+										<th class="py-2 px-3 text-center" width="100">Revision</th>
+										<th class="py-2 text-center" width="50px">View</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (isset($procedures)) :
+										$no = 0;
+										foreach ($procedures as $pro) : $no++; ?>
+											<tr class="cursor-pointer text-dark h6">
+												<td class="align-middle"><?= $no; ?></td>
+												<td><?= $pro->nomor; ?></td>
+												<td class="align-middle d-flex align-items-center">
+													<i class="fa fa-file-alt text-primary font-size-h2 mr-2"></i><?= $pro->name; ?>
+												</td>
+												<td class="text-center"><?= $pro->published_at; ?></td>
+												<td class="text-center"><?= $pro->revision; ?></td>
+												<td class="text-center" style="vertical-align: middle;">
+													<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-procedure" data-id="<?= $pro->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
+												</td>
 											</tr>
-										</thead>
-										<tbody>
-											<?php if (isset($procedure)) :
-												$no = 0;
-												foreach ($procedure as $lsPro) : $no++; ?>
-													<tr class="cursor-pointer">
-														<td class="h6 text-dark"><?= $no; ?></td>
-														<td class="h4 text-dark d-flex align-items-center my-0"><i class="fa fa-file-alt text-success fa-2x mr-4"></i>
-															<span class="mt-2"><?= $lsPro->name; ?></span>
-														</td>
-														<td class="h6 text-center" style="vertical-align: middle;">
-															<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-procedure" data-id="<?= $lsPro->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
-														</td>
-													</tr>
-												<?php endforeach;
-											else : ?>
-												<tr>
-													<td colspan="2" class="text-center h4"><i>No data available</i></td>
-												</tr>
-											<?php endif; ?>
-										</tbody>
-									</table>
-								</div>
-								<div class="tab-pane fade" id="data_form" role="tabpanel" aria-labelledby="tab_form">
-									<table class="table table-condensed table-hover">
-										<thead>
-											<tr class="">
-												<th class="h5 border-2 border-bottom-secondary" width="15px">No.</th>
-												<th class="h5 border-2 border-bottom-secondary text-center">File Name</th>
-												<th class="h5 border-2 border-bottom-secondary text-center" width="50px">View</th>
+										<?php endforeach;
+									else : ?>
+										<tr>
+											<td colspan="6" class="text-center h4"><i>No data available</i></td>
+										</tr>
+									<?php endif; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="data_form" role="tabpanel" aria-labelledby="tab_form">
+							<table class="table table-condensed table-hover">
+								<thead>
+									<tr class="">
+										<th class="h5 border-2 border-bottom-secondary" width="15px">No.</th>
+										<th class="h5 border-2 border-bottom-secondary text-center">File Name</th>
+										<th class="h5 border-2 border-bottom-secondary text-center" width="50px">View</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (isset($forms)) :
+										$no = 0;
+										foreach ($forms as $frm) : $no++; ?>
+											<tr class="cursor-pointer text-dark h6">
+												<td class="text-dark"><?= $no; ?></td>
+												<td class="align-middle d-flex align-items-center">
+													<i class="fa fa-file-alt text-success font-size-h2 mr-2"></i><?= $frm->name; ?>
+												</td>
+												<td class="text-center" style="vertical-align: middle;">
+													<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-form" data-id="<?= $frm->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
+												</td>
 											</tr>
-										</thead>
-										<tbody>
-											<?php if (isset($forms)) :
-												$no = 0;
-												foreach ($forms as $lsFrm) : $no++; ?>
-													<tr class="cursor-pointer">
-														<td class="h6 text-dark"><?= $no; ?></td>
-														<td class="h4 text-dark d-flex align-items-center my-0"><i class="fa fa-file-alt text-primary fa-2x mr-4"></i>
-															<span class="mt-2"><?= $lsFrm->name; ?></span>
-														</td>
-														<td class="h6 text-center" style="vertical-align: middle;">
-															<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-form" data-id="<?= $lsFrm->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
-														</td>
-													</tr>
-												<?php endforeach;
-											else : ?>
-												<tr>
-													<td colspan="2" class="text-center h4"><i>No data available</i></td>
-												</tr>
-											<?php endif; ?>
-										</tbody>
-									</table>
-								</div>
-								<div class="tab-pane fade" id="data_guide" role="tabpanel" aria-labelledby="tab_guide">
-									<table class="table table-condensed table-hover">
-										<thead>
-											<tr class="">
-												<th class="h5 border-2 border-bottom-secondary" width="15px">No.</th>
-												<th class="h5 border-2 border-bottom-secondary text-center">File Name</th>
-												<th class="h5 border-2 border-bottom-secondary text-center" width="50px">View</th>
+										<?php endforeach;
+									else : ?>
+										<tr>
+											<td colspan="2" class="text-center h4"><i>No data available</i></td>
+										</tr>
+									<?php endif; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="data_guide" role="tabpanel" aria-labelledby="tab_guide">
+							<table class="table table-condensed table-hover">
+								<thead>
+									<tr class="">
+										<th class="h5 border-2 border-bottom-secondary" width="15px">No.</th>
+										<th class="h5 border-2 border-bottom-secondary text-center">File Name</th>
+										<th class="h5 border-2 border-bottom-secondary text-center" width="50px">View</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (isset($ik)) :
+										$no = 0;
+										foreach ($ik as $i) : $no++; ?>
+											<tr class="cursor-pointer text-dark h6">
+												<td class="text-dark"><?= $no; ?></td>
+												<td class="align-middle d-flex align-items-center">
+													<i class="fa fa-file-alt text-info font-size-h2 mr-2"></i><?= $i->name; ?>
+												</td>
+												<td class="text-center" style="vertical-align: middle;">
+													<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-guide" data-id="<?= $i->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
+												</td>
 											</tr>
-										</thead>
-										<tbody>
-											<?php if (isset($guides)) :
-												$no = 0;
-												foreach ($guides as $lsGui) : $no++; ?>
-													<tr class="cursor-pointer">
-														<td class="h6 text-dark"><?= $no; ?></td>
-														<td class="h4 text-dark d-flex align-items-center my-0"><i class="fa fa-file-alt text-info fa-2x mr-4"></i>
-															<span class="mt-2"><?= $lsGui->name; ?></span>
-														</td>
-														<td class="h6 text-center" style="vertical-align: middle;">
-															<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-guide" data-id="<?= $lsGui->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
-														</td>
-													</tr>
-												<?php endforeach;
-											else : ?>
-												<tr>
-													<td colspan="2" class="text-center h4"><i>No data available</i></td>
+										<?php endforeach;
+									else : ?>
+										<tr>
+											<td colspan="2" class="text-center h4"><i>No data available</i></td>
+										</tr>
+									<?php endif; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="data_record" role="tabpanel" aria-labelledby="tab_record">
+							<div id="data-records">
+								<!-- Nav tabs -->
+								<ul class="nav pb-2 nav-success nav-tabs nav-pills" id="navId">
+									<li class="nav-item">
+										<a href="javascript:void(0)" id="home" data-id="" data-procedure="<?= $procedures[0]->id; ?>" class="nav-link py-2 px-3">
+											<i class="fa fa-home mr-2"></i>
+											Home
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="javascript:void(0)" id="back" data-parent="<?= isset($parent_id) ? $parent_id : ''; ?>" data-procedure="<?= $procedures[0]->id; ?>" class="disabled nav-link py-2 px-3">
+											<i class="fa fa-arrow-up mr-2"></i>
+											Up Folder
+										</a>
+									</li>
+									<li class="nav-item">
+										<a href="javascript:void(0)" id="refresh" data-parent="<?= isset($parent_id) ? $parent_id : ''; ?>" data-procedure="<?= $procedures[0]->id; ?>" class="nav-link py-2 px-3">
+											<i class="fa fa-sync-alt mr-2"></i>
+											Refresh
+										</a>
+									</li>
+								</ul>
+								<table class="table table-condensed table-hover">
+									<thead>
+										<tr class="">
+											<th class="py-1">File Name</th>
+											<th class="py-1 text-right" width="150">Last Update</th>
+											<th class="py-1 text-center" width="50px"></th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php if (isset($records)) :
+											$no = 0;
+											foreach ($records as $lsRec) : $no++; ?>
+												<tr class="cursor-pointer text-dark record-item" data-id="<?= $lsRec->id; ?>" data-procedure="<?= $procedures[0]->id; ?>">
+													<td class=" d-flex align-items-center h6">
+														<?php if ($lsRec->flag_type == 'FOLDER') : ?>
+															<i class="fa fa-folder text-warning font-size-h2 mr-3"></i>
+														<?php else : ?>
+															<i class="fa fa-file-alt text-info font-size-h2 mr-3"></i>
+														<?php endif; ?>
+														<span class=""><?= $lsRec->name; ?></span>
+													</td>
+													<td style="vertical-align: middle;" class="text-right pt-1"><?= ($lsRec->modified_at) ?: $lsRec->created_at; ?></td>
+													<td class="text-center pt-1" style="vertical-align: middle;">
+														<?php if ($lsRec->flag_type == 'FILE') : ?>
+															<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-record" data-id="<?= $lsRec->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
+														<?php endif; ?>
+													</td>
 												</tr>
-											<?php endif; ?>
-										</tbody>
-									</table>
-								</div>
-								<div class="tab-pane fade" id="data_record" role="tabpanel" aria-labelledby="tab_record">
-									<div id="data-records">
-										<!-- Nav tabs -->
-										<ul class="nav pb-2 nav-success nav-tabs nav-pills" id="navId">
-											<li class="nav-item">
-												<a href="javascript:void(0)" id="home" data-id="" data-procedure="<?= $procedure[0]->id; ?>" class="nav-link py-2 px-3">
-													<i class="fa fa-home mr-2"></i>
-													Home
-												</a>
-											</li>
-											<li class="nav-item">
-												<a href="javascript:void(0)" id="back" data-parent="<?= isset($parent_id) ? $parent_id : ''; ?>" data-procedure="<?= $procedure[0]->id; ?>" class="disabled nav-link py-2 px-3">
-													<i class="fa fa-arrow-up mr-2"></i>
-													Up Folder
-												</a>
-											</li>
-											<li class="nav-item">
-												<a href="javascript:void(0)" id="refresh" data-parent="<?= isset($parent_id) ? $parent_id : ''; ?>" data-procedure="<?= $procedure[0]->id; ?>" class="nav-link py-2 px-3">
-													<i class="fa fa-sync-alt mr-2"></i>
-													Refresh
-												</a>
-											</li>
-										</ul>
-										<table class="table table-condensed table-hover">
-											<thead>
-												<tr class="">
-													<th class="py-1">File Name</th>
-													<th class="py-1 text-center" width="50px"></th>
-													<th class="py-1 text-right" width="150">Last Update</th>
-												</tr>
-											</thead>
-											<tbody>
-												<?php if (isset($records)) :
-													$no = 0;
-													foreach ($records as $lsRec) : $no++; ?>
-														<tr class="cursor-pointer record-item" data-id="<?= $lsRec->id; ?>" data-procedure="<?= $procedure[0]->id; ?>">
-															<td class="h4 text-dark d-flex align-items-center my-0 pt-1">
-																<?php if ($lsRec->flag_type == 'FOLDER') : ?>
-																	<i class="fa fa-folder text-warning fa-2x mr-4"></i>
-																<?php else : ?>
-																	<i class="fa fa-file-alt text-info fa-2x mr-4"></i>
-																<?php endif; ?>
-																<span class="mt-2"><?= $lsRec->name; ?></span>
-															</td>
-															<td class="h6 text-center pt-1" style="vertical-align: middle;">
-																<?php if ($lsRec->flag_type == 'FILE') : ?>
-																	<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-record" data-id="<?= $lsRec->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
-																<?php endif; ?>
-															</td>
-															<td style="vertical-align: middle;" class="text-right pt-1"><?= ($lsRec->modified_at) ?: $lsRec->created_at; ?></td>
-														</tr>
-													<?php endforeach;
-												else : ?>
-													<tr>
-														<td colspan="2" class="text-center h4"><i>No data available</i></td>
-													</tr>
-												<?php endif; ?>
-											</tbody>
-										</table>
-									</div>
-								</div>
+											<?php endforeach;
+										else : ?>
+											<tr>
+												<td colspan="2" class="text-center h4"><i>No data available</i></td>
+											</tr>
+										<?php endif; ?>
+									</tbody>
+								</table>
 							</div>
 						</div>
 					</div>
@@ -247,7 +248,7 @@
 
 <!-- Modal -->
 <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document" style="height:100%;max-width: 97%;">
+	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content" data-scroll="true" data-height="">
 			<div class="modal-header">
 				<h5 class="modal-title">View Document</h5>

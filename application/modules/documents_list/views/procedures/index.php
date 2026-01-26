@@ -1,20 +1,18 @@
 <div class="content d-flex flex-column flex-column-fluid p-0">
 	<div class="d-flex flex-column-fluid justify-content-between align-items-top">
 		<div class="container">
-			<div class="d-flex align-items-baseline flex-wrap mr-5">
+			<div class="d-flex justify-content-start align-items-center my-3">
 				<a href="<?= base_url('dashboard'); ?>">
 					<h4 class="text-dark font-weight-bold my-1 mr-2"><i class="fa fa-home"></i></h4>
 				</a>
 				<ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
 					<li class="breadcrumb-item text-muted">
-						<a href="" class="text-muted">PROSEDUR, FORM, IK DAN RECORD</a>
+						PROSEDUR, FORM, IK DAN RECORD
 					</li>
 				</ul>
 			</div>
-			<a href="<?= base_url('dashboard'); ?>" class="btn btn-primary btn-sm btn-icon mb-3"><i class="fa fa-arrow-left"></i></a>
-
-			<h1 class="text-white fa-3x">PROSEDUR, FORM, IK DAN RECORD</h1>
-			<div class="row mb-10">
+			<h1 class="text-white fa-3x mb-5">PROSEDUR, FORM, IK DAN RECORD</h1>
+			<div class="row mb-5">
 				<div class="col-md-4">
 					<input type="text" name="serarch" id="search" placeholder="Pencarian" class="form-control rounded form-control-sm">
 				</div>
@@ -38,33 +36,27 @@
 							</li>
 						<?php endforeach; ?>
 					</ul>
-					<div class="card rounded-top-0 border-0" style="background-color: zrgba(255,255,255,0.85);">
-						<div class="card-body py-3 ">
-							<?php if (!$groups) : ?>
-								<div class="justify-content-center flex-column d-flex py-10">
-									<img src="/assets/images/directory/not-found.png" alt="" class="img-cover justify-content-center m-auto" width="200px">
-									<h3 class="text-center text-dark-50">File not found</h3>
-								</div>
-							<?php endif; ?>
-							<div class="tab-content " id="myTabContent2">
+
+					<div class="card rounded-top-0 border-0">
+						<div class="card-body p-5">
+							<div class="tab-content">
 								<?php $n = 0;
 								foreach ($groups as $grp) :  $n++; ?>
 									<div class="tab-pane fade <?= ($n == '1') ? 'active show' : ''; ?>" id="data_<?= $grp->id; ?>" role="tabpanel" aria-labelledby="tab_<?= $grp->id; ?>">
 										<?php if (isset($ArrPro[$grp->id])) : ?>
-											<table class="table table-condensed table-hover datatable">
+											<table class="table table-sm table-hover datatable">
 												<thead>
 													<tr class="">
-														<th class="h5 border-2 border-bottom-secondary" width="15px">No.</th>
-														<th class="h5 border-2 border-bottom-secondary">File Name</th>
+														<th class="py-2 " width="15px">No.</th>
+														<th class="py-2 px-5">File Name</th>
 													</tr>
 												</thead>
 												<tbody>
 													<?php $no = 0;
 													foreach ($ArrPro[$grp->id] as $list) : $no++; ?>
-														<!-- ondblclick="location.href = siteurl+active_controller+'procedures/<?= $list['id']; ?>'" -->
-														<tr class="cursor-pointer list-document">
-															<td class="h6 text-dark"><?= $no; ?></td>
-															<td class="h5 text-dark d-flex align-items-center my-0 py-2">
+														<tr class="cursor-pointer list-document text-dark h5">
+															<td class="align-middle"><?= $no; ?></td>
+															<td class="d-flex align-items-center px-5">
 																<i class="fa fa-folder text-warning fa-2x mr-2 pt-0"></i>
 																<strong class="mt-1">
 																	<a class="link-action" href="<?= base_url($this->uri->segment(1) . '/procedures/' . $list['id']); ?>"><?= $list['name']; ?></a>
@@ -75,11 +67,9 @@
 												</tbody>
 											</table>
 										<?php else : ?>
-											<table class="table">
-												<tr>
-													<td colspan="2" class="text-center h4"><i>No data available</i></td>
-												</tr>
-											</table>
+											<div class="text-center my-4">
+												<i>No data available</i>
+											</div>
 										<?php endif; ?>
 									</div>
 								<?php endforeach; ?>
@@ -150,9 +140,9 @@
 		});
 
 		oTable = $('.datatable').DataTable({
-			dom: 'Pfrtip',
-			searchPanes: {
-				cascadePanes: true
+			layout: {
+				topStart:'',
+				topEnd:'',
 			},
 			language: {
 				searchPanes: {
@@ -164,12 +154,8 @@
 				zeroRecords: "No results returned",
 				emptyTable: "No results returned",
 			},
-			lengthChange: true,
-			paging: true,
-			info: false,
 			stateSave: false,
 			pageLength: 20,
-			// scrollCollapse: true
 		})
 
 		$(document).on('input paste', '#search', function() {

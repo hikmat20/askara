@@ -1,4 +1,4 @@
-<div class="modal-header py-2 px-2">
+<!-- <div class="modal-header py-2 px-2">
 	<ul class="nav nav-pills nav-light-success py-0" id="myTab" role="tablist">
 		<li class="nav-item">
 			<a class="nav-link active" data-toggle="tab" href="#file">
@@ -17,16 +17,15 @@
 			</a>
 		</li>
 	</ul>
-</div>
+</div> -->
 <div class="tab-content mt-5">
 	<div class="tab-pane fade show active" id="file" role="tabpanel" aria-labelledby="file-tab">
-		<div style="width:92%;height:400px;background-color: red;position: absolute;opacity: 0;"></div>
+		<div style="width:92%;height:70vh;background-color: red;position: absolute;opacity: 0;"></div>
 		<?php if ($record->ext == '.pdf' || $record->ext == '.PDF') : ?>
-			<iframe src="<?= base_url("directory/RECORDS/$record->company_id/$record->file_name"); ?>#toolbar=0&navpanes=0" frameborder="0" width="100%" height="400px"></iframe>
+			<iframe src="<?= base_url("directory/RECORDS/$record->company_id/$record->file_name"); ?>#toolbar=0&navpanes=0" frameborder="0" width="100%" style="height:70vh"></iframe>
 		<?php else : ?>
 			<iframe src="https://docs.google.com/gview?embedded=true&url=<?= base_url("directory/RECORDS/$record->company_id/$record->file_name"); ?>&rm=minimal#toolbar=0&navpanes=0" frameborder="0" width="100%" height="400px"></iframe>
 		<?php endif; ?>
-		<hr>
 	</div>
 	<div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
 		<div class="row overflow-auto">

@@ -23,29 +23,29 @@
 	<thead>
 		<tr class="">
 			<th class="py-1">File Name</th>
+			<th class="py-1 text-right" width="250">Last Update</th>
 			<th class="py-1 text-center" width="50px"></th>
-			<th class="py-1 text-right" width="150">Last Update</th>
 		</tr>
 	</thead>
 	<tbody>
 		<?php if (($records)) :
 			$no = 0;
 			foreach ($records as $lsRec) : $no++; ?>
-				<tr class="cursor-pointer <?= ($lsRec->flag_type == 'FOLDER') ? 'record-item' : ''; ?>  " data-procedure="<?= $procedure_id; ?>" data-id="<?= $lsRec->id; ?>">
-					<td class="h4 text-dark d-flex align-items-center my-0 pt-1">
+				<tr class="cursor-pointer h6 <?= ($lsRec->flag_type == 'FOLDER') ? 'record-item' : ''; ?>  " data-procedure="<?= $procedure_id; ?>" data-id="<?= $lsRec->id; ?>">
+					<td class="text-dark d-flex align-items-center">
 						<?php if ($lsRec->flag_type == 'FOLDER') : ?>
-							<i class="fa fa-folder text-warning fa-2x mr-4"></i>
+							<i class="fa fa-folder text-warning font-size-h2 mr-3"></i>
 						<?php else : ?>
-							<i class="fa fa-file-alt text-info fa-2x mr-4"></i>
+							<i class="fa fa-file-alt text-info font-size-h2 mr-3"></i>
 						<?php endif; ?>
 						<span class="mt-2"><?= $lsRec->name; ?></span>
 					</td>
+					<td style="vertical-align: middle;" class="text-right pt-1"><?= ($lsRec->modified_at) ?: $lsRec->created_at; ?></td>
 					<td class="h6 text-center pt-1" style="vertical-align: middle;">
 						<?php if ($lsRec->flag_type == 'FILE') : ?>
 							<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-record" data-id="<?= $lsRec->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
 						<?php endif; ?>
 					</td>
-					<td style="vertical-align: middle;" class="text-right pt-1"><?= ($lsRec->modified_at) ?: $lsRec->created_at; ?></td>
 				</tr>
 			<?php endforeach;
 		else : ?>

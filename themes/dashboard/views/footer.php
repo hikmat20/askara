@@ -245,12 +245,12 @@
                  link_default_protocol: 'https',
                  menubar: false,
                  plugins: [
-                     'preview', 'anchor', 'accordion', 'advlist', 'anchor', 'code', 'image', 'link', 'lists', 'table',
+                      'accordion', 'advlist', 'anchor',  'link', 'lists', 'table',
                  ],
-                 toolbar: 'undo redo | paste pastetext fontsize| ' +
+                 toolbar: 'undo redo ' +
                      'bold italic backcolor forecolor | alignleft aligncenter ' +
-                     'alignright alignjustify | bullist numlist outdent indent | table tabledelete | link ' +
-                     'removeformat | help',
+                     'alignright alignjustify | bullist numlist outdent indent | table | link ' +
+                     'removeformat',
                  content_style: `body { font-family:Calibri,Arial,sans-serif; font-size:14pt }
                       ol, ul {
                           padding-left: 1rem;

@@ -774,3 +774,14 @@ function get_manual_prefix(DOMNode $list)
 
     return '';
 }
+
+
+if (!function_exists('slugify')) {
+    function slugify($string)
+    {
+        $string = strtolower($string);
+        $string = preg_replace('/[^a-z0-9\s-]/', '', $string);
+        $string = preg_replace('/[\s-]+/', '-', trim($string));
+        return $string;
+    }
+}

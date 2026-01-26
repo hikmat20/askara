@@ -8,6 +8,7 @@ class Documents_list extends Admin_Controller
 		parent::__construct();
 
 		$this->load->model('documents_list/Documents_list_model', 'List');
+		$this->load->model('Procedures/Procedures_model', 'ProcedureModel');
 		$this->template->page_icon('fa fa-dashboard');
 		$this->MainData 	= $this->db->get_where('directory', ['parent_id' => '0'])->result();
 		$this->sts = [
@@ -97,35 +98,36 @@ class Documents_list extends Admin_Controller
 
 	public function procedures($id = null)
 	{
+
+		
 		if (isset($id)) {
-			$procedure 		= $this->db->get_where('view_procedures', ['id' => $id])->result();
-			$forms 			= $this->db->order_by('name', 'ASC')->get_where('dir_forms', ['procedure_id' => $id, 'active' => 'Y', 'status !=' => 'DEL'])->result();
-			$guides 		= $this->db->order_by('name', 'ASC')->get_where('dir_guides', ['procedure_id' => $id, 'active' => 'Y', 'status !=' => 'DEL'])->result();
-			$records 		= $this->db->order_by('name', 'ASC')->get_where('dir_records', ['procedure_id' => $id, 'status' => 'PUB', 'flag_type' => 'FOLDER', 'company_id' => $this->company, 'parent_id' => null])->result();
-			$countRecords 	= $this->db->get_where('dir_records', ['procedure_id' => $id, 'status' => 'PUB', 'flag_type' => 'FILE', 'company_id' => $this->company])->num_rows();
+			$procedures =$this->ProcedureModel->find_all_by(['status' =>'PUB']);
+			$forms        = $this->db->order_by('name', 'ASC')->get_where('forms', ['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL'])->result();
+			$ik          = $this->db->order_by('name', 'ASC')->get_where('work_instructions', ['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL'])->result();
+			$records      = $this->db->order_by('name', 'ASC')->get_where('dir_records', ['procedure_id' => $id, 'status' => 'PUB', 'flag_type' => 'FOLDER', 'company_id' => $this->company, 'parent_id' => null])->result();
+			$countRecords = $this->db->get_where('dir_records', ['procedure_id' => $id, 'status' => 'PUB', 'flag_type' => 'FILE', 'company_id' => $this->company])->num_rows();
 
 			$this->template->set([
-				'procedure' 		=> $procedure,
-				'forms' 			=> $forms,
-				'guides' 			=> $guides,
-				'records' 			=> $records,
-				'MainData' 			=> $this->MainData,
-				'countRecords' 	 	=> $countRecords
+				'procedures'   => $procedures,
+				'forms'        => $forms,
+				'ik'          => $ik,
+				'records'      => $records,
+				'MainData'     => $this->MainData,
+				'countRecords' => $countRecords
 			]);
 			$this->template->render('procedures/list-docs');
 		} else {
-			$groups 		= $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
-			$procedures 	= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status' => 'PUB', 'deleted_by' => null])->result_array();
+			$groups        = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
+			$procedures    = $this->ProcedureModel->as_array()->find_all_by(['company_id' => $this->company,'status' => 'PUB', 'deleted_by' => null]);
 
 			$ArrPro = [];
 			foreach ($procedures as $pro) {
 				$ArrPro[$pro['group_procedure']][] = $pro;
 			}
-
+	
 			$this->template->set([
 				'groups' 		=> $groups,
 				'ArrPro' 		=> $ArrPro,
-				'MainData' 		=> $this->MainData
 			]);
 			$this->template->render('procedures/index');
 		}
@@ -190,15 +192,15 @@ class Documents_list extends Admin_Controller
 
 	public function view_form($id)
 	{
-		$form 			= $this->db->get_where('dir_forms', ['id' => $id])->row();
-		$history			= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
+		$form = $this->db->get_where('forms', ['id' => $id])->row();
+		// $history = $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
 		$users = $this->db->get_where('users', ['status' => 'ACT'])->result();
 		foreach ($users as $user) {
 			$ArrUsr[$user->id_user] = $user;
 		}
 		$this->template->set([
 			'form' 			=> $form,
-			'history' 			=> $history,
+			// 'history' 			=> $history,
 			'sts'				=> $this->sts,
 			'ArrUsr'			=> $ArrUsr
 		]);
@@ -208,15 +210,15 @@ class Documents_list extends Admin_Controller
 
 	public function view_guide($id)
 	{
-		$guide 			= $this->db->get_where('dir_guides', ['id' => $id])->row();
-		$history			= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
+		$ik 			= $this->db->get_where('work_instructions', ['id' => $id])->row();
+		// $history			= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
 		$users = $this->db->get_where('users', ['status' => 'ACT'])->result();
 		foreach ($users as $user) {
 			$ArrUsr[$user->id_user] = $user;
 		}
 		$this->template->set([
-			'guide' 		=> $guide,
-			'history' 		=> $history,
+			'ik' 		=> $ik,
+			// 'history' 		=> $history,
 			'sts'			=> $this->sts,
 			'ArrUsr'		=> $ArrUsr
 		]);
@@ -415,7 +417,7 @@ class Documents_list extends Admin_Controller
 
 	public function view_guides($id = null)
 	{
-		$data 			= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id,'status'=>'1'])->result();
+		$data 			= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'status' => '1'])->result();
 		$ArrDoc = [];
 		foreach ($data as $d) {
 			$ArrDoc[$d->file_type][] = $d;
