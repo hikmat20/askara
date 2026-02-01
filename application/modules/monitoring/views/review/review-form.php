@@ -1,7 +1,23 @@
-<div class="modal-header py-2 px-2">
+<form id="form-review">
     <ul class="nav nav-pills nav-light-success py-0" id="myTab" role="tablist">
         <li class="nav-item">
-            <a class="nav-link active" data-toggle="tab" href="#file">
+            <a class="nav-link active" data-toggle="tab" href="#review">
+                <span class="nav-icon">
+                    <i class="fa fa-edit"></i>
+                </span>
+                <span class="nav-text">Submit Review</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link nav-sm" data-toggle="tab" href="#data">
+                <span class="nav-icon">
+                    <i class="fa fa-list"></i>
+                </span>
+                <span class="nav-text">Data Procedure</span>
+            </a>
+        </li>
+        <li class="nav-item">
+            <a class="nav-link" data-toggle="tab" href="#filetab">
                 <span class="nav-icon">
                     <i class="fa fa-file-alt"></i>
                 </span>
@@ -9,23 +25,18 @@
             </a>
         </li>
         <li class="nav-item">
-            <a class="nav-link" data-toggle="tab" href="#home">
+            <a class="nav-link" data-toggle="tab" href="#history">
                 <span class="nav-icon">
                     <i class="fa fa-history"></i>
                 </span>
-                <span class="nav-text">History</span>
+                <span class="nav-text">Activity Log</span>
             </a>
         </li>
     </ul>
-</div>
-<div class="tab-content mt-5">
-    <div class="tab-pane fade show active" id="file" role="tabpanel" aria-labelledby="file-tab">
-        <iframe class="w-100" style="height: 350px;" src="<?= base_url("procedures/printOut/" . $file->id); ?>#toolbar=0&navpanes=0" frameborder="1"></iframe>
-        <hr>
-        <div class="row">
-            <div class="col-md-2"></div>
-            <div class="col-md-8">
-                <input type="hidden" name="id" id="id" value="<?= $file->id; ?>">
+    <div class="tab-content">
+        <div class="tab-pane fade show active" id="review" role="tabpanel" aria-labelledby="review-tab">
+            <input type="hidden" name="id" id="id" value="<?= $file->id; ?>">
+            <div class="py-3">
                 <div class="form-group">
                     <label class="col-form-label font-weight-bold">Action Review</label>
                     <div class="div">
@@ -50,51 +61,418 @@
                             </label>
                         </div>
                         <span class="form-text text-muted">write down the reason</span>
-                        <textarea name="note" id="note" class="form-control" placeholder="Reason"></textarea>
+                        <textarea name="note" disabled id="note" rows="6" class="form-control" placeholder="Reason"></textarea>
                         <span class="invalid-feedback text-danger">Harus di isi</span>
                     </div>
                     <button type="button" class="btn btn-light-primary" id="save-review"><i class="fab fa-telegram-plane"></i>Submit Review</button>
                 </div>
             </div>
         </div>
-    </div>
-    <div class="tab-pane fade" id="home" role="tabpanel" aria-labelledby="home-tab">
-        <div class="container">
+        <div class="tab-pane fade" id="data" role="tabpanel" aria-labelledby="file-tab">
+            <table class="table table-sm table-bordered border-dark">
+                <tr>
+                    <td rowspan="5" width="30%" class="text-center" style="vertical-align: middle;border-right:0px">
+                        <div class="d-flex justify-content-center align-items-center g-3 gap-3">
+                            <img width="80" class="img-fluid mr-4" src="<?= base_url() . $company->path_logo . $company->id_perusahaan . '/' . $company->logo; ?>" alt="">
+                            <h2><?= $company->nm_perusahaan; ?></h2>
+                        </div>
+                    </td>
+                    <td rowspan="5" width="40%" class="text-center" style="vertical-align: middle;border-left:0px">
+                        <h2><?= $data->name; ?></h2>
+                        <h3 style="color: #0088ffff;">(<?= isset($bilingual->name) ? $bilingual->name : ''; ?>)</h3>
+                    </td>
+                    <td width="150">Dept</td>
+                    <td width=""><?= $data->departement_name; ?></td>
+                </tr>
+                <tr>
+                    <td>No. Dok</td>
+                    <td><?= $data->nomor; ?></td>
+                </tr>
+                <tr>
+                    <td>Revisi</td>
+                    <td><?= $data->revision; ?></td>
+                </tr>
+                <tr>
+                    <td>Tgl. Terbit</td>
+                    <td><?= $data->published_at; ?></td>
+                </tr>
+                <tr>
+                    <td>Kelompok Proses</td>
+                    <td><?= $data->group_name; ?></td>
+                </tr>
+            </table>
+            <div class="card mb-3">
+                <div class="card-body p-2">
+                    <h4>RIWAYAT DOKUMEN</h4>
+                    <table class="table table-sm">
+                        <thead>
+                            <tr class="bg-secondary">
+                                <th class="py-2" width="100">REVISI</th>
+                                <th class="py-2" width="150">TANGGAL REVISI</th>
+                                <th class="py-2">URAIAN PERUBAHAN</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if (isset($revision_logs) && count($revision_logs) > 0): foreach ($revision_logs as $revisionLog): ?>
+                                    <tr>
+                                        <td class="text-center"><?= $revisionLog->revision_number; ?></td>
+                                        <td class="text-center"><?= $revisionLog->revision_date; ?></td>
+                                        <td><?= $revisionLog->description; ?></td>
+                                    </tr>
+                                <?php endforeach; ?>
+                            <?php else: ?>
+                                <tr>
+                                    <td class="text-center">~</td>
+                                    <td class="text-center">~</td>
+                                    <td>~</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+            <div class="card rounded-10">
+                <div class="card-body p-3">
+                    <table class="table table-borderless rounded-lg mb-6">
+                        <tr>
+                            <td class="py-6 w-50">
+                                <h3 class="fw-extra-bold"><strong>TUJUAN</strong></h3>
+                                <div>
+                                    <?= (isset($data->object) ? $data->object : ''); ?>
+                                </div>
+                            </td>
+                            <td style="color:#0088ffff">
+                                <h3 class="fw-extra-bold"><strong>OBJECT</strong></h3>
+                                <div>
+                                    <?= (isset($bilingual->object) ? $bilingual->object : ''); ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="py-6">
+                                <h3 class="fw-extra-bold"><strong>RUANG LINGKUP</strong></h3>
+                                <div>
+                                    <?= (isset($data->scope) ? $data->scope : ''); ?>
+                                </div>
+                            </td>
+                            <td style="color:#0088ffff" class="py-6">
+                                <h3 class="fw-extra-bold"><strong>SCOPE</strong></h3>
+                                <div>
+                                    <?= (isset($bilingual->scope) ? $bilingual->scope : ''); ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="py-6">
+                                <h3 class="fw-extra-bold"><strong>TANGGUNG JAWAB</strong></h3>
+                                <div>
+                                    <?= (isset($data->responsibility) ? $data->responsibility : ''); ?>
+                                </div>
+                            </td>
+                            <td style="color:#0088ffff" class="py-6">
+                                <h3 class="fw-extra-bold"><strong>RESPONSIBILITY</strong></h3>
+                                <div>
+                                    <?= (isset($bilingual->responsibility) ? $bilingual->responsibility : ''); ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="py-6">
+                                <h3 class="fw-extra-bold"><strong>DEFINISI</strong></h3>
+                                <div>
+                                    <?= (isset($data->define) ? $data->define : ''); ?>
+                                </div>
+                            </td>
+                            <td style="color:#0088ffff" class="py-6">
+                                <h3 class="fw-extra-bold"><strong>DEFINE</strong></h3>
+                                <div>
+                                    <?= (isset($bilingual->define) ? $bilingual->define : ''); ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="py-6">
+                                <h3 class="fw-extra-bold"><strong>PERFORMA INDIKATOR</strong></h3>
+                                <div>
+                                    <?= (isset($data->performance) ? $data->performance : ''); ?>
+                                </div>
+                            </td>
+                            <td style="color:#0088ffff" class="py-6">
+                                <h3 class="fw-extra-bold"><strong>INDICATOR PERFORMANCE</strong></h3>
+                                <div>
+                                    <?= (isset($bilingual->performance) ? $bilingual->performance : ''); ?>
+                                </div>
+                            </td>
+                        </tr>
+                        <tr>
+                            <td class="py-6">
+                                <h3 class="fw-extra-bold"><strong>KETENTUAN UMUM</strong></h3>
+                                <div>
+                                    <?= (isset($data->general_requirement) ? $data->general_requirement : ''); ?>
+                                </div>
+                            </td>
+                            <td style="color:#0088ffff" class="py-6">
+                                <h3 class="fw-extra-bold"><strong>GENERAL REQUIREMENT</strong></h3>
+                                <div>
+                                    <?= (isset($bilingual->general_requirement) ? $bilingual->general_requirement : ''); ?>
+                                </div>
+                            </td>
+                        </tr>
+                    </table>
+                    <!-- SIPOCOR -->
+                    <?php if ($data->supplier): ?>
+                        <table class="table table-bordered mb-6">
+                            <thead>
+                                <tr class="table-secondary">
+                                    <th colspan="2">
+                                        <h3>SIPOCOR</h3>
+                                    </th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                <tr>
+                                    <td width="50%">
+                                        <label for="Supplier" class="font-weight-bold font-size-"><strong>Supplier</strong></label>
+                                        <div class="">
+                                            <?= $data->supplier; ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <label for="Input" class="font-weight-bold font-size-"><strong>2. Input</strong></label>
+                                        <div class="">
+                                            <?= $data->input; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="Proses" class="font-weight-bold font-size-"><strong>3. Proses</strong></label>
+                                        <div class="">
+                                            <?= $data->process; ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <label for="Output" class="font-weight-bold font-size-"><strong>4. Output</strong></label>
+                                        <div class="">
+                                            <?= $data->output; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="Customer" class="font-weight-bold font-size-"><strong>5. Customer</strong></label>
+                                        <div class="">
+                                            <?= $data->customer; ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <label for="Objective" class="font-weight-bold font-size-"><strong>6. Objective</strong></label>
+                                        <div class="">
+                                            <?= $data->objective; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                                <tr>
+                                    <td>
+                                        <label for="Risk" class="font-weight-bold font-size-"><strong>7. Risk</strong></label>
+                                        <div class="">
+                                            <?= $data->risk; ?>
+                                        </div>
+                                    </td>
+                                    <td>
+                                        <label for="mitigation" class="font-weight-bold font-size-"><strong>8. Mitigation</strong></label>
+                                        <div class="">
+                                            <?= $data->mitigation; ?>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    <?php endif; ?>
+                    <hr>
+
+                    <!-- FLOW IMAGE -->
+                    <h3>FLOW IMAGE & FILE</h3>
+                    <?php if ($data->image_flow_1 || $data->image_flow_2 || $data->image_flow_3) : ?>
+                        <div class="d-flex justify-content-start align-items-center">
+                            <?php if ($data->image_flow_1) : ?>
+                                <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+                                    <div class="dropzone-desc">
+                                        <?php if ($data->image_flow_1) : ?>
+                                            <img src="<?= base_url("directory/FLOW_IMG/$data->company_id/$data->image_flow_1"); ?>" alt="image_flow_1" class="img-fluid">
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if ($data->image_flow_1) : ?>
+                                        <div class="middle d-flex justify-content-center align-items-center">
+                                            <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i class="fa fa-search"></i></button>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($data->image_flow_2) : ?>
+                                <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+                                    <div class="dropzone-desc">
+                                        <?php if ($data->image_flow_2) : ?>
+                                            <img src="<?= base_url("directory/FLOW_IMG/$data->company_id/$data->image_flow_2"); ?>" alt="image_flow_2" class="img-fluid">
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if ($data->image_flow_2) : ?>
+                                        <div class="middle d-flex justify-content-center align-items-center">
+                                            <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i class="fa fa-search"></i></button>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+
+                            <?php if ($data->image_flow_3) : ?>
+                                <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+                                    <div class="dropzone-desc">
+                                        <?php if ($data->image_flow_3) : ?>
+                                            <img src="<?= base_url("directory/FLOW_IMG/$data->company_id/$data->image_flow_3"); ?>" alt="image_flow_3" class="img-fluid">
+                                        <?php endif; ?>
+                                    </div>
+                                    <?php if ($data->image_flow_3) : ?>
+                                        <div class="middle d-flex justify-content-center align-items-center">
+                                            <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i class="fa fa-search"></i></button>
+                                        </div>
+                                    <?php endif; ?>
+                                </div>
+                            <?php endif; ?>
+
+                        </div>
+                    <?php endif; ?>
+                    <?php if ($data->flow_file): ?>
+                        <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+                            <div class="dropzone-desc">
+                                <?php if ($data->flow_file) : ?>
+                                    <canvas id="pdf-preview" class="" width="150"></canvas>
+                                <?php endif; ?>
+                            </div>
+                            <?php if ($data->flow_file) : ?>
+                                <div class="middle d-flex justify-content-center align-items-center">
+                                    <a target="_blank" href="<?= base_url("directory/FLOW_FILE/$data->company_id/$data->flow_file"); ?>" class="btn btn-sm mr-1 btn-icon btn-default rounded-circle"><i class="fa fa-eye"></i></a>
+                                </div>
+                            <?php endif; ?>
+                        </div>
+                    <?php endif; ?>
+                    <hr>
+
+                    <!-- VIDEO -->
+                    <h3>VIDEO</h3>
+                    <?php if ($data->link_video) : ?>
+                        <?= ($data->link_video); ?>
+                    <?php else : ?>
+                        <span>~</span>
+                    <?php endif; ?>
+
+                    <hr>
+                    <!-- FLOW DETAIL -->
+                    <h3>DETAIL PROSES</h3>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr class="table-secondary">
+                                <th class="py-1 text-center">No.</th>
+                                <th class="py-1 text-center">PIC/TANGGUNG JAWAB</th>
+                                <th class="py-1 text-center" colspan="2">DESKRIPSI</th>
+                                <th class="py-1 text-center">DOKUMEN TERKAIT</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php if ($detail) :
+                                foreach ($detail as $dtl) : ?>
+                                    <tr>
+                                        <td class="text-center"><?= $dtl->number; ?></td>
+                                        <td class="text-center"><?= $dtl->pic; ?></td>
+                                        <td class="wd-25"><?= $dtl->description; ?></td>
+                                        <td class="wd-25" style="color:#0088ffff"><?= $dtl->description_2; ?></td>
+                                        <td class="">
+                                            <?php $relDocs = json_decode($dtl->relate_doc); ?>
+                                            <?php if (is_array($relDocs)) : ?>
+                                                <?php foreach ($relDocs as $relDoc) { ?>
+                                                    <span class="d-block badge btn <?= ($ArrForms[$relDoc]->status == 'DEL') ? 'btn-light' : 'bg-success btn-success'; ?>  view-form mb-1" data-id="<?= $relDoc; ?>"><?= $ArrForms[$relDoc]->name; ?> <?= ($ArrForms[$relDoc]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger" title="File has been deleted!"></i>' : ''; ?></span>
+                                                <?php } ?>
+                                            <?php endif; ?>
+
+                                            <?php $relIk = json_decode($dtl->relate_ik_doc); ?>
+                                            <?php if (is_array($relIk)) : ?>
+                                                <?php foreach ($relIk as $ik) { ?>
+                                                    <span class="d-block badge btn <?= ($ArrGuides[$ik]->status == 'DEL') ? 'btn-light' : 'bg-danger btn-danger'; ?> view-guide mb-1" data-id="<?= $ik; ?>"><?= $ArrGuides[$ik]->name; ?> <?= ($ArrGuides[$ik]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger"  title="File has been deleted!"></i>' : ''; ?></span>
+                                                <?php } ?>
+                                            <?php endif; ?>
+                                        </td>
+                                    </tr>
+                                <?php endforeach;
+                            else : ?>
+                                <tr>
+                                    <td colspan="4" class="text-center">~ Not available data ~</td>
+                                </tr>
+                            <?php endif; ?>
+                        </tbody>
+                    </table>
+
+                    <hr>
+
+                    <h4>DATA APPROVAL</h4>
+                    <table class="table table-sm table-bordered">
+                        <thead>
+                            <tr class="bg-secondary">
+                                <th class="py-2 text-center">DIBUAT</th>
+                                <th class="py-2 text-center">DIPERIKSA</th>
+                                <th class="py-2 text-center">DISETUJUI</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <tr>
+                                <td class="text-center"><?= ($data->prepare_name) ?: '~'; ?></td>
+                                <td class="text-center"><?= ($data->reviewer_name) ?: '~'; ?></td>
+                                <td class="text-center"><?= ($data->approval_name) ?: '~'; ?></td>
+                            </tr>
+                            <tr>
+                                <td class="text-center" style="vertical-align: middle;padding:10px">
+                                    QR
+                                </td>
+                                <td class="text-center" style="vertical-align: middle;padding:10px">
+                                    QR
+                                </td>
+                                <td class="text-center" style="vertical-align: middle;padding:10px">
+                                    QR
+                                </td>
+                            </tr>
+                            <tr class="text-center bg-secondary">
+                                <th class="text-center" style="vertical-align: middle;"><?= ($data->user_prepared_name) ?: '~'; ?></th>
+                                <th class="text-center" style="vertical-align: middle;"><?= ($data->user_reviewed_name) ?: '~'; ?></th>
+                                <th class="text-center" style="vertical-align: middle;"><?= ($data->user_approved_name) ?: '~'; ?></th>
+                            </tr>
+                        </tbody>
+                    </table>
+                    <br>
+                </div>
+            </div>
+        </div>
+        <div class="tab-pane fade" id="filetab" role="tabpanel" aria-labelledby="file-">
+            <?php if ($type == 'procedures') : ?>
+                <iframe class="w-100" style="height: 70vh;" src="<?= base_url("procedures/printfile/" . $file->id); ?>#toolbar=0&navpanes=0"></iframe>
+            <?php endif; ?>
+        </div>
+        <div class="tab-pane fade" id="history" role="tabpanel" aria-labelledby="history-tab">
             <div class="row">
-                <div class="col-md-8">
+                <div class="col-md-8 offset-md-1">
                     <label for="">Tracking File</label>
                     <div class="timeline timeline-5">
                         <div class="timeline-items">
-                            <!-- <div class="timeline-item">
-                                <div class="timeline-media bg-light-primary">
-                                    <i class="fa fa-upload text-success"></i>
-                                </div>
-                                <div class="timeline-desc timeline-desc-light-primary">
-                                    <span class="font-weight-bolder text-primary"> <?= date('Y-m-d'); ?> 09:30 AM</span>
-                                    <span class="label label-pill label-inline label-light-danger">Upload File</span>
-                                    <p class="font-weight-normal text-dark-50 pb-2">
-                                        To start a blog, think of a topic about and first brainstorm ways to write details
-                                    </p>
-                                </div>
-                            </div> -->
                             <?php if (isset($history)) :
-
-
                                 foreach ($history as $his) : ?>
                                     <div class="timeline-item">
                                         <div class="timeline-media <?= ($his->new_status == 'OPN') ? 'bg-light-success' : 'bg-light-danger'; ?>">
                                             <span class="<?= ($his->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-danger'; ?>"></span>
                                         </div>
 
-                                        <div class="timeline-desc timeline-desc-light-danger">
+                                        <div class="timeline-desc timeline-desc-light-danger mb-5">
                                             <span class="font-weight-bolder text-danger"> <?= $his->updated_at; ?></span>
-                                            <?= $sts[$his->new_status]; ?>
-                                            <p class="font-weight-normal text-dark-50 pt-1">
-                                                <strong for="">Processed by <?= $his->updated_by; ?></strong>
-                                            </p>
-                                            <p>
-                                                <?= $his->note; ?>
-                                            </p>
+                                            <p>Status : <?= $sts[$his->new_status]; ?></p>
+                                            <p>Processed by : <strong class="text-dark"><?= $his->full_name; ?></strong></p>
+                                            <p>Note : <?= $his->note; ?></p>
                                         </div>
                                     </div>
                             <?php endforeach;
@@ -105,4 +483,4 @@
             </div>
         </div>
     </div>
-</div>
+</form>

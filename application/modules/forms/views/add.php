@@ -42,7 +42,7 @@
 										<select name="procedure_id" id="procedure" class="form-control select2">
 											<option value=""></option>
 											<?php if ($procedures) foreach ($procedures as $k => $procedure): ?>
-												<option value="<?= $procedures->id; ?>"><?= $procedure->name; ?></option>
+												<option value="<?= $procedure['id']; ?>"><?= $procedure['name']; ?></option>
 											<?php endforeach; ?>
 										</select>
 										<span class="form-text text-danger invalid-feedback">Procedure harus di isi</span>
@@ -56,7 +56,7 @@
 										<select name="is_active" id="is_active" class="form-control select2">
 											<option value=""></option>
 											<option value="ACT">Active</option>
-											<option value="ABS">Absolete</option>
+											<option value="OBS">Obsolete</option>
 										</select>
 										<span class="form-text text-danger invalid-feedback">Procedure harus di isi</span>
 									</div>
@@ -81,7 +81,7 @@
 								<div class="mb-3 row">
 									<label class="col-md-4 col-form-label">Revision Number <span class="text-danger">*</span></label>
 									<div class="col-md-8">
-										<input type="number" name="revision_number" class="form-control text-right" placeholder="0" id="revision_number">
+										<input type="number" readonly name="revision_number" class="form-control text-right" value="0" placeholder="0" id="revision_number">
 										<span class="form-text text-danger invalid-feedback">Revision Number harus di isi</span>
 									</div>
 								</div>
@@ -97,6 +97,7 @@
 									<div class="form-check form-check-inline">
 										<label class="form-check-label">
 											<input class="form-check-input" type="radio" <?= (isset($data) && $data->file_name) ? 'checked' : ''; ?> name="form_type" value="upload_file"> Upload File
+											<span class="invalid-feedback text-danger"></span>
 										</label>
 									</div>
 									<div class="form-check form-check-inline">
@@ -114,8 +115,14 @@
 								<div class="mb-3 row">
 									<label class="col-md-4">Prepared By <span class="text-danger">*</span></label>
 									<div class="col-md-8">
-										<input type="text" readonly class="form-control bg-dark-o-20" placeholder="Prepared By Name" value="<?= $user->full_name; ?>">
-										<input type="hidden" name="prepared_by" class="form-control" id="prepared_by" placeholder="Name" value="<?= $this->auth->user_id(); ?>">
+										<select class="form-control select2" name="prepared_by" id="prepared_by">
+											<option value=""></option>
+											<?php if ($users) foreach ($users as $user): ?>
+												<option value="<?= $user->id_user; ?>" <?= ($this->auth->user_id() == $user->id_user) ? 'selected' : ''; ?>><?= $user->full_name; ?></option>
+											<?php endforeach; ?>
+										</select>
+										<!-- <input type="text" readonly class="form-control bg-dark-o-20" placeholder="Prepared By Name" value="<?= $user->full_name; ?>"> -->
+										<!-- <input type="hidden" name="prepared_by" class="form-control" id="prepared_by" placeholder="Name" value="<?= $this->auth->user_id(); ?>"> -->
 										<span class="form-text text-danger invalid-feedback">harus di isi</span>
 									</div>
 								</div>
@@ -169,25 +176,23 @@
 			const form_type = $(this).val()
 			if (form_type == 'upload_file') {
 				html = `
-					<div class="form-group row mb-0">
+					<div class="form-group row mb-3">
 						<label class="col-12 col-form-label"><span class="text-danger">*</span> Upload Document :</label>
 						<div class="col-12">
-							<input type="file" name="forms_image" id="image" class="form-control" placeholder="Upload File">
+							<input type="file" name="form_file" accept=".pdf" class="form-control" placeholder="Upload File">
 							<span class="form-text text-muted">File type : PDF</span>
 							<span class="form-text text-danger invalid-feedback">Upload Document By harus di isi</span>
 						</div>
 					</div>`
 			} else if (form_type == 'online_form') {
 				html = `
-					<div class="form-group row">
-						<label class="col-12 col-form-label"><span class="text-danger">*</span> Link Google Form</label>
-						<div class="col-12">
-							<div class="input-group mb-3">
-								<span class="input-group-text rounded-right-0"><i class="fa fa-link"></i></span>
-								<input type="text" class="form-control" id="link-form" placeholder="Link Form" name="forms[link_form]" value="" autocomplete="off" />
-							</div>
-							<span class="form-text text-danger invalid-feedback">Link Form harus di isi</span>
+					<div class="form-group mb-3">
+						<label class="col-form-label"><span class="text-danger">*</span> Link Google Form</label>
+						<div class="input-group">
+							<span class="input-group-text rounded-right-0"><i class="fa fa-link"></i></span>
+							<input type="text" class="form-control" id="link-form" placeholder="Link Form" name="link_form" autocomplete="off" />
 						</div>
+						<span class="form-text text-danger invalid-feedback">Link Form harus di isi</span>
 					</div>`
 			}
 			$('#type-form').html(html)
@@ -219,30 +224,45 @@
 					btn.html('<i class="fa fa-save"></i>Save')
 				},
 				success: function(result) {
-					if (result.status == '0') {
-						console.log(result.errors);
+					console.log(result);
+					if (result.status == 0) {
 
 						// tampilkan error per field
 						$.each(result.errors, function(field, message) {
 							let input = $('[name="' + field + '"]');
 							input.addClass('is-invalid');
 							input.closest('.mb-3').find('span.invalid-feedback').html(message);
+							input.closest('.form-check-label').find('span.invalid-feedback').text(message);
 
 							if (input.is('select')) {
 								input.addClass('is-invalid');
 
 								// select2
-								if (input.hasClass('select2')) {
-									input.next('.select2-container')
-										.find('.select2-selection')
-										.addClass('is-invalid');
-								}
+								if (input.is('select')) {
+									input.addClass('is-invalid');
 
-								input.closest('.mb-3')
-									.find('.invalid-feedback')
-									.html(message);
+									// select2
+									if (input.hasClass('select2')) {
+										input.next('.select2-container')
+											.find('.select2-selection')
+											.addClass('is-invalid');
+									}
+
+									input.closest('.mb-3')
+										.find('.invalid-feedback')
+										.html(message);
+								}
 							}
 						});
+
+						if (result.msg) {
+							Swal.fire({
+								title: 'Error!',
+								html: result.msg,
+								icon: 'error',
+								timer: 3000
+							})
+						}
 
 						return;
 					}

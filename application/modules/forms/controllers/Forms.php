@@ -43,12 +43,12 @@ class Forms extends Admin_Controller
 	public function add()
 	{
 		$departements = $this->db->get_where('departements', ['status' => '1'])->result_array();
-		$user         = $this->UserModel->find($this->auth->user_id());
+		$users         = $this->UserModel->find_all_by('status', 'ACT');
 		$positions    = $this->PositionModel->find_all();
 		$procedures   = $this->ProcedureModel->as_array()->find_all_by('status !=', 'DEL');
 
 		$this->template->title('Add New Form');
-		$this->template->render('add', compact('departements', 'user', 'positions'));
+		$this->template->render('add', compact('departements', 'users', 'positions', 'procedures'));
 	}
 
 	public function edit($id = '')
@@ -57,13 +57,13 @@ class Forms extends Admin_Controller
 		$this->template->page_icon('fa fa-edit');
 
 		$dataForm      = $this->FormModel->find_data('view_forms', $id, 'id');
-
 		$departements  = $this->db->get_where('departements', ['status' => '1'])->result_array();
-		$user          = $this->UserModel->find($this->auth->user_id());
+		$users         = $this->UserModel->find_all_by('status', 'ACT');
+		// $user          = $this->UserModel->find($this->auth->user_id());
 		$positions     = $this->PositionModel->find_all();
 		$procedures    = $this->ProcedureModel->as_array()->find_all_by('status !=', 'DEL');
 
-		$this->template->render('edit', compact('dataForm', 'departements', 'user', 'positions', 'procedures'));
+		$this->template->render('edit', compact('dataForm', 'departements', 'users', 'positions', 'procedures'));
 	}
 
 	public function view($id = '')
@@ -75,7 +75,6 @@ class Forms extends Admin_Controller
 	private function _validation()
 	{
 		$this->load->library('form_validation');
-
 		$this->form_validation->set_rules('name', 'Document Name', 'required|trim');
 		$this->form_validation->set_rules('departement_id', 'Departement', 'required|trim');
 		$this->form_validation->set_rules('prepared_by', 'Upload Document By', 'required|trim');
@@ -89,13 +88,19 @@ class Forms extends Admin_Controller
 		$this->form_validation->set_rules('reviewer_id', 'Reviewer', 'required|trim');
 		$this->form_validation->set_rules('approval_id', 'Approval', 'required|trim');
 
-		$this->form_validation->set_message('required', '{field} tiidak boleh kosong');
+		if ($this->input->post('form_type')) {
+			if (isset($_FILES['form_file']) && $_FILES['form_file']['name'] == '') {
+				$this->form_validation->set_rules('form_file', 'File Upload', 'required|trim');
+			}
+		}
+
+		if ($this->input->post('link_form')) {
+			$this->form_validation->set_rules('link_form', 'Link online Form', 'required|trim');
+		}
+
+		$this->form_validation->set_message('required', '{field} tidak boleh kosong');
 		if ($this->form_validation->run() === FALSE) {
-			echo json_encode([
-				'status' => 0,
-				'errors' => $this->form_validation->error_array()
-			]);
-			return;
+			return ['errors' => $this->form_validation->error_array()];
 		}
 	}
 
@@ -108,7 +113,15 @@ class Forms extends Admin_Controller
 			]);
 			return;
 		}
-		$this->_validation();
+		$validated = $this->_validation();
+		if ($validated) {
+			echo json_encode([
+				'status' => 0,
+				'errors' => $validated['errors']
+			]);
+			return;
+		}
+
 		$Return = $this->FormModel->saveData();
 		echo json_encode($Return);
 	}

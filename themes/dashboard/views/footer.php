@@ -300,7 +300,7 @@
                  ['style', ['style']],
                  ['edit', ['undo', 'redo']],
                  ['font', ['bold', 'italic', 'underline', 'clear']],
-                 ['fontname', ['fontname']],
+                //  ['fontname', ['fontname']],
                  ['fontsize', ['fontsize', 'height']],
                  ['color', ['color']],
                  ['para', ['ul', 'ol', 'paragraph']],

@@ -13,7 +13,7 @@
     body {
       margin: 0;
       height: 100%;
-      background-color: #202020ff;
+      background-color: rgb(225, 225, 225);
     }
 
     iframe {

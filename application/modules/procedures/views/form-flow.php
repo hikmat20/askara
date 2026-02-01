@@ -31,7 +31,7 @@
 		<div class="form-group">
 			<label for="description" class="">Deskripsi <span class="text-danger">*</span></label>
 			<div class="">
-				<textarea rows="5" name="flow[description]" id="description" class="form-control editor" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description : ''; ?></textarea>
+				<textarea rows="5" name="flow[description]" id="description" class="form-control summernote" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description : ''; ?></textarea>
 				<small class="text-danger invalid-feedback">Deskripsi</small>
 			</div>
 		</div>
@@ -41,7 +41,7 @@
 			<div class="form-group">
 				<label for="description_2" class="">Description <span class="text-danger">*</span></label>
 				<div class="">
-					<textarea rows="5" name="flow[description_2]" id="description_2" class="form-control editor" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description_2 : ''; ?></textarea>
+					<textarea rows="5" name="flow[description_2]" id="description_2" class="form-control summernote" placeholder="Deskripsi" aria-describedby="helpId"><?= ($flow) ? $flow->description_2 : ''; ?></textarea>
 					<small class="text-danger invalid-feedback">Deskripsi</small>
 				</div>
 			</div>
@@ -83,9 +83,6 @@
 	<button type="submit" class="btn btn-sm btn-primary min-w-100px save"><i class="fas fa-save"></i>Save</button>
 </div>
 
-<!-- <div class="modal-footer justify-content-between align-items-center mb-3"> -->
-<!-- </div> -->
-
 <script>
 	$('.select2').select2({
 		placeholder: 'Choose an options',
@@ -93,7 +90,66 @@
 		allowClear: true
 	})
 
-	if (!tinymce.get('editor')) {
-		TinyManager.init('.editor');
+	// if (!tinymce.get('editor')) {
+	// 	TinyManager.init('.editor');
+	// }
+
+
+	var btnExample = function(context) {
+		var ui = $.summernote.ui;
+
+		// create button
+		var button = ui.button({
+			contents: '<i class="fa fa-child"/> Hello',
+			tooltip: 'hello',
+			click: function() {
+				// invoke insertText method with 'hello' on editor module.
+				context.invoke('editor.insertText', 'hello');
+			}
+		});
+
+		return button.render(); // return button as jquery object
 	}
+
+
+
+
+
+	$('.summernote').summernote({
+		height: 250, // set editor height
+		minHeight: null, // set minimum height of editor
+		maxHeight: null,
+		inheritPlaceholder: true,
+		toolbar: [
+			// ['style', ['style']],
+			['edit', ['undo', 'redo']],
+			['font', ['bold', 'italic', 'underline', 'clear']],
+			//  ['fontname', ['fontname']],
+			['fontsize', ['fontsize', 'height']],
+			['color', ['color']],
+			['para', ['ul', 'ol', 'paragraph', 'alphaList']],
+			// ['table', ['table']],
+			// ['insert', ['link', 'picture', 'video']],
+			['view', ['fullscreen', 'codeview', 'help']],
+		],
+		buttons: {
+			alphaList: function(context) {
+				var ui = $.summernote.ui;
+				var button = ui.button({
+					contents: '<i class="note-icon-orderedlist"></i>', // Use an appropriate icon
+					tooltip: 'Ordered List (Alpha)',
+					click: function() {
+						// Insert an ordered list (defaults to numbers)
+						context.invoke('editor.insertOrderedList');
+						// Find the newly created OL and set its style
+						var ol = context.layoutInfo.editable.find('ol');
+						if (ol.length > 0) {
+							ol.css('list-style-type', 'lower-alpha');
+						}
+					}
+				});
+				return button.render();
+			}
+		}
+	})
 </script>

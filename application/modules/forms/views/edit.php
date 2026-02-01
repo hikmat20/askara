@@ -56,7 +56,7 @@
 										<select name="is_active" id="is_active" class="form-control select2">
 											<option value=""></option>
 											<option value="ACT" <?= ($dataForm->is_active == 'ACT' ? 'selected' : ''); ?>>Active</option>
-											<option value="ABS" <?= ($dataForm->is_active == 'ABS' ? 'selected' : ''); ?>>Absolete</option>
+											<option value="OBS" <?= ($dataForm->is_active == 'OBS' ? 'selected' : ''); ?>>Obsolete</option>
 										</select>
 										<span class="form-text text-danger invalid-feedback">Procedure harus di isi</span>
 									</div>
@@ -81,7 +81,7 @@
 								<div class="mb-3 row">
 									<label class="col-md-4 col-form-label">Revision Number <span class="text-danger">*</span></label>
 									<div class="col-md-8">
-										<input type="number" name="revision_number" value="<?= (isset($dataForm->revision_number) ? $dataForm->revision_number : ''); ?>" class="form-control text-right" placeholder="0" id="revision_number">
+										<input readonly type="number" name="revision_number" value="<?= (isset($dataForm->revision_number) ? $dataForm->revision_number : ''); ?>" class="form-control text-right" placeholder="0" id="revision_number">
 										<span class="form-text text-danger invalid-feedback">Revision Number harus di isi</span>
 									</div>
 								</div>
@@ -142,8 +142,14 @@
 								<div class="mb-3 row">
 									<label class="col-md-4">Prepared By <span class="text-danger">*</span></label>
 									<div class="col-md-8">
-										<input type="text" readonly class="form-control bg-dark-o-20" placeholder="Prepared By Name" value="<?= (isset($dataForm->prepared_by_name) ? $dataForm->prepared_by_name : ''); ?>">
-										<input type="hidden" name="prepared_by" class="form-control" id="prepared_by" placeholder="Name" value="<?= (isset($dataForm->prepared_by) ? $dataForm->prepared_by : $this->auth->user_id()); ?>">
+										<!-- <input type="text" readonly class="form-control bg-dark-o-20" placeholder="Prepared By Name" value="<?= (isset($dataForm->prepared_by_name) ? $dataForm->prepared_by_name : ''); ?>">
+										<input type="hidden" name="prepared_by" class="form-control" id="prepared_by" placeholder="Name" value="<?= (isset($dataForm->prepared_by) ? $dataForm->prepared_by : $this->auth->user_id()); ?>"> -->
+										<select class="form-control select2" name="prepared_by" id="prepared_by">
+											<option value=""></option>
+											<?php if ($users) foreach ($users as $user): ?>
+												<option value="<?= $user->id_user; ?>" <?= ($dataForm->prepared_by == $user->id_user) ? 'selected' : ''; ?>><?= $user->full_name; ?></option>
+											<?php endforeach; ?>
+										</select>
 										<span class="form-text text-danger invalid-feedback">harus di isi</span>
 									</div>
 								</div>
@@ -217,7 +223,7 @@
 					<div class="form-group row mb-0">
 						<label class="col-12 col-form-label"><span class="text-danger">*</span> Upload Document :</label>
 						<div class="col-12">
-							<input type="file" name="form_file" id="image" class="form-control" placeholder="Upload File">
+							<input type="file" name="form_file" id="image" accept="pdf" class="form-control" placeholder="Upload File">
 							<span class="form-text text-muted">File type : PDF</span>
 							<span class="form-text text-danger invalid-feedback">Upload Document By harus di isi</span>
 						</div>
@@ -227,9 +233,9 @@
 					<div class="form-group row">
 						<label class="col-12 col-form-label"><span class="text-danger">*</span> Link Google Form</label>
 						<div class="col-12">
-							<div class="input-group mb-3">
+							<div class="input-group">
 								<span class="input-group-text rounded-right-0"><i class="fa fa-link"></i></span>
-								<input type="text" class="form-control" id="link-form" placeholder="Link Form" name="link_form" value="" autocomplete="off" />
+								<input type="text" class="form-control" id="link-form" placeholder="Link Form" name="link_form" autocomplete="off" />
 							</div>
 							<span class="form-text text-danger invalid-feedback">Link Form harus di isi</span>
 						</div>
@@ -265,8 +271,6 @@
 				},
 				success: function(result) {
 					if (result.status == '0') {
-						console.log(result.errors);
-
 						// tampilkan error per field
 						$.each(result.errors, function(field, message) {
 							let input = $('[name="' + field + '"]');
@@ -288,6 +292,15 @@
 									.html(message);
 							}
 						});
+
+						if (result.msg) {
+							Swal.fire({
+								title: 'Error!',
+								html: result.msg,
+								icon: 'error',
+								timer: 3000
+							})
+						}
 
 						return;
 					}

@@ -14,12 +14,12 @@
 								<li class="nav-item" role="presentation">
 									<button class="nav-link active" id="procedures-tab" data-toggle="tab" data-target="#procedures" type="button" role="tab" aria-controls="procedures" aria-selected="true">PROCEDURE</button>
 								</li>
-								<li class="nav-item" role="presentation">
+								<!-- <li class="nav-item" role="presentation">
 									<button class="nav-link" disabled id="form-tab" data-toggle="tab" data-target="#form" type="button" role="tab" aria-controls="form" aria-selected="false">FORM</button>
 								</li>
 								<li class="nav-item" role="presentation">
 									<button class="nav-link" disabled id="guides-tab" data-toggle="tab" data-target="#guides" type="button" role="tab" aria-controls="guides" aria-selected="false">IK</button>
-								</li>
+								</li> -->
 								<!-- <li class="nav-item" role="presentation">
 									<button class="nav-link" disabled id="records-tab" data-toggle="tab" data-target="#records" type="button" role="tab" aria-controls="records" aria-selected="false">RECORD</button>
 								</li> -->

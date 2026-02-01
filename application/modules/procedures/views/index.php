@@ -72,7 +72,7 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId">
-															<a href="javascript:void(0)" class="dropdown-item view" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" title="View Data"><i class="fa fa-search mr-2 text-info"></i>View</a>
+															<a href="javascript:void(0)" class="dropdown-item view" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" title="View Data"><i class="fa fa-eye mr-2 text-info"></i>View</a>
 															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item" data-id="<?= $draft->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
 															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $draft->id; ?>" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
@@ -113,7 +113,7 @@
 											<td class=""><?= $dt->group_name; ?></td>
 											<td class=""><?= $status[$dt->status]; ?></td>
 											<td class="">
-												<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search"></i></button>
+												<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 												<button type="button" class="btn btn-xs btn-icon btn-light-danger cancle-review" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Cancel Review"><i class="fa fa-undo"></i></button>
 											</td>
 											</tr>
@@ -145,7 +145,7 @@
 												</td>
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
 												<td class="p-2">
-													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $dt->id); ?>" class="btn btn-xs btn-icon btn-warning" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
 													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
 													<button type="button" class="btn btn-icon btn-primary review btn-xs" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-sync"></i></button>
@@ -179,11 +179,7 @@
 												</td>
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
 												<td class="p-2">
-													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" title="View Data"><i class="fa fa-search"></i></button>
-													<?php if ($dt->approval_id == $this->auth->user_id()) : ?>
-														<!-- <a href="<?= base_url($this->uri->segment(1) . '/edit/' . $dt->id); ?>" class="btn btn-xs btn-icon btn-warning" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a> -->
-													<?php endif; ?>
-													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" title="View Data"><i class="fa fa-eye"></i></button>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -196,30 +192,39 @@
 						<div class="tab-pane fade" id="Revision" role="tabpanel" aria-labelledby="Revision-tab">
 							<table id="tblRevision" class="table datatable table-bordered table-sm table-condensed table-hover datatable">
 								<thead class="text-center table-light">
-									<tr class="text-center">
+									<!-- <tr class="text-center">
 										<th class="p-2" width="40">No.</th>
 										<th class="p-2 text-left">Nama</th>
 										<th class="p-2 text-left">Reason</th>
 										<th class="p-2" width="130">Status</th>
 										<th class="p-2" width="70">Action</th>
+									</tr> -->
+									<tr>
+										<th class="" width="40">No.</th>
+										<th class="">Nama</th>
+										<th class="">Nomor</th>
+										<th class="text-center">Departement</th>
+										<th class="text-center">Kelompok</th>
+										<th class="">Reason</th>
+										<th class="text-center" width="130">Status</th>
+										<th class="text-center" width="100">Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php if (isset($dataRvi) && $dataRvi) :
 										$n = 0;
 										foreach ($dataRvi as $dt) : $n++; ?>
-											<tr class="text-center">
-												<td class="p-2"><?= $n; ?></td>
-												<td class="p-2 text-left">
-													<h6 class="my-0"><?= $dt->name; ?></h6>
-												</td>
-												<td class="p-2 text-left">
-													<?= $ArrReason[$dt->id]->note; ?>
-												</td>
-												<td class="p-2"><?= $status[$dt->status]; ?></td>
-												<td class="p-2">
-													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $dt->id); ?>" class="btn btn-xs btn-icon btn-warning" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
+											<tr class="">
+												<td class=""><?= $n; ?></td>
+												<td class="h6"><?= $dt->name; ?></td>
+												<td class=""><?= $dt->nomor; ?></td>
+												<td class=""><?= $dt->departement_name; ?></td>
+												<td class=""><?= $dt->group_name; ?></td>
+												<td class=""><?= $ArrReason[$dt->id]->note; ?></td>
+												<td class=""><?= $status[$dt->status]; ?></td>
+												<td class="">
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<a href="<?= base_url($this->uri->segment(1) . '/revision/' . $dt->id); ?>" class="btn btn-xs btn-icon btn-warning" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Revision Data"><i class="fa fa-edit"></i></a>
 													<button type="button" class="btn btn-xs btn-icon btn-success review" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-sync-alt"></i></button>
 												</td>
 											</tr>
@@ -252,7 +257,7 @@
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
 												<td class="p-2">
 													<a href="<?= base_url($this->uri->segment(1) . '/printout/' . $dt->id); ?>" target="_blank" class="btn btn-xs btn-icon btn-light print" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Print Data"><i class="fa fa-print"></i></a>
-													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -284,7 +289,7 @@
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
 												<td class="p-2">
 													<!-- <a href="<?= base_url($this->uri->segment(1) . '/printout/' . $dt->id); ?>" target="_blank" class="btn btn-xs btn-icon btn-light print" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Print Data"><i class="fa fa-print"></i></a> -->
-													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-search"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<button type="button" class="btn btn-xs btn-icon btn-danger delete" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button>
 												</td>
 											</tr>
@@ -325,21 +330,20 @@
 </div>
 
 <div class="modal fade" id="modalView" data-keyboard="true" tabindex="-1" aria-labelledby="modal-view" aria-hidden="true">
-	<div class="modal-dialog modal-xl modal-dialog-scrollable" style="min-width: 90%;" role="document">
+	<div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
 		<div class="modal-content" data-scroll="true" data-height="700">
-			<form class="form-horiontal" id="form-input">
-				<div class="modal-header">
+			<div class="">
+				<div class="modal-header py-2">
 					<h6 class="modal-title" id="modal-view">View Procedure</h6>
 					<span type="button" onclick="$('#name').val('')" class="btn-close" data-dismiss="modal" aria-label="Close">
 						<i class="fa fa-times"></i>
 					</span>
 				</div>
-				<div class="modal-body">
-				</div>
+				<div class="modal-body py-2"></div>
 				<div class="modal-footer">
 					<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#name').val('')"><i class="fa fa-times"></i>Close</button>
 				</div>
-			</form>
+			</div>
 		</div>
 	</div>
 </div>
@@ -513,101 +517,6 @@
 
 		})
 
-		$(document).on('click', '.edit', function() {
-			let id = $(this).data('id')
-			$('#modalForm').modal('show')
-			$.ajax({
-				url: siteurl + active_controller + 'edit/' + id,
-				type: 'GET',
-				dataType: 'JSON',
-				success: function(result) {
-					if (result) {
-						let html = `
-						<div class="form-group row">
-							<label class="col-3">Name Procedure</label>
-							<div class="col-9">
-								<input type="hidden" name="id" id="id" class="form-control" value="` + result.id + `">
-								<input type="text" name="name" id="name" class="form-control" required placeholder="Name Procedure" value="` + result.name + `">
-								<small class="text-danger invalid-feedback">Name procedure</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="">Objektif Proses</label>
-							<div class="">
-								<input type="text" name="object" id="object" class="form-control" value="` + result.object + `" required placeholder="Objektif Proses" aria-describedby="helpId">
-								<small class="text-danger invalid-feedback">Objektif Proses</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="">Definisi</label>
-							<div class="">
-								<input type="text" name="define" id="define" class="form-control" value="` + result.define + `" required placeholder="Definisi Proses" aria-describedby="helpId">
-								<small class="text-danger invalid-feedback">Definisi Proses</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="">Performa Indikator</label>
-							<div class="">
-								<input type="text" name="performance" id="performance" class="form-control" value="` + result.performance + `" required placeholder="Performa Indikator" aria-describedby="helpId">
-								<small class="text-danger invalid-feedback">Performa Indikator</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="">Ruang Lingkup</label>
-							<div class="">
-								<input type="text" name="scope" id="scope" class="form-control" value="` + result.scope + `" required placeholder="Ruang Lingkup" aria-describedby="helpId">
-								<small class="text-danger invalid-feedback">Ruang Lingkup</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="sipocor" class="">SIPOCOR</label>
-							<div class="">
-								<textarea  name="sipocor" id="sipocor" class="form-control" placeholder="SIPOCOR"  aria-describedby="helpId">` + result.name + `</textarea>
-								<small class="text-danger invalid-feedback">SIPOCOR</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="">Nomor</label>
-							<div class="">
-								<input type="text" name="number" id="number" class="form-control" value="` + result.number + `" required placeholder="Nomor" aria-describedby="helpId">
-								<small class="text-danger invalid-feedback">Nomor</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="">PIC</label>
-							<div class="">
-								<input type="text" name="pic" id="pic" class="form-control" required placeholder="PIC" value="` + result.pic + `" aria-describedby="helpId">
-								<small class="text-danger invalid-feedback">PIC</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label for="description" class="">Deskripsi</label>
-							<div class="">
-								<textarea name="description" id="description" class="form-control" placeholder="Deskripsi" aria-describedby="helpId">` + result.name + `</textarea>
-								<small class="text-danger invalid-feedback">Deskripsi</small>
-							</div>
-						</div>
-						<div class="form-group">
-							<label class="">Dok. Terkait</label>
-							<div class="">
-								<input type="text" name="relate_doc" id="relate_doc" class="form-control" value="` + result.relate_doc + `" required placeholder="Dokumen terkait" aria-describedby="helpId"/>
-								<small class="text-danger invalid-feedback">Dokumen terkait</small>
-							</div>
-						</div>
-						`;
-						$('.modal-body').html(html);
-
-						// load_tinymce('textarea')
-					} else {
-						Swal.fire('Warning', 'Data not valid. Please try again!', 'warning', 3000)
-					}
-
-				},
-				error: function() {
-					Swal.fire('Error!', 'Server timeout. Please try again!', 'error', 5000)
-				}
-			})
-		})
 
 		$(document).on('click', '.view', function() {
 			let id = $(this).data('id')
@@ -671,14 +580,19 @@
 			let id = $(this).data('id')
 			Swal.fire({
 				title: 'Are you sure to review this data?',
+				text: 'New Release Document will be created after this process.',
 				icon: 'question',
 				showCancelButton: true,
+				cancelButtonColor: '#e64322',
 				confirmButtonText: 'Yes',
 			}).then((value) => {
 				if (value.isConfirmed) {
 					$.ajax({
-						url: siteurl + active_controller + 'review/' + id,
-						type: 'GET',
+						url: siteurl + active_controller + 'process_to_review',
+						data: {
+							id
+						},
+						type: 'POST',
 						dataType: 'JSON',
 						success: function(result) {
 							if (result.status == '1') {

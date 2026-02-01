@@ -18,7 +18,7 @@ class Monitoring extends Admin_Controller
 		$this->template->page_icon('fa fa-dashboard');
 
 		$this->sts = [
-			'' => '<span class="label label-light-secondary label-pill label-inline mr-2 text-dark-50">!Null!</span>',
+			'DFT' => '<span class="label label-light-secondary label-pill label-inline mr-2 text-dark-50">Draft</span>',
 			'OPN' => '<span class="label label-light-primary label-pill label-inline mr-2">New</span>',
 			'REV' => '<span class="label label-light-warning label-pill label-inline mr-2">Waiting Review</span>',
 			'COR' => '<span class="label label-light-danger label-pill label-inline mr-2">Need Correction</span>',
@@ -116,29 +116,128 @@ class Monitoring extends Admin_Controller
 	public function view($id = null, $type = null)
 	{
 		$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
-		$this->template->set([
-			'sts' => $this->sts,
-			'file' => $file,
-			'type' => $type,
-			'history' => $history,
-			'view_data' => false
-		]);
-		$this->template->render('view');
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
+		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
+		$users         = $this->db->get_where('view_users')->result();
+		$getForms      = $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
+		$getGuides     = $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
+		$jabatan       = $this->db->get('positions')->result();
+		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
+		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		$company       = $this->session->company;
+		$revision_logs = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+		$signatures	   = $this->db->get_where('signature_documents', ['document_id' => $id, 'document_type' => 'procedure'])->result();
+
+		$ArrSign = [];
+		foreach($signatures as $sign){
+			$ArrSign[$sign->sign_type] = $sign->qr_path;
+		}
+
+		foreach ($getForms as $frm) {
+			$ArrForms[$frm->id] = $frm;
+		}
+		foreach ($getGuides as $gui) {
+			$ArrGuides[$gui->id] = $gui;
+		}
+
+		foreach ($users as $usr) {
+			$ArrUsr[$usr->id_user] = $usr;
+		}
+
+		foreach ($jabatan as $jab) {
+			$ArrJab[$jab->id] = $jab;
+		}
+
+		foreach ($depts as $dept) {
+			$ArrDept[$dept->id] = $dept;
+		}
+
+		if ($Data) {
+			$Data_detail = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$this->template->set([
+				'sts'           => $this->sts,
+				'file'          => $file,
+				'type'          => $type,
+				'history'       => $history,
+				'view_data'     => false,
+				'data'          => $Data,
+				'bilingual'     => $bilingual,
+				'detail'        => $Data_detail,
+				'users'         => $users,
+				'jabatan'       => $jabatan,
+				'ArrUsr'        => $ArrUsr,
+				'ArrJab'        => $ArrJab,
+				'ArrDept'       => $ArrDept,
+				'ArrForms'      => $ArrForms,
+				'ArrGuides'     => $ArrGuides,
+				'company'       => $company,
+				'revision_logs' => $revision_logs,
+				'ArrSign'       => $ArrSign,
+			]);
+			$this->template->render('view');
+		}
 	}
 
 	public function view_data($id = null, $type = null)
 	{
-		$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
-		$this->template->set([
-			'sts' => $this->sts,
-			'file' => $file,
-			'type' => $type,
-			'history' => $history,
-			'view_data' => true
-		]);
-		$this->template->render('view');
+		$file 		= $this->db->get_where('view_procedures', ['id' => $id])->row();
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+
+		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
+		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
+		$users         = $this->db->get_where('view_users')->result();
+		$getForms      = $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
+		$getGuides     = $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
+		$jabatan       = $this->db->get('positions')->result();
+		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
+		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		$company       = $this->session->company;
+		$revision_logs = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+
+
+		foreach ($getForms as $frm) {
+			$ArrForms[$frm->id] = $frm;
+		}
+		foreach ($getGuides as $gui) {
+			$ArrGuides[$gui->id] = $gui;
+		}
+
+		foreach ($users as $usr) {
+			$ArrUsr[$usr->id_user] = $usr;
+		}
+
+		foreach ($jabatan as $jab) {
+			$ArrJab[$jab->id] = $jab;
+		}
+
+		foreach ($depts as $dept) {
+			$ArrDept[$dept->id] = $dept;
+		}
+
+		if ($Data) {
+			$Data_detail = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$this->template->set([
+				'sts'           => $this->sts,
+				'file'          => $file,
+				'type'          => $type,
+				'history'       => $history,
+				'view_data'     => true,
+				'data'          => $Data,
+				'bilingual'     => $bilingual,
+				'detail'        => $Data_detail,
+				'users'         => $users,
+				'jabatan'       => $jabatan,
+				'ArrUsr'        => $ArrUsr,
+				'ArrJab'        => $ArrJab,
+				'ArrDept'       => $ArrDept,
+				'ArrForms'      => $ArrForms,
+				'ArrGuides'     => $ArrGuides,
+				'company'       => $company,
+				'revision_logs' => $revision_logs,
+			]);
+			$this->template->render('view');
+		}
 	}
 
 
@@ -147,10 +246,10 @@ class Monitoring extends Admin_Controller
 	public function review()
 	{
 		/* REVIEW */
-		$procedures 	= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status' => 'REV'])->result();
-		$ArrPosts 		= $this->ArrPosts;
-		$users = $this->db->get_where('users')->result();
-		$positions = $this->db->get_where('positions', ['company_id' => $this->company])->result_array();
+		$procedures  = $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status' => 'REV'])->result();
+		$ArrPosts    = $this->ArrPosts;
+		$users       = $this->db->get_where('users')->result();
+		$positions   = $this->db->get_where('positions', ['company_id' => $this->company])->result_array();
 		$ArrPosition = array_combine(array_column($positions, 'id'), array_column($positions, 'name'));
 
 		$ArrUsers = [];
@@ -172,42 +271,69 @@ class Monitoring extends Admin_Controller
 
 	public function load_form_review($id, $type = null)
 	{
-		$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
-		$this->template->set('sts', $this->sts);
-		$this->template->set('file', $file);
-		$this->template->set('type', $type);
-		$this->template->set('history', $history);
-		$this->template->render('review/review-form');
+		$file 		= $this->db->get_where('view_procedures', ['id' => $id])->row();
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+
+		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
+		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
+		$users         = $this->db->get_where('view_users')->result();
+		$getForms      = $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
+		$getGuides     = $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
+		$jabatan       = $this->db->get('positions')->result();
+		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
+		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		$company       = $this->session->company;
+		$revision_logs = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+
+
+		foreach ($getForms as $frm) {
+			$ArrForms[$frm->id] = $frm;
+		}
+		foreach ($getGuides as $gui) {
+			$ArrGuides[$gui->id] = $gui;
+		}
+
+		foreach ($users as $usr) {
+			$ArrUsr[$usr->id_user] = $usr;
+		}
+
+		foreach ($jabatan as $jab) {
+			$ArrJab[$jab->id] = $jab;
+		}
+
+		foreach ($depts as $dept) {
+			$ArrDept[$dept->id] = $dept;
+		}
+
+		if ($Data) {
+			$Data_detail = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$this->template->set([
+				'sts'           => $this->sts,
+				'file'          => $file,
+				'type'          => $type,
+				'history'       => $history,
+				'view_data'     => true,
+				'data'          => $Data,
+				'bilingual'     => $bilingual,
+				'detail'        => $Data_detail,
+				'users'         => $users,
+				'jabatan'       => $jabatan,
+				'ArrUsr'        => $ArrUsr,
+				'ArrJab'        => $ArrJab,
+				'ArrDept'       => $ArrDept,
+				'ArrForms'      => $ArrForms,
+				'ArrGuides'     => $ArrGuides,
+				'company'       => $company,
+				'revision_logs' => $revision_logs,
+			]);
+			$this->template->render('review/review-form');
+		}
 	}
 
 	public function save_review()
 	{
 		$data = $this->input->post();
-
-		if ($data) {
-			$this->db->trans_begin();
-			$this->Monitor_model->review($data);
-			if ($this->db->trans_status() === FALSE) {
-				$this->db->trans_rollback();
-				$Return = [
-					'status' => 0,
-					'msg'	 => 'Failed process review document. Please try again later.!'
-				];
-			} else {
-				$this->db->trans_commit();
-				$Return = [
-					'status' => 1,
-					'msg'	 => 'Success process review document...'
-				];
-			}
-		} else {
-			$Return = [
-				'status' => 0,
-				'msg'	 => 'Data not valid.'
-			];
-		}
-
+		$Return = $this->Monitor_model->review($data);
 		echo json_encode($Return);
 	}
 	/* END REVIEW PROCESS */
@@ -323,7 +449,7 @@ class Monitoring extends Admin_Controller
 			$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
 		}
 
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
 		$jabatan 	= $this->db->get('positions')->result();
 
 		$this->template->set('jabatan', $jabatan);
@@ -336,30 +462,7 @@ class Monitoring extends Admin_Controller
 
 	public function save_approval()
 	{
-		$data = $this->input->post();
-		if ($data) {
-			$this->db->trans_begin();
-			$this->Monitor_model->approval($data);
-			if ($this->db->trans_status() === FALSE) {
-				$this->db->trans_rollback();
-				$Return = [
-					'status' => 0,
-					'msg'	 => 'Failed upload document file. Please try again later.!'
-				];
-			} else {
-				$this->db->trans_commit();
-				$Return = [
-					'status' => 1,
-					'msg'	 => 'Success upload document file...'
-				];
-			}
-		} else {
-			$Return = [
-				'status' => 0,
-				'msg'	 => 'Data not valid.'
-			];
-		}
-
+		$Return = $this->Monitor_model->approval();
 		echo json_encode($Return);
 	}
 
@@ -475,16 +578,15 @@ class Monitoring extends Admin_Controller
 	public function revision()
 	{
 		/* CORRECTION */
-		$procedures 	= $this->db->get_where('view_procedures', [
-			'company_id' => $this->company, 'status' => 'RVI'
-		])->result();
-		$users = $this->db->get_where('users')->result();
-		$positions 		= $this->db->get_where('positions', ['company_id' => $this->company])->result_array();
-		$ArrPosition 	= array_combine(array_column($positions, 'id'), array_column($positions, 'name'));
+		$procedures  = $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status' => 'RVI'])->result();
+		$users       = $this->db->get_where('users')->result();
+		$positions 	 = $this->db->get_where('positions', ['company_id' => $this->company])->result_array();
+		$ArrPosition = array_combine(array_column($positions, 'id'), array_column($positions, 'name'));
 
 		$ArrUsers = [];
 		foreach ($users as $user) {
-			$ArrUsers[$user->id_user] = $user;
+			$ArrUsers[$user->id_user]['id_user'] = $user->id_user;
+			$ArrUsers[$user->id_user]['full_name'] = $user->full_name;
 		}
 
 		$this->template->set([
@@ -495,6 +597,7 @@ class Monitoring extends Admin_Controller
 			'ArrPosition'	=> $ArrPosition,
 			'ArrPosts'		=> $this->ArrPosts,
 		]);
+
 		$this->template->render('list');
 	}
 
@@ -512,30 +615,7 @@ class Monitoring extends Admin_Controller
 	public function save_revision()
 	{
 		$data = $this->input->post();
-		if ($data) {
-			$this->db->trans_begin();
-			$data['status'] = 'RVI';
-			$this->Monitor_model->revision($data);
-			if ($this->db->trans_status() === FALSE) {
-				$this->db->trans_rollback();
-				$Return = [
-					'status' => 0,
-					'msg'	 => 'Failed revision document file. Please try again later.!'
-				];
-			} else {
-				$this->db->trans_commit();
-				$Return = [
-					'status' => 1,
-					'msg'	 => 'Success revision document file...'
-				];
-			}
-		} else {
-			$Return = [
-				'status' => 0,
-				'msg'	 => 'Data not valid.'
-			];
-		}
-
+		$Return = $this->Monitor_model->saveRevision($data);
 		echo json_encode($Return);
 	}
 

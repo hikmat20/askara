@@ -1,0 +1,1 @@
+<img src="<?= base_url('directory/QR_CODE/' . $id . '.png');; ?>" alt="">

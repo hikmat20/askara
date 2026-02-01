@@ -10,6 +10,6 @@
 </div>
 <div class="d-flex justify-content-between align-items-center">
     <button type="button" class="btn btn-light-danger save-deletion"><i class="fa fa-paper-plane"></i>Submit to Deletion</button>
-    <button type="button" class="btn btn-light-success" data-dismiss="modal"><i class="fa fa-times"></i>Cancel</button>
+    <!-- <button type="button" class="btn btn-light-success" data-dismiss="modal"><i class="fa fa-times"></i>Cancel</button> -->
 
 </div>

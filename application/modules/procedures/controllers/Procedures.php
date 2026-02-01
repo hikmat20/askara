@@ -12,6 +12,9 @@ class Procedures extends Admin_Controller
 		$this->load->helper('download');
 		$this->load->library(array('upload', 'Image_lib'));
 		$this->load->model('companies/Company_model', 'Comp');
+		$this->load->model('Procedure_model', 'ProcedureModel');
+		$this->load->model('forms/Form_model', 'FormModel');
+		$this->load->model('work_instructions/Work_instruction_model', 'WiModel');
 
 
 		$this->template->set('title', 'List Procedures');
@@ -144,6 +147,67 @@ class Procedures extends Admin_Controller
 		}
 	}
 
+	public function revision($id = '')
+	{
+		$Data 			= $this->db->get_where('procedures', ['company_id' => $this->company, 'id' => $id])->row();
+		$languange 		= ['english'];
+
+		if ($Data) {
+			$Data_detail      = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$grProcess        = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
+			$getForms         = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getGuides        = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getRecords       = $this->db->get_where('dir_records', ['procedure_id' => $id, 'status !=' => 'DEL', 'flag_type' => 'FOLDER', 'parent_id' => null])->result();
+			$users            = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
+			$jabatan          = $this->db->get_where('positions', ['company_id' => $this->company])->result();
+			$depts            = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+			$bilingual        = $this->db->get_where('procedure_bilingual', ['procedure_id' => $Data->id])->result();
+			$revision_markers = $this->db->get_where('procedure_revision_markers', ['procedure_id' => $Data->id, 'marker_counter' => $Data->revision])->result();
+			$ArrMarker = array_column($revision_markers, 'is_active', 'marker_position');
+
+			$bilingualArr = [];
+			foreach ($bilingual as $bilingualItem) {
+				$bilingualArr[$bilingualItem->language] = $bilingualItem;
+			}
+
+			$ArrForms = [];
+			foreach ($getForms as $frm) {
+				$ArrForms[$frm->id] = $frm;
+			}
+			$ArrGuides = [];
+			foreach ($getGuides as $gui) {
+				$ArrGuides[$gui->id] = $gui;
+			}
+
+			$this->template->set([
+				'title'        => 'Edit Procedures',
+				'data'         => $Data,
+				'users'        => $users,
+				'grProcess'    => $grProcess,
+				'detail'       => $Data_detail,
+				'getForms'     => $getForms,
+				'getGuides'    => $getGuides,
+				'getRecords'   => $getRecords,
+				'jabatan'      => $jabatan,
+				'ArrForms'     => $ArrForms,
+				'ArrGuides'    => $ArrGuides,
+				'depts'        => $depts,
+				'languange'    => $languange,
+				'bilingualArr' => $bilingualArr,
+				'sts'          => $this->sts,
+				'ArrMarker'      => $ArrMarker,
+			]);
+
+			$this->template->render('revision');
+		} else {
+			$data = [
+				'heading' => 'Error!',
+				'message' => 'Data not found..'
+			];
+			$this->template->render('../views/errors/html/error_404_custome', $data);
+		}
+	}
+
 	public function view($id = '', $status = '')
 	{
 		$Data 				= $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
@@ -154,6 +218,9 @@ class Procedures extends Admin_Controller
 		$jabatan 			= $this->db->get('positions')->result();
 		$ArrUsr 			= $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
 		$depts 			= $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		$company 			= $this->session->company;
+		$revision_logs       = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+
 
 		foreach ($getForms as $frm) {
 			$ArrForms[$frm->id] = $frm;
@@ -177,17 +244,19 @@ class Procedures extends Admin_Controller
 		if ($Data) {
 			$Data_detail 		= $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$this->template->set([
-				'title'	    => 'Procedures',
-				'data'      => $Data,
-				'bilingual' => $bilingual,
-				'detail'    => $Data_detail,
-				'users'	    => $users,
-				'jabatan'   => $jabatan,
-				'ArrUsr'    => $ArrUsr,
-				'ArrJab'    => $ArrJab,
-				'ArrDept'    => $ArrDept,
-				'ArrForms'  => $ArrForms,
-				'ArrGuides' => $ArrGuides,
+				'title'	        => 'Procedures',
+				'data'          => $Data,
+				'bilingual'     => $bilingual,
+				'detail'        => $Data_detail,
+				'users'	        => $users,
+				'jabatan'       => $jabatan,
+				'ArrUsr'        => $ArrUsr,
+				'ArrJab'        => $ArrJab,
+				'ArrDept'       => $ArrDept,
+				'ArrForms'      => $ArrForms,
+				'ArrGuides'     => $ArrGuides,
+				'company'       => $company,
+				'revision_logs' => $revision_logs,
 			]);
 			$this->template->render('view');
 		} else {
@@ -204,12 +273,17 @@ class Procedures extends Admin_Controller
 		$Data      = $this->input->post();
 		$Data_flow = $this->input->post('flow');
 		$bilingual = $Data['bilingual'];
+		$revision  = $Data['revision'];
 
+		unset($Data['revision']);
 		unset($Data['bilingual']);
-		unset($Data['DataTables_Table_0_length']);
-		unset($Data['DataTables_Table_1_length']);
-		unset($Data['DataTables_Table_2_length']);
+		// unset($Data['DataTables_Table_0_length']);
+		// unset($Data['DataTables_Table_1_length']);
+		// unset($Data['DataTables_Table_2_length']);
+
 		if ($Data) {
+			// $Return = $this->ProcedureModel->saveProcedure();
+
 			if (isset($_FILES)) {
 				$images = $this->upload_images();
 
@@ -240,12 +314,46 @@ class Procedures extends Admin_Controller
 				$Data['modified_at'] = date('Y-m-d H:i:s');
 				$pro_id = $Data['id'];
 				$this->db->update('procedures', $Data, ['id' => $Data['id']]);
+				$thisData = $this->db->get_where('procedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
+
+				if ($thisData->status == 'RVI') {
+					$check_log = $this->db->get_where('procedure_revision_logs', ['procedure_id' => $thisData->id, 'revision_number' => $thisData->revision])->row();
+
+					$revisionData = [
+						'company_id'      => $this->company,
+						'procedure_id'    => $thisData->id,
+						'revision_number' => $thisData->revision,
+						'description'     => $revision['revision_description'],
+						'created_by'      => $this->auth->user_id(),
+						'created_at'      => date('Y-m-d H:i:s'),
+					];
+
+					if (!$check_log) {
+						$this->db->insert('procedure_revision_logs', $revisionData);
+					} else {
+						$this->db->update('procedure_revision_logs', $revisionData, ['company_id' => $this->company, 'procedure_id' => $thisData->id, 'revision_number' => $thisData->revision]);
+					}
+
+					if (isset($revision['marker_position']) && count($revision['marker_position']) > 0) {
+						foreach ($revision['marker_position'] as $marker) {
+							$revisionMarker = [
+								'company_id'      => $this->company,
+								'procedure_id'    => $thisData->id,
+								'marker_counter'  => $thisData->revision,
+								'marker_position' => $marker,
+								'created_by'      => $this->auth->user_id(),
+								'created_at'      => date('Y-m-d H:i:s'),
+							];
+							$this->db->insert('procedure_revision_markers', $revisionMarker);
+						}
+					}
+				}
 			} else {
 				$Data['created_by'] = $this->auth->user_id();
 				$Data['created_at'] = date('Y-m-d H:i:s');
 				$this->db->insert('procedures', $Data);
 				$pro_id = $this->db->order_by('id', 'DESC')->get_where('procedures')->row()->id;
-				$thisData = $this->db->get_where('procedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
+				$thisData = $this->db->get_where('eprocedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
 				$dataLog = [
 					'directory_id' 	=> $thisData->id,
 					'new_status' 	=> (($thisData->status) ?: null),
@@ -254,7 +362,6 @@ class Procedures extends Admin_Controller
 				];
 				$this->_update_history($dataLog);
 			}
-
 
 			// if bilingual
 			if ($bilingual) {
@@ -292,6 +399,7 @@ class Procedures extends Admin_Controller
 				$this->db->insert('procedure_details', $Data_flow);
 			}
 		}
+
 
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
@@ -489,8 +597,9 @@ class Procedures extends Admin_Controller
 		$language = ['english'];
 		if ($proc_id && $id) {
 			$flow 		= $this->db->get_where('procedure_details', ['id' => $id])->row();
-			$forms 		= $this->db->get_where('dir_forms', ['procedure_id' => $proc_id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
-			$guides 	= $this->db->get_where('dir_guides', ['procedure_id' => $proc_id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
+			// $formsx 		= $this->db->get_where('forms', ['procedure_id' => $proc_id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
+			$forms = $this->FormModel->find_all_by(['procedure_id' => $proc_id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
+			$guides 	= $this->WiModel->find_all_by(['procedure_id' => $proc_id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
 		}
 
 		$this->template->set([
@@ -685,55 +794,11 @@ class Procedures extends Admin_Controller
 		echo json_encode($Return);
 	}
 
-	function review($id)
+	function process_to_review()
 	{
-		$this->db->trans_begin();
-		if (($id)) {
-			$thisData = $this->db->get_where('procedures', ['id' => $id])->row();
-			if ($thisData->reviewer_id == '' || $thisData->reviewer_id == null || $thisData->approval_id == '' || $thisData->approval_id == null) {
-				$Return		= array(
-					'status'		=> 0,
-					'msg'			=> 'Please select Reviewer User And Approval User first to go to the next process.',
-				);
-				echo json_encode($Return);
-				return false;
-			}
-
-			$data['modified_by'] = $this->auth->user_id();
-			$data['modified_at'] = date('Y-m-d H:i:s');
-			$data['status'] = 'REV';
-
-			if ($thisData->status == 'RVI') {
-				$data['revision'] = $thisData->revision + 1;
-				$data['revision_date'] = date('Y-m-d H:i:s');
-			}
-
-			$this->db->update('procedures', $data, ['company_id' => $this->company, 'id' => $id]);
-			$dataLog = [
-				'directory_id' 	=> $id,
-				'old_status'	=> $thisData->status,
-				'new_status' 	=> $data['status'],
-				'note' 			=> 'Procesed to review procedure',
-				'doc_type' 		=> 'Procedure',
-			];
-
-			$this->_update_history($dataLog);
-		}
-
-		if ($this->db->trans_status() === FALSE) {
-			$this->db->trans_rollback();
-			$Return		= array(
-				'status'		=> 0,
-				'msg'			=> 'Can\'t process this data. Please try again.',
-			);
-		} else {
-			$this->db->trans_commit();
-			$Return		= array(
-				'status'		=> 1,
-				'msg'			=> 'Data Procedure successfully processed for review..',
-			);
-		}
-		echo json_encode($Return);
+		$id = $this->input->post('id');
+		$return = $this->ProcedureModel->processReview($id);
+		echo json_encode($return);
 	}
 
 	function cancel_review($id)
@@ -1534,6 +1599,8 @@ class Procedures extends Admin_Controller
 		$mpdf = $this->pdfservice->load();
 		$mpdf->showImageErrors = true;
 		$mpdf->curlAllowUnsafeSslRequests = true;
+		$mpdf->SetHtmlFooter('<div class="text-center" style="color:#595959"><i>- Hardcopy Uncontrol -</i></div>');
+		// watermark
 		$procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
 		$flowDetail          = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 		$getForms            = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
@@ -1544,7 +1611,8 @@ class Procedures extends Admin_Controller
 		$procedure_bilingual = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$company             = $this->Comp->find($this->company);
 		$depts               = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
-		$revision_logs = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+		$revision_logs       = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+		$revision_markers    = $this->db->get_where('procedure_revision_markers', ['company_id' => $this->company, 'procedure_id' => $id, 'is_active' => '1', 'marker_counter' => $procedure->revision])->result();
 
 		foreach ($depts as $dept) {
 			$ArrDept[$dept->id] = $dept;
@@ -1565,6 +1633,13 @@ class Procedures extends Admin_Controller
 			$ArrGuides[$gui->id] = $gui;
 		}
 
+		$markers = [];
+		if ($revision_markers) {
+			foreach ($revision_markers as $rm) {
+				$markers[$rm->marker_position] = $rm;
+			}
+		}
+
 		$this->db->select('*')->from('view_cross_reference_details');
 		$this->db->where("find_in_set($id, procedure_id)");
 		$this->db->where("company_id", $this->company);
@@ -1580,6 +1655,24 @@ class Procedures extends Admin_Controller
 			$ArrStd[$dtstd->requirement_id] = $dtstd;
 		}
 
+		$status = $procedure->status;
+
+		if ($status == 'DFT') {
+			$watermark = 'DRAFT';
+		} elseif ($status == 'REV') {
+			$watermark = 'UNDER REVIEW';
+		} elseif ($status == 'APV') {
+			$watermark = 'UNDER APPROVAL';
+		} elseif ($status == 'RVI') {
+			$watermark = 'UNDER REVISION';
+		} elseif ($status == 'COR') {
+			$watermark = 'UNDER CORRECTION';
+		} else {
+			$mpdf->showWatermarkText = false;
+			$watermark = '';
+		}
+		$mpdf->SetWatermarkText($watermark);
+
 		$getData = [
 			'procedure'           => $procedure,
 			'company'             => $company,
@@ -1594,7 +1687,14 @@ class Procedures extends Admin_Controller
 			'ArrStd'              => $ArrStd,
 			'procedure_bilingual' => $procedure_bilingual,
 			'revision_logs'       => $revision_logs,
+			'markers'             => $markers,
+			'watermark'             => $watermark,
 		];
+
+
+		$mpdf->showWatermarkText = true;
+		// $mpdf->SetWatermarkImage(FCPATH . 'assets/logo/1/' . $company->logo,0.2,[100,80],[60,100]);
+		// $mpdf->showWatermarkImage = true;
 
 		$header = $this->getHeader($getData);
 		$mpdf->SetHTMLHeader($header);
@@ -1652,5 +1752,21 @@ class Procedures extends Admin_Controller
 				</td>
 				</tr>
 			</table></div>';
+	}
+
+	public function generateQrCode($id)
+	{
+		$this->load->library('ciqrcode');
+		$config['cacheable']    = true; //boolean, the default is true
+		$config['cachedir']     = './directory/QR_CODE/'; //string, the default is application/cache/
+		$this->ciqrcode->initialize($config);
+
+		$params['data'] = site_url($this->uri->segment(1) . '/printfile/' . $id);
+		$params['level'] = 'H';
+		$params['size'] = 100;
+		$params['savename'] = FCPATH . 'directory/QR_CODE/' . $id . '.png';
+		$this->ciqrcode->generate($params);
+		// header("Content-Type: image/png");
+		$this->load->view('qrcode', ['id' => $id]);
 	}
 }

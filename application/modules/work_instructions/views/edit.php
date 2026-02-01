@@ -56,7 +56,7 @@
 										<select name="is_active" id="is_active" class="form-control select2">
 											<option value=""></option>
 											<option value="ACT" <?= ($dataWi->is_active == 'ACT' ? 'selected' : ''); ?>>Active</option>
-											<option value="ABS" <?= ($dataWi->is_active == 'ABS' ? 'selected' : ''); ?>>Absolete</option>
+											<option value="OBS" <?= ($dataWi->is_active == 'OBS' ? 'selected' : ''); ?>>Obsolete</option>
 										</select>
 										<span class="form-text text-danger invalid-feedback">Procedure harus di isi</span>
 									</div>

@@ -56,7 +56,7 @@
 										<select name="is_active" id="is_active" class="form-control select2">
 											<option value=""></option>
 											<option value="ACT">Active</option>
-											<option value="ABS">Absolete</option>
+											<option value="OBS">Obsolete</option>
 										</select>
 										<span class="form-text text-danger invalid-feedback">Procedure harus di isi</span>
 									</div>

@@ -5,7 +5,6 @@
   <meta charset="UTF-8">
   <meta http-equiv="X-UA-Compatible" content="IE=edge">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <!-- <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.3/dist/css/bootstrap.min.css" integrity="sha384-QWTKZyjpPEjISv5WaRU9OFeRpok6YctnYmDr5pNlyT2bRjXh0JMhjY6hW+ALEwIH" crossorigin="anonymous"> -->
   <title><?= $procedure->name; ?></title>
   <style>
     * {
@@ -145,11 +144,6 @@
 </head>
 
 <body>
-  <!-- header -->
-  <?php if ($watermark): ?>
-    <div class="ribbon"><?= $watermark; ?></div>
-  <?php endif; ?>
-  
   <div class="text-center">
     <table class="table-data" width="100%" border="1" cellpadding="3">
       <thead>
@@ -171,13 +165,19 @@
         </tr>
         <tr>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if (isset($ArrSign['create'])): ?>
+              <img src="<?= base_url($ArrSign['create']); ?>" width="100" alt="">
+            <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if (isset($ArrSign['review'])): ?>
+              <img src="<?= base_url($ArrSign['review']); ?>" width="100" alt="">
+            <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if (isset($ArrSign['approve'])): ?>
+              <img src="<?= base_url($ArrSign['approve']); ?>" width="100" alt="">
+            <?php endif; ?>
           </td>
         </tr>
         <tr style="background-color: #e6e6e6;">

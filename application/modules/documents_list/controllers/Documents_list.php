@@ -8,7 +8,7 @@ class Documents_list extends Admin_Controller
 		parent::__construct();
 
 		$this->load->model('documents_list/Documents_list_model', 'List');
-		$this->load->model('Procedures/Procedures_model', 'ProcedureModel');
+		$this->load->model('Procedures/Procedure_model', 'ProcedureModel');
 		$this->template->page_icon('fa fa-dashboard');
 		$this->MainData 	= $this->db->get_where('directory', ['parent_id' => '0'])->result();
 		$this->sts = [

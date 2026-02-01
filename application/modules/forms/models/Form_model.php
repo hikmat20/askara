@@ -82,9 +82,14 @@ class Form_model extends BF_Model
 
           $uploadFile        = $this->_uploadFile();
 
-          $Data['file_name'] = $uploadFile['file_name'];
-          $Data['size']      = $uploadFile['size'];
-          $Data['ext']       = $uploadFile['ext'];
+          if ($uploadFile['status'] == 1) {
+            $Data['file_name'] = $uploadFile['data']['file_name'];
+            $Data['size']      = $uploadFile['data']['size'];
+            $Data['ext']       = $uploadFile['data']['ext'];
+          } else {
+            $error = $uploadFile['error'];
+            throw new Exception($error);
+          }
         }
 
         if (isset($Data['id']) && $Data['id']) {
@@ -142,16 +147,18 @@ class Form_model extends BF_Model
       $data['file_name'] = $file['file_name'];
       $data['size']      = $file['file_size'];
       $data['ext']       = $file['file_ext'];
-      return $data;
+      return [
+        'status' => 1,
+        'data' => $data
+      ];
+   
     else :
       $error = $this->upload->display_errors();
       $this->db->trans_rollback();
-      $Return = [
+      return [
         'status' => 0,
-        'msg'   => $error
+        'error' => $error
       ];
-      echo json_encode($Return);
-      return;
     endif;
   }
 
@@ -221,7 +228,7 @@ class Form_model extends BF_Model
 
     try {
       $dataUpdate['status'] = $data['status'];
-      
+
       if ($data['status'] == 'APV') {
         $dataUpdate['published_date'] = $data['published_date'];
         $dataUpdate['approved_by']    = $this->auth->user_id();
