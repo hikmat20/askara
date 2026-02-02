@@ -126,6 +126,11 @@ class Forms extends Admin_Controller
 		echo json_encode($Return);
 	}
 
+	public function form_review($id)
+	{
+		$this->load->view('form_review', ['id' => $id]);
+	}
+	
 	public function process_to_review()
 	{
 		if (!$this->input->is_ajax_request()) {
