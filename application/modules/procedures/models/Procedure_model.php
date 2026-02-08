@@ -126,10 +126,6 @@ class Procedure_model extends BF_Model
     $this->db->trans_begin();
 
     try {
-      // echo '<pre>';
-      // print_r($Data);
-      // echo '</pre>';
-      // exit;
       $this->db->insert('procedures', $Data);
       $pro_id = $this->db->insert_id();
 

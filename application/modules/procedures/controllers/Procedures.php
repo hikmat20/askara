@@ -174,6 +174,7 @@ class Procedures extends Admin_Controller
 			foreach ($getForms as $frm) {
 				$ArrForms[$frm->id] = $frm;
 			}
+			
 			$ArrGuides = [];
 			foreach ($getGuides as $gui) {
 				$ArrGuides[$gui->id] = $gui;
