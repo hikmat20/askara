@@ -109,8 +109,8 @@
 								<div id="type-form"></div>
 							</div>
 						</div>
-						<hr>
-						<div class="row">
+						<!-- <hr> -->
+						<!-- <div class="row">
 							<div class="col-md-6">
 								<div class="mb-3 row">
 									<label class="col-md-4">Prepared By <span class="text-danger">*</span></label>
@@ -121,8 +121,6 @@
 												<option value="<?= $user->id_user; ?>" <?= ($this->auth->user_id() == $user->id_user) ? 'selected' : ''; ?>><?= $user->full_name; ?></option>
 											<?php endforeach; ?>
 										</select>
-										<!-- <input type="text" readonly class="form-control bg-dark-o-20" placeholder="Prepared By Name" value="<?= $user->full_name; ?>"> -->
-										<!-- <input type="hidden" name="prepared_by" class="form-control" id="prepared_by" placeholder="Name" value="<?= $this->auth->user_id(); ?>"> -->
 										<span class="form-text text-danger invalid-feedback">harus di isi</span>
 									</div>
 								</div>
@@ -151,7 +149,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 					</div>
 					<div class="d-flex card-footer justify-content-between align-items-center">
 						<button class="btn btn-primary save min-w-100px"><i class="fa fa-save"></i>Save</button>

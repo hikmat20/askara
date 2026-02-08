@@ -54,10 +54,10 @@
 	<h5 class="">Form</h5>
 	<div class="mb-3">
 		<select multiple name="flow[relate_doc][]" class="select2 form-control">
-			<?php $relDocs = json_decode($flow->relate_doc); ?>
+			<?php //$relDocs = isset($flow->relate_doc) ? json_decode($flow->relate_doc) : []; ?>
 			<?php if ($forms) : ?>
 				<?php foreach ($forms as $form) : ?>
-					<option value="<?= $form->id; ?>" <?= ($relDocs) ? (in_array($form->id, $relDocs) ? 'selected' : '') : ''; ?>><?= $form->name; ?></option>
+					<option value="<?= $form->id; ?>"><?= $form->name; ?></option>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</select>
@@ -68,10 +68,10 @@
 	<div class="mb-3">
 		<!-- <textarea rows="5" name="flow[relate_doc]" id="relate_doc" class="form-control" required placeholder="Dokumen terkait" aria-describedby="helpId" /></textarea> -->
 		<select multiple name="flow[relate_ik_doc][]" class="select2 form-control">
-			<?php $relDocs = json_decode($flow->relate_ik_doc, true); ?>
+			<?php //$relDocs = isset($flow->relate_ik_doc) ? json_decode($flow->relate_ik_doc, true) : []; ?>
 			<?php if ($guides) : ?>
 				<?php foreach ($guides as $guide) : ?>
-					<option value="<?= $guide->id; ?>" <?= ($relDocs) ? (in_array($guide->id, $relDocs)) : ''; ?>><?= $guide->name; ?></option>
+					<option value="<?= $guide->id; ?>"><?= $guide->name; ?></option>
 				<?php endforeach; ?>
 			<?php endif; ?>
 		</select>

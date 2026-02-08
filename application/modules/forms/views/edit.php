@@ -96,54 +96,30 @@
 								<div class="form-group mb-0">
 									<div class="form-check form-check-inline">
 										<label class="form-check-label">
-											<input class="form-check-input" type="radio" <?= ((isset($dataForm) && $dataForm->form_type == 'upload_file') ? 'checked' : ''); ?> name="form_type" value="upload_file"> Upload File
+											<input class="form-check-input" type="radio" name="form_type" value="upload_file"> Upload File
 											<span></span>
 										</label>
 									</div>
 									<div class="form-check form-check-inline">
 										<label class="form-check-label">
-											<input class="form-check-input" type="radio" <?= ((isset($dataForm) && $dataForm->form_type == 'online_form') ? 'checked' : ''); ?> name="form_type" value="online_form"> Online Form
+											<input class="form-check-input" type="radio" name="form_type" value="online_form"> Online Form
 											<span></span>
 										</label>
 									</div>
 								</div>
-								<div id="type-form">
-									<?php if (isset($dataForm) && $dataForm->form_type == 'upload_file') : ?>
-										<div class="form-group mt-3 row mb-0">
-											<label class="col-12"><span class="text-danger">*</span> Upload Document :</label>
-											<div class="col-12">
-												<input type="file" name="form_file" class="form-control" placeholder="Upload File">
-												<span class="form-text text-muted">File type : PDF</span>
-												<span class="form-text text-danger invalid-feedback">Upload Document By harus di isi</span>
-											</div>
-										</div>
-									<?php else : ?>
-										<div class="form-group row">
-											<label class="col-12 col-form-label"><span class="text-danger">*</span> Link Google Form</label>
-											<div class="col-12">
-												<div class="input-group mb-3">
-													<span class="input-group-text rounded-right-0"><i class="fa fa-link"></i></span>
-													<input type="text" class="form-control" id="link-form" placeholder="Link Form" name="link_form" value="<?= isset($dataForm) ? $dataForm->link_form : ''; ?>" autocomplete="off" />
-												</div>
-												<span class="form-text text-danger invalid-feedback">Link Form harus di isi</span>
-											</div>
-										</div>
-									<?php endif; ?>
-								</div>
+								<div id="type-form"></div>
 							</div>
 							<div class="col-md-4">
 								<label for="">Document Form</label>
 								<button type="button" data-id="<?= $dataForm->id; ?>" class="btn btn-block btn-success view" data-toggle="modal" data-target="#modelId"><i class="fa fa-eye" aria-hidden="true"></i> View Form</button>
 							</div>
 						</div>
-						<hr>
-						<div class="row">
+						<!-- <hr> -->
+						<!-- <div class="row">
 							<div class="col-md-6">
 								<div class="mb-3 row">
 									<label class="col-md-4">Prepared By <span class="text-danger">*</span></label>
 									<div class="col-md-8">
-										<!-- <input type="text" readonly class="form-control bg-dark-o-20" placeholder="Prepared By Name" value="<?= (isset($dataForm->prepared_by_name) ? $dataForm->prepared_by_name : ''); ?>">
-										<input type="hidden" name="prepared_by" class="form-control" id="prepared_by" placeholder="Name" value="<?= (isset($dataForm->prepared_by) ? $dataForm->prepared_by : $this->auth->user_id()); ?>"> -->
 										<select class="form-control select2" name="prepared_by" id="prepared_by">
 											<option value=""></option>
 											<?php if ($users) foreach ($users as $user): ?>
@@ -178,7 +154,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 					</div>
 					<div class="d-flex card-footer justify-content-between align-items-center">
 						<button class="btn btn-primary save min-w-100px"><i class="fa fa-save"></i>Save</button>

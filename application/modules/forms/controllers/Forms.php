@@ -23,7 +23,7 @@ class Forms extends Admin_Controller
 
 	public function index()
 	{
-		$dataDraft		= $this->FormModel->getAllByStatus('DFT');
+		$dataDraft		= $this->FormModel->getAll();
 		$dataCorrection = $this->FormModel->getAllByStatus('COR');
 		$dataReview		= $this->FormModel->getAllByStatus('REV');
 		$dataApproval	= $this->FormModel->getAllByStatus('APV');
@@ -77,26 +77,25 @@ class Forms extends Admin_Controller
 		$this->load->library('form_validation');
 		$this->form_validation->set_rules('name', 'Document Name', 'required|trim');
 		$this->form_validation->set_rules('departement_id', 'Departement', 'required|trim');
-		$this->form_validation->set_rules('prepared_by', 'Upload Document By', 'required|trim');
 		$this->form_validation->set_rules('number', 'Number', 'required|trim');
 		$this->form_validation->set_rules('procedure_id', 'Procedure', 'required|trim');
-		$this->form_validation->set_rules('form_type', 'Form Type', 'required|trim');
 		$this->form_validation->set_rules('is_active', 'Status Active', 'required|trim');
 		$this->form_validation->set_rules('issue_date', 'Issue Date', 'required|trim');
 		$this->form_validation->set_rules('effective_date', 'Effective Date', 'required|trim');
 		$this->form_validation->set_rules('revision_number', 'Revision Number', 'required|trim');
-		$this->form_validation->set_rules('reviewer_id', 'Reviewer', 'required|trim');
-		$this->form_validation->set_rules('approval_id', 'Approval', 'required|trim');
 
-		if ($this->input->post('form_type')) {
+		if (!$this->input->post('id')) {
+			if (!$this->input->post('form_type')) {
+				$this->form_validation->set_rules('form_type', 'Form Type', 'required|trim');
+			}
 			if (isset($_FILES['form_file']) && $_FILES['form_file']['name'] == '') {
 				$this->form_validation->set_rules('form_file', 'File Upload', 'required|trim');
 			}
+			if (!$this->input->post('link_form')) {
+				$this->form_validation->set_rules('link_form', 'Link online Form', 'required|trim');
+			}
 		}
 
-		if ($this->input->post('link_form')) {
-			$this->form_validation->set_rules('link_form', 'Link online Form', 'required|trim');
-		}
 
 		$this->form_validation->set_message('required', '{field} tidak boleh kosong');
 		if ($this->form_validation->run() === FALSE) {
@@ -130,7 +129,7 @@ class Forms extends Admin_Controller
 	{
 		$this->load->view('form_review', ['id' => $id]);
 	}
-	
+
 	public function process_to_review()
 	{
 		if (!$this->input->is_ajax_request()) {

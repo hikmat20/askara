@@ -57,6 +57,11 @@ class Work_instruction_model extends BF_Model
     parent::__construct();
   }
 
+  public function getAll()
+  {
+    return $this->db->get_where('view_work_instructions', ['status !=' => 'DEL'])->result();
+  }
+
   public function getAllByStatus($status)
   {
     return $this->db->get_where('view_work_instructions', ['status' => $status])->result();
@@ -72,10 +77,17 @@ class Work_instruction_model extends BF_Model
         $Data['company_id'] = 1;
 
         if (isset($_FILES['file']) && $_FILES['file']['name'] != '') {
+
           $uploadFile        = $this->_uploadFile();
-          $Data['file_name'] = $uploadFile['file_name'];
-          $Data['size']      = $uploadFile['size'];
-          $Data['ext']       = $uploadFile['ext'];
+
+          if ($uploadFile['status'] == 1) {
+            $fileData = $uploadFile['data'];
+            $Data['file_name'] = $fileData['file_name'];
+            $Data['size']      = $fileData['size'];
+            $Data['ext']       = $fileData['ext'];
+          } else {
+            throw new Exception($uploadFile['error']);
+          }
         }
 
         if (isset($Data['id']) && $Data['id']) {
@@ -131,16 +143,17 @@ class Work_instruction_model extends BF_Model
       $data['file_name'] = $file['file_name'];
       $data['size']      = $file['file_size'];
       $data['ext']       = $file['file_ext'];
-      return $data;
+      return  [
+        'status' => 1,
+        'data'   => $data
+      ];
     else :
       $error = $this->upload->display_errors();
-      $this->db->trans_rollback();
       $Return = [
         'status' => 0,
-        'msg'   => $error
+        'error'   => $error
       ];
-      echo json_encode($Return);
-      return;
+      return $Return;
     endif;
   }
 
@@ -210,7 +223,7 @@ class Work_instruction_model extends BF_Model
 
     try {
       $dataUpdate['status'] = $data['status'];
-      
+
       if ($data['status'] == 'APV') {
         $dataUpdate['published_date'] = $data['published_date'];
         $dataUpdate['approved_by']    = $this->auth->user_id();

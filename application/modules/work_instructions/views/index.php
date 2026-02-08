@@ -12,7 +12,7 @@
 				</div>
 				<div class="card-body py-3">
 					<!-- Nav tabs -->
-					<ul class="nav nav-tabs nav-pills pb-3" id="myTab" role="tablist">
+					<!-- <ul class="nav nav-tabs nav-pills pb-3" id="myTab" role="tablist">
 						<li class="nav-item" role="presentation">
 							<button class="nav-link active btn-sm" id="Draft-tab" data-toggle="tab" data-target="#Draft" type="button" role="tab" aria-controls="Draft" aria-selected="false">Draft <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataDraft); ?></span></button>
 						</li>
@@ -31,7 +31,7 @@
 						<li class="nav-item" role="presentation">
 							<button class="nav-link btn-sm" id="Published-tab" data-toggle="tab" data-target="#Published" type="button" role="tab" aria-controls="Published" aria-selected="true">Published <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataPublished); ?></span></button>
 						</li>
-					</ul>
+					</ul> -->
 
 					<!-- Tab panes -->
 					<div class="tab-content mt-3">
@@ -64,7 +64,7 @@
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs	 btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
-													<button type="button" class="btn btn-xs	 btn-icon btn-primary toReview" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Review WI"><i class="fa fa-check"></i></button>
+													<!-- <button type="button" class="btn btn-xs	 btn-icon btn-primary toReview" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Review WI"><i class="fa fa-check"></i></button> -->
 													<!-- <button type="button" class="btn btn-xs	 btn-icon btn-danger delete" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
 												</td>
 											</tr>

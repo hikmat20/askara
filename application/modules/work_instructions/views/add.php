@@ -96,15 +96,15 @@
 								<div class="form-group row mb-0">
 									<label class="col-12 col-form-label"><span class="text-danger">*</span> Upload Document :</label>
 									<div class="col-12">
-										<input type="file" name="file" id="file" class="form-control" placeholder="Upload File">
+										<input type="file" name="file" id="file" accept=".pdf,.xlsx,.docx" class="form-control" placeholder="Upload File">
 										<span class="form-text text-muted">File type : PDF</span>
 										<span class="form-text text-danger invalid-feedback">Upload Document By harus di isi</span>
 									</div>
 								</div>
 							</div>
 						</div>
-						<hr>
-						<div class="row">
+						<!-- <hr> -->
+						<!-- <div class="row">
 							<div class="col-md-6">
 								<div class="mb-3 row">
 									<label class="col-md-4">Prepared By <span class="text-danger">*</span></label>
@@ -139,7 +139,7 @@
 									</div>
 								</div>
 							</div>
-						</div>
+						</div> -->
 					</div>
 					<div class="d-flex card-footer justify-content-between align-items-center">
 						<button class="btn btn-primary save min-w-100px"><i class="fa fa-save"></i> Save</button>
@@ -185,8 +185,6 @@
 				},
 				success: function(result) {
 					if (result.status == '0') {
-						console.log(result.errors);
-
 						// tampilkan error per field
 						$.each(result.errors, function(field, message) {
 							let input = $('[name="' + field + '"]');
@@ -208,6 +206,14 @@
 									.html(message);
 							}
 						});
+						if (result.msg) {
+							Swal.fire({
+								title: 'Error!',
+								html: result.msg,
+								icon: 'error',
+								timer: 3000
+							})
+						}
 
 						return;
 					}

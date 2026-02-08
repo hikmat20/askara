@@ -23,7 +23,7 @@ class Work_instructions extends Admin_Controller
 
 	public function index()
 	{
-		$dataDraft		= $this->WiModel->getAllByStatus('DFT');
+		$dataDraft		= $this->WiModel->getAll();
 		$dataCorrection = $this->WiModel->getAllByStatus('COR');
 		$dataReview		= $this->WiModel->getAllByStatus('REV');
 		$dataApproval	= $this->WiModel->getAllByStatus('APV');
@@ -78,16 +78,19 @@ class Work_instructions extends Admin_Controller
 
 		$this->form_validation->set_rules('name', 'Document Name', 'required|trim');
 		$this->form_validation->set_rules('departement_id', 'Departement', 'required|trim');
-		$this->form_validation->set_rules('prepared_by', 'Upload Document By', 'required|trim');
 		$this->form_validation->set_rules('number', 'Number', 'required|trim');
 		$this->form_validation->set_rules('procedure_id', 'Procedure', 'required|trim');
 		$this->form_validation->set_rules('is_active', 'Status Active', 'required|trim');
 		$this->form_validation->set_rules('issue_date', 'Issue Date', 'required|trim');
 		$this->form_validation->set_rules('effective_date', 'Effective Date', 'required|trim');
 		$this->form_validation->set_rules('revision_number', 'Revision Number', 'required|trim');
-		$this->form_validation->set_rules('reviewer_id', 'Reviewer', 'required|trim');
-		$this->form_validation->set_rules('approval_id', 'Approval', 'required|trim');
 
+		if (!$this->input->post('id')) {
+			if (isset($_FILES['form_file']) && $_FILES['form_file']['name'] == '') {
+				$this->form_validation->set_rules('form_file', 'File Upload', 'required|trim');
+			}
+		}
+		
 		$this->form_validation->set_message('required', '{field} tiidak boleh kosong');
 		if ($this->form_validation->run() === FALSE) {
 			echo json_encode([

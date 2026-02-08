@@ -57,6 +57,11 @@ class Form_model extends BF_Model
     parent::__construct();
   }
 
+  public function getAll()
+  {
+    return $this->db->get_where('view_forms',['status !='=>'DEL'])->result();
+  }
+
   public function getDraft()
   {
     return $this->db->get_where('view_forms', ['status' => 'DFT'])->result();
