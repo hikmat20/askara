@@ -97,8 +97,8 @@ class Procedures extends Admin_Controller
 		if ($Data) {
 			$Data_detail = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$grProcess   = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
-			$getForms    = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-			$getGuides   = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getForms    = $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getGuides   = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 			$getRecords  = $this->db->get_where('dir_records', ['procedure_id' => $id, 'status !=' => 'DEL', 'flag_type' => 'FOLDER', 'parent_id' => null])->result();
 			$users       = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 			$jabatan     = $this->db->get_where('positions', ['company_id' => $this->company])->result();
@@ -155,8 +155,8 @@ class Procedures extends Admin_Controller
 		if ($Data) {
 			$Data_detail      = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$grProcess        = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
-			$getForms         = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-			$getGuides        = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getForms         = $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getGuides        = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 			$getRecords       = $this->db->get_where('dir_records', ['procedure_id' => $id, 'status !=' => 'DEL', 'flag_type' => 'FOLDER', 'parent_id' => null])->result();
 			$users            = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 			$jabatan          = $this->db->get_where('positions', ['company_id' => $this->company])->result();
@@ -213,8 +213,8 @@ class Procedures extends Admin_Controller
 		$Data 				= $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual 			= $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users 				= $this->db->get_where('view_users')->result();
-		$getForms			= $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
-		$getGuides			= $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
+		$getForms			= $this->db->get_where('forms', ['procedure_id' => $id])->result();
+		$getGuides			= $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
 		$jabatan 			= $this->db->get('positions')->result();
 		$ArrUsr 			= $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
 		$depts 			= $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
@@ -463,10 +463,10 @@ class Procedures extends Admin_Controller
 		$dir = '';
 
 		if (isset($data['type']) && $data['type'] == 'form') {
-			$table = 'dir_forms';
+			$table = 'forms';
 			$dir = 'FORMS';
 		} else if (isset($data['type']) && $data['type'] == 'guide') {
-			$table = 'dir_guides';
+			$table = 'work_instructions';
 			$dir = 'GUIDES';
 		} else if (isset($data['type']) && $data['type'] == 'record') {
 			$table = 'dir_records';
@@ -617,8 +617,8 @@ class Procedures extends Admin_Controller
 		$Data_detail = '';
 		if ($id) {
 			$Data_detail 	= $this->db->order_by('number asc')->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
-			$getForms	= $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-			$getguides	= $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getForms	= $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getguides	= $this->db->get_where('work_instuctions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 			$ArrForms = [];
 			foreach ($getForms as $frm) {
 				$ArrForms[$frm->id] = $frm;
@@ -985,7 +985,7 @@ class Procedures extends Admin_Controller
 	public function view_form($id = null)
 	{
 		if ($id) {
-			$file 		= $this->db->get_where('dir_forms', ['id' => $id])->row();
+			$file 		= $this->db->get_where('forms', ['id' => $id])->row();
 			// $dir_name 	= $this->db->get_where('dir_form', ['id' => $file->parent_id])->row()->name;
 			$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
 			// $this->template->set('dir_name', $dir_name);
@@ -1017,7 +1017,7 @@ class Procedures extends Admin_Controller
 	{
 		$users 		= $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 		$jabatan 	= $this->db->get('positions')->result();
-		$data = $this->db->get_where('dir_forms', ['id' => $id])->row();
+		$data = $this->db->get_where('forms', ['id' => $id])->row();
 
 
 		$this->template->set([
@@ -1039,8 +1039,8 @@ class Procedures extends Admin_Controller
 				'deleted_by' => $this->auth->user_id(),
 				'deleted_at' => date('Y-m-d H:i:s'),
 			];
-			$this->db->update('dir_forms', $data, ['id' => $id]);
-			$file_name = $this->db->get_where('dir_forms', ['id' => $id])->row()->file_name;
+			$this->db->update('forms', $data, ['id' => $id]);
+			$file_name = $this->db->get_where('forms', ['id' => $id])->row()->file_name;
 			$this->_delete_file('FORMS', $file_name);
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
@@ -1073,7 +1073,7 @@ class Procedures extends Admin_Controller
 			$data['id']	    		= $id;
 			$data['name']	    	= $data['description'];
 			$data['company_id']		= $this->company;
-			$check 					= $this->db->get_where('dir_forms', ['id' => $id])->num_rows();
+			$check 					= $this->db->get_where('forms', ['id' => $id])->num_rows();
 			$note 					= isset($data['note']) ? $data['note'] : null;
 			$data['status']			= isset($data['status']) ? $data['status'] : 'OPN';
 			unset($data['note']);
@@ -1124,12 +1124,12 @@ class Procedures extends Admin_Controller
 				$data['created_by']		= $this->auth->user_id();
 				$data['created_at']		= date('Y-m-d H:i:s');
 				$data['note']			= 'First Upload File';
-				$this->db->insert('dir_forms', $data);
+				$this->db->insert('forms', $data);
 			} else {
 				$data['modified_by']	= $this->auth->user_id();
 				$data['modified_at']	= date('Y-m-d H:i:s');
 				$data['note']			= 'Re-upload File';
-				$this->db->update('dir_forms', $data, ['id' => $id]);
+				$this->db->update('forms', $data, ['id' => $id]);
 			}
 
 			$dataLog = [
@@ -1161,7 +1161,7 @@ class Procedures extends Admin_Controller
 
 	public function loadDataForm($procedure_id = null)
 	{
-		$getForms	= $this->db->get_where('dir_forms', ['procedure_id' => $procedure_id, 'status !=' => 'DEL'])->result();
+		$getForms	= $this->db->get_where('forms', ['procedure_id' => $procedure_id, 'status !=' => 'DEL'])->result();
 		$this->template->set('getForms', $getForms);
 		$this->template->render('data-forms');
 	}
@@ -1180,7 +1180,7 @@ class Procedures extends Admin_Controller
 	public function view_guide($id = null)
 	{
 		if ($id) {
-			$file 		= $this->db->get_where('dir_guides', ['id' => $id])->row();
+			$file 		= $this->db->get_where('work_instructions', ['id' => $id])->row();
 			// $dir_name 	= $this->db->get_where('dir_form', ['id' => $file->parent_id])->row()->name;
 			$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
 			// $this->template->set('dir_name', $dir_name);
@@ -1213,7 +1213,7 @@ class Procedures extends Admin_Controller
 
 		$users 		= $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 		$jabatan 	= $this->db->get('positions')->result();
-		$data = $this->db->get_where('dir_guides', ['id' => $id])->row();
+		$data = $this->db->get_where('work_instructions', ['id' => $id])->row();
 
 
 		$this->template->set([
@@ -1235,8 +1235,8 @@ class Procedures extends Admin_Controller
 				'deleted_by' => $this->auth->user_id(),
 				'deleted_at' => date('Y-m-d H:i:s'),
 			];
-			$this->db->update('dir_guides', $data, ['id' => $id]);
-			$file_name = $this->db->get_where('dir_guides', ['id' => $id])->row()->file_name;
+			$this->db->update('work_instructions', $data, ['id' => $id]);
+			$file_name = $this->db->get_where('work_instructions', ['id' => $id])->row()->file_name;
 			$this->_delete_file('GUIDES', $file_name);
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
@@ -1263,7 +1263,7 @@ class Procedures extends Admin_Controller
 
 	public function loadDataGuide($procedure_id = null)
 	{
-		$getGuides	= $this->db->get_where('dir_guides', ['procedure_id' => $procedure_id, 'status !=' => 'DEL'])->result();
+		$getGuides	= $this->db->get_where('work_instructions', ['procedure_id' => $procedure_id, 'status !=' => 'DEL'])->result();
 
 		$this->template->set('getGuides', $getGuides);
 		$this->template->render('data-guides');
@@ -1311,7 +1311,7 @@ class Procedures extends Admin_Controller
 					}
 				}
 
-				$check = $this->db->get_where('dir_guides', ['id' => $id])->num_rows();
+				$check = $this->db->get_where('work_instructions', ['id' => $id])->num_rows();
 				$note = isset($data['note']) ? $data['note'] : null;
 				$data['status']			= isset($data['status']) ? $data['status'] : 'OPN';
 				unset($data['note']);
@@ -1320,12 +1320,12 @@ class Procedures extends Admin_Controller
 					$data['created_by']		= $this->auth->user_id();
 					$data['created_at']		= date('Y-m-d H:i:s');
 					$data['note']			= 'First Upload File';
-					$this->db->insert('dir_guides', $data);
+					$this->db->insert('work_instructions', $data);
 				} else {
 					$data['modified_by']	= $this->auth->user_id();
 					$data['modified_at']	= date('Y-m-d H:i:s');
 					$data['note']			= 'Re-upload File';
-					$this->db->update('dir_guides', $data, ['id' => $id]);
+					$this->db->update('work_instructions', $data, ['id' => $id]);
 				}
 
 				$dataLog = [
@@ -1603,8 +1603,8 @@ class Procedures extends Admin_Controller
 		// watermark
 		$procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
 		$flowDetail          = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
-		$getForms            = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-		$getGuides           = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+		$getForms            = $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+		$getGuides           = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 		$users               = $this->db->get_where('view_users', ['company_id' => $this->company])->result();
 		$jabatan             = $this->db->get('positions')->result();
 		$ArrUsr              = $ArrJab = $ArrDept = $ArrForms = $ArrGuides = [];
