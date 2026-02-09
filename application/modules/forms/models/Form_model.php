@@ -140,7 +140,7 @@ class Form_model extends BF_Model
     }
 
     $config['upload_path']   = $path; //path folder
-    $config['allowed_types'] = 'pdf'; //type yang dapat diakses bisa anda sesuaikan
+    $config['allowed_types'] = 'pdf|xlsx|docx'; //type yang dapat diakses bisa anda sesuaikan
     $config['encrypt_name']  = false; //Enkripsi nama yang terupload
     $config['max_size']      = 2048;
     $config['remove_spaces'] = true;

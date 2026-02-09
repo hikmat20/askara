@@ -174,7 +174,7 @@ class Procedures extends Admin_Controller
 			foreach ($getForms as $frm) {
 				$ArrForms[$frm->id] = $frm;
 			}
-			
+
 			$ArrGuides = [];
 			foreach ($getGuides as $gui) {
 				$ArrGuides[$gui->id] = $gui;
@@ -274,7 +274,10 @@ class Procedures extends Admin_Controller
 		$Data      = $this->input->post();
 		$Data_flow = $this->input->post('flow');
 		$bilingual = $Data['bilingual'];
-		$revision  = $Data['revision'];
+		$revision = '';
+		if (isset($Data['revision'])) {
+			$revision  = $Data['revision'];
+		}
 
 		unset($Data['revision']);
 		unset($Data['bilingual']);
@@ -335,17 +338,19 @@ class Procedures extends Admin_Controller
 						$this->db->update('procedure_revision_logs', $revisionData, ['company_id' => $this->company, 'procedure_id' => $thisData->id, 'revision_number' => $thisData->revision]);
 					}
 
-					if (isset($revision['marker_position']) && count($revision['marker_position']) > 0) {
-						foreach ($revision['marker_position'] as $marker) {
-							$revisionMarker = [
-								'company_id'      => $this->company,
-								'procedure_id'    => $thisData->id,
-								'marker_counter'  => $thisData->revision,
-								'marker_position' => $marker,
-								'created_by'      => $this->auth->user_id(),
-								'created_at'      => date('Y-m-d H:i:s'),
-							];
-							$this->db->insert('procedure_revision_markers', $revisionMarker);
+					if ($revision) {
+						if (isset($revision['marker_position']) && count($revision['marker_position']) > 0) {
+							foreach ($revision['marker_position'] as $marker) {
+								$revisionMarker = [
+									'company_id'      => $this->company,
+									'procedure_id'    => $thisData->id,
+									'marker_counter'  => $thisData->revision,
+									'marker_position' => $marker,
+									'created_by'      => $this->auth->user_id(),
+									'created_at'      => date('Y-m-d H:i:s'),
+								];
+								$this->db->insert('procedure_revision_markers', $revisionMarker);
+							}
 						}
 					}
 				}
@@ -581,7 +586,7 @@ class Procedures extends Admin_Controller
 		$forms     = $this->db->get_where('forms', ['procedure_id' => $id, 'company_id' => $this->company, 'status !=' => 'DEL'])->result();
 		$guides    = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'company_id' => $this->company, 'status !=' => 'DEL'])->result();
 		$language = ['english'];
-		
+
 		$this->template->set([
 			'procedure_id' => $id,
 			'flow'         => $flow,
