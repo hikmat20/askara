@@ -359,7 +359,7 @@ class Procedures extends Admin_Controller
 				$Data['created_at'] = date('Y-m-d H:i:s');
 				$this->db->insert('procedures', $Data);
 				$pro_id = $this->db->order_by('id', 'DESC')->get_where('procedures')->row()->id;
-				$thisData = $this->db->get_where('eprocedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
+				$thisData = $this->db->get_where('procedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
 				$dataLog = [
 					'directory_id' 	=> $thisData->id,
 					'new_status' 	=> (($thisData->status) ?: null),
