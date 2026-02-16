@@ -98,8 +98,6 @@ class Documents_list extends Admin_Controller
 
 	public function procedures($id = null)
 	{
-
-
 		if (isset($id)) {
 			$procedures = $this->ProcedureModel->find_all_by(['status' => 'PUB']);
 			$forms        = $this->db->order_by('name', 'ASC')->get_where('forms', ['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL'])->result();
@@ -137,14 +135,25 @@ class Documents_list extends Admin_Controller
 
 	public function view_procedure($id)
 	{
-		$docs 			= $this->db->get_where('view_procedures', ['id' => $id])->row();
-		$detail 		= $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
-		$forms 			= $this->db->get_where('dir_forms', ['procedure_id' => $id, 'active' => 'Y'])->result();
-		$guides 		= $this->db->get_where('dir_guides', ['procedure_id' => $id, 'active' => 'Y'])->result();
-		$users 			= $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
-		$jabatan 		= $this->db->get('positions')->result();
-		$ArrUsr 		= $ArrJab = $ArrForms = $ArrGuides = [];
+	
+		$docs          = $this->db->get_where('view_procedures', ['id' => $id])->row();
+		$detail        = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+		$forms         = $this->db->get_where('forms', ['procedure_id' => $id])->result();
+		$guides        = $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
+		$users         = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
+		$jabatan       = $this->db->get('positions')->result();
+		$ArrUsr        = $ArrJab = $ArrForms = $ArrGuides = [];
+		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
+		$company       = $this->session->company;
+		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		$revision_logs = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+		$signatures	   = $this->db->get_where('signature_documents', ['document_id' => $id, 'document_type' => 'procedure'])->result();
 
+		$ArrSign = [];
+		foreach ($signatures as $sign) {
+			$ArrSign[$sign->sign_type] = $sign->qr_path;
+		}
+		
 		foreach ($users as $usr) {
 			$ArrUsr[$usr->id_user] = $usr;
 		}
@@ -160,18 +169,26 @@ class Documents_list extends Admin_Controller
 			$ArrGuides[$gui->id] = $gui;
 		}
 
+		foreach ($depts as $dept) {
+			$ArrDept[$dept->id] = $dept;
+		}
 
 		$this->template->set([
-			'docs' 			=> $docs,
+			'data' 			=> $docs,
 			'detail' 		=> $detail,
 			'MainData' 		=> $this->MainData,
 			'ArrUsr' 		=> $ArrUsr,
 			'ArrJab' 		=> $ArrJab,
 			'ArrForms' 		=> $ArrForms,
 			'ArrGuides' 	=> $ArrGuides,
+			'bilingual'     => $bilingual,
+			'ArrDept'       => $ArrDept,
+			'ArrSign'       => $ArrSign,
+			'company'       => $company,
+			'revision_logs' => $revision_logs,
 		]);
 
-		$this->template->render('procedures/view-docs');
+		$this->template->render('procedures/view-procedure');
 	}
 
 	public function view_record($id)

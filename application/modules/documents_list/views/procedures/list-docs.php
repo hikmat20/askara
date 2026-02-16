@@ -248,9 +248,9 @@
 
 <!-- Modal -->
 <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-	<div class="modal-dialog modal-lg" role="document">
-		<div class="modal-content" data-scroll="true" data-height="">
-			<div class="modal-header">
+	<div class="modal-dialog modal-xl" role="document" style="min-width: 75%;">
+		<div class="modal-content" data-scroll="true" data-height="700">
+			<div class="modal-header py-3">
 				<h5 class="modal-title">View Document</h5>
 				<button type="button" class="btn btn-xs btn-icon btn-light" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true"><i class="fa fa-times text-secondary" aria-hidden="true"></i></span>
@@ -286,7 +286,7 @@
 </div>
 
 <div class="modal fade" id="modelId2" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-	<div class="modal-dialog modal-lg modal-dialog-centered modal-dialog-scrollable" role="document" style="max-width:90%">
+	<div class="modal-dialog modal-xl" role="document" style="min-width:90%">
 		<div class="modal-content" data-scroll="true" data-height="700">
 			<div class="modal-header">
 				<h5 class="modal-title">View Document</h5>
@@ -314,6 +314,8 @@
 
 	<img class="modal-content-img" id="img01">
 </div>
+
+
 <style>
 	span p {
 		margin-bottom: 0;
@@ -430,7 +432,7 @@
 			const id = $(this).data('id') || ''
 			if (id) {
 				$('#modelId').modal('show')
-				$('#data-file').load(siteurl + active_controller + 'view_procedure/' + id)
+				$('#modelId .modal-body').load(siteurl + active_controller + 'view_procedure/' + id)
 			}
 		})
 	})
@@ -440,7 +442,7 @@
 			const id = $(this).data('id') || ''
 			if (id) {
 				$('#modelId').modal('show')
-				$('#data-file').load(siteurl + active_controller + 'view_record/' + id)
+				$('#modelId .modal-body').load(siteurl + active_controller + 'view_record/' + id)
 			}
 		})
 	})
@@ -448,12 +450,12 @@
 	$(document).on('click', '.view-form', function() {
 		const id = $(this).data('id') || ''
 		if (id) {
-			$('#modelId').modal('show')
-			$('#data-file').load(siteurl + active_controller + 'view_form/' + id)
+			$('#modalViewForm').modal('show')
+			$('#modalViewForm .modal-body').load(siteurl + active_controller + 'view_form/' + id)
 		}
 	})
 
-	$(document).on('click', '.view-guide', function() {
+	$(document).on('click', '.view-wi', function() {
 		const id = $(this).data('id') || ''
 		if (id) {
 			$('#modalViewForm').modal('show')
