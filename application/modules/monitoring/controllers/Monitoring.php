@@ -13,7 +13,7 @@ class Monitoring extends Admin_Controller
 	{
 		parent::__construct();
 
-		$this->load->model('monitoring/monitoring_model', 'Monitor_model');
+		$this->load->model('monitoring/monitoring_model', 'Monitoring');
 		$this->template->set_theme('dashboard');
 		$this->template->page_icon('fa fa-dashboard');
 
@@ -120,8 +120,8 @@ class Monitoring extends Admin_Controller
 		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users         = $this->db->get_where('view_users')->result();
-		$getForms      = $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
-		$getGuides     = $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
+		$getForms      = $this->db->get_where('forms', ['procedure_id' => $id])->result();
+		$getGuides     = $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
 		$jabatan       = $this->db->get('positions')->result();
 		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
 		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
@@ -333,7 +333,7 @@ class Monitoring extends Admin_Controller
 	public function save_review()
 	{
 		$data = $this->input->post();
-		$Return = $this->Monitor_model->review($data);
+		$Return = $this->Monitoring->review($data);
 		echo json_encode($Return);
 	}
 	/* END REVIEW PROCESS */
@@ -462,7 +462,7 @@ class Monitoring extends Admin_Controller
 
 	public function save_approval()
 	{
-		$Return = $this->Monitor_model->approval();
+		$Return = $this->Monitoring->approval();
 		echo json_encode($Return);
 	}
 
@@ -615,7 +615,7 @@ class Monitoring extends Admin_Controller
 	public function save_revision()
 	{
 		$data = $this->input->post();
-		$Return = $this->Monitor_model->saveRevision($data);
+		$Return = $this->Monitoring->saveRevision($data);
 		echo json_encode($Return);
 	}
 
@@ -638,7 +638,7 @@ class Monitoring extends Admin_Controller
 		if ($data) {
 			$this->db->trans_begin();
 			$data['status'] = 'HLD';
-			$this->Monitor_model->deletion($data);
+			$this->Monitoring->deletion($data);
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
 				$Return = [
@@ -701,7 +701,7 @@ class Monitoring extends Admin_Controller
 				$data['note'] = 'Rejected';
 			}
 			unset($data['sts']);
-			$this->Monitor_model->rev_deletion($data);
+			$this->Monitoring->rev_deletion($data);
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
 				$Return = [
@@ -767,7 +767,7 @@ class Monitoring extends Admin_Controller
 				$data['note'] = 'Rejected';
 			}
 			unset($data['sts']);
-			$this->Monitor_model->rev_deletion($data);
+			$this->Monitoring->rev_deletion($data);
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
 				$Return = [
@@ -815,4 +815,16 @@ class Monitoring extends Admin_Controller
 		]);
 		$this->template->render('list');
 	}
+
+
+	/* FORMS */
+	public function view_form($id)
+	{
+		$wi = $this->Monitoring->getWi($id);
+		$this->template->set([
+			'wi' => $wi,
+		]);
+		$this->template->render('view_wi');
+	}
+	
 }

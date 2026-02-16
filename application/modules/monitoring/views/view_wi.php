@@ -1,0 +1,1 @@
+        <iframe class="w-100" style="height: 70vh;" src="<?= base_url('directory/WI/1/'.$wi->file_name); ?>#toolbar=0&navpanes=0" frameborder="1"></iframe>

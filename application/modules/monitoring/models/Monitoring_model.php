@@ -155,7 +155,7 @@ class Monitoring_model extends BF_Model
                 $this->_signature($data, 'approve');
                 $this->_update_history($data);
                 $this->_logsProcedure($data);
-                $this->generatePdfFile($data['id']);
+                $result = $this->generatePdfFile($data['id']);
                 $this->db->update(
                     'procedures',
                     [
@@ -165,6 +165,7 @@ class Monitoring_model extends BF_Model
                         'approved_by' => $this->auth->user_id(),
                         'approved_at' => date('Y-m-d H:i:s'),
                         'published_at' => date('Y-m-d H:i:s'),
+                        'file_path'    => $result['filePath'] . $result['filename'],
                     ],
                     ['id' => $data['id']]
                 );
@@ -373,8 +374,7 @@ class Monitoring_model extends BF_Model
             $document->id,
             config_item('encryption_key')
         );
-
-        $filePath = FCPATH . 'directory/PROCEDURES/' . date('Y') . '/' . date('m') . '/';
+        $filePath = './directory/PROCEDURES/' . date('Y') . '/' . date('m') . '/';
         if (!is_dir($filePath)) mkdir($filePath, 0755, true);
         $filename = $document->nomor . '-FINAL.pdf';
 
@@ -488,6 +488,7 @@ class Monitoring_model extends BF_Model
 
         $mpdf->WriteHTML($page);
         $mpdf->Output($filePath . $filename, 'F');
+        return ['filePath' => $filePath, 'filename' => $filename];
     }
 
     public function getHeader($allData)
@@ -530,5 +531,17 @@ class Monitoring_model extends BF_Model
     }
 
 
-    /* Signature */
+    /* FORMS */
+
+    public function getForm($id)
+    {
+        return $this->db->get_where('forms', ['id' => $id])->row();
+    }
+
+    /* WI */
+
+    public function getWi($id)
+    {
+        return $this->db->get_where('work_instructions', ['id' => $id])->row();
+    }
 }

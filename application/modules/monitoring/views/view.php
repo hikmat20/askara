@@ -42,7 +42,7 @@
 </ul>
 <div class="tab-content mt-5">
     <div class="tab-pane fade show active" id="data" role="tabpanel" aria-labelledby="file-tab">
-        <table class="table table-sm table-bordered border-dark">
+        <table class="table table-sm table-bordered border-1 border-dark">
             <tr>
                 <td rowspan="5" width="30%" class="text-center" style="vertical-align: middle;border-right:0px">
                     <div class="d-flex justify-content-center align-items-center g-3 gap-3">
@@ -74,7 +74,7 @@
                 <td><?= $data->group_name; ?></td>
             </tr>
         </table>
-        <div class="card rounded-10">
+        <div class="card rounded-10 mb-3">
             <div class="card-body p-3">
                 <table class="table table-borderless rounded-lg mb-6">
                     <tr>
@@ -232,10 +232,14 @@
                         </tbody>
                     </table>
                 <?php endif; ?>
-                <hr>
 
-                <!-- FLOW IMAGE -->
-                <h3>FLOW IMAGE & FILE</h3>
+            </div>
+        </div>
+
+        <!-- FLOW IMAGE -->
+        <div class="card rounded-10 mb-3">
+            <div class="card-body p-3">
+                <h3 class="fw-extra-bold"><strong>FLOW IMAGE & FILE</strong></h3>
                 <?php if ($data->image_flow_1 || $data->image_flow_2 || $data->image_flow_3) : ?>
                     <div class="d-flex justify-content-start align-items-center">
                         <?php if ($data->image_flow_1) : ?>
@@ -300,18 +304,25 @@
                     </div>
                 <?php endif; ?>
                 <hr>
+            </div>
+        </div>
 
-                <!-- VIDEO -->
-                <h3>VIDEO</h3>
+        <!-- VIDEO -->
+        <div class="card rounded-10 mb-3">
+            <div class="card-body p-3">
+                <h3 class="fw-extra-bold"><strong>VIDEO</strong></h3>
                 <?php if ($data->link_video) : ?>
                     <?= ($data->link_video); ?>
                 <?php else : ?>
                     <span>~</span>
                 <?php endif; ?>
+            </div>
+        </div>
 
-                <hr>
-                <!-- FLOW DETAIL -->
-                <h3>DETAIL PROSES</h3>
+        <!-- FLOW DETAIL -->
+        <div class="card rounded-10">
+            <div class="card-body p-3">
+                <h3 class="fw-extra-bold"><strong>DETAIL PROSES</strong></h3>
                 <table class="table table-sm table-bordered">
                     <thead>
                         <tr class="table-secondary">
@@ -340,7 +351,7 @@
                                         <?php $relIk = json_decode($dtl->relate_ik_doc); ?>
                                         <?php if (is_array($relIk)) : ?>
                                             <?php foreach ($relIk as $ik) { ?>
-                                                <span class="d-block badge btn <?= ($ArrGuides[$ik]->status == 'DEL') ? 'btn-light' : 'bg-danger btn-danger'; ?> view-guide mb-1" data-id="<?= $ik; ?>"><?= $ArrGuides[$ik]->name; ?> <?= ($ArrGuides[$ik]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger"  title="File has been deleted!"></i>' : ''; ?></span>
+                                                <span class="d-block badge btn <?= ($ArrGuides[$ik]->status == 'DEL') ? 'btn-light' : 'bg-danger btn-danger'; ?> view-wi mb-1" data-id="<?= $ik; ?>"><?= $ArrGuides[$ik]->name; ?> <?= ($ArrGuides[$ik]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger"  title="File has been deleted!"></i>' : ''; ?></span>
                                             <?php } ?>
                                         <?php endif; ?>
                                     </td>
@@ -355,6 +366,7 @@
                 </table>
             </div>
         </div>
+
     </div>
 
     <div class="tab-pane fade" id="revision" role="tabpanel" aria-labelledby="file-tab">
@@ -429,7 +441,7 @@
     </div>
 
     <div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
-        <iframe class="w-100" style="height: 70vh;" src="<?= base_url("directory/PROCEDURES/2026/02/" . $file->nomor . '-FINAL.pdf'); ?>#toolbar=0&navpanes=0" frameborder="1"></iframe>
+        <iframe class="w-100" style="height: 70vh;" src="<?= base_url($data->file_path); ?>#toolbar=0&navpanes=0" frameborder="1"></iframe>
         <?php if ($view_data == false) : ?>
             <!-- <button type="button" class="btn btn-default revision" data-id="<?= $file->id; ?>" data-type="procedure"><i class="fa fa-info-circle text-"></i>Submit this document for Revision</button>
             <button type="button" class="btn btn-light-danger deletion" data-id="<?= $file->id; ?>" data-type="procedure"><i class="fa fa-info-circle text-"></i>Submit this document for Deletion</button> -->

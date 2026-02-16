@@ -32,7 +32,6 @@
             <?php $n = 0;
             if ($procedures) :
               foreach ($procedures as $list) : $n++; ?>
-
                 <tr>
                   <td style="vertical-align: middle;" class="text-center"><?= $n; ?></td>
                   <td class="font-weight-bolder h6" style="vertical-align: middle;">
@@ -128,7 +127,7 @@
   </div>
 </div>
 
-<div class="modal fade" id="Modal2" data-backdrop="static" data-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="Modal2" data-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content" data-scroll="true" style="height:90vh;">
       <form class="form-horiontal" id="form-revision">
@@ -138,9 +137,7 @@
             <div class="fa fa-times"></div>
           </span>
         </div>
-        <div class="modal-body overflow-auto">
-          <div id="content-modal2"></div>
-        </div>
+        <div class="modal-body overflow-auto" id="content-modal2"></div>
       </form>
     </div>
   </div>
@@ -719,6 +716,20 @@
         $('#published_date').attr('disabled', true);
         $('#note').attr('disabled', false);
       }
+    })
+
+    $(document).on('click', '.view-form', function() {
+      const id = $(this).data('id')
+      $('#Modal2').modal('show')
+      $('#Modal2 .modal-title').html('View Form')
+      $('#Modal2 .modal-body').load(siteurl + active_controller + 'view_form/' + id)
+    })
+
+    $(document).on('click', '.view-wi', function() {
+      const id = $(this).data('id')
+      $('#Modal2').modal('show')
+      $('#Modal2 .modal-title').html('View Form')
+      $('#Modal2 .modal-body').load(siteurl + active_controller + 'view_form/' + id)
     })
   })
 </script>
