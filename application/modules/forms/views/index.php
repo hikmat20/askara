@@ -40,12 +40,13 @@
 								<thead class="table-light">
 									<tr>
 										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
 										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center" width="100">Rev. Number</th>
+										<th class="p-2 text-center">Status</th>
 										<th class="p-2 nosort" width="100">Opsi</th>
 									</tr>
 								</thead>
@@ -55,12 +56,13 @@
 										foreach ($dataDraft as $draft) : $n++; ?>
 											<tr>
 												<td><?= $n; ?></td>
-												<td><?= $draft->departement_name; ?></td>
-												<td><?= $draft->number; ?></td>
 												<td><?= $draft->name; ?></td>
-												<td><?= $draft->issue_date; ?></td>
-												<td><?= $draft->effective_date; ?></td>
+												<td><?= $draft->number; ?></td>
+												<td><?= $draft->procedure_name; ?></td>
+												<td><?= date("d M Y",strtotime($draft->issue_date)); ?></td>
+												<td><?= date("d M Y",strtotime($draft->effective_date)); ?></td>
 												<td><?= $draft->revision_number; ?></td>
+												<td><?= $status[$draft->status]; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs	 btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>

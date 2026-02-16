@@ -24,19 +24,19 @@ class Forms extends Admin_Controller
 	public function index()
 	{
 		$dataDraft		= $this->FormModel->getAll();
-		$dataCorrection = $this->FormModel->getAllByStatus('COR');
-		$dataReview		= $this->FormModel->getAllByStatus('REV');
-		$dataApproval	= $this->FormModel->getAllByStatus('APV');
-		$dataRevision	= $this->FormModel->getAllByStatus('RVI');
-		$dataPublished	= $this->FormModel->getAllByStatus('PUB');
+
+		$status = [
+			'DFT' => '<span class="badge badge-light">Draft</span>',
+			'COR' => '<span class="badge badge-warning">Correction</span>',
+			'REV' => '<span class="badge badge-info">Review</span>',
+			'APV' => '<span class="badge badge-success">Approval</span>',
+			'RVI' => '<span class="badge badge-danger">Revision</span>',
+			'PUB' => '<span class="badge badge-primary">Published</span>',
+		];
 
 		$this->template->render('index', compact(
 			'dataDraft',
-			'dataCorrection',
-			'dataReview',
-			'dataApproval',
-			'dataRevision',
-			'dataPublished'
+			'status'
 		));
 	}
 
@@ -68,7 +68,27 @@ class Forms extends Admin_Controller
 
 	public function view($id = '')
 	{
+		$this->load->library('OnlyOfficeJWT');
+
 		$result = $this->FormModel->find_data('view_forms', $id, 'id');
+		// $file_path = 'http://192.168.2.127:8080/askara/directory/FORMS/1/' . $result->file_name;
+
+		// $payload = [
+		// 	"document" => [
+		// 		"fileType" => "xlsx",
+		// 		"key" => $result->file_name,
+		// 		"title" => $result->file_name,
+		// 		"url" => $file_path
+		// 	],
+		// 	"documentType" => "cell",
+		// 	"editorConfig" => [
+		// 		"mode" => "view"
+		// 	]
+		// ];
+
+		// $token           = $this->onlyofficejwt->generate($payload);
+		// $data['payload'] = $payload;
+		// // $data['token']   = $token;
 		$this->template->render('view', $result);
 	}
 
@@ -91,7 +111,7 @@ class Forms extends Admin_Controller
 			if (isset($_FILES['form_file']) && $_FILES['form_file']['name'] == '') {
 				$this->form_validation->set_rules('form_file', 'File Upload', 'required|trim');
 			}
-			if (!$this->input->post('link_form')) {
+			if ($this->input->post('link_form')) {
 				$this->form_validation->set_rules('link_form', 'Link online Form', 'required|trim');
 			}
 		}
@@ -174,7 +194,6 @@ class Forms extends Admin_Controller
 
 	public function saveApprove()
 	{
-
 		$this->load->library('form_validation');
 		$postDatat = $this->input->post();
 

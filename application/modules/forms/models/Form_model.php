@@ -1,4 +1,8 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php
+
+use FontLib\Table\Type\prep;
+
+ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Form_model extends BF_Model
 {
@@ -59,7 +63,7 @@ class Form_model extends BF_Model
 
   public function getAll()
   {
-    return $this->db->get_where('view_forms',['status !='=>'DEL'])->result();
+    return $this->db->get_where('view_forms', ['status !=' => 'DEL'])->result();
   }
 
   public function getDraft()
@@ -140,7 +144,7 @@ class Form_model extends BF_Model
     }
 
     $config['upload_path']   = $path; //path folder
-    $config['allowed_types'] = 'pdf|xlsx|docx'; //type yang dapat diakses bisa anda sesuaikan
+    $config['allowed_types'] = 'pdf|xlsx|xls|docx'; //type yang dapat diakses bisa anda sesuaikan
     $config['encrypt_name']  = false; //Enkripsi nama yang terupload
     $config['max_size']      = 2048;
     $config['remove_spaces'] = true;
@@ -152,19 +156,57 @@ class Form_model extends BF_Model
       $data['file_name'] = $file['file_name'];
       $data['size']      = $file['file_size'];
       $data['ext']       = $file['file_ext'];
+
+      $excelPath = $file['full_path'];
+      $pdfPath = str_replace('.xlsx', '.pdf', $excelPath);
+      // $convert = $this->_convert_excel_to_pdf($excelPath, $pdfPath);
+
+  
       return [
         'status' => 1,
         'data' => $data
       ];
-   
+
+    /* Convert to PDF */
+
     else :
       $error = $this->upload->display_errors();
-      $this->db->trans_rollback();
       return [
         'status' => 0,
         'error' => $error
       ];
     endif;
+  }
+
+
+  private function _convert_excel_to_pdf($excelPath, $pdfPath)
+  {
+    ini_set('memory_limit', '512M');
+    set_time_limit(300);
+
+    // Load PHPExcel
+    // $this->load->library('phpexcel'); // kalau library Anda namanya excel.php
+
+    // Kalau perlu manual require:
+    require_once APPPATH . 'libraries/PHPExcel_NEW/Classes/PHPExcel.php';
+    require_once APPPATH . 'third_party/tcpdf/tcpdf.php';
+  
+    // Load Excel
+    $objPHPExcel = PHPExcel_IOFactory::load($excelPath);
+    
+    // Set PDF Renderer (mPDF)
+    PHPExcel_Settings::setPdfRenderer(
+      PHPExcel_Settings::PDF_RENDERER_TCPDF,
+      APPPATH . 'third_party/tcpdf/' // sesuaikan path Anda
+    );
+
+    $filename = pathinfo($excelPath, PATHINFO_FILENAME);
+    $pdfPath = FCPATH . 'directory/FORMS/1/pdf/' . $filename . '_' . time() . '.pdf';
+    // Create Writer
+    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
+    $objWriter->save($pdfPath);
+  
+    return $pdfPath;
   }
 
   public function reviewProcess()
