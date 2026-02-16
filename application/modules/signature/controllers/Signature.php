@@ -8,6 +8,7 @@ class Signature extends MX_Controller
 
         $this->load->library('ciqrcode');
         $this->load->helper('signature/signature');
+        $this->load->model('Signature_model', 'Signature');
     }
 
     /**
@@ -42,6 +43,44 @@ class Signature extends MX_Controller
      */
     public function verify()
     {
-        echo 'QR SCANNED - TOKEN OK';
+        $token = $this->input->get('token');
+
+        if (!$token) {
+            show_404();
+        }
+        $result = $this->Signature->getByToken($token);
+        
+        if (!$result) {
+            return $this->load->view('invalid');
+        }
+
+        $document = $this->Signature->getDocument($result->document_id, $result->document_type);
+
+        if (!$document) {
+            return $this->load->view('invalid');
+        }
+
+        $currentHash = null;
+        if (file_exists($document->file_path)) {
+            $currentHash = hash_file('sha256', $document->file_path);
+        }
+
+        $status = 'VALID';
+
+        if ($result->status === 'REVOKE') {
+            $status = 'REVOKED';
+        }
+
+        // if ($currentHash !== $document->file_path) {
+        //     $status = 'TAMPERED';
+        // }
+
+        $data = [
+            'signature'  => $result,
+            'document'   => $document,
+            'status'     => $status,
+        ];
+
+        $this->load->view('verify_result', $data);
     }
 }
