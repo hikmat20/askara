@@ -12,26 +12,6 @@
 				</div>
 				<div class="card-body py-3">
 					<!-- Nav tabs -->
-					<!-- <ul class="nav nav-tabs nav-pills pb-3" id="myTab" role="tablist">
-						<li class="nav-item" role="presentation">
-							<button class="nav-link active btn-sm" id="Draft-tab" data-toggle="tab" data-target="#Draft" type="button" role="tab" aria-controls="Draft" aria-selected="false">Draft <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataDraft); ?></span></button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link btn-sm" id="Review-tab" data-toggle="tab" data-target="#Review" type="button" role="tab" aria-controls="Review" aria-selected="false">Review <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataReview); ?></span></button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link btn-sm" id="Correction-tab" data-toggle="tab" data-target="#Correction" type="button" role="tab" aria-controls="Correction" aria-selected="false">Correction <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataCorrection); ?></span></button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link btn-sm" id="Approval-tab" data-toggle="tab" data-target="#Approval" type="button" role="tab" aria-controls="Approval" aria-selected="false">Approval <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataApproval); ?></span></button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link btn-sm" id="Revision-tab" data-toggle="tab" data-target="#Revision" type="button" role="tab" aria-controls="Revision" aria-selected="false">Revision <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataRevision); ?></span></button>
-						</li>
-						<li class="nav-item" role="presentation">
-							<button class="nav-link btn-sm" id="Published-tab" data-toggle="tab" data-target="#Published" type="button" role="tab" aria-controls="Published" aria-selected="true">Published <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataPublished); ?></span></button>
-						</li>
-					</ul> -->
 
 					<!-- Tab panes -->
 					<div class="tab-content mt-3">
@@ -40,12 +20,13 @@
 								<thead class="table-light">
 									<tr>
 										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
 										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure Name</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center" width="100">Rev. Number</th>
+										<th class="p-2 text-center" width="100">Status</th>
 										<th class="p-2" width="100">Opsi</th>
 									</tr>
 								</thead>
@@ -55,203 +36,18 @@
 										foreach ($dataDraft as $draft) : $n++; ?>
 											<tr>
 												<td><?= $n; ?></td>
-												<td><?= $draft->departement_name; ?></td>
-												<td><?= $draft->number; ?></td>
 												<td><?= $draft->name; ?></td>
-												<td><?= $draft->issue_date; ?></td>
-												<td><?= $draft->effective_date; ?></td>
+												<td><?= $draft->number; ?></td>
+												<td><?= $draft->procedure_name; ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($draft->issue_date)); ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($draft->effective_date)); ?></td>
 												<td><?= $draft->revision_number; ?></td>
+												<td><?= $status[$draft->status]; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs	 btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
 													<!-- <button type="button" class="btn btn-xs	 btn-icon btn-primary toReview" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Review WI"><i class="fa fa-check"></i></button> -->
 													<!-- <button type="button" class="btn btn-xs	 btn-icon btn-danger delete" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
-												</td>
-											</tr>
-									<?php endforeach;
-									endif; ?>
-								</tbody>
-							</table>
-						</div>
-						<div class="tab-pane fade" id="Review" role="tabpanel" aria-labelledby="Review-tab">
-							<table class="datatable table table-bordered table-sm table-hover datatable">
-								<thead class="table-light">
-									<tr>
-										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
-										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php if (isset($dataReview) && $dataReview) :
-										$n = 0;
-										foreach ($dataReview as $review) : $n++; ?>
-											<tr>
-												<td><?= $n; ?></td>
-												<td><?= $review->departement_name; ?></td>
-												<td><?= $review->number; ?></td>
-												<td><?= $review->name; ?></td>
-												<td><?= $review->issue_date; ?></td>
-												<td><?= $review->effective_date; ?></td>
-												<td><?= $review->revision_number; ?></td>
-												<td class="text-center">
-													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<button type="button" class="btn btn-xs	 btn-icon btn-success process-review" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
-													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
-												</td>
-											</tr>
-									<?php endforeach;
-									endif; ?>
-								</tbody>
-							</table>
-						</div>
-						<div class="tab-pane fade" id="Correction" role="tabpanel" aria-labelledby="Correction-tab">
-							<table class="datatable table table-bordered table-sm table-hover datatable">
-								<thead class="table-light">
-									<tr>
-										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
-										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php if (isset($dataCorrection) && $dataCorrection) :
-										$n = 0;
-										foreach ($dataCorrection as $cor) : $n++; ?>
-											<tr>
-												<td><?= $n; ?></td>
-												<td><?= $cor->departement_name; ?></td>
-												<td><?= $cor->number; ?></td>
-												<td><?= $cor->name; ?></td>
-												<td><?= $cor->issue_date; ?></td>
-												<td><?= $cor->effective_date; ?></td>
-												<td><?= $cor->revision_number; ?></td>
-												<td class="text-center">
-													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs	 btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
-													<button type="button" class="btn btn-xs	 btn-icon btn-success toReview" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
-													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
-												</td>
-											</tr>
-									<?php endforeach;
-									endif; ?>
-								</tbody>
-							</table>
-						</div>
-						<div class="tab-pane fade" id="Approval" role="tabpanel" aria-labelledby="Approval-tab">
-							<table class="datatable table table-bordered table-sm table-hover datatable">
-								<thead class="table-light">
-									<tr>
-										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
-										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php if (isset($dataApproval) && $dataApproval) :
-										$n = 0;
-										foreach ($dataApproval as $apv) : $n++; ?>
-											<tr>
-												<td><?= $n; ?></td>
-												<td><?= $apv->departement_name; ?></td>
-												<td><?= $apv->number; ?></td>
-												<td><?= $apv->name; ?></td>
-												<td><?= $apv->issue_date; ?></td>
-												<td><?= $apv->effective_date; ?></td>
-												<td><?= $apv->revision_number; ?></td>
-												<td class="text-center">
-													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<button type="button" class="btn btn-xs	 btn-icon btn-success process-approval" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
-													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
-												</td>
-											</tr>
-									<?php endforeach;
-									endif; ?>
-								</tbody>
-							</table>
-						</div>
-						<div class="tab-pane fade" id="Revision" role="tabpanel" aria-labelledby="Revision-tab">
-							<table class="datatable table table-bordered table-sm table-hover datatable">
-								<thead class="table-light">
-									<tr>
-										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
-										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php if (isset($dataRevision) && $dataRevision) :
-										$n = 0;
-										foreach ($dataRevision as $rev) : $n++; ?>
-											<tr>
-												<td><?= $n; ?></td>
-												<td><?= $rev->departement_name; ?></td>
-												<td><?= $rev->number; ?></td>
-												<td><?= $rev->name; ?></td>
-												<td><?= $rev->issue_date; ?></td>
-												<td><?= $rev->effective_date; ?></td>
-												<td><?= $rev->revision_number; ?></td>
-												<td class="text-center">
-													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<button type="button" class="btn btn-xs	 btn-icon btn-success process-rev" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
-													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
-												</td>
-											</tr>
-									<?php endforeach;
-									endif; ?>
-								</tbody>
-							</table>
-						</div>
-						<div class="tab-pane fade" id="Published" role="tabpanel" aria-labelledby="Published-tab">
-							<table class="datatable table table-bordered table-sm table-hover datatable">
-								<thead class="table-light">
-									<tr>
-										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
-										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
-									</tr>
-								</thead>
-								<tbody>
-									<?php if (isset($dataPublished) && $dataPublished) :
-										$n = 0;
-										foreach ($dataPublished as $pub) : $n++; ?>
-											<tr>
-												<td><?= $n; ?></td>
-												<td><?= $pub->departement_name; ?></td>
-												<td><?= $pub->number; ?></td>
-												<td><?= $pub->name; ?></td>
-												<td><?= $pub->issue_date; ?></td>
-												<td><?= $pub->effective_date; ?></td>
-												<td><?= $pub->revision_number; ?></td>
-												<td class="text-center">
-													<button type="button" class="btn btn-xs	btn-icon btn-info view" data-id="<?= $pub->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<!-- <a href="#" target="_blank" class="btn btn-xs btn-icon btn-light" data-id="<?= $pub->id; ?>" data-toggle="tooltip" title="Print Document"><i class="fa fa-print"></i></a> -->
-													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $pub->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
 												</td>
 											</tr>
 									<?php endforeach;
@@ -265,6 +61,7 @@
 		</div>
 	</div>
 </div>
+
 <!-- Modal -->
 <div class="modal fade" id="modalId" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
 	<div class="modal-dialog modal-xl">
@@ -292,6 +89,7 @@
 
 		$('.datatable').DataTable({
 			orderCellsTop: false,
+			responsive: false,
 		});
 
 		$(document).on('click', '.view', function() {

@@ -24,19 +24,23 @@ class Work_instructions extends Admin_Controller
 	public function index()
 	{
 		$dataDraft		= $this->WiModel->getAll();
-		$dataCorrection = $this->WiModel->getAllByStatus('COR');
-		$dataReview		= $this->WiModel->getAllByStatus('REV');
-		$dataApproval	= $this->WiModel->getAllByStatus('APV');
-		$dataRevision	= $this->WiModel->getAllByStatus('RVI');
-		$dataPublished	= $this->WiModel->getAllByStatus('PUB');
+		// $dataCorrection = $this->WiModel->getAllByStatus('COR');
+		// $dataReview		= $this->WiModel->getAllByStatus('REV');
+		// $dataApproval	= $this->WiModel->getAllByStatus('APV');
+		// $dataRevision	= $this->WiModel->getAllByStatus('RVI');
+		// $dataPublished	= $this->WiModel->getAllByStatus('PUB');
+		$status = [
+			'DFT' => '<span class="badge badge-light">Draft</span>',
+			'COR' => '<span class="badge badge-warning">Correction</span>',
+			'REV' => '<span class="badge badge-info">Review</span>',
+			'APV' => '<span class="badge badge-success">Approval</span>',
+			'RVI' => '<span class="badge badge-danger">Revision</span>',
+			'PUB' => '<span class="badge badge-primary">Published</span>',
+		];
 
 		$this->template->render('index', compact(
 			'dataDraft',
-			'dataCorrection',
-			'dataReview',
-			'dataApproval',
-			'dataRevision',
-			'dataPublished'
+			'status'
 		));
 	}
 
@@ -48,7 +52,7 @@ class Work_instructions extends Admin_Controller
 		$procedures   = $this->ProcedureModel->as_array()->find_all_by('status !=', 'DEL');
 
 		$this->template->title('Add New Work Instruction');
-		$this->template->render('add', compact('procedures','departements', 'user', 'positions'));
+		$this->template->render('add', compact('procedures', 'departements', 'user', 'positions'));
 	}
 
 	public function edit($id = '')
@@ -90,7 +94,7 @@ class Work_instructions extends Admin_Controller
 				$this->form_validation->set_rules('form_file', 'File Upload', 'required|trim');
 			}
 		}
-		
+
 		$this->form_validation->set_message('required', '{field} tiidak boleh kosong');
 		if ($this->form_validation->run() === FALSE) {
 			echo json_encode([
