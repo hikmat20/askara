@@ -26,7 +26,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center" width="100">Rev. Number</th>
-										<th class="p-2 text-center" width="100">Status</th>
+										<!-- <th class="p-2 text-center" width="100">Status</th> -->
 										<th class="p-2" width="100">Opsi</th>
 									</tr>
 								</thead>
@@ -42,7 +42,7 @@
 												<td class="text-center"><?= date("d M Y", strtotime($draft->issue_date)); ?></td>
 												<td class="text-center"><?= date("d M Y", strtotime($draft->effective_date)); ?></td>
 												<td><?= $draft->revision_number; ?></td>
-												<td><?= $status[$draft->status]; ?></td>
+												<!-- <td><?= $status[$draft->status]; ?></td> -->
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs	 btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>

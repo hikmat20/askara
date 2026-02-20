@@ -988,21 +988,47 @@ class Procedures extends Admin_Controller
 		return $config;
 	}
 
-	public function view_form($id = null)
+	// public function view_form($id = null)
+	// {
+	// 	if ($id) {
+	// 		$file 		= $this->db->get_where('forms', ['id' => $id])->row();
+	// 		// $dir_name 	= $this->db->get_where('dir_form', ['id' => $file->parent_id])->row()->name;
+	// 		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+	// 		// $this->template->set('dir_name', $dir_name);
+	// 		$this->template->set('sts', $this->sts);
+	// 		$this->template->set('file', $file);
+	// 		$this->template->set('type', 'form');
+	// 		$this->template->set('history', $history);
+	// 		$this->template->render('show');
+	// 	} else {
+	// 		echo "~ Not data available ~";
+	// 	}
+	// }
+
+	public function view_form($id = '')
 	{
-		if ($id) {
-			$file 		= $this->db->get_where('forms', ['id' => $id])->row();
-			// $dir_name 	= $this->db->get_where('dir_form', ['id' => $file->parent_id])->row()->name;
-			$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
-			// $this->template->set('dir_name', $dir_name);
-			$this->template->set('sts', $this->sts);
-			$this->template->set('file', $file);
-			$this->template->set('type', 'form');
-			$this->template->set('history', $history);
-			$this->template->render('show');
-		} else {
-			echo "~ Not data available ~";
-		}
+		// $this->load->library('OnlyOfficeJWT');
+
+		$result = $this->FormModel->find_data('view_forms', $id, 'id');
+		// $file_path = 'http://192.168.2.127:8080/askara/directory/FORMS/1/' . $result->file_name;
+
+		// $payload = [
+		// 	"document" => [
+		// 		"fileType" => "xlsx",
+		// 		"key" => $result->file_name,
+		// 		"title" => $result->file_name,
+		// 		"url" => $file_path
+		// 	],
+		// 	"documentType" => "cell",
+		// 	"editorConfig" => [
+		// 		"mode" => "view"
+		// 	]
+		// ];
+
+		// $token           = $this->onlyofficejwt->generate($payload);
+		// $data['payload'] = $payload;
+		// // $data['token']   = $token;
+		$this->template->render('view_form', $result);
 	}
 
 	public function upload_form($id = null)
@@ -1183,22 +1209,29 @@ class Procedures extends Admin_Controller
 
 	/* upload ik */
 
-	public function view_guide($id = null)
+	// public function view_guide($id = null)
+	// {
+	// 	if ($id) {
+	// 		$file 		= $this->db->get_where('work_instructions', ['id' => $id])->row();
+	// 		// $dir_name 	= $this->db->get_where('dir_form', ['id' => $file->parent_id])->row()->name;
+	// 		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+	// 		// $this->template->set('dir_name', $dir_name);
+	// 		$this->template->set('sts', $this->sts);
+	// 		$this->template->set('file', $file);
+	// 		$this->template->set('type', 'guide');
+	// 		$this->template->set('history', $history);
+	// 		$this->template->render('show');
+	// 	} else {
+	// 		echo "~ Not data available ~";
+	// 	}
+	// }
+
+	public function view_guide($id = '')
 	{
-		if ($id) {
-			$file 		= $this->db->get_where('work_instructions', ['id' => $id])->row();
-			// $dir_name 	= $this->db->get_where('dir_form', ['id' => $file->parent_id])->row()->name;
-			$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
-			// $this->template->set('dir_name', $dir_name);
-			$this->template->set('sts', $this->sts);
-			$this->template->set('file', $file);
-			$this->template->set('type', 'guide');
-			$this->template->set('history', $history);
-			$this->template->render('show');
-		} else {
-			echo "~ Not data available ~";
-		}
+		$result = $this->WiModel->find_data('view_work_instructions', $id, 'id');
+		$this->template->render('view_guide', $result);
 	}
+
 
 	public function upload_guide($id = null)
 	{
