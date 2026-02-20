@@ -68,7 +68,7 @@ class Forms extends Admin_Controller
 
 	public function view($id = '')
 	{
-		$this->load->library('OnlyOfficeJWT');
+		// $this->load->library('OnlyOfficeJWT');
 
 		$result = $this->FormModel->find_data('view_forms', $id, 'id');
 		// $file_path = 'http://192.168.2.127:8080/askara/directory/FORMS/1/' . $result->file_name;
