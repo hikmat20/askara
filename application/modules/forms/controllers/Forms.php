@@ -23,7 +23,12 @@ class Forms extends Admin_Controller
 
 	public function index()
 	{
-		$dataDraft		= $this->FormModel->getAll();
+		$dataDraft		= $this->FormModel->getAllByStatus('DFT');
+		$dataCorrection		= $this->FormModel->getAllByStatus('COR');
+		$dataReview		= $this->FormModel->getAllByStatus('REV');
+		$dataApproval		= $this->FormModel->getAllByStatus('APV');
+		$dataRevision		= $this->FormModel->getAllByStatus('RVI');
+		$dataPublished		= $this->FormModel->getAllByStatus('PUB');
 
 		$status = [
 			'DFT' => '<span class="badge badge-light">Draft</span>',
@@ -36,6 +41,11 @@ class Forms extends Admin_Controller
 
 		$this->template->render('index', compact(
 			'dataDraft',
+			'dataReview',
+			'dataCorrection',
+			'dataApproval',
+			'dataRevision',
+			'dataPublished',
 			'status'
 		));
 	}

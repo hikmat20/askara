@@ -12,7 +12,7 @@
 				</div>
 				<div class="card-body py-3">
 					<!-- Nav tabs -->
-					<!-- <ul class="nav nav-tabs nav-pills pb-3" id="myTab" role="tablist">
+					<ul class="nav nav-tabs nav-pills pb-3" id="myTab" role="tablist">
 						<li class="nav-item" role="presentation">
 							<button class="nav-link active btn-sm" id="Draft-tab" data-toggle="tab" data-target="#Draft" type="button" role="tab" aria-controls="Draft" aria-selected="false">Draft <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataDraft); ?></span></button>
 						</li>
@@ -31,7 +31,7 @@
 						<li class="nav-item" role="presentation">
 							<button class="nav-link btn-sm" id="Published-tab" data-toggle="tab" data-target="#Published" type="button" role="tab" aria-controls="Published" aria-selected="true">Published <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataPublished); ?></span></button>
 						</li>
-					</ul> -->
+					</ul>
 
 					<!-- Tab panes -->
 					<div class="tab-content mt-3">
@@ -59,9 +59,9 @@
 												<td><?= $draft->name; ?></td>
 												<td><?= $draft->number; ?></td>
 												<td><?= $draft->procedure_name; ?></td>
-												<td><?= date("d M Y",strtotime($draft->issue_date)); ?></td>
-												<td><?= date("d M Y",strtotime($draft->effective_date)); ?></td>
-												<td><?= $draft->revision_number; ?></td>
+												<td class="text-center"><?= date("d M Y",strtotime($draft->issue_date)); ?></td>
+												<td class="text-center"><?= date("d M Y",strtotime($draft->effective_date)); ?></td>
+												<td class="text-center"><?= $draft->revision_number; ?></td>
 												<!-- <td><?= $status[$draft->status]; ?></td> -->
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
@@ -80,13 +80,13 @@
 								<thead class="table-light">
 									<tr>
 										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
 										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Revision Number</th>
+										<th class="p-2 text-center" width="100">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -95,12 +95,12 @@
 										foreach ($dataReview as $review) : $n++; ?>
 											<tr>
 												<td><?= $n; ?></td>
-												<td><?= $review->departement_name; ?></td>
-												<td><?= $review->number; ?></td>
 												<td><?= $review->name; ?></td>
-												<td><?= $review->issue_date; ?></td>
-												<td><?= $review->effective_date; ?></td>
-												<td><?= $review->revision_number; ?></td>
+												<td><?= $review->number; ?></td>
+												<td><?= $review->procedure_name; ?></td>
+												<td class="text-center"><?= $review->issue_date; ?></td>
+												<td class="text-center"><?= $review->effective_date; ?></td>
+												<td class="text-center"><?= $review->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<button type="button" class="btn btn-xs	 btn-icon btn-success process-review" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
@@ -117,13 +117,13 @@
 								<thead class="table-light">
 									<tr>
 										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
 										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Revision Number</th>
+										<th class="p-2 text-center" width="100">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -132,12 +132,12 @@
 										foreach ($dataCorrection as $cor) : $n++; ?>
 											<tr>
 												<td><?= $n; ?></td>
-												<td><?= $cor->departement_name; ?></td>
-												<td><?= $cor->number; ?></td>
 												<td><?= $cor->name; ?></td>
-												<td><?= $cor->issue_date; ?></td>
-												<td><?= $cor->effective_date; ?></td>
-												<td><?= $cor->revision_number; ?></td>
+												<td><?= $cor->number; ?></td>
+												<td><?= $cor->prodedure_name; ?></td>
+												<td class="text-center"><?= $cor->issue_date; ?></td>
+												<td class="text-center"><?= $cor->effective_date; ?></td>
+												<td class="text-center"><?= $cor->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<button type="button" class="btn btn-xs	 btn-icon btn-success process-cor" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
@@ -154,13 +154,13 @@
 								<thead class="table-light">
 									<tr>
 										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
 										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Revision Number</th>
+										<th class="p-2 text-center" width="100">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -169,12 +169,12 @@
 										foreach ($dataApproval as $apv) : $n++; ?>
 											<tr>
 												<td><?= $n; ?></td>
-												<td><?= $apv->departement_name; ?></td>
-												<td><?= $apv->number; ?></td>
 												<td><?= $apv->name; ?></td>
-												<td><?= $apv->issue_date; ?></td>
-												<td><?= $apv->effective_date; ?></td>
-												<td><?= $apv->revision_number; ?></td>
+												<td><?= $apv->number; ?></td>
+												<td><?= $apv->procedure_name; ?></td>
+												<td class="text-center"><?= $apv->issue_date; ?></td>
+												<td class="text-center"><?= $apv->effective_date; ?></td>
+												<td class="text-center"><?= $apv->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<button type="button" class="btn btn-xs	 btn-icon btn-success process-approval" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
@@ -191,13 +191,13 @@
 								<thead class="table-light">
 									<tr>
 										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
 										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Revision Number</th>
+										<th class="p-2 text-center" width="100">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -206,12 +206,12 @@
 										foreach ($dataRevision as $rev) : $n++; ?>
 											<tr>
 												<td><?= $n; ?></td>
-												<td><?= $rev->departement_name; ?></td>
-												<td><?= $rev->number; ?></td>
 												<td><?= $rev->name; ?></td>
-												<td><?= $rev->issue_date; ?></td>
-												<td><?= $rev->effective_date; ?></td>
-												<td><?= $rev->revision_number; ?></td>
+												<td><?= $rev->number; ?></td>
+												<td><?= $rev->procedure_name; ?></td>
+												<td class="text-center"><?= $rev->issue_date; ?></td>
+												<td class="text-center"><?= $rev->effective_date; ?></td>
+												<td class="text-center"><?= $rev->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<button type="button" class="btn btn-xs	 btn-icon btn-success process-rev" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
@@ -228,13 +228,13 @@
 								<thead class="table-light">
 									<tr>
 										<th class="p-2" width="50">No.</th>
-										<th class="p-2">Departement</th>
-										<th class="p-2">Number</th>
 										<th class="p-2">Name</th>
-										<th class="p-2">Issue Date</th>
-										<th class="p-2">Effective Date</th>
-										<th class="p-2">Revision Number</th>
-										<th class="p-2" width="100">Opsi</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Revision Number</th>
+										<th class="p-2 text-center" width="100">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -243,12 +243,12 @@
 										foreach ($dataPublished as $pub) : $n++; ?>
 											<tr>
 												<td><?= $n; ?></td>
-												<td><?= $pub->departement_name; ?></td>
-												<td><?= $pub->number; ?></td>
 												<td><?= $pub->name; ?></td>
-												<td><?= $pub->issue_date; ?></td>
-												<td><?= $pub->effective_date; ?></td>
-												<td><?= $pub->revision_number; ?></td>
+												<td><?= $pub->number; ?></td>
+												<td><?= $pub->procedure_name; ?></td>
+												<td class="text-center"><?= $pub->issue_date; ?></td>
+												<td class="text-center"><?= $pub->effective_date; ?></td>
+												<td class="text-center"><?= $pub->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	btn-icon btn-info view" data-id="<?= $pub->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<!-- <a href="#" target="_blank" class="btn btn-xs btn-icon btn-light" data-id="<?= $pub->id; ?>" data-toggle="tooltip" title="Print Document"><i class="fa fa-print"></i></a> -->

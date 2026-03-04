@@ -1,3 +1,13 @@
+<style>
+  .cover
+  {
+    position: absolute;
+    width: 95%;
+    height: 95%;
+    background-color: red;
+    opacity: 0
+  }
+</style>
 <?php
 $file_path = '';
 if ($form_type == 'upload_file') {
@@ -43,4 +53,5 @@ if ($form_type == 'upload_file') {
   $file_path = $link_form;
 }
 ?>
+<div class="cover"></div>
 <iframe src="<?= $file_path; ?>#toolbar=0&navpanes=0" style="width: 100%;height: 68vh;" frameborder="0"></iframe>
