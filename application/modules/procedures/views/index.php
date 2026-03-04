@@ -66,13 +66,14 @@
 												<td class=""><?= $draft->group_name; ?></td>
 												<td class=""><?= $status[$draft->status]; ?></td>
 												<td class="">
-													<a href="<?= base_url($this->uri->segment(1) . '/printout/' . $draft->id); ?>" target="_blank" class="btn btn-xs btn-icon btn-light print" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Print Data"><i class="fa fa-print"></i></a>
+													<a href="javascript:void(0)" class="btn btn-xs btn-icon btn-info view" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" title="View Data"><i class="fa fa-eye"></i></a>
+
+													<!-- <a href="<?= base_url($this->uri->segment(1) . '/printout/' . $draft->id); ?>" target="_blank" class="btn btn-xs btn-icon btn-light print" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Print Data"><i class="fa fa-print"></i></a> -->
 													<div class="dropdown open d-inline">
 														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId">
-															<a href="javascript:void(0)" class="dropdown-item view" data-status="<?= $draft->status; ?>" data-id="<?= $draft->id; ?>" title="View Data"><i class="fa fa-eye mr-2 text-info"></i>View</a>
 															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item" data-id="<?= $draft->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
 															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $draft->id; ?>" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
@@ -146,9 +147,18 @@
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
 												<td class="p-2">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $dt->id); ?>" class="btn btn-xs btn-icon btn-warning" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
-													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
-													<button type="button" class="btn btn-icon btn-primary review btn-xs" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-sync"></i></button>
+													<div class="dropdown open d-inline">
+														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
+															<i class="fa fa-cog"></i>
+														</button>
+														<div class="dropdown-menu" aria-labelledby="triggerId">
+															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $dt->id); ?>" class="dropdown-item" data-id="<?= $dt->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $dt->id; ?>" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item delete" data-id="<?= $dt->id; ?>" title="Delete Data"><i class="fa fa-trash mr-2 text-danger"></i>Delete</a>
+														</div>
+													</div>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -192,13 +202,6 @@
 						<div class="tab-pane fade" id="Revision" role="tabpanel" aria-labelledby="Revision-tab">
 							<table id="tblRevision" class="table datatable table-bordered table-sm table-condensed table-hover datatable">
 								<thead class="text-center table-light">
-									<!-- <tr class="text-center">
-										<th class="p-2" width="40">No.</th>
-										<th class="p-2 text-left">Nama</th>
-										<th class="p-2 text-left">Reason</th>
-										<th class="p-2" width="130">Status</th>
-										<th class="p-2" width="70">Action</th>
-									</tr> -->
 									<tr>
 										<th class="" width="40">No.</th>
 										<th class="">Nama</th>
@@ -224,8 +227,20 @@
 												<td class=""><?= $status[$dt->status]; ?></td>
 												<td class="">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/revision/' . $dt->id); ?>" class="btn btn-xs btn-icon btn-warning" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Revision Data"><i class="fa fa-edit"></i></a>
-													<button type="button" class="btn btn-xs btn-icon btn-success review" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-sync-alt"></i></button>
+													<!-- <a href="<?= base_url($this->uri->segment(1) . '/revision/' . $dt->id); ?>" class="btn btn-xs btn-icon btn-warning" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Revision Data"><i class="fa fa-edit"></i></a> -->
+													<!-- <button type="button" class="btn btn-xs btn-icon btn-success review" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-sync-alt"></i></button> -->
+													<div class="dropdown open d-inline">
+														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
+															<i class="fa fa-cog"></i>
+														</button>
+														<div class="dropdown-menu" aria-labelledby="triggerId">
+															<a href="<?= base_url($this->uri->segment(1) . '/revision/' . $dt->id); ?>" class="dropdown-item" data-id="<?= $dt->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $dt->id; ?>" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
+															<div class="dropdown-divider my-0"></div>
+															<!-- <a href="javascript:void(0)" class="dropdown-item delete" data-id="<?= $dt->id; ?>" title="Delete Data"><i class="fa fa-trash mr-2 text-danger"></i>Delete</a> -->
+														</div>
+													</div>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -256,7 +271,6 @@
 												</td>
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
 												<td class="p-2">
-													<a href="<?= base_url($this->uri->segment(1) . '/printout/' . $dt->id); ?>" target="_blank" class="btn btn-xs btn-icon btn-light print" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Print Data"><i class="fa fa-print"></i></a>
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 												</td>
 											</tr>
