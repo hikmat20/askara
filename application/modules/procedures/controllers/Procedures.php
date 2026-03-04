@@ -30,7 +30,7 @@ class Procedures extends Admin_Controller
 		$this->sts = [
 			'DFT' => '<span class="label label-secondary label-pill label-inline mr-2">Draft</span>',
 			'REV' => '<span class="label label-warning label-pill label-inline mr-2">Waiting Review</span>',
-			'COR' => '<span class="label label-danger label-pill label-inline mr-2">Need Correction</span>',
+			'COR' => '<span class="label label-light-danger label-pill label-inline mr-2 font-weight-bold">Need Correction</span>',
 			'APV' => '<span class="label label-info label-pill label-inline mr-2">Waiting Approval</span>',
 			'PUB' => '<span class="label label-success label-pill label-inline mr-2">Published</span>',
 			'RVI' => '<span class="label label-success label-pill label-inline mr-2">Revision</span>',
