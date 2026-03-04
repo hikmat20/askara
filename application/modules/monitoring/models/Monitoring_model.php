@@ -155,7 +155,6 @@ class Monitoring_model extends BF_Model
                 $this->_signature($data, 'approve');
                 $this->_update_history($data);
                 $this->_logsProcedure($data);
-                $result = $this->generatePdfFile($data['id']);
                 $this->db->update(
                     'procedures',
                     [
@@ -165,14 +164,18 @@ class Monitoring_model extends BF_Model
                         'approved_by' => $this->auth->user_id(),
                         'approved_at' => date('Y-m-d H:i:s'),
                         'published_at' => date('Y-m-d H:i:s'),
-                        'file_path'    => $result['filePath'] . $result['filename'],
                     ],
                     ['id' => $data['id']]
                 );
-
+                $result = $this->generatePdfFile($data['id']);
+                $this->db->update(
+                    'procedures',
+                    ['file_path' => $result['filePath'] . $result['filename'],],
+                    ['id' => $data['id']]
+                );
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
-                    throw new Exception("Error Processing Request", 1);
+                    throw new Exception("Error Processing Request");
                 } else {
                     $this->db->trans_commit();
                     $Return = [
@@ -388,7 +391,7 @@ class Monitoring_model extends BF_Model
         // $mpdf->showWatermarkText = true;
         $mpdf->showImageErrors = true;
         $mpdf->curlAllowUnsafeSslRequests = true;
-        $mpdf->SetHtmlFooter('<div class="text-center" style="color:#595959"><i>- Hardcopy Uncontrol -</i></div>');
+        $mpdf->SetHtmlFooter('<div class="text-center" style="color:#595959"><i>- UNCONTROLLED COPY -</i></div>');
 
         $company_id = $this->session->company->id_perusahaan;
 

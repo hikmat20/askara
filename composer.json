@@ -12,7 +12,6 @@
    },
    "require": {
       "php": ">=5.6",
-      "firebase/php-jwt": "*",
       "mpdf/mpdf": "^8.2"
    },
    "suggest": {
