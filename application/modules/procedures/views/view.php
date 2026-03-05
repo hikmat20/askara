@@ -308,7 +308,7 @@
 
           </div>
         <?php endif; ?>
-        <?php if ($data->flow_file): ?>
+        <?php if (isset($data->flow_file)): ?>
           <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
             <div class="dropzone-desc">
               <?php if ($data->flow_file) : ?>
