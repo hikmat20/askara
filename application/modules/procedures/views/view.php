@@ -83,7 +83,7 @@
                 <tr>
                   <td class="text-center"><?= $revisionLog->revision_number; ?></td>
                   <td class="text-center"><?= $revisionLog->revision_date; ?></td>
-                  <td class="text-center"><?= $ArrUsr[$revisionLog->created_by]->full_name; ?></td>
+                  <td class=""><?= $ArrUsr[$revisionLog->created_by]->full_name; ?></td>
                   <td><?= $revisionLog->description; ?></td>
                 </tr>
               <?php endforeach; ?>
