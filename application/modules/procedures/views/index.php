@@ -373,6 +373,9 @@
 			</div>
 			<div id="content_modal">
 			</div>
+			<div class="modal-footer">
+				<button type="button" class="btn btn-sm btn-danger w-100px close_modal" data-dismiss="modal" data-target="#modalId"><i class="fa fa-times"></i>Close</button>
+			</div>
 		</div>
 	</div>
 </div>
