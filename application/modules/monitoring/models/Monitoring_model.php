@@ -61,10 +61,11 @@ class Monitoring_model extends BF_Model
 
     private function _update_history($data, $note = null)
     {
-        $thisData = $this->db->get_where('procedures', ['id' => $data['id']])->row();
+        
+        $thisData = $this->db->get_where('procedures', ['id' => $data['directory_id']])->row();
 
-        $logData['directory_id'] = $data['id'];
-        $logData['new_status']   = $data['status'];
+        $logData['directory_id'] = $data['directory_id'];
+        $logData['new_status']   = $data['new_status'];
         $logData['old_status']   = $thisData->status;
         $logData['doc_type']     = 'Procedure';
         $logData['note']         = ($note) ?: '~';

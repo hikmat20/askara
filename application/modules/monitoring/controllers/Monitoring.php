@@ -670,6 +670,7 @@ class Monitoring extends Admin_Controller
 			'status' => 'HLD',
 			'deletion_status' => 'OPN'
 		])->result();
+		
 		$users = $this->db->get_where('users')->result();
 
 		$ArrUsers = [];
