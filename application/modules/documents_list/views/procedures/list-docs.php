@@ -166,7 +166,7 @@
 													<i class="fa fa-file-alt text-info font-size-h2 mr-2"></i><?= $i->name; ?>
 												</td>
 												<td class="text-center" style="vertical-align: middle;">
-													<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-guide" data-id="<?= $i->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
+													<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-wi" data-id="<?= $i->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
 												</td>
 											</tr>
 										<?php endforeach;
@@ -267,15 +267,15 @@
 </div>
 
 <div class="modal fade" id="modalViewForm" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-	<div class="modal-dialog modal-xl modal-dialog-centered modal-dialog-scrollable" role="document">
-		<div class="modal-content" data-scroll="true" data-height="700">
+	<div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+		<div class="modal-content" data-height="700">
 			<div class="modal-header">
 				<h5 class="modal-title">View Document</h5>
 				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
 					<span aria-hidden="true">&times;</span>
 				</button>
 			</div>
-			<div class="modal-body pt-1  py-5" id="data-file">
+			<div class="modal-body p-0" id="data-file">
 				<h3 class="text-center">File not found</h3>
 			</div>
 			<div class="modal-footer py-2">
@@ -459,7 +459,7 @@
 		const id = $(this).data('id') || ''
 		if (id) {
 			$('#modalViewForm').modal('show')
-			$('#modalViewForm').find('#data-file').load(siteurl + active_controller + 'view_guide/' + id)
+			$('#modalViewForm .modal-body').load(siteurl + active_controller + 'view_guide/' + id)
 		}
 	})
 

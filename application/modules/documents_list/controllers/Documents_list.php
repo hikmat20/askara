@@ -99,7 +99,7 @@ class Documents_list extends Admin_Controller
 	public function procedures($id = null)
 	{
 		if (isset($id)) {
-			$procedures = $this->ProcedureModel->find_all_by(['status' => 'PUB']);
+			$procedures = $this->ProcedureModel->find_all_by(['id' => $id, 'status' => 'PUB', '']);
 			$forms        = $this->db->order_by('name', 'ASC')->get_where('forms', ['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL'])->result();
 			$ik          = $this->db->order_by('name', 'ASC')->get_where('work_instructions', ['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL'])->result();
 			$records      = $this->db->order_by('name', 'ASC')->get_where('dir_records', ['procedure_id' => $id, 'status' => 'PUB', 'flag_type' => 'FOLDER', 'company_id' => $this->company, 'parent_id' => null])->result();
@@ -135,7 +135,7 @@ class Documents_list extends Admin_Controller
 
 	public function view_procedure($id)
 	{
-	
+
 		$docs          = $this->db->get_where('view_procedures', ['id' => $id])->row();
 		$detail        = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 		$forms         = $this->db->get_where('forms', ['procedure_id' => $id])->result();
@@ -153,7 +153,7 @@ class Documents_list extends Admin_Controller
 		foreach ($signatures as $sign) {
 			$ArrSign[$sign->sign_type] = $sign->qr_path;
 		}
-		
+
 		foreach ($users as $usr) {
 			$ArrUsr[$usr->id_user] = $usr;
 		}
@@ -212,14 +212,16 @@ class Documents_list extends Admin_Controller
 	public function view_form($id)
 	{
 		$form = $this->db->get_where('forms', ['id' => $id])->row();
-		// $history = $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
+		$history = $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
 		$users = $this->db->get_where('users', ['status' => 'ACT'])->result();
+
 		foreach ($users as $user) {
 			$ArrUsr[$user->id_user] = $user;
 		}
+		
 		$this->template->set([
 			'form' 			=> $form,
-			// 'history' 			=> $history,
+			'history' 			=> $history,
 			'sts'				=> $this->sts,
 			'ArrUsr'			=> $ArrUsr
 		]);
