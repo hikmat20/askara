@@ -441,7 +441,17 @@
 	</div>
 
 	<div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
-		<iframe class="w-100" style="height: 70vh;" src="<?= base_url($data->file_path); ?>#toolbar=0&navpanes=0" frameborder="1"></iframe>
+
+		<?php
+		$path = FCPATH . $data->file_path;
+
+		if (!file_exists($path) || !$path) {
+			echo "File not found: " . $path;
+			return;
+		}
+		$file_path = base_url($path);
+		?>
+		<iframe src="<?= $file_path; ?>#toolbar=0&navpanes=0" style="width: 100%;height: 70vh;" frameborder="0"></iframe>
 	</div>
 
 	<div class="tab-pane fade" id="log" role="tabpanel" aria-labelledby="log-tab">

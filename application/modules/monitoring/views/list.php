@@ -78,8 +78,10 @@
                           <a href="<?= base_url('procedures/edit/' . $list->id); ?>" data-id="<?= $list->id; ?>" data-type="procedures" class="btn btn-warning btn-icon btn-xs shadow-sm"><i class="fa fa-edit"></i></a>
                         <?php endif; ?>
                       <?php elseif ($list->status == 'PUB') : ?>
-                        <!-- <button type="button" data-id="<?= $list->id; ?>" data-type="procedures" data-toggle="tooltip" title="Request for Revision" class="btn btn-warning btn-icon revision btn-xs shadow-sm"><i class="far fa-edit"></i></button>
-                        <button type="button" data-id="<?= $list->id; ?>" data-type="procedures" data-toggle="tooltip" title="Request for Deletion" class="btn btn-danger btn-icon deletion btn-xs shadow-sm"><i class="fa fa-trash-alt"></i></button> -->
+                        <?php if (in_array('1', $ArrPosts)): ?>
+                          <button type="button" data-id="<?= $list->id; ?>" data-type="procedures" data-toggle="tooltip" title="Request for Revision" class="btn btn-warning btn-icon revision btn-xs shadow-sm"><i class="far fa-edit"></i></button>
+                          <button type="button" data-id="<?= $list->id; ?>" data-type="procedures" data-toggle="tooltip" title="Request for Deletion" class="btn btn-danger btn-icon deletion btn-xs shadow-sm"><i class="fa fa-trash-alt"></i></button>
+                        <?php endif; ?>
                         <button type="button" data-id="<?= $list->id; ?>" data-type="procedures" data-toggle="tooltip" title="View" class="btn btn-info btn-icon rounded-circle view btn-xs shadow-sm"><i class="fa fa-eye"></i></button>
                       <?php else : ?>
                         <button type="button" data-id="<?= $list->id; ?>" data-type="procedures" data-toggle="tooltip" title="View" class="btn btn-success btn-icon rounded-circle view btn-xs shadow-sm"><i class="fa fa-edit"></i></button>
@@ -130,15 +132,13 @@
 <div class="modal fade" id="Modal2" data-keyboard="true" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
   <div class="modal-dialog modal-xl">
     <div class="modal-content" data-scroll="true" style="height:90vh;">
-      <form class="form-horiontal" id="form-revision">
-        <div class="modal-header">
-          <h5 class="modal-title"></h5>
-          <span type="button" class="close" data-dismiss="modal" aria-label="Close">
-            <div class="fa fa-times"></div>
-          </span>
-        </div>
-        <div class="modal-body overflow-auto" id="content-modal2"></div>
-      </form>
+      <div class="modal-header">
+        <h5 class="modal-title"></h5>
+        <span type="button" class="close" data-dismiss="modal" aria-label="Close">
+          <div class="fa fa-times"></div>
+        </span>
+      </div>
+      <div class="modal-body overflow-auto" id="content-modal2"></div>
     </div>
   </div>
 </div>
