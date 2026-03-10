@@ -256,6 +256,9 @@
 									<tr class="text-center">
 										<th class="p-2" width="40">No.</th>
 										<th class="p-2 text-left">Nama</th>
+										<th class="p-2 text-left">Nomor</th>
+										<th class="p-2">Departement</th>
+										<th class="p-2">Kelompok</th>
 										<th class="p-2" width="130">Status</th>
 										<th class="p-2" width="70">Action</th>
 									</tr>
@@ -266,9 +269,10 @@
 										foreach ($dataPub as $dt) : $n++; ?>
 											<tr class="text-center">
 												<td class="p-2"><?= $n; ?></td>
-												<td class="p-2 text-left">
-													<h6 class="my-0"><?= $dt->name; ?></h6>
-												</td>
+												<td class="p-2 text-left"><?= $dt->name; ?></td>
+												<td class="p-2 text-left"><?= $dt->nomor; ?></td>
+												<td class="p-2 text-center"><?= $dt->departement_name; ?></td>
+												<td class="p-2 text-center"><?= $dt->group_name; ?></td>
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
 												<td class="p-2">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
@@ -287,6 +291,9 @@
 									<tr class="text-center">
 										<th class="p-2" width="40">No.</th>
 										<th class="p-2 text-left">Nama</th>
+										<th class="p-2 text-left">Nomor</th>
+										<th class="p-2">Departement</th>
+										<th class="p-2">Kelompok</th>
 										<th class="p-2" width="130">Status</th>
 										<th class="p-2" width="70">Action</th>
 									</tr>
@@ -297,9 +304,10 @@
 										foreach ($dataDel as $dt) : $n++; ?>
 											<tr class="text-center">
 												<td class="p-2"><?= $n; ?></td>
-												<td class="p-2 text-left">
-													<h6 class="my-0"><?= $dt->name; ?></h6>
-												</td>
+												<td class="p-2 text-left"><?= $dt->name; ?></td>
+												<td class="p-2 text-left"><?= $dt->nomor; ?></td>
+												<td class="p-2 text-left"><?= $dt->departement_name; ?></td>
+												<td class="p-2 text-left"><?= $dt->group_name; ?></td>
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
 												<td class="p-2">
 													<!-- <a href="<?= base_url($this->uri->segment(1) . '/printout/' . $dt->id); ?>" target="_blank" class="btn btn-xs btn-icon btn-light print" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="Print Data"><i class="fa fa-print"></i></a> -->
