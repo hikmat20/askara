@@ -879,7 +879,7 @@
 				</div>
 				<div class="modal-body" id="content_modal"></div>
 				<div class="modal-footer">
-					<button type="button" class="btn btn-sm btn-danger w-100px close_modal" data-dismiss="modal" data-target="#modalId"><i class="fa fa-times"></i>Cancel</button>
+					<button type="button" class="btn btn-sm btn-danger w-100px close_modal" data-dismiss="modal" data-target="#modalId"><i class="fa fa-times"></i>Close</button>
 				</div>
 			</form>
 		</div>
@@ -1274,8 +1274,8 @@
 			const id = $(this).data('id')
 			if (id) {
 				$('.modal-title').html('View Form')
-				$('#content_modal').load(siteurl + active_controller + 'view_form/' + id)
 				$('#modelId').modal('show')
+				$('#modelId .modal-body').load(siteurl + active_controller + 'view_form/' + id)
 			} else {
 				Swal.fire('Warning!!', 'Not available data to process', 'waring', 2000);
 			}

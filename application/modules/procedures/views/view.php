@@ -74,6 +74,7 @@
             <tr class="bg-secondary">
               <th class="py-2" width="100">REVISI</th>
               <th class="py-2" width="150">TANGGAL REVISI</th>
+              <th class="py-2">REVISI OLEH</th>
               <th class="py-2">URAIAN PERUBAHAN</th>
             </tr>
           </thead>
@@ -82,6 +83,7 @@
                 <tr>
                   <td class="text-center"><?= $revisionLog->revision_number; ?></td>
                   <td class="text-center"><?= $revisionLog->revision_date; ?></td>
+                  <td class=""><?= $ArrUsr[$revisionLog->created_by]->full_name; ?></td>
                   <td><?= $revisionLog->description; ?></td>
                 </tr>
               <?php endforeach; ?>
@@ -308,7 +310,7 @@
 
           </div>
         <?php endif; ?>
-        <?php if ($data->flow_file): ?>
+        <?php if (isset($data->flow_file)): ?>
           <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
             <div class="dropzone-desc">
               <?php if ($data->flow_file) : ?>
