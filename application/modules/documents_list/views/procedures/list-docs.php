@@ -120,17 +120,19 @@
 							<table class="table table-condensed table-hover">
 								<thead>
 									<tr class="">
-										<th class="h5 border-2 border-bottom-secondary" width="15px">No.</th>
-										<th class="h5 border-2 border-bottom-secondary text-center">File Name</th>
-										<th class="h5 border-2 border-bottom-secondary text-center" width="50px">View</th>
+										<th class="py-2 border-2 border-bottom-secondary" width="15px">No.</th>
+										<th class="py-2 border-2 border-bottom-secondary" width="250">Number</th>
+										<th class="py-2 border-2 border-bottom-secondary text-center">File Name</th>
+										<th class="py-2 border-2 border-bottom-secondary text-center" width="50px">View</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php if (isset($forms)) :
 										$no = 0;
 										foreach ($forms as $frm) : $no++; ?>
-											<tr class="cursor-pointer text-dark h6">
+											<tr class="cursor-pointer view-form text-dark h6" data-id="<?= $frm->id; ?>">
 												<td class="text-dark"><?= $no; ?></td>
+												<td class=" text-dark"><?= $frm->number; ?></td>
 												<td class="align-middle d-flex align-items-center">
 													<i class="fa fa-file-alt text-success font-size-h2 mr-2"></i><?= $frm->name; ?>
 												</td>
@@ -151,17 +153,19 @@
 							<table class="table table-condensed table-hover">
 								<thead>
 									<tr class="">
-										<th class="h5 border-2 border-bottom-secondary" width="15px">No.</th>
-										<th class="h5 border-2 border-bottom-secondary text-center">File Name</th>
-										<th class="h5 border-2 border-bottom-secondary text-center" width="50px">View</th>
+										<th class="py-2 border-2 border-bottom-secondary" width="15px">No.</th>
+										<th class="py-2 border-2 border-bottom-secondary" width="250">Number</th>
+										<th class="py-2 border-2 border-bottom-secondary text-center">File Name</th>
+										<th class="py-2 border-2 border-bottom-secondary text-center" width="50px">View</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php if (isset($ik)) :
 										$no = 0;
 										foreach ($ik as $i) : $no++; ?>
-											<tr class="cursor-pointer text-dark h6">
+											<tr class="cursor-pointer text-dark h6 view-wi" data-id="<?= $i->id; ?>">
 												<td class="text-dark"><?= $no; ?></td>
+												<td class="text-dark"><?= $i->number; ?></td>
 												<td class="align-middle d-flex align-items-center">
 													<i class="fa fa-file-alt text-info font-size-h2 mr-2"></i><?= $i->name; ?>
 												</td>
