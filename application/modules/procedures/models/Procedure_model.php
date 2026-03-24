@@ -78,6 +78,7 @@ class Procedure_model extends BF_Model
     if ($procedure->status == 'DFT') {
       $dataLog['note'] = 'Procesed to review procedure';
     }
+    
     $this->db->insert('directory_log', $dataLog);
   }
 

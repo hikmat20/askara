@@ -462,7 +462,8 @@ class Monitoring extends Admin_Controller
 
 	public function save_approval()
 	{
-		$Return = $this->Monitoring->approval();
+		$data = $this->input->post();
+		$Return = $this->Monitoring->approval($data);
 		echo json_encode($Return);
 	}
 

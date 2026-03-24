@@ -73,10 +73,10 @@ class Procedures extends Admin_Controller
 
 	public function add()
 	{
-		$grProcess	= $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
-		$users 		= $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
-		$jabatan 	= $this->db->get_where('positions', ['company_id' => $this->company])->result();
-		$depts 	= $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		$grProcess = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
+		$users     = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
+		$jabatan   = $this->db->get_where('positions', ['company_id' => $this->company])->result();
+		$depts     = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
 
 		$this->template->set([
 			'grProcess' 	=> $grProcess,
@@ -582,10 +582,16 @@ class Procedures extends Admin_Controller
 
 	public function add_flow($id = null)
 	{
-		$flow 	   = '';
-		$forms     = $this->db->get_where('forms', ['procedure_id' => $id, 'company_id' => $this->company, 'status !=' => 'DEL'])->result();
-		$guides    = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'company_id' => $this->company, 'status !=' => 'DEL'])->result();
+		$this->load->model('setting/Setting_model','SettingModel');
+		$flow 	  = '';
 		$language = ['english'];
+		$cross_dept = $this->SettingModel->getSettingByName('cross_departement');
+		$forms      = $this->FormModel->find_all_by(['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
+		$guides    = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'company_id' => $this->company, 'status !=' => 'DEL'])->result();
+		if($cross_dept == 1){
+			$forms     = $this->db->get_where('forms', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
+			$guides     = $this->WiModel->find_all_by(['is_active' => 'ACT', 'status !=' => 'DEL']);
+		}
 
 		$this->template->set([
 			'procedure_id' => $id,
@@ -593,6 +599,7 @@ class Procedures extends Admin_Controller
 			'forms'        => $forms,
 			'guides'       => $guides,
 			'language'    => $language,
+			'cross_dept'    => $cross_dept,
 		]);
 
 		$this->template->render('form-flow');
@@ -600,12 +607,19 @@ class Procedures extends Admin_Controller
 
 	public function edit_flow($proc_id = null, $id = null)
 	{
+		$this->load->model('setting/Setting_model','SettingModel');
+		
 		$language = ['english'];
 		if ($proc_id && $id) {
-			$flow 		= $this->db->get_where('procedure_details', ['id' => $id])->row();
-			// $formsx 		= $this->db->get_where('forms', ['procedure_id' => $proc_id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
-			$forms = $this->FormModel->find_all_by(['procedure_id' => $proc_id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
-			$guides 	= $this->WiModel->find_all_by(['procedure_id' => $proc_id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
+			$flow       = $this->db->get_where('procedure_details', ['id' => $id])->row();
+			// $formsx  = $this->db->get_where('forms', ['procedure_id' => $proc_id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
+			$cross_dept = $this->SettingModel->getSettingByName('cross_departement');
+			$forms      = $this->FormModel->find_all_by(['procedure_id' => $proc_id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
+			$guides    = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'company_id' => $this->company, 'status !=' => 'DEL'])->result();
+			if($cross_dept == 1){
+				$forms     = $this->db->get_where('forms', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
+				$guides     = $this->WiModel->find_all_by(['is_active' => 'ACT', 'status !=' => 'DEL']);
+			}
 		}
 
 		$this->template->set([

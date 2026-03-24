@@ -6,20 +6,20 @@ class Monitoring_model extends BF_Model
     /**
      * @var string  User Table Name
      */
-    protected $table_name = 'monitoring';
-    protected $key        = 'kodebarang';
+    protected $table_name = 'procedures';
+    protected $key        = 'id';
 
     /**
      * @var string Field name to use for the created time column in the DB table
      * if $set_created is enabled.
      */
-    protected $created_field = 'created_on';
+    protected $created_field = 'created_at';
 
     /**
      * @var string Field name to use for the modified time column in the DB
      * table if $set_modified is enabled.
      */
-    protected $modified_field = 'modified_on';
+    protected $modified_field = 'modified_at';
 
     /**
      * @var bool Set the created time automatically on a new record (if true)
@@ -61,11 +61,12 @@ class Monitoring_model extends BF_Model
 
     private function _update_history($data, $note = null)
     {
-        
-        $thisData = $this->db->get_where('procedures', ['id' => $data['directory_id']])->row();
 
-        $logData['directory_id'] = $data['directory_id'];
-        $logData['new_status']   = $data['new_status'];
+        
+        $thisData = $this->db->get_where('procedures', ['id' => $data['id']])->row();
+
+        $logData['directory_id'] = $data['id'];
+        $logData['new_status']   = $data['status'];
         $logData['old_status']   = $thisData->status;
         $logData['doc_type']     = 'Procedure';
         $logData['note']         = ($note) ?: '~';
@@ -149,31 +150,32 @@ class Monitoring_model extends BF_Model
 
     public function approval($data = null)
     {
-        $data = $this->input->post();
         try {
             if ($data) {
                 $this->db->trans_begin();
-                $this->_signature($data, 'approve');
+
+                $dataUpdate = [
+                    'status'      => $data['status'],
+                    'modified_by' => $this->auth->user_id(),
+                    'modified_at' => date('Y-m-d H:i:s'),
+                ];
+                
+                if($data['status'] == 'PUB'){
+                    $this->_signature($data, 'approve');
+                    $dataUpdate['approved_by'] = $this->auth->user_id();
+                    $dataUpdate['approved_at'] = date('Y-m-d H:i:s');
+                    $dataUpdate['published_at'] = date('Y-m-d H:i:s');
+
+                    $result = $this->generatePdfFile($data['id']);
+                    if($result){
+                        $dataUpdate['file_path'] = $result['filePath'] . $result['filename'];
+                    }
+                }
+                $this->update($data['id'],$dataUpdate);
+
                 $this->_update_history($data);
                 $this->_logsProcedure($data);
-                $this->db->update(
-                    'procedures',
-                    [
-                        'status'      => $data['status'],
-                        'modified_by' => $this->auth->user_id(),
-                        'modified_at' => date('Y-m-d H:i:s'),
-                        'approved_by' => $this->auth->user_id(),
-                        'approved_at' => date('Y-m-d H:i:s'),
-                        'published_at' => date('Y-m-d H:i:s'),
-                    ],
-                    ['id' => $data['id']]
-                );
-                $result = $this->generatePdfFile($data['id']);
-                $this->db->update(
-                    'procedures',
-                    ['file_path' => $result['filePath'] . $result['filename'],],
-                    ['id' => $data['id']]
-                );
+                
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     throw new Exception("Error Processing Request");
@@ -381,7 +383,6 @@ class Monitoring_model extends BF_Model
         $filePath = './directory/PROCEDURES/' . date('Y') . '/' . date('m') . '/';
         if (!is_dir($filePath)) mkdir($filePath, 0755, true);
         $filename = $document->nomor . '-FINAL.pdf';
-
         $this->load->helper('app');
         $this->load->library('PdfService');
         $this->load->model('companies/Company_model', 'Comp');
