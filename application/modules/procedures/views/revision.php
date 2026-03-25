@@ -712,15 +712,13 @@
 <script>
 	$(document).ready(function() {
 		<?php if ($data->status == 'RVI'): ?>
-			tinymce.on('AddEditor', function(e) {
-				if (e.editor.id === 'revision_description') {
-					e.editor.mode.set('design');
-				} else {
-					e.editor.mode.set('readonly');
-				}
-			});
-
-
+			// tinymce.on('AddEditor', function(e) {
+			// 	if (e.editor.id === 'revision_description') {
+			// 		e.editor.mode.set('design');
+			// 	} else {
+			// 		e.editor.mode.set('readonly');
+			// 	}
+			// });
 		<?php endif; ?>
 
 		$(document).on('change', '.ckRevision', function() {
