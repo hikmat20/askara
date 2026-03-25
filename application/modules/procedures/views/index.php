@@ -223,7 +223,7 @@
 												<td class=""><?= $dt->nomor; ?></td>
 												<td class=""><?= $dt->departement_name; ?></td>
 												<td class=""><?= $dt->group_name; ?></td>
-												<td class=""><?= ($ArrReason[$dt->id]->note) ?: '-'	; ?></td>
+												<td class=""><?= isset($ArrReason[$dt->id]->note) ? $ArrReason[$dt->id]->note: '-'; ?></td>
 												<td class=""><?= $status[$dt->status]; ?></td>
 												<td class="">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
