@@ -26,6 +26,8 @@ class Monitoring extends Admin_Controller
 			'PUB' => '<span class="label label-light-success label-pill label-inline mr-2">Published</span>',
 			'RVI' => '<span class="label label-light-danger label-pill label-inline mr-2">Revision</span>',
 			'HLD' => '<span class="label label-light-secondary text-secondary label-pill label-inline mr-2">Hold</span>',
+			'DEL' => '<span class="label label-light-danger text-danger label-pill label-inline mr-2">Request Deletion</span>',
+			'REJ' => '<span class="label label-light-success text-success label-pill label-inline mr-2">Rejected Deletion</span>',
 		];
 	}
 
@@ -71,13 +73,13 @@ class Monitoring extends Admin_Controller
 			if ($value->status == 'RVI') {
 				$rvi = $rvi + 1;
 			}
-			if (($value->status == 'HLD') && ($value->deletion_status == 'OPN')) {
+			if (($value->status == 'HLD') && ($value->deletion_status == 'REV')) {
 				$hld = $hld + 1;
 			}
-			if (($value->status == 'HLD') && ($value->deletion_status == 'REV')) {
+			if (($value->status == 'HLD') && ($value->deletion_status == 'APV')) {
 				$revDel = $revDel + 1;
 			}
-			if (($value->status == 'HLD') && ($value->deletion_status == 'APV')) {
+			if (($value->status == 'HLD') && ($value->deletion_status == 'DEL')) {
 				$apvDel = $apvDel + 1;
 			}
 			if (($value->status == 'HLD') && ($value->deletion_status == 'REJ')) {
@@ -669,7 +671,7 @@ class Monitoring extends Admin_Controller
 		$procedures 	= $this->db->get_where('view_procedures', [
 			'company_id' => $this->company,
 			'status' => 'HLD',
-			'deletion_status' => 'OPN'
+			'deletion_status' => 'REV'
 		])->result();
 		
 		$users = $this->db->get_where('users')->result();
@@ -692,39 +694,25 @@ class Monitoring extends Admin_Controller
 	public function save_rev_deletion()
 	{
 		$data = $this->input->post();
-
 		if ($data) {
-			$this->db->trans_begin();
 			$data['deletion_status'] = $data['sts'];
-			$data['status'] = 'HLD';
-			if ($data['sts'] == 'REV') {
-				$data['note'] = 'Reviewed';
+			// $data['status'] = 'HLD';
+			if ($data['sts'] == 'APV') {
+				$data['note'] = 'Reviewed for deleteion';
 			} elseif ($data['sts'] == 'REJ') {
-				$data['note'] = 'Rejected';
+				$data['note'] = 'Rejected for deleteion';
 			}
+
 			unset($data['sts']);
-			$this->Monitoring->rev_deletion($data);
-			if ($this->db->trans_status() === FALSE) {
-				$this->db->trans_rollback();
-				$Return = [
-					'status' => 0,
-					'msg'	 => 'Failed processing this file. Please try again later.!'
-				];
-			} else {
-				$this->db->trans_commit();
-				$Return = [
-					'status' => 1,
-					'msg'	 => 'Success deletion document...'
-				];
-			}
+			$result = $this->Monitoring->rev_deletion($data);
 		} else {
-			$Return = [
+			$result = [
 				'status' => 0,
 				'msg'	 => 'Data not valid.'
 			];
 		}
 
-		echo json_encode($Return);
+		echo json_encode($result);
 	}
 
 	/* APPROVAL DELETION */
@@ -735,7 +723,7 @@ class Monitoring extends Admin_Controller
 		$procedures 	= $this->db->get_where('view_procedures', [
 			'company_id' => $this->company,
 			'status' => 'HLD',
-			'deletion_status' => 'REV'
+			'deletion_status' => 'APV'
 		])->result();
 		$users = $this->db->get_where('users')->result();
 
@@ -757,9 +745,8 @@ class Monitoring extends Admin_Controller
 	public function save_apv_deletion()
 	{
 		$data = $this->input->post();
-
+		
 		if ($data) {
-			$this->db->trans_begin();
 			$data['deletion_status'] = $data['sts'];
 			if ($data['sts'] == 'APV') {
 				$data['status'] = 'DEL';
@@ -769,28 +756,30 @@ class Monitoring extends Admin_Controller
 				$data['note'] = 'Rejected';
 			}
 			unset($data['sts']);
-			$this->Monitoring->rev_deletion($data);
-			if ($this->db->trans_status() === FALSE) {
-				$this->db->trans_rollback();
-				$Return = [
-					'status' => 0,
-					'msg'	 => 'Failed processing this file. Please try again later.!'
-				];
-			} else {
-				$this->db->trans_commit();
-				$Return = [
-					'status' => 1,
-					'msg'	 => 'Success deletion document...'
-				];
-			}
+			$result = $this->Monitoring->approval_deletion($data);
 		} else {
-			$Return = [
+			$result = [
 				'status' => 0,
 				'msg'	 => 'Data not valid.'
 			];
 		}
 
-		echo json_encode($Return);
+		echo json_encode($result);
+	}
+
+	public function save_delete()
+	{
+		$data = $this->input->post();
+		if ($data) {
+			$result = $this->Monitoring->delete_document($data);
+		} else {
+			$result = [
+				'status' => 0,
+				'msg'	 => 'Data not valid.'
+			];
+		}
+
+		echo json_encode($result);
 	}
 
 	public function deletion_document()
@@ -799,7 +788,7 @@ class Monitoring extends Admin_Controller
 		$procedures 	= $this->db->get_where('view_procedures', [
 			'company_id' => $this->company,
 			'status' => 'HLD',
-			'deletion_status' => 'APV'
+			'deletion_status' => 'DEL'
 		])->result();
 		$users = $this->db->get_where('users')->result();
 
@@ -810,6 +799,31 @@ class Monitoring extends Admin_Controller
 
 		$this->template->set([
 			'title'			=> 'NEED ACTION TO DELETE PROCEDURES',
+			'procedures' 	=> $procedures,
+			'sts'			=> $this->sts,
+			'ArrUsers'		=> $ArrUsers,
+			'ArrPosts'		=> $this->ArrPosts,
+		]);
+		$this->template->render('list');
+	}
+
+	public function rejected_document()
+	{
+		/* CORRECTION */
+		$procedures 	= $this->db->get_where('view_procedures', [
+			'company_id' => $this->company,
+			'status' => 'HLD',
+			'deletion_status' => 'REJ'
+		])->result();
+		$users = $this->db->get_where('users')->result();
+
+		$ArrUsers = [];
+		foreach ($users as $user) {
+			$ArrUsers[$user->id_user] = $user;
+		}
+
+		$this->template->set([
+			'title'			=> 'REJECTED DELETION DOCUMENTS',
 			'procedures' 	=> $procedures,
 			'sts'			=> $this->sts,
 			'ArrUsers'		=> $ArrUsers,

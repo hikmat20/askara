@@ -61,10 +61,7 @@ class Monitoring_model extends BF_Model
 
     private function _update_history($data, $note = null)
     {
-
-        
         $thisData = $this->db->get_where('procedures', ['id' => $data['id']])->row();
-
         $logData['directory_id'] = $data['id'];
         $logData['new_status']   = $data['status'];
         $logData['old_status']   = $thisData->status;
@@ -159,23 +156,23 @@ class Monitoring_model extends BF_Model
                     'modified_by' => $this->auth->user_id(),
                     'modified_at' => date('Y-m-d H:i:s'),
                 ];
-                
-                if($data['status'] == 'PUB'){
+
+                if ($data['status'] == 'PUB') {
                     $this->_signature($data, 'approve');
                     $dataUpdate['approved_by'] = $this->auth->user_id();
                     $dataUpdate['approved_at'] = date('Y-m-d H:i:s');
                     $dataUpdate['published_at'] = date('Y-m-d H:i:s');
 
                     $result = $this->generatePdfFile($data['id']);
-                    if($result){
+                    if ($result) {
                         $dataUpdate['file_path'] = $result['filePath'] . $result['filename'];
                     }
                 }
-                $this->update($data['id'],$dataUpdate);
+                $this->update($data['id'], $dataUpdate);
 
                 $this->_update_history($data);
                 $this->_logsProcedure($data);
-                
+
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     throw new Exception("Error Processing Request");
@@ -256,14 +253,6 @@ class Monitoring_model extends BF_Model
                 ],
                 ['id' => $data['id']]
             );
-
-            $thisData = $this->db->get_where('procedures', ['id' => $data['id']])->row();
-            $data['directory_id']     = $data['id'];
-            $data['new_status']       = $data['status'];
-            $data['old_status']       = $thisData->status;
-            $data['doc_type']         = 'Procedure';
-            unset($data['id']);
-            unset($data['status']);
             $this->_update_history($data);
         } else {
             return false;
@@ -272,29 +261,132 @@ class Monitoring_model extends BF_Model
 
     public function rev_deletion($data = null)
     {
-        if ($data) {
+        try {
+            if ($data) {
+                $this->db->trans_begin();
+                $this->db->update(
+                    'procedures',
+                    [
+                        'deletion_status'     => $data['deletion_status'],
+                        'modified_by'     => $this->auth->user_id(),
+                        'modified_at'     => date('Y-m-d H:i:s'),
+                    ],
+                    ['id' => $data['id']]
+                );
+
+                if ($this->db->trans_status() === FALSE) {
+                    $this->db->trans_rollback();
+                    throw new ErrorException('Failed to submit revision document.');
+                } else {
+                    $this->db->trans_commit();
+                    return [
+                        'status' => 1,
+                        'msg'    => 'Success submit revision document file...'
+                    ];
+                }
+            } else {
+                throw new ErrorException('Data not found.');
+            }
+        } catch (\Throwable $th) {
+            $this->db->trans_rollback();
+            $this->_update_history($data);
+            $Return = [
+                'status' => 0,
+                'msg'    => $th->getMessage()
+            ];
+
+            return $Return;
+        }
+
+
+        // $thisData = $this->db->get_where('procedures', ['id' => $data['id']])->row();
+        // $data['directory_id']     = $data['id'];
+        // $data['new_status']       = $data['status'];
+        // $data['old_status']       = $thisData->status;
+        // $data['doc_type']         = 'Procedure';
+        // unset($data['id']);
+        // unset($data['status']);
+        // unset($data['deletion_status']);
+        // } else {
+        //     return false;
+        // }
+    }
+
+    public function approval_deletion($data = null)
+    {
+        try {
+            if ($data) {
+                $this->db->trans_begin();
+                $this->db->update(
+                    'procedures',
+                    [
+                        'deletion_status' => $data['deletion_status'],
+                        'modified_by'     => $this->auth->user_id(),
+                        'modified_at'     => date('Y-m-d H:i:s'),
+                    ],
+                    ['id' => $data['id']]
+                );
+
+                if ($this->db->trans_status() === FALSE) {
+                    $this->db->trans_rollback();
+                    throw new ErrorException('Failed to submit approval deletion document.');
+                } else {
+                    $this->db->trans_commit();
+                    return [
+                        'status' => 1,
+                        'msg'    => 'Success submit approval deletion document file...'
+                    ];
+                }
+            } else {
+                throw new ErrorException('Data not found.');
+            }
+        } catch (\Throwable $th) {
+            $this->db->trans_rollback();
+            $this->_update_history($data);
+            $Return = [
+                'status' => 0,
+                'msg'    => $th->getMessage()
+            ];
+
+            return $Return;
+        }
+    }
+
+    public function delete_document($data = null)
+    {
+        try {
+            $this->db->trans_begin();
             $this->db->update(
                 'procedures',
                 [
-                    'deletion_status'     => $data['deletion_status'],
-                    'modified_by'     => $this->auth->user_id(),
-                    'modified_at'     => date('Y-m-d H:i:s'),
+                    'status'      => 'DEL',
+                    'deleted_by'  => $this->auth->user_id(),
+                    'deleted_at'  => date('Y-m-d H:i:s'),
                 ],
                 ['id' => $data['id']]
             );
 
-            $thisData = $this->db->get_where('procedures', ['id' => $data['id']])->row();
-            $data['directory_id']     = $data['id'];
-            $data['new_status']       = $data['status'];
-            $data['old_status']       = $thisData->status;
-            $data['doc_type']         = 'Procedure';
-            unset($data['id']);
-            unset($data['status']);
-            unset($data['deletion_status']);
+                if ($this->db->trans_status() === FALSE) {
+                    $this->db->trans_rollback();
+                    throw new ErrorException('Failed to submit approval deletion document.');
+                } else {
+                    $this->db->trans_commit();
+                    return [
+                        'status' => 1,
+                        'msg'    => 'Success submit approval deletion document file...'
+                    ];
+                }
+        } catch (\Throwable $th) {
+            $this->db->trans_rollback();
             $this->_update_history($data);
-        } else {
-            return false;
+            $Return = [
+                'status' => 0,
+                'msg'    => $th->getMessage()
+            ];
+
+            return $Return;
         }
+
     }
 
     public function _signature($data, $sign_type)

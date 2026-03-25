@@ -28,42 +28,41 @@
     <div class="tab-pane fade show active p-4" id="apv" role="tabpanel" aria-labelledby="file-">
         <form id="form-approval">
             <input type="hidden" name="id" id="id" value="<?= $file->id; ?>">
-            <div class="form-group pb-3">
+            <div class="form-group pb-2">
                 <div class="checkbox-inline">
                     <label class="status checkbox checkbox-outline checkbox-outline-2x checkbox-primary">
                         <input type="checkbox" class="status" name="status" value="PUB" />
                         <span></span>
                         <h5>Setujui & Publikasikan</h5>
                     </label>
-                    <span class="pl-8 invalid-feedback text-danger">Ceklist terlebuh dahulu.</span>
-                    <span class="ml-8 pl-3 border-left border-5 border-success font-italic">Menyatakan bahwa dokumen ini telah melalui proses peninjauan dan disetujui, sehingga dapat dipublikasikan dan diberlakukan secara resmi.</span>
+                    <span class="pl-9 invalid-feedback text-danger">Ceklist terlebuh dahulu.</span>
+                    <span class="ml-9 pl-3 border-left border-5 border-success font-italic">Menyatakan bahwa dokumen ini telah melalui proses peninjauan dan disetujui, sehingga dapat dipublikasikan dan diberlakukan secara resmi.</span>
                 </div>
                 <br>
-                <br>
-                <div class="pl-8">
+                <div class="pl-9">
                     <strong>Published Date</strong>
-                    <input type="date" name="published_date" min="<?= date('Y-m-d', strtotime(date('Y-m-d') . '-7 days')); ?>" id="published_date" class="form-control" placeholder="Published Date">
+                    <input type="date" name="published_date" min="<?= date('Y-m-d', strtotime(date('Y-m-d') . '-7 days')); ?>" value="<?= date('Y-m-d'); ?>" id="published_date" class="form-control" placeholder="Published Date">
                     <span class="invalid-feedback text-danger">Harus di isi</span>
                 </div>
             </div>
             <hr>
-            <div class="form-group pb-5">
+            <div class="form-group">
                 <div class="checkbox-inline">
                     <label class="status checkbox checkbox-outline checkbox-outline-2x checkbox-danger">
                         <input type="checkbox" class="status" name="status" value="COR" />
                         <span></span>
                         <h5>Perlu Perbaikan</h5>
                     </label>
-                    <span class="pl-8 invalid-feedback text-danger">Ceklist terlebuh dahulu.</span>
-                    <span class="ml-8 pl-3 border-left border-5 border-danger font-italic">Menyatakan bahwa dokumen ini belum dapat disetujui dan memerlukan perbaikan serta koreksi sesuai dengan catatan dan alasan yang disampaikan.</span>
+                    <span class="pl-9 invalid-feedback text-danger">Ceklist terlebuh dahulu.</span>
+                    <span class="ml-9 pl-3 border-left border-5 border-danger font-italic">Menyatakan bahwa dokumen ini belum dapat disetujui dan memerlukan perbaikan serta koreksi sesuai dengan catatan dan alasan yang disampaikan.</span>
                 </div>
             </div>
 
-            <div class="form-group">
+            <div class="form-group pl-9">
                 <textarea name="note" disabled rows="5" id="note" class="form-control" placeholder="Note"></textarea>
                 <span class="invalid-feedback text-danger">Harus di isi</span>
             </div>
-            <button type="button" class="btn btn-light-info" id="save-approval"><i class="fab fa-telegram-plane"></i>Submit</button>
+            <button type="button" class="btn btn-light-info" id="save-approval"><i class="fab fa-telegram-plane"></i> Submit to Publish</button>
         </form>
     </div>
     <div class="tab-pane fade" id="filetab" role="tabpanel" aria-labelledby="file-">
