@@ -1240,7 +1240,10 @@
 				}
 			})
 		})
+	
 
+
+		
 		$(document).on('change', ".dropzone", function() {
 			readFile(this);
 		});
@@ -2115,6 +2118,11 @@
 		})
 
 	})
+
+
+	function loadDetailProcedure(id) {
+		$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + id)
+	}
 
 
 	function reload_form(pro_id) {

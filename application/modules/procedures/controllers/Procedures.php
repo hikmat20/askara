@@ -94,10 +94,10 @@ class Procedures extends Admin_Controller
 		$languange 		= ['english'];
 
 		if ($Data) {
-			$Data_detail = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$Data_detail = $this->db->order_by('number asc')->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$grProcess   = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
-			$getForms    = $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-			$getGuides   = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getForms    = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
+			$getGuides   = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
 			$getRecords  = $this->db->get_where('dir_records', ['procedure_id' => $id, 'status !=' => 'DEL', 'flag_type' => 'FOLDER', 'parent_id' => null])->result();
 			$users       = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 			$jabatan     = $this->db->get_where('positions', ['company_id' => $this->company])->result();
@@ -413,6 +413,10 @@ class Procedures extends Admin_Controller
 		echo json_encode($Return);
 	}
 
+	// public function loadFlow($id){
+	// 	$data = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+	// 	$this->load->view('load_flow', compact('data'));
+	// }
 	private function _save_upload()
 	{
 		$data = $this->input->post('forms');
@@ -587,8 +591,8 @@ class Procedures extends Admin_Controller
 		$Data_detail = '';
 		if ($id) {
 			$Data_detail 	= $this->db->order_by('number asc')->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
-			$getForms	= $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-			$getguides	= $this->db->get_where('work_instuctions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+			$getForms	= $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
+			$getguides	= $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
 			$ArrForms = [];
 			foreach ($getForms as $frm) {
 				$ArrForms[$frm->id] = $frm;
