@@ -3,6 +3,41 @@
 	.record-item:hover td>span {
 		color: #0bb783;
 	}
+
+
+	.bg-hover-light-o:hover {
+		-webkit-transition: all .15s ease;
+		transition: all .15s ease;
+		background-color: rgba(243, 246, 249, .1) !important
+	}
+
+	.bg-light-o-15.nav-link.active {
+		background-color: rgba(255, 255, 255, 1) !important;
+		color: #000000 !important;
+	}
+
+	.bg-light-o-15.nav-link.active i {
+		color: #5d5d5dff !important;
+	}
+
+
+	.bg-light-o-15 {
+		background-color: rgba(243, 246, 249, .15)
+	}
+
+	.nav.nav-pills.nav-light-white .nav-item .nav-link.active .badge {
+		background-color: rgba(232, 178, 0, 1) !important;
+		color: #ffffffff !important;
+		opacity: 1 !important;
+	}
+
+	.border-light-o-10 {
+		border-color: rgba(243, 246, 249, .1) !important
+	}
+
+	.border-warning-o-10 {
+		border-color: rgba(212, 178, 6, 1)
+	}
 </style>
 <div class="content d-flex flex-column flex-column-fluid p-0">
 	<div class="d-flex flex-column-fluid justify-content-between align-items-top">
@@ -20,58 +55,46 @@
 					</li>
 				</ul>
 			</div>
-			<h1 class="text-white fa-3x mb-5"><?= $procedures[0]->name; ?></h1>
+			<h1 class="text-warning fa-3x mb-5"><?= $procedures[0]->name; ?></h1>
 			<div class="row mb-5">
-				<div class="col-md-4">
+				<!-- <div class="col-md-4">
 					<input type="text" name="serarch" id="search" placeholder="Pencarian" class="form-control rounded form-control-sm">
-				</div>
+				</div> -->
 			</div>
-			<ul class="nav nav-warning nav-pills nav-bolder" id="myTab2" role="tablist">
-				<li class="nav-item mx-0">
-					<a class="rounded-bottom-0 nav-link active" id="tab_procedure" data-toggle="tab" href="#data_procedure">
-						<span class="nav-icon ">
-							<i class="fa fa-file-alt"></i>
-						</span>
-						<span class="text-white h5 my-0">Prosedur
-							<small class="">
-								<div class="badge bg-white rounded-circle text-warning"><?= (isset($procedures)) ? count($procedures) : '0'; ?></div>
-							</small>
+			<ul class="nav nav-pills nav-light-white" id="myTab2" role="tablist">
+				<li class="nav-item mr-2">
+					<a class="rounded-bottom-0 bg-light-o-15 bg-hover-light-o border-light-o-10 border-x border-top nav-link active" id="tab_procedure" data-toggle="tab" href="#data_procedure">
+						<span class="mr-2"><i class="fa fa-file-alt"></i></span>
+						<span class="">Prosedur</span>
+						<span class="ml-2">
+							<strong class="badge bg-warning-o-70 text-warning text-bolder"><?= (isset($procedures)) ? count($procedures) : '0'; ?></strong>
 						</span>
 					</a>
 				</li>
-				<li class="nav-item mx-0">
-					<a class="rounded-bottom-0 nav-link" id="tab_form" data-toggle="tab" href="#data_form">
-						<span class="nav-icon ">
-							<i class="fa fa-file-alt"></i>
-						</span>
-						<span class="text-white h5 my-0">Form
-							<small class="">
-								<div class="badge bg-white rounded-circle text-warning"><?= (isset($forms)) ? count($forms) : '0'; ?></div>
-							</small>
+				<li class="nav-item mr-2">
+					<a class="rounded-bottom-0 bg-light-o-15 bg-hover-light-o border-light-o-10 border-x border-top nav-link" id="tab_form" data-toggle="tab" href="#data_form">
+						<span class="mr-2"><i class="fa fa-file-alt"></i></span>
+						<span class="">Form </span>
+						<span class="ml-2">
+							<strong class="badge bg-warning-o-70 text-warning text-bolder"><?= (isset($forms)) ? count($forms) : '0'; ?></strong>
 						</span>
 					</a>
 				</li>
-				<li class="nav-item mx-0">
-					<a class="rounded-bottom-0 nav-link" id="tab_guide" data-toggle="tab" href="#data_guide">
-						<span class="nav-icon ">
-							<i class="fa fa-file-alt"></i>
-						</span>
-						<span class="text-white h5 my-0">IK
-							<small class="">
-								<div class="badge bg-white rounded-circle text-warning"><?= (isset($ik)) ? count($ik) : '0'; ?></div>
-							</small>
+				<li class="nav-item mr-2">
+					<a class="rounded-bottom-0 bg-light-o-15 bg-hover-light-o border-light-o-10 border-x border-top nav-link" id="tab_guide" data-toggle="tab" href="#data_guide">
+						<span class="mr-2"><i class="fa fa-file-alt"></i></span>
+						<span class="">IK</span>
+						<span class="ml-2">
+							<strong class="badge bg-warning-o-70  text-warning text-bolder"><?= (isset($ik)) ? count($ik) : '0'; ?></strong>
 						</span>
 					</a>
 				</li>
-				<li class="nav-item mx-0">
-					<a class="rounded-bottom-0 nav-link" id="tab_record" data-toggle="tab" href="#data_record">
-						<span class="nav-icon ">
-							<i class="fa fa-file-alt"></i>
-						</span>
-						<span class="text-white h5 my-0">Records
-							<small class="">
-								<div class="badge bg-white rounded-circle text-warning"><?= (isset($countRecords)) ? ($countRecords) : '0'; ?></div>
-							</small>
+				<li class="nav-item mr-2">
+					<a class="rounded-bottom-0 bg-light-o-15 bg-hover-light-o border-light-o-10 border-x border-top nav-link" id="tab_record" data-toggle="tab" href="#data_record">
+						<span class="mr-2"><i class="fa fa-file-alt"></i></span>
+						<span class="">Records</span>
+						<span class="ml-2">
+							<strong class="badge bg-warning-o-70  text-warning text-bolder"><?= (isset($countRecords)) ? ($countRecords) : '0'; ?></strong>
 						</span>
 					</a>
 				</li>
@@ -83,23 +106,24 @@
 							<table class="table datatable table-hover">
 								<thead>
 									<tr class="">
-										<th class="py-2" width="15px">No.</th>
-										<th class="py-2 px-3" width="200">Number</th>
-										<th class="py-2 px-3">File Name</th>
-										<th class="py-2 px-3 text-center" width="200">Published At</th>
-										<th class="py-2 px-3 text-center" width="100">Revision</th>
-										<th class="py-2 text-center" width="50px">View</th>
+										<th class="" width="15px">No.</th>
+										<th class="" width="200">Number</th>
+										<th class="">File Name</th>
+										<th class="text-center" width="200">Published At</th>
+										<th class="text-center" width="100">Revision</th>
+										<th class="text-center" width="50px">View</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php if (isset($procedures)) :
 										$no = 0;
 										foreach ($procedures as $pro) : $no++; ?>
-											<tr class="cursor-pointer text-dark h6">
+											<tr class="">
 												<td class="align-middle"><?= $no; ?></td>
 												<td><?= $pro->nomor; ?></td>
 												<td class="align-middle d-flex align-items-center">
-													<i class="fa fa-file-alt text-primary font-size-h2 mr-2"></i><?= $pro->name; ?>
+													<i class="fa fa-file-alt text-primary font-size-h2 mr-2"></i>
+													<strong> <?= $pro->name; ?></strong>
 												</td>
 												<td class="text-center"><?= $pro->published_at; ?></td>
 												<td class="text-center"><?= $pro->revision; ?></td>
@@ -117,27 +141,39 @@
 							</table>
 						</div>
 						<div class="tab-pane fade" id="data_form" role="tabpanel" aria-labelledby="tab_form">
-							<table class="table table-condensed table-hover">
+							<table class="table datatable table-hover">
 								<thead>
 									<tr class="">
-										<th class="py-2 border-2 border-bottom-secondary" width="15px">No.</th>
-										<th class="py-2 border-2 border-bottom-secondary" width="250">Number</th>
-										<th class="py-2 border-2 border-bottom-secondary text-center">File Name</th>
-										<th class="py-2 border-2 border-bottom-secondary text-center" width="50px">View</th>
+										<th class="" width="15px">No.</th>
+										<th class="" width="200">Number</th>
+										<th class="">File Name</th>
+										<th class="text-center" width="100">Type</th>
+										<th class="text-center" width="100">Revision</th>
+										<th class="text-center" width="100">Issue Date</th>
+										<th class="text-center" width="100">Effective Date</th>
+										<th class="text-center" width="80">Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php if (isset($forms)) :
 										$no = 0;
 										foreach ($forms as $frm) : $no++; ?>
-											<tr class="cursor-pointer view-form text-dark h6" data-id="<?= $frm->id; ?>">
+											<tr class="view-orm" data-id="<?= $frm->id; ?>">
 												<td class="text-dark"><?= $no; ?></td>
-												<td class=" text-dark"><?= $frm->number; ?></td>
-												<td class="align-middle d-flex align-items-center">
-													<i class="fa fa-file-alt text-success font-size-h2 mr-2"></i><?= $frm->name; ?>
+												<td class="text-dark align-middle"><strong><?= $frm->number; ?></strong></td>
+												<td class="align-middle">
+													<strong><?= $frm->name; ?></strong>
+													<p class="text-muted small mb-0">Last update : <?= ($frm->modified_at) ? date('d M Y', strtotime($frm->modified_at)) : (isset($frm->created_at) ? date('d M Y', strtotime($frm->created_at)) : '~'); ?></p>
 												</td>
+												<td class="text-center align-middle"><i class="fa <?= extention($frm->ext) ?>"></i>
+													<p class="small text-muted mb-0"><?= ($frm->size) ? formatBytes($frm->size) : '~'; ?></p>
+												</td>
+												<td class="text-center align-middle">Rev <?= $frm->revision_number; ?></td>
+												<td class="text-center align-middle"><?= ($frm->issue_date) ? date('d M Y', strtotime($frm->issue_date)) : '-'; ?></td>
+												<td class="text-center align-middle"><?= ($frm->effective_date) ? date('d M Y', strtotime($frm->effective_date)) : '-'; ?></td>
 												<td class="text-center" style="vertical-align: middle;">
-													<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-form" data-id="<?= $frm->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
+													<button type="button" class="btn btn-icon btn-xs btn-light-info view-form" data-id="<?= $frm->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
+													<button type="button" class="btn btn-icon btn-xs btn-light-primary download-form" data-id="<?= $frm->id; ?>" data-toggle="tooltip" data-theme="dark" title="Download Document"><i class="fa fa-download"></i></button>
 												</td>
 											</tr>
 										<?php endforeach;
@@ -150,27 +186,38 @@
 							</table>
 						</div>
 						<div class="tab-pane fade" id="data_guide" role="tabpanel" aria-labelledby="tab_guide">
-							<table class="table table-condensed table-hover">
+							<table class="table datatable table-hover">
 								<thead>
 									<tr class="">
-										<th class="py-2 border-2 border-bottom-secondary" width="15px">No.</th>
-										<th class="py-2 border-2 border-bottom-secondary" width="250">Number</th>
-										<th class="py-2 border-2 border-bottom-secondary text-center">File Name</th>
-										<th class="py-2 border-2 border-bottom-secondary text-center" width="50px">View</th>
+										<th class="" width="15px">No.</th>
+										<th class="" width="200">Number</th>
+										<th class="">File Name</th>
+										<th class="text-center" width="100px">Type</th>
+										<th class="text-center" width="100px">Revision</th>
+										<th class="text-center" width="100px">Issue Date</th>
+										<th class="text-center" width="100px">Effective Date</th>
+										<th class="text-center" width="80px">Action</th>
 									</tr>
 								</thead>
 								<tbody>
 									<?php if (isset($ik)) :
 										$no = 0;
 										foreach ($ik as $i) : $no++; ?>
-											<tr class="cursor-pointer text-dark h6 view-wi" data-id="<?= $i->id; ?>">
+											<tr class="view-" data-id="<?= $i->id; ?>">
 												<td class="text-dark"><?= $no; ?></td>
-												<td class="text-dark"><?= $i->number; ?></td>
-												<td class="align-middle d-flex align-items-center">
-													<i class="fa fa-file-alt text-info font-size-h2 mr-2"></i><?= $i->name; ?>
+												<td class="text-dark align-middle"><strong><?= $i->number; ?></strong></td>
+												<td class="align-middle">
+													<strong><?= $i->name; ?></strong>
+													<p class="text-muted small mb-0">Last update : <?= ($i->modified_at) ? date('d M Y', strtotime($i->modified_at)) : (isset($i->created_at) ? date('d M Y', strtotime($i->created_at)) : '~'); ?></p>
 												</td>
+												<td class="text-center align-middle"><i class="fa <?= extention($i->ext) ?>"></i>
+													<p class="small text-muted mb-0"><?= ($i->size) ? formatBytes($i->size) : '~'; ?></p>
+												</td>
+												<td class="text-center align-middle">Rev <?= $i->revision_number; ?></td>
+												<td class="text-center align-middle"><?= ($i->issue_date) ? date('d M Y', strtotime($i->issue_date)) : '-'; ?></td>
+												<td class="text-center align-middle"><?= ($i->effective_date) ? date('d M Y', strtotime($i->effective_date)) : '-'; ?></td>
 												<td class="text-center" style="vertical-align: middle;">
-													<button type="button" class="btn btn-icon btn-xs shadow-xs btn-info view-wi" data-id="<?= $i->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
+													<button type="button" class="btn btn-icon btn-xs btn-light-info view-wi" data-id="<?= $i->id; ?>" data-toggle="tooltip" data-theme="dark" title="View Document"><i class="fa fa-eye"></i></button>
 												</td>
 											</tr>
 										<?php endforeach;
@@ -186,19 +233,19 @@
 							<div id="data-records">
 								<!-- Nav tabs -->
 								<ul class="nav pb-2 nav-success nav-tabs nav-pills" id="navId">
-									<li class="nav-item">
+									<li class="nav-item mr-2">
 										<a href="javascript:void(0)" id="home" data-id="" data-procedure="<?= $procedures[0]->id; ?>" class="nav-link py-2 px-3">
 											<i class="fa fa-home mr-2"></i>
 											Home
 										</a>
 									</li>
-									<li class="nav-item">
+									<li class="nav-item mr-2">
 										<a href="javascript:void(0)" id="back" data-parent="<?= isset($parent_id) ? $parent_id : ''; ?>" data-procedure="<?= $procedures[0]->id; ?>" class="disabled nav-link py-2 px-3">
 											<i class="fa fa-arrow-up mr-2"></i>
 											Up Folder
 										</a>
 									</li>
-									<li class="nav-item">
+									<li class="nav-item mr-2">
 										<a href="javascript:void(0)" id="refresh" data-parent="<?= isset($parent_id) ? $parent_id : ''; ?>" data-procedure="<?= $procedures[0]->id; ?>" class="nav-link py-2 px-3">
 											<i class="fa fa-sync-alt mr-2"></i>
 											Refresh
@@ -432,6 +479,26 @@
 	}
 
 	$(document).ready(function() {
+
+		/* Datatable */
+
+		$('.datatable').DataTable({
+			stateSave: true,
+			order: [
+				[0, 'desc']
+			],
+		});
+
+		$(document).on('click', '.download-form', function() {
+			const id = $(this).data('id')
+
+			if (id) {
+				window.open(siteurl + active_controller + '/download_form/' + id, '_blank');
+			}
+
+		})
+
+
 		$(document).on('click', '.view-procedure', function() {
 			const id = $(this).data('id') || ''
 			if (id) {

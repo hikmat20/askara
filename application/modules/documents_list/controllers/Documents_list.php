@@ -703,4 +703,23 @@ class Documents_list extends Admin_Controller
 
 		$this->template->render('cross/all-cross');
 	}
+
+
+
+
+	/* DOWNLOAD FORM */
+	public function download_form($id)
+	{
+		$this->db->select('file_name')->from('forms')->where('id', $id)->where('company_id', $this->company)->where('is_active', 'ACT')->where('file_name IS NOT NULL');
+		$data = $this->db->get()->row();
+		$file_path = 'directory/FORMS/1/';
+
+		if ($data) {
+			$file_path = FCPATH . $file_path . $data->file_name;
+			if (file_exists($file_path)) {
+				$this->load->helper('download');
+				force_download($file_path, NULL);
+			}
+		}
+	}
 }

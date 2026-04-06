@@ -64,6 +64,84 @@ class Procedure_model extends BF_Model
     parent::__construct();
   }
 
+  public function getDataProcedureById($id)
+  {
+    /* join with departement and group procedure*/
+    $this->db->select('procedures.*, departements.name as departement_name, group_procedure.name as group_name');
+    $this->db->from('procedures');
+    $this->db->join('departements', 'procedures.departement_id = departements.id');
+    $this->db->join('group_procedure', 'procedures.group_procedure = group_procedure.id');
+    $this->db->where('procedures.id', $id);
+    return $this->db->get()->row();
+  }
+
+  public function getBilingualProcedure($id)
+  {
+    return $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
+  }
+
+  public function getRevisionLogProcedure($id)
+  {
+    return $this->db->get_where('procedure_revision_logs', ['procedure_id' => $id])->result();
+  }
+
+  public function getArrayDepartements()
+  {
+    $data = $this->db->get_where('departements', ['status' => '1'])->result_array();
+    return array_column($data, 'name', 'id');
+  }
+
+  public function getArrayPosition()
+  {
+    $data = $this->db->get_where('positions')->result_array();
+    return array_column($data, 'name', 'id');
+  }
+
+  public function getArrayUser()
+  {
+    $data = $this->db->get_where('users', ['status' => 'ACT'])->result_array();
+    return array_column($data, 'full_name', 'id_user');
+  }
+
+  public function getArrayForm($id)
+  {
+    $data = $this->db->get_where('forms', ['procedure_id' => $id, 'is_active' => 'ACT'])->result_array();
+    return array_column($data, 'name', 'id');
+  }
+
+  public function getArrayWorkInstruction($id)
+  {
+    $data = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'is_active' => 'ACT'])->result_array();
+    return array_column($data, 'name', 'id');
+  }
+
+  public function getDetailProcedureById($id)
+  {
+    $data = $this->db->get_where('procedure_details', ['procedure_id' => $id])->result();
+    return $data;
+  }
+
+  public function getActivityProcedure($id)
+  {
+    $data = $this->db->order_by('last_update', 'desc')->get_where('procedure_activity_logs', ['procedure_id' => $id])->result();
+    return $data;
+  }
+
+  public function viewDataProcedure($id)
+  {
+    $data['procedure']     = $this->getDataProcedureById($id);
+    $data['bilingual']    = $this->getBilingualProcedure($id);
+    $data['revision_logs'] = $this->getRevisionLogProcedure($id);
+    $data['depts']         = $this->getArrayDepartements();
+    $data['positions']     = $this->getArrayPosition();
+    $data['users']         = $this->getArrayUser();
+    $data['detail']        = $this->getDetailProcedureById($id);
+    $data['activity']      = $this->getActivityProcedure($id);
+    $data['company']      = $this->session->userdata['company'];
+
+    return $data;
+  }
+
   private function _update_history($data, $procedure)
   {
     $dataLog = [
@@ -78,7 +156,7 @@ class Procedure_model extends BF_Model
     if ($procedure->status == 'DFT') {
       $dataLog['note'] = 'Procesed to review procedure';
     }
-    
+
     $this->db->insert('directory_log', $dataLog);
   }
 

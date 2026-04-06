@@ -55,7 +55,6 @@ class Procedures extends Admin_Controller
 			$ArrReason[$rvi->directory_id] = $rvi;
 		};
 
-
 		$this->template->set('title', 'List of Procedures');
 		$this->template->set([
 			'dataDraft' => $dataDraft,
@@ -211,16 +210,18 @@ class Procedures extends Admin_Controller
 
 	public function view($id = '', $status = '')
 	{
-		$Data 				= $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
-		$bilingual 			= $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
-		$users 				= $this->db->get_where('view_users')->result();
-		$getForms			= $this->db->get_where('forms', ['procedure_id' => $id])->result();
-		$getGuides			= $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
-		$jabatan 			= $this->db->get('positions')->result();
-		$ArrUsr 			= $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
-		$depts 			= $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
-		$company 			= $this->session->company;
-		$revision_logs       = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
+		$result = $this->ProcedureModel->viewDataProcedure($id);
+
+		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
+		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
+		$users         = $this->db->get_where('view_users')->result();
+		$getForms      = $this->db->get_where('forms', ['procedure_id' => $id])->result();
+		$getGuides     = $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
+		$jabatan       = $this->db->get('positions')->result();
+		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
+		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		$company       = $this->session->company;
+		$revision_logs = $this->db->get_where('procedure_revision_logs', ['company_id' => $this->company, 'procedure_id' => $id, 'status' => '1'])->result();
 
 
 		foreach ($getForms as $frm) {
@@ -244,21 +245,22 @@ class Procedures extends Admin_Controller
 
 		if ($Data) {
 			$Data_detail 		= $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
-			$this->template->set([
-				'title'	        => 'Procedures',
-				'data'          => $Data,
-				'bilingual'     => $bilingual,
-				'detail'        => $Data_detail,
-				'users'	        => $users,
-				'jabatan'       => $jabatan,
-				'ArrUsr'        => $ArrUsr,
-				'ArrJab'        => $ArrJab,
-				'ArrDept'       => $ArrDept,
-				'ArrForms'      => $ArrForms,
-				'ArrGuides'     => $ArrGuides,
-				'company'       => $company,
-				'revision_logs' => $revision_logs,
-			]);
+			$this->template->set($result);
+			// $this->template->set([
+			// 	'title'	        => 'Procedures',
+			// 	'data'          => $Data,
+			// 	'bilingual'     => $bilingual,
+			// 	'detail'        => $Data_detail,
+			// 	'users'	        => $users,
+			// 	'jabatan'       => $jabatan,
+			// 	'ArrUsr'        => $ArrUsr,
+			// 	'ArrJab'        => $ArrJab,
+			// 	'ArrDept'       => $ArrDept,
+			// 	'ArrForms'      => $ArrForms,
+			// 	'ArrGuides'     => $ArrGuides,
+			// 	'company'       => $company,
+			// 	'revision_logs' => $revision_logs,
+			// ]);
 			$this->template->render('view');
 		} else {
 			$data = [
@@ -582,13 +584,13 @@ class Procedures extends Admin_Controller
 
 	public function add_flow($id = null)
 	{
-		$this->load->model('setting/Setting_model','SettingModel');
+		$this->load->model('setting/Setting_model', 'SettingModel');
 		$flow 	  = '';
 		$language = ['english'];
 		$cross_dept = $this->SettingModel->getSettingByName('cross_departement');
 		$forms      = $this->FormModel->find_all_by(['procedure_id' => $id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
 		$guides    = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'company_id' => $this->company, 'status !=' => 'DEL'])->result();
-		if($cross_dept == 1){
+		if ($cross_dept == 1) {
 			$forms     = $this->db->get_where('forms', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
 			$guides     = $this->WiModel->find_all_by(['is_active' => 'ACT', 'status !=' => 'DEL']);
 		}
@@ -607,8 +609,8 @@ class Procedures extends Admin_Controller
 
 	public function edit_flow($proc_id = null, $id = null)
 	{
-		$this->load->model('setting/Setting_model','SettingModel');
-		
+		$this->load->model('setting/Setting_model', 'SettingModel');
+
 		$language = ['english'];
 		if ($proc_id && $id) {
 			$flow       = $this->db->get_where('procedure_details', ['id' => $id])->row();
@@ -616,7 +618,7 @@ class Procedures extends Admin_Controller
 			$cross_dept = $this->SettingModel->getSettingByName('cross_departement');
 			$forms      = $this->FormModel->find_all_by(['procedure_id' => $proc_id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
 			$guides    = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'company_id' => $this->company, 'status !=' => 'DEL'])->result();
-			if($cross_dept == 1){
+			if ($cross_dept == 1) {
 				$forms     = $this->db->get_where('forms', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
 				$guides     = $this->WiModel->find_all_by(['is_active' => 'ACT', 'status !=' => 'DEL']);
 			}
