@@ -80,14 +80,14 @@ class Work_instruction_model extends BF_Model
 
           $uploadFile        = $this->_uploadFile();
 
-          if ($uploadFile['status'] == 1) {
-            $fileData = $uploadFile['data'];
+          // if ($uploadFile['status'] == 1) {
+            $fileData = $uploadFile;
             $Data['file_name'] = $fileData['file_name'];
             $Data['size']      = $fileData['size'];
             $Data['ext']       = $fileData['ext'];
-          } else {
-            throw new Exception($uploadFile['error']);
-          }
+          // } else {
+          //   throw new Exception($uploadFile['error']);
+          // }
         }
 
         if (isset($Data['id']) && $Data['id']) {
@@ -133,7 +133,7 @@ class Work_instruction_model extends BF_Model
     $config['upload_path']   = $path; //path folder
     $config['allowed_types'] = 'pdf'; //type yang dapat diakses bisa anda sesuaikan
     $config['encrypt_name']  = false; //Enkripsi nama yang terupload
-    $config['max_size']      = 2048;
+    $config['max_size']      = 10048;
     $config['remove_spaces'] = true;
     $config['file_name']     = slugify($Data['number'] . '-' . $Data['name']) . '-' . date('Ymd') . '-' . bin2hex(random_bytes(6));
 
@@ -143,17 +143,11 @@ class Work_instruction_model extends BF_Model
       $data['file_name'] = $file['file_name'];
       $data['size']      = $file['file_size'];
       $data['ext']       = $file['file_ext'];
-      return  [
-        'status' => 1,
-        'data'   => $data
-      ];
+      return $data;
     else :
       $error = $this->upload->display_errors();
-      $Return = [
-        'status' => 0,
-        'error'   => $error
-      ];
-      return $Return;
+    
+      throw new Exception($error);
     endif;
   }
 

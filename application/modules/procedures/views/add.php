@@ -459,19 +459,19 @@
 														<div class="form-group row">
 															<label class="col-12 col-form-label"><span class="text-danger">*</span> Prepared By :</label>
 															<div class="col-12">
-																<select name="prepared_by" id="prepared_by" class="form-control select2">;
+																<select name="prepared_id" id="prepared_id" class="form-control select2">;
 																	<option value=""></option>
-																	<?php foreach ($users as $usr) : ?>
-																		<option value="<?= $usr->id_user; ?>"><?= $usr->full_name; ?></option>
+																	<?php foreach ($jabatan as $jbt) : ?>
+																		<option value="<?= $jbt->id; ?>"><?= $jbt->name; ?></option>
 																	<?php endforeach; ?>
 																</select>
 																<span class="form-text text-danger invalid-feedback">Prepared By harus di isi</span>
 															</div>
 														</div>
-
+<!-- 
 														<div class="form-group">
 															<h5 class="col-12 px-0"><span class="text-danger">*</span> This document requires approval :</h5>
-														</div>
+														</div> -->
 
 														<div class="form-group row">
 															<label class="col-lg-3"><span class="text-danger">*</span> Review By</label>

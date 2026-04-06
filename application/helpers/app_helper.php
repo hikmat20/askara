@@ -785,3 +785,83 @@ if (!function_exists('slugify')) {
         return $string;
     }
 }
+
+if (!function_exists('extention')) {
+    function extention($ext)
+    {
+        // param is .ext
+        $ext = str_replace('.', '', $ext);
+
+
+        // with color is file type
+        $ArrExt = [
+            'pdf' => 'fa-file-pdf text-danger',
+            'doc' => 'fa-file-word text-primary',
+            'docx' => 'fa-file-word text-primary',
+            'xls' => 'fa-file-excel text-success',
+            'xlsx' => 'fa-file-excel text-success',
+            'ppt' => 'fa-file-powerpoint text-warning',
+            'pptx' => 'fa-file-powerpoint text-warning',
+            'jpg' => 'fa-file-image text-info',
+            'jpeg' => 'fa-file-image text-info',
+            'png' => 'fa-file-image text-info',
+            'gif' => 'fa-file-image text-info',
+            'txt' => 'fa-file-alt text-muted',
+            'rar' => 'fa-file-archive text-danger',
+            'zip' => 'fa-file-archive text-danger',
+            '7z' => 'fa-file-archive text-danger',
+            'html' => 'fa-file-code text-warning',
+            'htm' => 'fa-file-code text-warning',
+            'css' => 'fa-file-code text-warning',
+            'js' => 'fa-file-code text-warning',
+            'php' => 'fa-file-code text-warning',
+            'sql' => 'fa-file-code text-warning',
+            'xml' => 'fa-file-code text-warning',
+            'json' => 'fa-file-code text-warning',
+            'csv' => 'fa-file-csv text-warning',
+            'md' => 'fa-file-markdown text-warning',
+            'py' => 'fa-file-code text-warning',
+            'java' => 'fa-file-code text-warning',
+            'c' => 'fa-file-code text-warning',
+            'cpp' => 'fa-file-code text-warning',
+            'h' => 'fa-file-code    ',
+            'hpp' => 'fa-file-code text-warning',
+            'cs' => 'fa-file-code text-warning',
+            'rb' => 'fa-file-code text-warning',
+            'go' => 'fa-file-code text-warning',
+            'swift' => 'fa-file-code text-warning',
+            'kt' => 'fa-file-code text-warning',
+            'rs' => 'fa-file-code text-warning',
+            'dart' => 'fa-file-code text-warning',
+            'lua' => 'fa-file-code text-warning',
+            'sh' => 'fa-file-code text-warning',
+            'bat' => 'fa-file-code text-warning',
+            'ps1' => 'fa-file-code text-warning',
+            'psm1' => 'fa-file-code text-warning',
+            'psd' => 'fa-file-image text-primary',
+            'ai' => 'fa-file-image text-primary',
+            'eps' => 'fa-file-image text-primary',
+            'svg' => 'fa-file-image text-primary',
+            'dwg' => 'fa-file-image text-primary',
+            'dxf' => 'fa-file-image text-primary',
+            
+        ];
+        return $ArrExt[$ext];
+    }
+}
+
+if (!function_exists('formatBytes')) {
+    function formatBytes($bytes, $precision = 2)
+    {
+        $units = ['B', 'KB', 'MB', 'GB', 'TB'];
+
+        $bytes = max($bytes, 0);
+        $pow = floor(log($bytes, 1024));
+        $pow = min($pow, count($units) - 1);
+
+        $bytes /= (1 << (10 * $pow));
+
+        return round($bytes, $precision) . ' ' . $units[$pow];
+    }
+}
+

@@ -223,7 +223,7 @@
 												<td class=""><?= $dt->nomor; ?></td>
 												<td class=""><?= $dt->departement_name; ?></td>
 												<td class=""><?= $dt->group_name; ?></td>
-												<td class=""><?= isset($ArrReason[$dt->id]->note) ? $ArrReason[$dt->id]->note: '-'; ?></td>
+												<td class=""><?= isset($ArrReason[$dt->id]->note) ? $ArrReason[$dt->id]->note : '-'; ?></td>
 												<td class=""><?= $status[$dt->status]; ?></td>
 												<td class="">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
@@ -351,20 +351,18 @@
 	</div>
 </div>
 
-<div class="modal fade" id="modalView" data-keyboard="true" tabindex="-1" aria-labelledby="modal-view" aria-hidden="true">
+<div class="modal fade" id="modalView" aria-labelledby="modal-view" aria-hidden="true">
 	<div class="modal-dialog modal-xl modal-dialog-scrollable" role="document">
-		<div class="modal-content" data-scroll="true" data-height="700">
-			<div class="">
-				<div class="modal-header py-2">
-					<h6 class="modal-title" id="modal-view">View Procedure</h6>
-					<span type="button" onclick="$('#name').val('')" class="btn-close" data-dismiss="modal" aria-label="Close">
-						<i class="fa fa-times"></i>
-					</span>
-				</div>
-				<div class="modal-body py-2"></div>
-				<div class="modal-footer">
-					<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#name').val('')"><i class="fa fa-times"></i>Close</button>
-				</div>
+		<div class="modal-content">
+			<div class="modal-header py-2">
+				<h6 class="modal-title" id="modal-view">View Procedure</h6>
+				<span type="button" onclick="$('#name').val('')" class="btn-close" data-dismiss="modal" aria-label="Close">
+					<i class="fa fa-times"></i>
+				</span>
+			</div>
+			<div class="modal-body py-2"></div>
+			<div class="modal-footer py-1">
+				<button type="button" class="btn btn-danger" data-dismiss="modal" onclick="$('#name').val('')"><i class="fa fa-times"></i>Close</button>
 			</div>
 		</div>
 	</div>

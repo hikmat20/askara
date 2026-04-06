@@ -6,31 +6,26 @@
 					<h4 class="text-dark font-weight-bold my-1 mr-2"><i class="fa fa-home"></i></h4>
 				</a>
 				<ul class="breadcrumb breadcrumb-transparent breadcrumb-dot font-weight-bold p-0 my-2 font-size-sm">
-					<li class="breadcrumb-item text-muted">
-						PROSEDUR, FORM, IK DAN RECORD
-					</li>
+					<li class="breadcrumb-item text-muted">PROSEDUR, FORM, IK DAN RECORD</li>
 				</ul>
 			</div>
-			<h1 class="text-white fa-3x mb-5">PROSEDUR, FORM, IK DAN RECORD</h1>
+			<h1 class="text-warning fa-3x mb-5">PROSEDUR, FORM, IK DAN RECORD</h1>
 			<div class="row mb-5">
 				<div class="col-md-4">
-					<input type="text" name="serarch" id="search" placeholder="Pencarian" class="form-control rounded form-control-sm">
+					<!-- <input type="text" name="serarch" id="search" placeholder="Pencarian" class="form-control rounded form-control-sm"> -->
 				</div>
 			</div>
 			<div class="row">
 				<div class="col-md-12">
-					<ul class="nav nav-warning nav-pills nav-bolder" id="myTab2" role="tablist">
+					<ul class="nav nav-pills nav-bolder" id="myTab2" role="tablist">
 						<?php $n = 0;
 						foreach ($groups as $grp) : $n++; ?>
-							<li class="nav-item mx-0">
-								<a class="rounded-bottom-0 nav-link  <?= ($n == '1') ? 'active' : ''; ?>" id="tab_<?= $grp->id; ?>" data-toggle="tab" href="#data_<?= $grp->id; ?>">
-									<span class="nav-icon ">
-										<i class="fa fa-file-alt"></i>
-									</span>
-									<span class="text-white h5 my-0"><?= $grp->name; ?>
-										<small class="">
-											<div class="badge bg-white rounded-circle text-warning"><?= (isset($ArrPro[$grp->id])) ? count($ArrPro[$grp->id]) : '0'; ?></div>
-										</small>
+							<li class="nav-item mr-2">
+								<a class="rounded-bottom-0 bg-light-o-15 bg-hover-light-o border-light-o-10 border-x border-top nav-link <?= ($n == '1') ? 'active' : ''; ?>" id="tab_<?= $grp->id; ?>" data-toggle="tab" href="#data_<?= $grp->id; ?>">
+									<span class="nav-icon "><i class="fa fa-file-alt"></i></span>
+									<span><?= $grp->name; ?></span>
+									<span class="ml-2">
+										<div class="badge bg-warning-o-70 text-warning text-bolder"><?= (isset($ArrPro[$grp->id])) ? count($ArrPro[$grp->id]) : '0'; ?></div>
 									</span>
 								</a>
 							</li>
@@ -116,6 +111,41 @@
 	#DataTables_Table_2_filter {
 		display: none;
 	}
+
+
+	.bg-hover-light-o:hover {
+		-webkit-transition: all .15s ease;
+		transition: all .15s ease;
+		background-color: rgba(243, 246, 249, .1) !important
+	}
+
+	.bg-light-o-15.nav-link.active {
+		background-color: rgba(255, 255, 255, 1) !important;
+		color: #000000 !important;
+	}
+
+	.bg-light-o-15.nav-link.active i {
+		color: #5d5d5dff !important;
+	}
+
+
+	.bg-light-o-15 {
+		background-color: rgba(243, 246, 249, .15)
+	}
+
+	.nav.nav-pills.nav-light-white .nav-item .nav-link.active .badge {
+		background-color: rgba(232, 178, 0, 1) !important;
+		color: #ffffffff !important;
+		opacity: 1 !important;
+	}
+
+	.border-light-o-10 {
+		border-color: rgba(243, 246, 249, .1) !important
+	}
+
+	.border-warning-o-10 {
+		border-color: rgba(212, 178, 6, 1)
+	}
 </style>
 <script>
 	function show(id) {
@@ -128,8 +158,8 @@
 			$.fn.dataTable.tables({
 				visible: true,
 				api: true,
-				searching: false,
-				lengthChange: false,
+				// searching: false,
+				// lengthChange: false,
 				paging: true,
 				info: false,
 				stateSave: true,
@@ -140,10 +170,10 @@
 		});
 
 		oTable = $('.datatable').DataTable({
-			layout: {
-				topStart:'',
-				topEnd:'',
-			},
+			// layout: {
+			// 	topStart:'',
+			// 	topEnd:'',
+			// },
 			language: {
 				searchPanes: {
 					i18n: {
