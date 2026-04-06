@@ -17,9 +17,6 @@
 </style>
 
 
-
-
-
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" id="navId">
   <li class="nav-item">
@@ -349,7 +346,7 @@
               <?php endforeach;
             else : ?>
               <tr>
-                <td colspan="4" class="text-center">~ Not available data ~</td>
+                <td colspan="5" class="text-center">~ Not available data ~</td>
               </tr>
             <?php endif; ?>
           </tbody>
@@ -360,6 +357,7 @@
   <div class="tab-pane fade" id="tab2Id" role="tabpanel">
     <div class="card mb-3">
       <div class="card-body p-2">
+        <br>
         <h4>RIWAYAT DOKUMEN</h4>
         <table class="table table-sm">
           <thead>
@@ -375,7 +373,7 @@
                 <tr>
                   <td class="text-center"><?= $revisionLog->revision_number; ?></td>
                   <td class="text-center"><?= $revisionLog->revision_date; ?></td>
-                  <td class=""><?= $ArrUsr[$revisionLog->created_by]->full_name; ?></td>
+                  <td class=""><?= $users[$revisionLog->created_by]; ?></td>
                   <td><?= $revisionLog->description; ?></td>
                 </tr>
               <?php endforeach; ?>
@@ -392,8 +390,7 @@
     </div>
   </div>
   <div class="tab-pane fade" id="tab3Id" role="tabpanel">
-    <hr>
-
+    <br>
     <h4>DATA APPROVAL</h4>
     <table class="table table-sm table-bordered">
       <thead>
@@ -432,14 +429,15 @@
     <iframe src="<?= base_url($this->uri->segment(1) . '/printfile/' . $procedure->id); ?>#toolbar=0&navpanes=0&scrollbar=0" frameborder="0" style="width: 100%;height:70vh"></iframe>
   </div>
   <div class="tab-pane fade" id="tab5Id" role="tabpanel">
+    <br>
     <div class="row overflow-auto">
-      <div class="col-md-2"></div>
+      <div class="col-md-1"></div>
       <div class="col-md-8">
         <!-- <label for="">Tracking File</label> -->
         <div class="timeline timeline-5">
           <div class="timeline-items">
             <div class="timeline-item">
-              <div class="timeline-media bg-light-primary">
+              <!-- <div class="timeline-media bg-light-primary">
                 <i class="fa fa-upload text-success"></i>
               </div>
               <div class="timeline-desc timeline-desc-light-primary">
@@ -448,24 +446,22 @@
                 <p class="font-weight-normal text-dark-50 pb-2">
                   To start a blog, think of a topic about and first brainstorm ways to write details
                 </p>
-              </div>
+              </div> -->
             </div>
-            <?php if (isset($history)) :
-              foreach ($history as $his) : ?>
+            <?php if (isset($logs)) :
+              foreach ($logs as $log) : ?>
                 <div class="timeline-item">
-                  <div class="timeline-media <?= ($his->new_status == 'OPN') ? 'bg-light-success' : 'bg-light-danger'; ?>">
-                    <span class="<?= ($his->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-danger'; ?>"></span>
+                  <div class="timeline-media <?= ($log->new_status == 'OPN') ? 'bg-light-success' : 'bg-light-primary'; ?>">
+                    <span class="<?= ($log->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-primary'; ?>"></span>
                   </div>
 
-                  <div class="timeline-desc timeline-desc-light-danger">
-                    <span class="font-weight-bolder text-danger"> <?= $his->updated_at; ?></span>
-                    <?php //$sts[$his->status]; 
-                    ?>
-                    <p>
-                      <?= $his->note; ?>
-                    </p>
+                  <div class="timeline-desc timeline-desc-light-primary">
+                    <p class="font-weight-bolder text-primary mb-0"> <?= $log->note; ?></p>
+                    <!-- <div class="card card-stretch d-inline-block border-left border-y-0 border-right-0 my-1 bg-light border-primary border-3">
+                      <div class="card-body p-2"></div>
+                    </div> -->
                     <p class="font-weight-normal text-dark-50 pt-1">
-                      <span class="badge badge-danger">by <?= $his->full_name; ?></span>
+                      <span class=" text-muted">Updated at <strong><?= $log->updated_at; ?></strong> by <strong><?= $log->full_name; ?></strong></span>
                     </p>
                   </div>
                 </div>

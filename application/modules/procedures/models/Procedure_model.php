@@ -67,12 +67,7 @@ class Procedure_model extends BF_Model
   public function getDataProcedureById($id)
   {
     /* join with departement and group procedure*/
-    $this->db->select('procedures.*, departements.name as departement_name, group_procedure.name as group_name');
-    $this->db->from('procedures');
-    $this->db->join('departements', 'procedures.departement_id = departements.id');
-    $this->db->join('group_procedure', 'procedures.group_procedure = group_procedure.id');
-    $this->db->where('procedures.id', $id);
-    return $this->db->get()->row();
+    return $this->db->get_where('view_procedures', ['id' => $id])->row();
   }
 
   public function getBilingualProcedure($id)
@@ -94,6 +89,7 @@ class Procedure_model extends BF_Model
   public function getArrayPosition()
   {
     $data = $this->db->get_where('positions')->result_array();
+    
     return array_column($data, 'name', 'id');
   }
 
@@ -127,17 +123,26 @@ class Procedure_model extends BF_Model
     return $data;
   }
 
+  // getLogsProcedure
+  public function getLogsProcedure($id)
+  {
+    return $this->db->get_where('view_directory_log', ['directory_id' => $id])->result();
+  }
+
   public function viewDataProcedure($id)
   {
-    $data['procedure']     = $this->getDataProcedureById($id);
-    $data['bilingual']    = $this->getBilingualProcedure($id);
-    $data['revision_logs'] = $this->getRevisionLogProcedure($id);
-    $data['depts']         = $this->getArrayDepartements();
-    $data['positions']     = $this->getArrayPosition();
-    $data['users']         = $this->getArrayUser();
-    $data['detail']        = $this->getDetailProcedureById($id);
-    $data['activity']      = $this->getActivityProcedure($id);
-    $data['company']      = $this->session->userdata['company'];
+    $data['procedure']         = $this->getDataProcedureById($id);
+    $data['bilingual']         = $this->getBilingualProcedure($id);
+    $data['revision_logs']     = $this->getRevisionLogProcedure($id);
+    $data['depts']             = $this->getArrayDepartements();
+    $data['positions']         = $this->getArrayPosition();
+    $data['users']             = $this->getArrayUser();
+    $data['detail']            = $this->getDetailProcedureById($id);
+    $data['activity']          = $this->getActivityProcedure($id);
+    $data['forms']             = $this->getArrayForm($id);
+    $data['work_instructions'] = $this->getArrayWorkInstruction($id);
+    $data['company']           = $this->session->userdata['company'];
+    $data['logs']              = $this->getLogsProcedure($id);
 
     return $data;
   }
