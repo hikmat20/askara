@@ -362,7 +362,6 @@
 		<button type="button" class="btn btn-sm shadow-xs border w-60px btn-icon bg-white mr-2 zoom-in" title="Zoom In"><i class="fa fa-plus"></i></button>
 		<button type="button" class="btn btn-sm shadow-xs border w-60px btn-icon bg-white mr-2" id="close-modal"><i class="fa fa-times"></i></button>
 	</div>
-
 	<img class="modal-content-img" id="img01">
 </div>
 
@@ -503,7 +502,7 @@
 			const id = $(this).data('id') || ''
 			if (id) {
 				$('#modelId').modal('show')
-				$('#modelId .modal-body').load(siteurl + active_controller + 'view_procedure/' + id)
+				$('#modelId .modal-body').load(siteurl +'procedures/view/' + id)
 			}
 		})
 	})
