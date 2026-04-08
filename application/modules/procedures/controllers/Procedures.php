@@ -306,7 +306,7 @@ class Procedures extends Admin_Controller
 			} else {
 				$Data['created_by'] = $this->auth->user_id();
 				$Data['created_at'] = date('Y-m-d H:i:s');
-				$Data['prepaded_by'] = $this->auth->user_id();
+				$Data['prepared_by'] = $this->auth->user_id();
 				$this->db->insert('procedures', $Data);
 				$pro_id = $this->db->order_by('id', 'DESC')->get_where('procedures')->row()->id;
 				$thisData = $this->db->get_where('procedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
