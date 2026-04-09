@@ -144,12 +144,21 @@ class Form_model extends BF_Model
     $config['upload_path']   = $path; //path folder
     $config['allowed_types'] = 'pdf|xlsx|xls|docx'; //type yang dapat diakses bisa anda sesuaikan
     $config['encrypt_name']  = false; //Enkripsi nama yang terupload
-    $config['max_size']      = 5148;
+    $config['max_size']      = 5120;
     $config['remove_spaces'] = true;
     $config['file_name']     = slugify($Data['number'] . '-' . $Data['name']) . '-' . date('Ymd') . '-' . bin2hex(random_bytes(6));
     $this->upload->initialize($config);
-    if ($this->upload->do_upload('form_file')) :
-      $file              = $this->upload->data();
+    if (!$this->upload->do_upload('form_file')) :
+      $error = $this->upload->display_errors();
+      return [
+        'status' => 0,
+        'error' => $error
+      ];
+
+    /* Convert to PDF */
+
+    else :
+       $file              = $this->upload->data();
       $data['file_name'] = $file['file_name'];
       $data['size']      = $file['file_size'];
       $data['ext']       = $file['file_ext'];
@@ -161,16 +170,6 @@ class Form_model extends BF_Model
       return [
         'status' => 1,
         'data' => $data
-      ];
-
-    /* Convert to PDF */
-
-    else :
-      $error = $this->upload->display_errors();
-     
-      return [
-        'status' => 0,
-        'error' => $error
       ];
     endif;
   }
