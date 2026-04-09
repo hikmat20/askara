@@ -142,6 +142,27 @@ class Forms extends Admin_Controller
 			]);
 			return;
 		}
+
+		// Handler khusus jika file melebihi upload_max_filesize di php.ini
+		if (isset($_FILES['form_file']['error']) && $_FILES['form_file']['error'] == UPLOAD_ERR_INI_SIZE) {
+			$maxSize = ini_get('upload_max_filesize');
+			echo json_encode([
+				'status' => 0,
+				'msg' => "Ukuran file form terlalu besar, melebihi konfigurasi server (Maksimal: {$maxSize})."
+			]);
+			return;
+		}
+
+		// Handler khusus jika request POST melebihi kapasitas post_max_size di php.ini
+		if (empty($_POST) && isset($_SERVER['CONTENT_LENGTH']) && $_SERVER['CONTENT_LENGTH'] > 0) {
+			$maxSize = ini_get('post_max_size');
+			echo json_encode([
+				'status' => 0,
+				'msg' => "Total beban payload/file terlalu besar melebihi kapasitas memori request (Maksimal: {$maxSize})."
+			]);
+			return;
+		}
+
 		$validated = $this->_validation();
 		if ($validated) {
 			echo json_encode([
@@ -152,6 +173,7 @@ class Forms extends Admin_Controller
 		}
 
 		$Return = $this->FormModel->saveData();
+		
 		echo json_encode($Return);
 	}
 

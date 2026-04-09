@@ -78,60 +78,58 @@ class Form_model extends BF_Model
 
   public function saveData()
   {
-
     try {
-
       $Data = $this->input->post();
 
+      if (empty($Data)) {
+        throw new Exception('No data provided to save.');
+      }
+
       $this->db->trans_begin();
-      if ($Data) {
-        $Data['company_id'] = 1;
 
-        if (isset($_FILES['form_file']) && $_FILES['form_file']['name'] != '') {
+      $Data['company_id'] = 1;
 
-          $uploadFile        = $this->_uploadFile();
+      if (!empty($_FILES['form_file']['name'])) {
+        $uploadFile = $this->_uploadFile();
 
-          if ($uploadFile['status'] == 1) {
-            $Data['file_name'] = $uploadFile['data']['file_name'];
-            $Data['size']      = $uploadFile['data']['size'];
-            $Data['ext']       = $uploadFile['data']['ext'];
-          } else {
-            $error = $uploadFile['error'];
-            throw new Exception($error);
-          }
-        }
-
-        if (isset($Data['id']) && $Data['id']) {
-          $Data['modified_by'] = $this->auth->user_id();
-          $Data['modified_at'] = date('Y-m-d H:i:s');
-          $this->update($Data['id'], $Data);
+        if ($uploadFile['status'] == 1) {
+          $Data['file_name'] = $uploadFile['data']['file_name'];
+          $Data['size']      = $uploadFile['data']['size'];
+          $Data['ext']       = $uploadFile['data']['ext'];
         } else {
-          $Data['created_by'] = $this->auth->user_id();
-          $Data['created_at'] = date('Y-m-d H:i:s');
-
-          $this->insert($Data);
+          throw new Exception($uploadFile['error']);
         }
       }
 
-      if ($this->db->trans_status() === FALSE) {
-        $this->db->trans_rollback();
+      $id = !empty($Data['id']) ? $Data['id'] : null;
 
-        throw new Exception('Failed to save data form . Please try again.');
+      if ($id) {
+        $Data['modified_by'] = $this->auth->user_id();
+        $Data['modified_at'] = date('Y-m-d H:i:s');
+        $save = $this->update($id, $Data);
       } else {
-        $this->db->trans_commit();
-        $Return    = array(
-          'status'    => 1,
-          'msg'      => 'Data Form successfully saved..',
-        );
+        $Data['created_by']  = $this->auth->user_id();
+        $Data['created_at']  = date('Y-m-d H:i:s');
+        $save = $this->insert($Data);
       }
+
+      if (!$save || $this->db->trans_status() === FALSE) {
+        throw new Exception('Failed to save data form . Please try again.');
+      }
+
+      $this->db->trans_commit();
+      
+      return [
+        'status' => 1,
+        'msg'    => 'Data Form successfully saved..',
+      ];
     } catch (\Throwable $th) {
       $this->db->trans_rollback();
-      $Return    = array(
-        'status'    => 0,
-        'msg'      => $th->getMessage(),
-      );
+      return [
+        'status' => 0,
+        'msg'    => $th->getMessage(),
+      ];
     }
-    return $Return;
   }
 
   private function _uploadFile()
@@ -146,10 +144,9 @@ class Form_model extends BF_Model
     $config['upload_path']   = $path; //path folder
     $config['allowed_types'] = 'pdf|xlsx|xls|docx'; //type yang dapat diakses bisa anda sesuaikan
     $config['encrypt_name']  = false; //Enkripsi nama yang terupload
-    $config['max_size']      = 2048;
+    $config['max_size']      = 5148;
     $config['remove_spaces'] = true;
     $config['file_name']     = slugify($Data['number'] . '-' . $Data['name']) . '-' . date('Ymd') . '-' . bin2hex(random_bytes(6));
-
     $this->upload->initialize($config);
     if ($this->upload->do_upload('form_file')) :
       $file              = $this->upload->data();
@@ -160,8 +157,7 @@ class Form_model extends BF_Model
       $excelPath = $file['full_path'];
       $pdfPath = str_replace('.xlsx', '.pdf', $excelPath);
       // $convert = $this->_convert_excel_to_pdf($excelPath, $pdfPath);
-
-  
+   
       return [
         'status' => 1,
         'data' => $data
@@ -171,6 +167,7 @@ class Form_model extends BF_Model
 
     else :
       $error = $this->upload->display_errors();
+     
       return [
         'status' => 0,
         'error' => $error
