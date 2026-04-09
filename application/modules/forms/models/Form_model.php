@@ -136,6 +136,13 @@ class Form_model extends BF_Model
   {
     $path = FCPATH . "directory/FORMS/1/";
     $Data = $this->input->post();
+    
+    if (empty($_FILES['form_file']['name'])) {
+      return [
+        'status' => 0,
+        'error' => 'File gagal diupload. Kemungkinan ukuran file melebihi batas server.'
+      ];
+    }
 
     if (!is_dir($path)) {
       mkdir($path, 0755, TRUE);
