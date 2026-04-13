@@ -20,19 +20,24 @@
 <!-- Nav tabs -->
 <ul class="nav nav-tabs" id="navId">
   <li class="nav-item">
-    <a href="#tab1Id" data-toggle="tab" data-target="#tab1Id" class="nav-link active"><i class="fa fa-list-alt mr-2"></i> Data Procedure</a>
+    <a href="#tab1Id" data-toggle="tab" data-target="#tab1Id" class="nav-link active"><i
+        class="fa fa-list-alt mr-2"></i> Data Procedure</a>
   </li>
   <li class="nav-item">
-    <a href="#tab2Id" data-toggle="tab" data-target="#tab2Id" class="nav-link"><i class="fa fa-history mr-2"></i> Revision History</a>
+    <a href="#tab2Id" data-toggle="tab" data-target="#tab2Id" class="nav-link"><i class="fa fa-history mr-2"></i>
+      Revision History</a>
   </li>
   <li class="nav-item">
-    <a href="#tab3Id" data-toggle="tab" data-target="#tab3Id" class="nav-link"><i class="fa fa-check-double mr-2"></i> Approval</a>
+    <a href="#tab3Id" data-toggle="tab" data-target="#tab3Id" class="nav-link"><i class="fa fa-check-double mr-2"></i>
+      Approval</a>
   </li>
   <li class="nav-item">
-    <a href="#tab4Id" data-toggle="tab" data-target="#tab4Id" class="nav-link"><i class="fa fa-file-alt mr-2"></i> Preview File</a>
+    <a href="#tab4Id" data-toggle="tab" data-target="#tab4Id" class="nav-link"><i class="fa fa-file-alt mr-2"></i>
+      Preview File</a>
   </li>
   <li class="nav-item">
-    <a href="#tab5Id" data-toggle="tab" data-target="#tab5Id" class="nav-link"><i class="far fa-file-alt mr-2"></i> Logs</a>
+    <a href="#tab5Id" data-toggle="tab" data-target="#tab5Id" class="nav-link"><i class="far fa-file-alt mr-2"></i>
+      Logs</a>
   </li>
 </ul>
 
@@ -43,7 +48,8 @@
       <tr>
         <td rowspan="5" width="30%" class="text-center" style="vertical-align: middle;border-right:0px">
           <div class="d-flex justify-content-center align-items-center g-3 gap-3">
-            <img width="80" class="img-fluid mr-4" src="<?= base_url() . $company->path_logo . $company->id_perusahaan . '/' . $company->logo; ?>" alt="">
+            <img width="80" class="img-fluid mr-4"
+              src="<?= base_url() . $company->path_logo . $company->id_perusahaan . '/' . $company->logo; ?>" alt="">
             <h3><?= $company->nm_perusahaan; ?></h3>
           </div>
         </td>
@@ -234,48 +240,57 @@
 
         <!-- FLOW IMAGE -->
         <h3>FLOW IMAGE & FILE</h3>
-        <?php if ($procedure->image_flow_1 || $procedure->image_flow_2 || $procedure->image_flow_3) : ?>
+        <?php if ($procedure->image_flow_1 || $procedure->image_flow_2 || $procedure->image_flow_3): ?>
           <div class="d-flex justify-content-start align-items-center">
-            <?php if ($procedure->image_flow_1) : ?>
-              <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+            <?php if ($procedure->image_flow_1): ?>
+              <div class="dropzone-wrapper mr-2 d-flex align-items-center"
+                style="width: 200px;height:200px;border:1px solid #eaeaea">
                 <div class="dropzone-desc">
-                  <?php if ($procedure->image_flow_1) : ?>
-                    <img src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_1"); ?>" alt="image_flow_1" class="img-fluid">
+                  <?php if ($procedure->image_flow_1): ?>
+                    <img src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_1"); ?>"
+                      alt="image_flow_1" class="img-fluid">
                   <?php endif; ?>
                 </div>
-                <?php if ($procedure->image_flow_1) : ?>
+                <?php if ($procedure->image_flow_1): ?>
                   <div class="middle d-flex justify-content-center align-items-center">
-                    <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i class="fa fa-search"></i></button>
+                    <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i
+                        class="fa fa-search"></i></button>
                   </div>
                 <?php endif; ?>
               </div>
             <?php endif; ?>
 
-            <?php if ($procedure->image_flow_2) : ?>
-              <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+            <?php if ($procedure->image_flow_2): ?>
+              <div class="dropzone-wrapper mr-2 d-flex align-items-center"
+                style="width: 200px;height:200px;border:1px solid #eaeaea">
                 <div class="dropzone-desc">
-                  <?php if ($procedure->image_flow_2) : ?>
-                    <img src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_2"); ?>" alt="image_flow_2" class="img-fluid">
+                  <?php if ($procedure->image_flow_2): ?>
+                    <img src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_2"); ?>"
+                      alt="image_flow_2" class="img-fluid">
                   <?php endif; ?>
                 </div>
-                <?php if ($procedure->image_flow_2) : ?>
+                <?php if ($procedure->image_flow_2): ?>
                   <div class="middle d-flex justify-content-center align-items-center">
-                    <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i class="fa fa-search"></i></button>
+                    <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i
+                        class="fa fa-search"></i></button>
                   </div>
                 <?php endif; ?>
               </div>
             <?php endif; ?>
 
-            <?php if ($procedure->image_flow_3) : ?>
-              <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+            <?php if ($procedure->image_flow_3): ?>
+              <div class="dropzone-wrapper mr-2 d-flex align-items-center"
+                style="width: 200px;height:200px;border:1px solid #eaeaea">
                 <div class="dropzone-desc">
-                  <?php if ($procedure->image_flow_3) : ?>
-                    <img src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_3"); ?>" alt="image_flow_3" class="img-fluid">
+                  <?php if ($procedure->image_flow_3): ?>
+                    <img src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_3"); ?>"
+                      alt="image_flow_3" class="img-fluid">
                   <?php endif; ?>
                 </div>
-                <?php if ($procedure->image_flow_3) : ?>
+                <?php if ($procedure->image_flow_3): ?>
                   <div class="middle d-flex justify-content-center align-items-center">
-                    <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i class="fa fa-search"></i></button>
+                    <button type="button" class="btn btn-sm mr-1 btn-icon btn-default view-image rounded-circle"><i
+                        class="fa fa-search"></i></button>
                   </div>
                 <?php endif; ?>
               </div>
@@ -284,15 +299,18 @@
           </div>
         <?php endif; ?>
         <?php if (isset($procedure->flow_file)): ?>
-          <div class="dropzone-wrapper mr-2 d-flex align-items-center" style="width: 200px;height:200px;border:1px solid #eaeaea">
+          <div class="dropzone-wrapper mr-2 d-flex align-items-center"
+            style="width: 200px;height:200px;border:1px solid #eaeaea">
             <div class="dropzone-desc">
-              <?php if ($procedure->flow_file) : ?>
+              <?php if ($procedure->flow_file): ?>
                 <canvas id="pdf-preview" class="" width="150"></canvas>
               <?php endif; ?>
             </div>
-            <?php if ($procedure->flow_file) : ?>
+            <?php if ($procedure->flow_file): ?>
               <div class="middle d-flex justify-content-center align-items-center">
-                <a target="_blank" href="<?= base_url("directory/FLOW_FILE/$procedure->company_id/$procedure->flow_file"); ?>" class="btn btn-sm mr-1 btn-icon btn-default rounded-circle"><i class="fa fa-eye"></i></a>
+                <a target="_blank"
+                  href="<?= base_url("directory/FLOW_FILE/$procedure->company_id/$procedure->flow_file"); ?>"
+                  class="btn btn-sm mr-1 btn-icon btn-default rounded-circle"><i class="fa fa-eye"></i></a>
               </div>
             <?php endif; ?>
           </div>
@@ -301,9 +319,9 @@
 
         <!-- VIDEO -->
         <h3>VIDEO</h3>
-        <?php if ($procedure->link_video) : ?>
+        <?php if ($procedure->link_video): ?>
           <?= ($procedure->link_video); ?>
-        <?php else : ?>
+        <?php else: ?>
           <span>~</span>
         <?php endif; ?>
 
@@ -320,8 +338,8 @@
             </tr>
           </thead>
           <tbody>
-            <?php if ($detail) :
-              foreach ($detail as $dtl) : ?>
+            <?php if ($detail):
+              foreach ($detail as $dtl): ?>
                 <tr>
                   <td class="text-center"><?= $dtl->number; ?></td>
                   <td class="text-center"><?= $dtl->pic; ?></td>
@@ -329,22 +347,28 @@
                   <td class="wd-25" style="color:#0088ffff"><?= $dtl->description_2; ?></td>
                   <td class="">
                     <?php $relDocs = json_decode($dtl->relate_doc); ?>
-                    <?php if (is_array($relDocs)) : ?>
+                    <?php if (is_array($relDocs)): ?>
                       <?php foreach ($relDocs as $relDoc) { ?>
-                        <span class="d-block badge btn <?= ($ArrForms[$relDoc]->status == 'DEL') ? 'btn-light' : 'bg-success btn-success'; ?>  view-form mb-1" data-id="<?= $relDoc; ?>"><?= $ArrForms[$relDoc]->name; ?> <?= ($ArrForms[$relDoc]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger" title="File has been deleted!"></i>' : ''; ?></span>
+                        <?php if (isset($forms[$relDoc])): ?>
+                          <span class="badge btn bg-success btn-success view-form mb-1"
+                            data-id="<?= $relDoc; ?>"><?= $forms[$relDoc]; ?></span>
+                        <?php endif; ?>
                       <?php } ?>
                     <?php endif; ?>
 
                     <?php $relIk = json_decode($dtl->relate_ik_doc); ?>
-                    <?php if (is_array($relIk)) : ?>
+                    <?php if (is_array($relIk)): ?>
                       <?php foreach ($relIk as $ik) { ?>
-                        <span class="d-block badge btn <?= ($ArrGuides[$ik]->status == 'DEL') ? 'btn-light' : 'bg-danger btn-danger'; ?> view-guide mb-1" data-id="<?= $ik; ?>"><?= $ArrGuides[$ik]->name; ?> <?= ($ArrGuides[$ik]->status == 'DEL') ? '<i class="fa fa-exclamation-circle text-danger"  title="File has been deleted!"></i>' : ''; ?></span>
+                        <?php if (isset($work_instructions[$ik])): ?>
+                          <span class="badge btn bg-danger btn-danger view-guide mb-1"
+                            data-id="<?= $ik; ?>"><?= $work_instructions[$ik]; ?></span>
+                        <?php endif; ?>
                       <?php } ?>
                     <?php endif; ?>
                   </td>
                 </tr>
               <?php endforeach;
-            else : ?>
+            else: ?>
               <tr>
                 <td colspan="5" class="text-center">~ Not available data ~</td>
               </tr>
@@ -369,7 +393,8 @@
             </tr>
           </thead>
           <tbody>
-            <?php if (isset($revision_logs) && count($revision_logs) > 0): foreach ($revision_logs as $revisionLog): ?>
+            <?php if (isset($revision_logs) && count($revision_logs) > 0):
+              foreach ($revision_logs as $revisionLog): ?>
                 <tr>
                   <td class="text-center"><?= $revisionLog->revision_number; ?></td>
                   <td class="text-center"><?= $revisionLog->revision_date; ?></td>
@@ -426,7 +451,9 @@
     </table>
   </div>
   <div class="tab-pane fade" id="tab4Id" role="tabpanel">
-    <iframe src="<?= base_url($this->uri->segment(1) . '/printfile/' . $procedure->id); ?>#toolbar=0&navpanes=0&scrollbar=0" frameborder="0" style="width: 100%;height:70vh"></iframe>
+    <iframe
+      src="<?= base_url($this->uri->segment(1) . '/printfile/' . $procedure->id); ?>#toolbar=0&navpanes=0&scrollbar=0"
+      frameborder="0" style="width: 100%;height:70vh"></iframe>
   </div>
   <div class="tab-pane fade" id="tab5Id" role="tabpanel">
     <br>
@@ -448,11 +475,12 @@
                 </p>
               </div> -->
             </div>
-            <?php if (isset($logs)) :
-              foreach ($logs as $log) : ?>
+            <?php if (isset($logs)):
+              foreach ($logs as $log): ?>
                 <div class="timeline-item">
                   <div class="timeline-media <?= ($log->new_status == 'OPN') ? 'bg-light-success' : 'bg-light-primary'; ?>">
-                    <span class="<?= ($log->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-primary'; ?>"></span>
+                    <span
+                      class="<?= ($log->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-primary'; ?>"></span>
                   </div>
 
                   <div class="timeline-desc timeline-desc-light-primary">
@@ -461,11 +489,12 @@
                       <div class="card-body p-2"></div>
                     </div> -->
                     <p class="font-weight-normal text-dark-50 pt-1">
-                      <span class=" text-muted">Updated at <strong><?= $log->updated_at; ?></strong> by <strong><?= $log->full_name; ?></strong></span>
+                      <span class=" text-muted">Updated at <strong><?= $log->updated_at; ?></strong> by
+                        <strong><?= $log->full_name; ?></strong></span>
                     </p>
                   </div>
                 </div>
-            <?php endforeach;
+              <?php endforeach;
             endif; ?>
           </div>
         </div>
@@ -475,9 +504,9 @@
 </div>
 
 <script>
-  $(document).ready(function() {
+  $(document).ready(function () {
     let id = '<?= $procedure->id; ?>'
-    $.getJSON(siteurl + active_controller + 'load_file_flow/' + id, function(result) {
+    $.getJSON(siteurl + active_controller + 'load_file_flow/' + id, function (result) {
       var data = result.data
       var d = ''
       const url = siteurl + 'directory/FLOW_FILE/' + data.company_id + '/' + data.flow_file;
@@ -510,7 +539,7 @@
 
     PDFJS.getDocument({
       url: pdf_url
-    }).then(function(pdf_doc) {
+    }).then(function (pdf_doc) {
       _PDF_DOC = pdf_doc;
 
       // Show the first page
@@ -518,7 +547,7 @@
 
       // destroy previous object url
       URL.revokeObjectURL(_OBJECT_URL);
-    }).catch(function(error) {
+    }).catch(function (error) {
       // trigger Cancel on error
       $("#cancel-pdf").click();
       // alert(error.message);
@@ -528,7 +557,7 @@
   function showPage(page_no) {
     var _CANVAS = document.querySelector('#pdf-preview');
     // fetch the page
-    _PDF_DOC.getPage(page_no).then(function(page) {
+    _PDF_DOC.getPage(page_no).then(function (page) {
       // set the scale of viewport
       var scale_required = _CANVAS.width / page.getViewport(1).width;
 
@@ -544,7 +573,7 @@
       };
 
       // render the page contents in the canvas
-      page.render(renderContext).then(function() {
+      page.render(renderContext).then(function () {
         $("#pdf-preview").css('display', 'inline-block');
         $("#pdf-loader").css('display', 'none');
       });

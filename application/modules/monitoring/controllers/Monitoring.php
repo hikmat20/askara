@@ -117,8 +117,8 @@ class Monitoring extends Admin_Controller
 
 	public function view($id = null, $type = null)
 	{
-		$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+		$file          = $this->db->get_where('procedures', ['id' => $id])->row();
+		$history       = $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
 		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users         = $this->db->get_where('view_users')->result();

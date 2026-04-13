@@ -79,7 +79,6 @@ class Work_instructions extends Admin_Controller
 	private function _validation()
 	{
 		$this->load->library('form_validation');
-
 		$this->form_validation->set_rules('name', 'Document Name', 'required|trim');
 		$this->form_validation->set_rules('departement_id', 'Departement', 'required|trim');
 		$this->form_validation->set_rules('number', 'Number', 'required|trim');
@@ -140,7 +139,6 @@ class Work_instructions extends Admin_Controller
 
 	public function saveReview()
 	{
-
 		$this->load->library('form_validation');
 		$postDatat = $this->input->post();
 
