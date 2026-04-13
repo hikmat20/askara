@@ -101,13 +101,13 @@ class Procedure_model extends BF_Model
 
   public function getArrayForm($id)
   {
-    $data = $this->db->get_where('forms', ['procedure_id' => $id, 'is_active' => 'ACT'])->result_array();
+    $data = $this->db->get_where('view_forms', ['status !=' => 'DEL'])->result_array();
     return array_column($data, 'name', 'id');
   }
 
   public function getArrayWorkInstruction($id)
   {
-    $data = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'is_active' => 'ACT'])->result_array();
+    $data = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result_array();
     return array_column($data, 'name', 'id');
   }
 
