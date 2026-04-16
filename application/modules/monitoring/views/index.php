@@ -94,7 +94,7 @@
             </div>
         </div>
 
-        <div class="pt-3">
+        <div class="pt-3 d-none">
             <h3 class="text-white mt-0 pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Other Document</h3>
             <div class="d-flex justify-content-start align-items-center">
 

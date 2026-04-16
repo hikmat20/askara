@@ -126,6 +126,10 @@ class Monitoring_model extends BF_Model
                     throw new Exception('Failed process review document. Please try again later.');
                 } else {
                     $this->db->trans_commit();
+                    
+                    // Trigger email notification
+                    $this->_send_email_notification($data['id'], $data['status'], isset($data['note']) ? $data['note'] : '');
+
                     $Return = [
                         'status' => 1,
                         'msg'     => 'Success process review document...'
@@ -178,6 +182,10 @@ class Monitoring_model extends BF_Model
                     throw new Exception("Error Processing Request");
                 } else {
                     $this->db->trans_commit();
+                    
+                    // Trigger email notification
+                    $this->_send_email_notification($data['id'], $data['status'], isset($data['note']) ? $data['note'] : '');
+
                     $Return = [
                         'status' => 1,
                         'msg'     => 'Success Approve document.'
@@ -222,6 +230,10 @@ class Monitoring_model extends BF_Model
                     throw new ErrorException('Failed to submit revision document.');
                 } else {
                     $this->db->trans_commit();
+                    
+                    // Trigger email notification
+                    $this->_send_email_notification($data['id'], $data['status'], isset($data['note']) ? $data['note'] : '');
+
                     $Return = [
                         'status' => 1,
                         'msg'    => 'Success submit revision document file...'
@@ -492,8 +504,8 @@ class Monitoring_model extends BF_Model
         // watermark
         $procedure           = $this->db->get_where('view_procedures', ['id' => $procedure_id])->row();
         $flowDetail          = $this->db->get_where('procedure_details', ['procedure_id' => $procedure_id, 'status' => '1'])->result();
-        $getForms            = $this->db->get_where('dir_forms', ['procedure_id' => $procedure_id, 'status !=' => 'DEL'])->result();
-        $getGuides           = $this->db->get_where('dir_guides', ['procedure_id' => $procedure_id, 'status !=' => 'DEL'])->result();
+        $getForms            = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
+        $getGuides           = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
         $users               = $this->db->get_where('view_users', ['company_id' => $company_id])->result();
         $jabatan             = $this->db->get('positions')->result();
         $ArrUsr              = $ArrJab = $ArrDept = $ArrForms = $ArrGuides = [];
@@ -640,5 +652,93 @@ class Monitoring_model extends BF_Model
     public function getWi($id)
     {
         return $this->db->get_where('work_instructions', ['id' => $id])->row();
+    }
+
+    /**
+     * Mengirim notifikasi email sesuai perubahan status (Workflow)
+     */
+    private function _send_email_notification($procedure_id, $new_status, $note = '')
+    {
+        $procedure = $this->db->get_where('procedures', ['id' => $procedure_id])->row();
+        if (!$procedure) return;
+
+        // Tentukan target *position_id* dan *user_id* berdasarkan status baru
+        $target_position_ids = [];
+        $target_user_ids = [];
+        
+        $subject_prefix = "[Askara Document] ";
+        $message = "<h3>Notifikasi Dokumen Kontrol</h3>";
+        $message .= "<p>Dokumen prosedur <strong>" . $procedure->name . "  (" . $procedure->nomor . ")</strong> mengalami pembaruan status.</p>";
+        
+        switch ($new_status) {
+            case 'REV':
+                $target_position_ids[] = $procedure->reviewer_id;
+                $subject = $subject_prefix . "Membutuhkan Review Anda";
+                $message .= "<p>Dokumen telah diajukan kepada Anda untuk proses <strong>Review</strong>. Harap segera diperiksa.</p>";
+                break;
+            case 'COR':
+                $target_user_ids[] = $procedure->created_by; // creator adalah user pure
+                if ($procedure->prepared_id) $target_position_ids[] = $procedure->prepared_id;
+                $subject = $subject_prefix . "Dokumen Membutuhkan Koreksi";
+                $message .= "<p>Dokumen Anda dikembalikan karena membutuhkan <strong>Koreksi</strong>.</p>";
+                break;
+            case 'APV':
+                $target_position_ids[] = $procedure->approval_id;
+                $subject = $subject_prefix . "Membutuhkan Approval Anda";
+                $message .= "<p>Dokumen telah lolos review dan kini menunggu tahapan akhir <strong>Approval</strong> dari Anda.</p>";
+                break;
+            case 'PUB':
+                $target_user_ids[] = $procedure->created_by;
+                $target_position_ids[] = $procedure->reviewer_id;
+                $target_position_ids[] = $procedure->approval_id;
+                $subject = $subject_prefix . "Dokumen Telah Rilis (Published)";
+                $message .= "<p>Dokumen telah disetujui secara keseluruhan dan resmi berstatus <strong>Published / Rilis</strong>.</p>";
+                break;
+            case 'RVI':
+                $target_user_ids[] = $procedure->created_by;
+                if ($procedure->reviewer_id) $target_position_ids[] = $procedure->reviewer_id;
+                $subject = $subject_prefix . "Pengajuan Revisi Dokumen";
+                $message .= "<p>Terdapat pengajuan <strong>Revisi</strong> pada dokumen ini.</p>";
+                break;
+            default:
+                return;
+        }
+
+        if (!empty($note) && $note !== '~') {
+            $message .= "<br><p><strong>Catatan Tambahan:</strong><br><i>\"" . $note . "\"</i></p>";
+        }
+        $message .= "<br><p>Silakan login ke aplikasi Askara untuk melihat detail dokumen ini.</p>";
+
+        // Konversi Position_ID menjadi User_ID jika ada target berupa position
+        $target_position_ids = array_unique(array_filter($target_position_ids));
+        if (!empty($target_position_ids)) {
+            $this->db->where_in('id', $target_position_ids);
+            $positions = $this->db->get('positions')->result();
+            foreach ($positions as $pos) {
+                if ($pos->assign_user) {
+                    $target_user_ids[] = $pos->assign_user; // Kumpulkan assign_user (user_id asli)
+                }
+            }
+        }
+
+        $target_user_ids = array_unique(array_filter($target_user_ids)); 
+        if (empty($target_user_ids)) return;
+
+        // Ambil email user
+        $this->db->where_in('id_user', $target_user_ids);
+        $users = $this->db->get('users')->result();
+
+        $emails = [];
+        foreach ($users as $u) {
+            if (!empty($u->email)) {
+                $emails[] = $u->email;
+            }
+        }
+
+        // Masukkan antrean (ke Cron / email_queues)
+        if (!empty($emails)) {
+            $this->load->library('email_runner');
+            $this->email_runner->queue($emails, $subject, $message);
+        }
     }
 }
