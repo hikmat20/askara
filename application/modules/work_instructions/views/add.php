@@ -96,8 +96,8 @@
 								<div class="form-group row mb-0">
 									<label class="col-12 col-form-label"><span class="text-danger">*</span> Upload Document :</label>
 									<div class="col-12">
-										<input type="file" name="file" id="file" accept=".pdf,.xlsx,.docx" class="form-control" placeholder="Upload File">
-										<span class="form-text text-muted">File type : PDF</span>
+										<input type="file" name="file" id="file" accept=".pdf,.xlsx,.xls,.docx" class="form-control" placeholder="Upload File">
+										<span class="form-text text-muted">File type : PDF,Excel,Word</span>
 										<span class="form-text text-danger invalid-feedback">Upload Document By harus di isi</span>
 									</div>
 								</div>

@@ -51,8 +51,8 @@ class Company_reference extends Admin_Controller
 
 	public function add()
 	{
-		$Companies 		= $this->db->get_where('companies', ['id_perusahaan' => $this->company])->result();
-		$branch = $this->db->get_where('company_branch', ['company_id' => $this->company])->result();
+		$Companies = $this->db->get_where('companies', ['id_perusahaan' => $this->company])->result();
+		$branch    = $this->db->get_where('company_branch', ['company_id' => $this->company])->result();
 
 		$this->template->set([
 			'title' 		=> 'Add Company Reference',
@@ -73,9 +73,7 @@ class Company_reference extends Admin_Controller
 		$regulations	= $this->db->get_where('view_regulation_subjects', ['status' => 'PUB'])->result();
 		$subjects 		= $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1', 'branch_id' => $branch])->result();
 
-		$ArrRegulation = [];
 		if ($regulations) foreach ($regulations as $v) {
-			$ArrRegulation[$v->subject_id][$v->regulation_id] = $v->regulation_id;
 			$ArrRegulation[$v->subject_id][$v->regulation_id] = $v->name;
 		}
 
@@ -165,7 +163,7 @@ class Company_reference extends Admin_Controller
 				$this->db->trans_rollback();
 				$Return		= array(
 					'status'		=> 0,
-					'msg'			=> 'Company name has already been created',
+					'msg'			=> 'Data per perusahaan yang dipilih sudah ada atau duplikat.',
 				);
 			}
 		} else {
@@ -181,38 +179,33 @@ class Company_reference extends Admin_Controller
 	public function delete()
 	{
 		$id = $this->input->post('id');
-		echo '<pre>';
-		print_r($id);
-		echo '</pre>';
-		if (($id)) {
+		if ($id) {
 			$this->db->trans_begin();
 			$this->db->delete('references', ['id' => $id]);
 			$this->db->delete('ref_standards', ['reference_id' => $id]);
 			$this->db->delete('cross_reference_details', ['reference_id' => $id]);
-
 			$this->db->delete('ref_regulations', ['reference_id' => $id]);
 			$this->db->delete('compliance_details', ['reference_id' => $id]);
 			$this->db->delete('compliance_opports', ['reference_id' => $id]);
-		} else {
-			$this->db->trans_rollback();
-			$Return		= array(
-				'status'		=> 0,
-				'msg'			=> 'Data not valid. Please try again.',
-			);
-		}
 
-		if ($this->db->trans_status() === FALSE) {
-			$this->db->trans_rollback();
-			$Return		= array(
-				'status'		=> 0,
-				'msg'			=> 'Failed to delete data.. Please try again.',
-			);
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				$Return = [
+					'status' => 0,
+					'msg'    => 'Failed to delete data.. Please try again.',
+				];
+			} else {
+				$this->db->trans_commit();
+				$Return = [
+					'status' => 1,
+					'msg'    => 'Successfully deleted data..',
+				];
+			}
 		} else {
-			$this->db->trans_commit();
-			$Return		= array(
-				'status'		=> 1,
-				'msg'			=> 'Successfully deleted data..',
-			);
+			$Return = [
+				'status' => 0,
+				'msg'    => 'Data not valid. Please try again.',
+			];
 		}
 
 		echo json_encode($Return);
@@ -221,29 +214,28 @@ class Company_reference extends Admin_Controller
 	public function delete_reg()
 	{
 		$id = $this->input->post('id');
-		if (($id)) {
+		if ($id) {
 			$this->db->trans_begin();
 			$this->db->delete('ref_regulations', ['id' => $id]);
-		} else {
-			$this->db->trans_rollback();
-			$Return		= array(
-				'status'		=> 0,
-				'msg'			=> 'Data not valid. Please try again.',
-			);
-		}
 
-		if ($this->db->trans_status() === FALSE) {
-			$this->db->trans_rollback();
-			$Return		= array(
-				'status'		=> 0,
-				'msg'			=> 'Failed to delete data.. Please try again.',
-			);
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				$Return = [
+					'status' => 0,
+					'msg'    => 'Failed to delete data.. Please try again.',
+				];
+			} else {
+				$this->db->trans_commit();
+				$Return = [
+					'status' => 1,
+					'msg'    => 'Successfully deleted data..',
+				];
+			}
 		} else {
-			$this->db->trans_commit();
-			$Return		= array(
-				'status'		=> 1,
-				'msg'			=> 'Successfully deleted data..',
-			);
+			$Return = [
+				'status' => 0,
+				'msg'    => 'Data not valid. Please try again.',
+			];
 		}
 
 		echo json_encode($Return);
