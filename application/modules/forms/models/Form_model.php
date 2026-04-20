@@ -1,7 +1,5 @@
 <?php
 
-use FontLib\Table\Type\prep;
-
  if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Form_model extends BF_Model
@@ -86,8 +84,7 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_begin();
-
-      $Data['company_id'] = 1;
+      $Data['company_id'] = $this->auth->user()->company_id;
 
       if (!empty($_FILES['form_file']['name'])) {
         $uploadFile = $this->_uploadFile();
@@ -134,7 +131,8 @@ class Form_model extends BF_Model
 
   private function _uploadFile()
   {
-    $path = FCPATH . "directory/FORMS/1/";
+    $company_id = $this->auth->user()->company_id;
+    $path = FCPATH . "directory/FORMS/{$company_id}/";
     $Data = $this->input->post();
     
     if (empty($_FILES['form_file']['name'])) {
@@ -243,14 +241,15 @@ class Form_model extends BF_Model
     $data = $this->input->post();
     try {
       $this->db->trans_begin();
-      $this->update(
-        $data['id'],
-        [
+      $updateData = [
           'status'      => $data['status'],
           'reviewed_by' => $this->auth->user_id(),
           'reviewed_at' => date('Y-m-d H:i:s'),
-        ]
-      );
+      ];
+      if ($data['status'] === 'COR' && !empty($data['note'])) {
+          $updateData['note'] = $data['note'];
+      }
+      $this->update($data['id'], $updateData);
       if ($this->db->trans_status() === FALSE) {
         $this->db->trans_rollback();
         throw new Exception('Failed process review document. Please try again later.');
@@ -279,7 +278,7 @@ class Form_model extends BF_Model
     try {
       $dataUpdate['status'] = $data['status'];
 
-      if ($data['status'] == 'APV') {
+      if ($data['status'] == 'PUB') {
         $dataUpdate['published_date'] = $data['published_date'];
         $dataUpdate['approved_by']    = $this->auth->user_id();
         $dataUpdate['approved_at']    = date('Y-m-d H:i:s');
