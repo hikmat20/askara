@@ -792,7 +792,6 @@ if (!function_exists('extention')) {
         // param is .ext
         $ext = str_replace('.', '', $ext);
 
-
         // with color is file type
         $ArrExt = [
             'pdf' => 'fa-file-pdf text-danger',
@@ -844,7 +843,6 @@ if (!function_exists('extention')) {
             'svg' => 'fa-file-image text-primary',
             'dwg' => 'fa-file-image text-primary',
             'dxf' => 'fa-file-image text-primary',
-            
         ];
         return $ArrExt[$ext];
     }
@@ -865,3 +863,20 @@ if (!function_exists('formatBytes')) {
     }
 }
 
+if (!function_exists('checkUrl')) {
+    function checkUrl($url)
+    {
+        if (!filter_var($url, FILTER_VALIDATE_URL)) {
+            return false;
+        }
+        $ch = curl_init($url);
+        curl_setopt($ch, CURLOPT_NOBODY, true);
+        curl_setopt($ch, CURLOPT_RETURNTRANSFER, true);
+        curl_setopt($ch, CURLOPT_TIMEOUT, 5);
+        curl_setopt($ch, CURLOPT_FOLLOWLOCATION, true);
+        curl_exec($ch);
+        $status = curl_getinfo($ch, CURLINFO_HTTP_CODE);
+        curl_close($ch);
+        return ($status >= 200 && $status < 400);
+    }
+}

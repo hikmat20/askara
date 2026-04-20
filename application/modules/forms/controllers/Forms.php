@@ -67,6 +67,13 @@ class Forms extends Admin_Controller
 		$this->template->page_icon('fa fa-edit');
 
 		$dataForm      = $this->FormModel->find_data('view_forms', $id, 'id');
+
+		// BUG-02: Cek otorisasi — pastikan record milik company yang login
+		if (!$dataForm || $dataForm->company_id != $this->company) {
+			show_error('Anda tidak memiliki akses ke data ini.', 403);
+			return;
+		}
+
 		$departements  = $this->db->get_where('departements', ['status' => '1'])->result_array();
 		$users         = $this->UserModel->find_all_by('status', 'ACT');
 		// $user          = $this->UserModel->find($this->auth->user_id());
@@ -118,7 +125,7 @@ class Forms extends Admin_Controller
 			if (!$this->input->post('form_type')) {
 				$this->form_validation->set_rules('form_type', 'Form Type', 'required|trim');
 			}
-			if (isset($_FILES['form_file']) && $_FILES['form_file']['name'] == '') {
+			if (!isset($_FILES['form_file']) || $_FILES['form_file']['name'] == '') {
 				$this->form_validation->set_rules('form_file', 'File Upload', 'required|trim');
 			}
 			if ($this->input->post('link_form')) {
@@ -131,6 +138,8 @@ class Forms extends Admin_Controller
 		if ($this->form_validation->run() === FALSE) {
 			return ['errors' => $this->form_validation->error_array()];
 		}
+
+		return false; // validasi sukses, tidak ada error
 	}
 
 	public function save()
@@ -172,6 +181,15 @@ class Forms extends Admin_Controller
 			return;
 		}
 
+		// BUG-02: Cek otorisasi untuk update
+		if ($this->input->post('id')) {
+			$existingRecord = $this->FormModel->find_data('view_forms', $this->input->post('id'), 'id');
+			if (!$existingRecord || $existingRecord->company_id != $this->company) {
+				echo json_encode(['status' => 0, 'msg' => 'Akses ditolak.']);
+				return;
+			}
+		}
+
 		$Return = $this->FormModel->saveData();
 		
 		echo json_encode($Return);
@@ -206,7 +224,7 @@ class Forms extends Admin_Controller
 			$this->form_validation->set_rules('note', 'Note', 'required|trim');
 		}
 
-		$this->form_validation->set_message('required', '{field} tiidak boleh kosong');
+		$this->form_validation->set_message('required', '{field} tidak boleh kosong');
 		if ($this->form_validation->run() === FALSE) {
 			echo json_encode([
 				'status' => 0,
@@ -238,11 +256,11 @@ class Forms extends Admin_Controller
 			]
 		);
 
-		if (isset($postDatat['published_date']) && $postDatat['published_date'] == '') {
+		if ($postDatat['status'] === 'PUB') {
 			$this->form_validation->set_rules('published_date', 'Published Date', 'required|trim');
 		}
 
-		if (isset($postDatat['note']) && $postDatat['note'] == '') {
+		if ($postDatat['status'] === 'COR') {
 			$this->form_validation->set_rules('note', 'Note', 'required|trim');
 		}
 

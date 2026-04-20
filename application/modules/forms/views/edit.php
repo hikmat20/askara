@@ -16,7 +16,7 @@
 										<select name="departement_id" id="departement" class="form-control select2">
 											<option value=""></option>
 											<?php if ($departements) foreach ($departements as $departement): ?>
-												<option value="<?= $departement['id']; ?>" <?= ($dataForm->departement_id == $departement['id'] ? 'selected' : ''); ?>><?= $departement['name']; ?></option>
+												<option value="<?= $departement['id']; ?>" <?= (isset($dataForm) && $dataForm->departement_id == $departement['id'] ? 'selected' : ''); ?>><?= $departement['name']; ?></option>
 											<?php endforeach; ?>
 										</select>
 										<span class="form-text text-danger invalid-feedback">Departement/Group Process harus di isi</span>
@@ -42,7 +42,7 @@
 										<select name="procedure_id" id="procedure" class="form-control select2">
 											<option value=""></option>
 											<?php if ($procedures) foreach ($procedures as $k => $procedure): ?>
-												<option value="<?= $procedure['id']; ?>" <?= ($dataForm->procedure_id == $procedure['id'] ? 'selected' : ''); ?>><?= $procedure['name']; ?></option>
+												<option value="<?= $procedure['id']; ?>" <?= (isset($dataForm) && $dataForm->procedure_id == $procedure['id'] ? 'selected' : ''); ?>><?= $procedure['name']; ?></option>
 											<?php endforeach; ?>
 										</select>
 										<span class="form-text text-danger invalid-feedback">Procedure harus di isi</span>
@@ -55,8 +55,8 @@
 									<div class="col-md-8">
 										<select name="is_active" id="is_active" class="form-control select2">
 											<option value=""></option>
-											<option value="ACT" <?= ($dataForm->is_active == 'ACT' ? 'selected' : ''); ?>>Active</option>
-											<option value="OBS" <?= ($dataForm->is_active == 'OBS' ? 'selected' : ''); ?>>Obsolete</option>
+											<option value="ACT" <?= (isset($dataForm) && $dataForm->is_active == 'ACT' ? 'selected' : ''); ?>>Active</option>
+											<option value="OBS" <?= (isset($dataForm) && $dataForm->is_active == 'OBS' ? 'selected' : ''); ?>>Obsolete</option>
 										</select>
 										<span class="form-text text-danger invalid-feedback">Procedure harus di isi</span>
 									</div>
@@ -111,7 +111,7 @@
 							</div>
 							<div class="col-md-4">
 								<label for="">Document Form</label>
-								<button type="button" data-id="<?= $dataForm->id; ?>" class="btn btn-block btn-success view" data-toggle="modal" data-target="#modelId"><i class="fa fa-eye" aria-hidden="true"></i> View Form</button>
+								<button type="button" data-id="<?= isset($dataForm) ? $dataForm->id : ''; ?>" class="btn btn-block btn-success view" data-toggle="modal" data-target="#modelId"><i class="fa fa-eye" aria-hidden="true"></i> View Form</button>
 							</div>
 						</div>
 						<!-- <hr> -->
