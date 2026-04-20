@@ -79,10 +79,10 @@ class Company_reference_model extends BF_Model
       $this->db->update('references', $Data, ['id' => $Data['id']]);
     } else {
 
-      /* Check Axist Data */
+      /* Check Exists Data */
       $checkData = $this->db->get_where('references', ['company_id' => $Data['company_id'], 'branch_id' => $Data['branch_id']])->num_rows();
       if ($checkData > 0) {
-        return ['axist' => 1];
+        return ['exists' => 1];
       }
 
       // $Data['company_id'] = $Data['company_id'];
@@ -113,15 +113,13 @@ class Company_reference_model extends BF_Model
 
     /* List Regulation */
     if ($DataReg) {
-      if (isset($DataReg['id'])) {
-        $DataReg['modified_by'] = $this->auth->user_id();
-        $DataReg['modified_at'] = date('Y-m-d H:i:s');
-        $this->db->update('ref_regulations', $DataReg, ['id' => $DataReg['id']]);
-      } else {
-      
-        foreach ($DataReg as $reg) {
+      foreach ($DataReg as $reg) {
+        if (isset($reg['id'])) {
+          $reg['modified_by'] = $this->auth->user_id();
+          $reg['modified_at'] = date('Y-m-d H:i:s');
+          $this->db->update('ref_regulations', $reg, ['id' => $reg['id']]);
+        } else {
           $reg['reference_id'] = $Id;
-          $reg['subject']     = $reg['subject'];
           $reg['created_by']  = $this->auth->user_id();
           $reg['created_at']  = date('Y-m-d H:i:s');
           $this->db->insert('ref_regulations', $reg);

@@ -434,9 +434,9 @@ class Monitoring extends Admin_Controller
 	public function approval()
 	{
 		/* APPROVAL */
-		$procedures 	= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status' => 'APV'])->result();
-		$users = $this->db->get_where('users')->result();
-		$positions = $this->db->get_where('positions', ['company_id' => $this->company])->result_array();
+		$procedures  = $this->db->get_where('view_procedures', ['company_id' => $this->company, 'status' => 'APV'])->result();
+		$users       = $this->db->get_where('users')->result();
+		$positions   = $this->db->get_where('positions', ['company_id' => $this->company])->result_array();
 		$ArrPosition = array_combine(array_column($positions, 'id'), array_column($positions, 'name'));
 		// $authority = $ArrPosition[$procedures->approval_id];
 
