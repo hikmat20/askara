@@ -94,7 +94,28 @@
                                             <?php endif; ?>
 
                                         <?php else : ?>
-                                            <span class="text-muted">—</span>
+                                            <?php if ($form->status === 'PUB') : ?>
+                                                <?php if (!empty($ArrPosts) && in_array(1, $ArrPosts)) : ?>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-light-warning btn-open-modal"
+                                                        data-id="<?= $form->id; ?>"
+                                                        data-type="revision"
+                                                        data-title="Revision Form — <?= htmlspecialchars($form->name ?? ''); ?>"
+                                                        title="Request Revision">
+                                                        <i class="far fa-edit"></i> Revision
+                                                    </button>
+                                                    <button type="button"
+                                                        class="btn btn-sm btn-light-danger btn-open-modal"
+                                                        data-id="<?= $form->id; ?>"
+                                                        data-type="deletion"
+                                                        data-title="Deletion Form — <?= htmlspecialchars($form->name ?? ''); ?>"
+                                                        title="Request Deletion">
+                                                        <i class="fa fa-trash-alt"></i> Deletion
+                                                    </button>
+                                                <?php endif; ?>
+                                            <?php else : ?>
+                                                <span class="text-muted">—</span>
+                                            <?php endif; ?>
                                         <?php endif; ?>
                                     </td>
                                 </tr>
@@ -136,13 +157,20 @@
     var baseUrl     = '<?= base_url($this->uri->segment(1)); ?>';
     var urlReview   = baseUrl + '/load_form_review_form/';
     var urlApproval = baseUrl + '/load_form_approval_form/';
+    var urlRevision = baseUrl + '/load_form_revision_form/';
+    var urlDeletion = baseUrl + '/load_form_deletion_form/';
 
-    // Tombol buka modal (REV / APV)
+    // Tombol buka modal (REV / APV / revision / deletion)
     $(document).on('click', '.btn-open-modal', function () {
         var id    = $(this).data('id');
         var type  = $(this).data('type');
         var title = $(this).data('title');
-        var url   = (type === 'review') ? urlReview + id : urlApproval + id;
+        var url;
+
+        if (type === 'review')        url = urlReview   + id;
+        else if (type === 'approval') url = urlApproval + id;
+        else if (type === 'revision') url = urlRevision + id;
+        else if (type === 'deletion') url = urlDeletion + id;
 
         $('#modalFormActionLabel').text(title);
         $('#modalFormActionBody').html(
