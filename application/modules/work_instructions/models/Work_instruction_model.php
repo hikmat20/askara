@@ -131,9 +131,9 @@ class Work_instruction_model extends BF_Model
     }
 
     $config['upload_path']   = $path; //path folder
-    $config['allowed_types'] = 'pdf'; //type yang dapat diakses bisa anda sesuaikan
+    $config['allowed_types'] = 'xlsx|xls|pdf'; //type yang dapat diakses bisa anda sesuaikan
     $config['encrypt_name']  = false; //Enkripsi nama yang terupload
-    $config['max_size']      = 10048;
+    $config['max_size']      = 10148;
     $config['remove_spaces'] = true;
     $config['file_name']     = slugify($Data['number'] . '-' . $Data['name']) . '-' . date('Ymd') . '-' . bin2hex(random_bytes(6));
 
