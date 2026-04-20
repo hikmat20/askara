@@ -84,7 +84,19 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_begin();
-      $Data['company_id'] = $this->auth->user()->company_id;
+      $Data['company_id'] = $this->session->company->id_perusahaan;
+
+      // Validasi PIC jika salah satu diisi
+      if (!empty($Data['reviewer_position_id']) || !empty($Data['approver_position_id'])) {
+        $picError = $this->_validatePic(
+          $Data['reviewer_position_id'] ?? null,
+          $Data['approver_position_id'] ?? null,
+          $Data['company_id']
+        );
+        if ($picError !== null) {
+          throw new Exception($picError);
+        }
+      }
 
       if (!empty($_FILES['form_file']['name'])) {
         $uploadFile = $this->_uploadFile();
@@ -131,7 +143,7 @@ class Form_model extends BF_Model
 
   private function _uploadFile()
   {
-    $company_id = $this->auth->user()->company_id;
+    $company_id = $this->session->company->id_perusahaan;
     $path = FCPATH . "directory/FORMS/{$company_id}/";
     $Data = $this->input->post();
     
@@ -210,12 +222,96 @@ class Form_model extends BF_Model
     return $pdfPath;
   }
 
+  /**
+   * Validasi PIC Reviewer dan PIC Approver.
+   * Memastikan kedua position_id valid, milik company yang sama, dan tidak identik.
+   *
+   * @param int|null $reviewer_position_id
+   * @param int|null $approver_position_id
+   * @param int      $company_id
+   * @return string|null  Pesan error jika tidak valid, null jika valid
+   */
+  private function _validatePic($reviewer_position_id, $approver_position_id, $company_id)
+  {
+    // Validasi reviewer_position_id
+    if (!empty($reviewer_position_id)) {
+      $reviewer = $this->db->get_where('positions', [
+        'id'         => $reviewer_position_id,
+        'company_id' => $company_id,
+      ])->row();
+      if (!$reviewer) {
+        return 'PIC Reviewer tidak valid atau tidak ditemukan untuk perusahaan ini.';
+      }
+    }
+
+    // Validasi approver_position_id
+    if (!empty($approver_position_id)) {
+      $approver = $this->db->get_where('positions', [
+        'id'         => $approver_position_id,
+        'company_id' => $company_id,
+      ])->row();
+      if (!$approver) {
+        return 'PIC Approver tidak valid atau tidak ditemukan untuk perusahaan ini.';
+      }
+    }
+
+    // Validasi keduanya tidak boleh sama
+    if (!empty($reviewer_position_id) && !empty($approver_position_id)
+      && (int)$reviewer_position_id === (int)$approver_position_id
+    ) {
+      return 'PIC Reviewer dan PIC Approver tidak boleh jabatan yang sama.';
+    }
+
+    return null;
+  }
+
+  /**
+   * Insert satu record ke tabel form_status_logs.
+   * Melempar Exception jika insert gagal (untuk trigger rollback).
+   *
+   * @param int         $form_id
+   * @param string      $old_status
+   * @param string      $new_status
+   * @param string|null $note
+   * @throws Exception
+   */
+  private function _insertStatusLog($form_id, $old_status, $new_status, $note = null)
+  {
+    $log = [
+      'form_id'    => $form_id,
+      'old_status' => $old_status,
+      'new_status' => $new_status,
+      'action_by'  => $this->auth->user_id(),
+      'action_at'  => date('Y-m-d H:i:s'),
+      'note'       => $note,
+      'created_at' => date('Y-m-d H:i:s'),
+    ];
+
+    $inserted = $this->db->insert('form_status_logs', $log);
+    if (!$inserted) {
+      throw new Exception('Gagal menyimpan log status form.');
+    }
+  }
+
   public function reviewProcess()
   {
     try {
       $id = $this->input->post('id');
+      if (empty($id)) {
+        throw new Exception('ID form tidak valid.');
+      }
+
+      $form = $this->db->get_where('forms', ['id' => $id])->row();
+      if (!$form) {
+        throw new Exception('Form tidak ditemukan.');
+      }
+      $old_status = $form->status;
+
       $this->db->trans_begin();
       $this->update($id, ['status' => 'REV']);
+
+      // Catat log perubahan status
+      $this->_insertStatusLog($id, $old_status, 'REV');
 
       if ($this->db->trans_status() === FALSE) {
         $this->db->trans_rollback();
@@ -236,35 +332,145 @@ class Form_model extends BF_Model
     return $Return;
   }
 
+  /**
+   * Cancel Review — kembalikan status dari REV ke DFT.
+   */
+  public function cancelReview()
+  {
+    try {
+      $id = $this->input->post('id');
+      if (empty($id)) {
+        throw new Exception('ID form tidak valid.');
+      }
+
+      $form = $this->db->get_where('forms', ['id' => $id])->row();
+      if (!$form) {
+        throw new Exception('Form tidak ditemukan.');
+      }
+      if ($form->status !== 'REV') {
+        throw new Exception('Form tidak dalam status Review. Tidak dapat dibatalkan.');
+      }
+
+      $this->db->trans_begin();
+      $this->update($id, [
+        'status'      => 'DFT',
+        'modified_by' => $this->auth->user_id(),
+        'modified_at' => date('Y-m-d H:i:s'),
+      ]);
+
+      $this->_insertStatusLog($id, 'REV', 'DFT');
+
+      if ($this->db->trans_status() === FALSE) {
+        $this->db->trans_rollback();
+        throw new Exception('Gagal membatalkan review. Silakan coba lagi.');
+      }
+
+      $this->db->trans_commit();
+      return ['status' => 1, 'msg' => 'Review dibatalkan. Form dikembalikan ke Draft.'];
+    } catch (\Throwable $th) {
+      $this->db->trans_rollback();
+      return ['status' => 0, 'msg' => $th->getMessage()];
+    }
+  }
+
+  /**
+   * Correction to Review — ubah status dari COR ke REV setelah koreksi selesai.
+   */
+  public function correctionToReview()
+  {
+    try {
+      $id = $this->input->post('id');
+      if (empty($id)) {
+        throw new Exception('ID form tidak valid.');
+      }
+
+      $form = $this->db->get_where('forms', ['id' => $id])->row();
+      if (!$form) {
+        throw new Exception('Form tidak ditemukan.');
+      }
+      if ($form->status !== 'COR') {
+        throw new Exception('Form tidak dalam status Correction.');
+      }
+
+      $this->db->trans_begin();
+      $this->update($id, [
+        'status'      => 'REV',
+        'modified_by' => $this->auth->user_id(),
+        'modified_at' => date('Y-m-d H:i:s'),
+      ]);
+
+      $this->_insertStatusLog($id, 'COR', 'REV');
+
+      if ($this->db->trans_status() === FALSE) {
+        $this->db->trans_rollback();
+        throw new Exception('Gagal memproses ke Review. Silakan coba lagi.');
+      }
+
+      $this->db->trans_commit();
+      return ['status' => 1, 'msg' => 'Form berhasil dikembalikan ke proses Review.'];
+    } catch (\Throwable $th) {
+      $this->db->trans_rollback();
+      return ['status' => 0, 'msg' => $th->getMessage()];
+    }
+  }
+
   public function saveReview()
   {
     $data = $this->input->post();
     try {
+      // Validasi status yang diizinkan
+      $allowed_statuses = ['APV', 'COR'];
+      if (empty($data['status']) || !in_array($data['status'], $allowed_statuses, true)) {
+        throw new Exception('Status review tidak valid. Pilih APV atau COR.');
+      }
+
+      // Validasi catatan wajib saat COR
+      if ($data['status'] === 'COR' && empty(trim($data['note'] ?? ''))) {
+        throw new Exception('Catatan wajib diisi jika aksi adalah Kembalikan (COR).');
+      }
+
+      // Ambil status lama sebelum transaksi
+      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      if (!$form) {
+        throw new Exception('Form tidak ditemukan.');
+      }
+      $old_status = $form->status;
+
       $this->db->trans_begin();
+
       $updateData = [
-          'status'      => $data['status'],
-          'reviewed_by' => $this->auth->user_id(),
-          'reviewed_at' => date('Y-m-d H:i:s'),
+        'status'      => $data['status'],
+        'reviewed_by' => $this->auth->user_id(),
+        'reviewed_at' => date('Y-m-d H:i:s'),
       ];
       if ($data['status'] === 'COR' && !empty($data['note'])) {
-          $updateData['note'] = $data['note'];
+        $updateData['note'] = $data['note'];
       }
+
       $this->update($data['id'], $updateData);
+
+      // Catat log perubahan status
+      $this->_insertStatusLog(
+        $data['id'],
+        $old_status,
+        $data['status'],
+        !empty($data['note']) ? $data['note'] : null
+      );
+
       if ($this->db->trans_status() === FALSE) {
-        $this->db->trans_rollback();
         throw new Exception('Failed process review document. Please try again later.');
-      } else {
-        $this->db->trans_commit();
-        $Return = [
-          'status' => 1,
-          'msg'     => 'Success process review document...'
-        ];
       }
+
+      $this->db->trans_commit();
+      $Return = [
+        'status' => 1,
+        'msg'    => 'Success process review document...'
+      ];
     } catch (\Throwable $th) {
       $this->db->trans_rollback();
       $Return = [
         'status' => 0,
-        'msg'     => $th->getMessage()
+        'msg'    => $th->getMessage()
       ];
     }
 
@@ -272,10 +478,32 @@ class Form_model extends BF_Model
   }
 
   public function saveApprove()
-  {
-    $data = $this->input->post();
+  {    $data = $this->input->post();
 
     try {
+      // Validasi status yang diizinkan
+      $allowed_statuses = ['PUB', 'COR'];
+      if (empty($data['status']) || !in_array($data['status'], $allowed_statuses, true)) {
+        throw new Exception('Status approval tidak valid. Pilih PUB atau COR.');
+      }
+
+      // Validasi published_date wajib saat PUB
+      if ($data['status'] === 'PUB' && empty(trim($data['published_date'] ?? ''))) {
+        throw new Exception('Tanggal terbit wajib diisi jika aksi adalah Setujui & Publish.');
+      }
+
+      // Validasi catatan wajib saat COR
+      if ($data['status'] === 'COR' && empty(trim($data['note'] ?? ''))) {
+        throw new Exception('Catatan wajib diisi jika aksi adalah Kembalikan (COR).');
+      }
+
+      // Ambil status lama sebelum transaksi
+      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      if (!$form) {
+        throw new Exception('Form tidak ditemukan.');
+      }
+      $old_status = $form->status;
+
       $dataUpdate['status'] = $data['status'];
 
       if ($data['status'] == 'PUB') {
@@ -285,32 +513,124 @@ class Form_model extends BF_Model
       }
 
       if ($data['status'] == 'COR') {
-        $dataUpdate['note']           = $data['note'];
+        $dataUpdate['note'] = $data['note'];
       }
 
       $this->db->trans_begin();
-      $this->update(
+
+      $this->update($data['id'], $dataUpdate);
+
+      // Catat log perubahan status
+      $this->_insertStatusLog(
         $data['id'],
-        $dataUpdate
+        $old_status,
+        $data['status'],
+        !empty($data['note']) ? $data['note'] : null
       );
 
       if ($this->db->trans_status() === FALSE) {
-        $this->db->trans_rollback();
         throw new Exception('Failed process approve document. Please try again later.');
-      } else {
-        $this->db->trans_commit();
-        $Return = [
-          'status' => 1,
-          'msg'     => 'Success process approve document...'
-        ];
       }
+
+      $this->db->trans_commit();
+      $Return = [
+        'status' => 1,
+        'msg'    => 'Success process approve document...'
+      ];
     } catch (\Throwable $th) {
       $this->db->trans_rollback();
       $Return = [
         'status' => 0,
-        'msg'     => $th->getMessage()
+        'msg'    => $th->getMessage()
       ];
     }
     return $Return;
+  }
+
+  /**
+   * Revision Form — ubah status dari PUB ke RVI.
+   * Dipanggil oleh PM/MR dari halaman monitoring forms published.
+   */
+  public function saveFormRevision($data)
+  {
+    try {
+      if (empty($data['id'])) {
+        throw new Exception('ID form tidak valid.');
+      }
+
+      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      if (!$form) {
+        throw new Exception('Form tidak ditemukan.');
+      }
+      if ($form->status !== 'PUB') {
+        throw new Exception('Form tidak dalam status Published. Tidak dapat diajukan revisi.');
+      }
+
+      $this->db->trans_begin();
+
+      $this->db->where('id', $form->id)->update('forms', [
+        'status'           => 'RVI',
+        'note'             => $data['note'],
+        'modified_by'      => $this->auth->user_id(),
+        'modified_at'      => date('Y-m-d H:i:s'),
+      ]);
+
+      $this->_insertStatusLog($form->id, 'PUB', 'RVI', $data['note']);
+
+      if ($this->db->trans_status() === FALSE) {
+        $this->db->trans_rollback();
+        throw new Exception('Gagal mengajukan revisi. Silakan coba lagi.');
+      }
+
+      $this->db->trans_commit();
+      return ['status' => 1, 'msg' => 'Pengajuan revisi berhasil. Form dikembalikan ke status Revision.'];
+    } catch (\Throwable $th) {
+      $this->db->trans_rollback();
+      return ['status' => 0, 'msg' => $th->getMessage()];
+    }
+  }
+
+  /**
+   * Deletion Form — ubah status dari PUB ke HLD (deletion_status = OPN).
+   * Dipanggil oleh PM/MR dari halaman monitoring forms published.
+   */
+  public function saveFormDeletion($data)
+  {
+    try {
+      if (empty($data['id'])) {
+        throw new Exception('ID form tidak valid.');
+      }
+
+      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      if (!$form) {
+        throw new Exception('Form tidak ditemukan.');
+      }
+      if ($form->status !== 'PUB') {
+        throw new Exception('Form tidak dalam status Published. Tidak dapat diajukan penghapusan.');
+      }
+
+      $this->db->trans_begin();
+
+      $this->db->where('id', $form->id)->update('forms', [
+        'status'           => 'HLD',
+        'deletion_status'  => 'OPN',
+        'note'             => $data['note'],
+        'modified_by'      => $this->auth->user_id(),
+        'modified_at'      => date('Y-m-d H:i:s'),
+      ]);
+
+      $this->_insertStatusLog($form->id, 'PUB', 'HLD', $data['note']);
+
+      if ($this->db->trans_status() === FALSE) {
+        $this->db->trans_rollback();
+        throw new Exception('Gagal mengajukan penghapusan. Silakan coba lagi.');
+      }
+
+      $this->db->trans_commit();
+      return ['status' => 1, 'msg' => 'Pengajuan penghapusan berhasil. Form masuk ke proses Deletion.'];
+    } catch (\Throwable $th) {
+      $this->db->trans_rollback();
+      return ['status' => 0, 'msg' => $th->getMessage()];
+    }
   }
 }

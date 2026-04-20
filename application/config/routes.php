@@ -98,3 +98,12 @@ $route['docs/(:any)/(:any)/(:any)'] = 'manage_documents/$1/$2/$3';
 $route['docs/(:any)/(:any)'] = 'manage_documents/$1/$2';
 $route['docs/(:any)'] = 'manage_documents/$1';
 $route['docs'] = 'manage_documents/index';
+
+/* Monitoring - Forms */
+$route['monitoring/forms/review'] = 'monitoring/monitoring/forms_review';
+$route['monitoring/forms/approval'] = 'monitoring/monitoring/forms_approval';
+$route['monitoring/forms/published'] = 'monitoring/monitoring/forms_published';
+$route['monitoring/forms/review/(:num)'] = 'monitoring/monitoring/load_form_review_form/$1';
+$route['monitoring/forms/review/save'] = 'monitoring/monitoring/save_review_form';
+$route['monitoring/forms/approval/(:num)'] = 'monitoring/monitoring/load_form_approval_form/$1';
+$route['monitoring/forms/approval/save'] = 'monitoring/monitoring/save_approval_form';

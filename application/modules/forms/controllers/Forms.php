@@ -30,6 +30,8 @@ class Forms extends Admin_Controller
 		$dataRevision		= $this->FormModel->getAllByStatus('RVI');
 		$dataPublished		= $this->FormModel->getAllByStatus('PUB');
 
+	
+		
 		$status = [
 			'DFT' => '<span class="badge badge-light">Draft</span>',
 			'COR' => '<span class="badge badge-warning">Correction</span>',
@@ -120,6 +122,8 @@ class Forms extends Admin_Controller
 		$this->form_validation->set_rules('issue_date', 'Issue Date', 'required|trim');
 		$this->form_validation->set_rules('effective_date', 'Effective Date', 'required|trim');
 		$this->form_validation->set_rules('revision_number', 'Revision Number', 'required|trim');
+		$this->form_validation->set_rules('reviewer_position_id', 'PIC Reviewer', 'required|trim|integer');
+		$this->form_validation->set_rules('approver_position_id', 'PIC Approver', 'required|trim|integer');
 
 		if (!$this->input->post('id')) {
 			if (!$this->input->post('form_type')) {
@@ -190,6 +194,19 @@ class Forms extends Admin_Controller
 			}
 		}
 
+		// Validasi silang: reviewer dan approver tidak boleh sama
+		$reviewer_id = (int) $this->input->post('reviewer_position_id');
+		$approver_id = (int) $this->input->post('approver_position_id');
+		if ($reviewer_id && $approver_id && $reviewer_id === $approver_id) {
+			echo json_encode([
+				'status' => 0,
+				'errors' => [
+					'approver_position_id' => 'PIC Approver tidak boleh sama dengan PIC Reviewer.',
+				],
+			]);
+			return;
+		}
+
 		$Return = $this->FormModel->saveData();
 		
 		echo json_encode($Return);
@@ -203,13 +220,30 @@ class Forms extends Admin_Controller
 	public function process_to_review()
 	{
 		if (!$this->input->is_ajax_request()) {
-			echo json_encode([
-				'status' => 0,
-				'msg' => 'Access Denied'
-			]);
+			echo json_encode(['status' => 0, 'msg' => 'Access Denied']);
 			return;
 		}
 		$Return = $this->FormModel->reviewProcess();
+		echo json_encode($Return);
+	}
+
+	public function cancel_review()
+	{
+		if (!$this->input->is_ajax_request()) {
+			echo json_encode(['status' => 0, 'msg' => 'Access Denied']);
+			return;
+		}
+		$Return = $this->FormModel->cancelReview();
+		echo json_encode($Return);
+	}
+
+	public function correction_to_review()
+	{
+		if (!$this->input->is_ajax_request()) {
+			echo json_encode(['status' => 0, 'msg' => 'Access Denied']);
+			return;
+		}
+		$Return = $this->FormModel->correctionToReview();
 		echo json_encode($Return);
 	}
 
