@@ -30,6 +30,8 @@ class Forms extends Admin_Controller
 		$dataRevision		= $this->FormModel->getAllByStatus('RVI');
 		$dataPublished		= $this->FormModel->getAllByStatus('PUB');
 
+	
+		
 		$status = [
 			'DFT' => '<span class="badge badge-light">Draft</span>',
 			'COR' => '<span class="badge badge-warning">Correction</span>',

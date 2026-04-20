@@ -95,6 +95,71 @@
         </div>
 
         <div class="pt-3">
+            <h3 class="text-white pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Forms</h3>
+            <div class="d-flex justify-content-start align-items-center">
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-success" style="font-size: 48px;"><?= $dtFormRev; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/forms_review'); ?>" class="text-hover-primary"
+                                title="REVIEW FORMS">
+                                <span class="card-label text-dark text-center font-weight-bolder">REVIEW FORMS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg " style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-warning" style="font-size: 48px;"><?= $dtFormCor; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/forms_correction'); ?>" class="text-hover-primary"
+                                title="CORRECTION FORMS">
+                                <span class="card-label text-dark text-center font-weight-bolder">CORRECTION FORMS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg " style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-info" style="font-size: 48px;"><?= $dtFormApv; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/forms_approval'); ?>" class="text-hover-primary"
+                                title="APPROVAL FORMS">
+                                <span class="card-label text-dark text-center font-weight-bolder">APPROVAL FORMS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg " style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-primary" style="font-size: 48px;"><?= $dtFormPub; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/forms_published'); ?>" class="text-hover-primary"
+                                title="PUBLISHED FORMS">
+                                <span class="card-label text-dark text-center font-weight-bolder">PUBLISHED FORMS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <div class="pt-3">
             <h3 class="text-white mt-0 pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Other Document</h3>
             <div class="d-flex justify-content-start align-items-center">
 

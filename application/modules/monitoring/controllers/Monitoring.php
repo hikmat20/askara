@@ -14,6 +14,7 @@ class Monitoring extends Admin_Controller
 		parent::__construct();
 
 		$this->load->model('monitoring/monitoring_model', 'Monitoring');
+		$this->load->model('forms/form_model', 'FormModel');
 		$this->template->set_theme('dashboard');
 		$this->template->page_icon('fa fa-dashboard');
 
@@ -87,6 +88,12 @@ class Monitoring extends Admin_Controller
 			}
 		}
 
+		/* FORM STATISTICS */
+		$dtFormRev = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'REV'])->num_rows();
+		$dtFormCor = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'COR'])->num_rows();
+		$dtFormApv = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'APV'])->num_rows();
+		$dtFormPub = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'PUB'])->num_rows();
+
 		$Data = $this->db->order_by('created_at', 'ASC')->get_where('directory', ['parent_id' => '0', 'active' => 'Y', 'status !=' => 'DEL'])->result();
 		$RecentFiles = $this->db->order_by('created_at', 'DESC')->get_where('directory', ['parent_id !=' => '0', 'active' => 'Y', 'flag_type' => 'FILE', 'status !=' => 'DEL', 'created_at like' => date('Y-m-d') . "%"])->result();
 
@@ -109,6 +116,10 @@ class Monitoring extends Admin_Controller
 				'dtGuidesCor' 		=> $dtGuidesCor,
 				'dtGuidesPub' 		=> $dtGuidesPub,
 				'dtGuidesRvi' 		=> $dtGuidesRvi,
+				'dtFormRev'			=> $dtFormRev,
+				'dtFormCor'			=> $dtFormCor,
+				'dtFormApv'			=> $dtFormApv,
+				'dtFormPub'			=> $dtFormPub,
 			]
 		);
 
@@ -842,5 +853,321 @@ class Monitoring extends Admin_Controller
 		]);
 		$this->template->render('view_wi');
 	}
-	
+
+	public function forms_review()
+	{
+		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'REV'])->result();
+
+		$this->template->set([
+			'title'  => 'DAFTAR FORM - REVIEW',
+			'forms'  => $forms,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('forms/list');
+	}
+
+	public function forms_correction()
+	{
+		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'COR'])->result();
+
+		$this->template->set([
+			'title'  => 'DAFTAR FORM - CORRECTION',
+			'forms'  => $forms,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('forms/list');
+	}
+
+	public function forms_approval()
+	{
+		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'APV'])->result();
+
+		$this->template->set([
+			'title'  => 'DAFTAR FORM - APPROVAL',
+			'forms'  => $forms,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('forms/list');
+	}
+
+	public function forms_published()
+	{
+		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'PUB'])->result();
+
+		$this->template->set([
+			'title'  => 'DAFTAR FORM - PUBLISHED',
+			'forms'  => $forms,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('forms/list');
+	}
+
+	public function load_form_review_form($id)
+	{
+		// Ambil data Form dari view_forms dengan filter company_id
+		$form = $this->db->get_where('view_forms', ['id' => $id, 'company_id' => $this->company])->row();
+
+		// Jika form tidak ditemukan atau company_id tidak cocok → 403
+		if (!$form) {
+			$this->output->set_status_header(403);
+			show_error('Akses ditolak. Form tidak ditemukan atau bukan milik perusahaan Anda.', 403);
+			return;
+		}
+
+		// Verifikasi bahwa user saat ini adalah PIC Reviewer yang sah
+		$reviewer_position = $this->db->get_where('positions', [
+			'id'          => $form->reviewer_position_id,
+			'assign_user' => $this->auth->user_id(),
+		])->row();
+
+		if (!$reviewer_position) {
+			$this->output->set_status_header(403);
+			show_error('Akses ditolak. Anda bukan PIC Reviewer yang berwenang untuk Form ini.', 403);
+			return;
+		}
+
+		// Ambil riwayat status dari form_status_logs
+		$history = $this->db->order_by('action_at', 'ASC')
+			->get_where('form_status_logs', ['form_id' => $id])
+			->result();
+
+		// Ambil data user untuk mapping action_by → nama
+		$users = $this->db->get_where('users')->result();
+		$ArrUsers = [];
+		foreach ($users as $user) {
+			$ArrUsers[$user->id_user] = $user;
+		}
+
+		$this->template->set([
+			'form'     => $form,
+			'history'  => $history,
+			'ArrUsers' => $ArrUsers,
+			'sts'      => $this->sts,
+		]);
+
+		$this->template->render('forms/review-form');
+	}
+
+	public function save_review_form()
+	{
+		// Validasi AJAX request
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		// Verifikasi kepemilikan company
+		$form = $this->db->get_where('view_forms', ['id' => $data['id'], 'company_id' => $this->company])->row();
+
+		if (!$form) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Form tidak ditemukan atau bukan milik perusahaan Anda.']);
+			return;
+		}
+
+		// Verifikasi otorisasi PIC Reviewer
+		$reviewer_position = $this->db->get_where('positions', [
+			'id'          => $form->reviewer_position_id,
+			'assign_user' => $this->auth->user_id(),
+		])->row();
+
+		if (!$reviewer_position) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Anda bukan PIC Reviewer yang berwenang untuk Form ini.']);
+			return;
+		}
+
+		// Panggil saveReview() di FormModel dan return JSON response
+		$Return = $this->FormModel->saveReview();
+		echo json_encode($Return);
+	}
+
+	public function load_form_approval_form($id)
+	{
+		// Ambil data Form dari view_forms dengan filter company_id
+		$form = $this->db->get_where('view_forms', ['id' => $id, 'company_id' => $this->company])->row();
+
+		// Jika form tidak ditemukan atau company_id tidak cocok → 403
+		if (!$form) {
+			$this->output->set_status_header(403);
+			show_error('Akses ditolak. Form tidak ditemukan atau bukan milik perusahaan Anda.', 403);
+			return;
+		}
+
+		// Verifikasi bahwa user saat ini adalah PIC Approver yang sah
+		$approver_position = $this->db->get_where('positions', [
+			'id'          => $form->approver_position_id,
+			'assign_user' => $this->auth->user_id(),
+		])->row();
+
+		if (!$approver_position) {
+			$this->output->set_status_header(403);
+			show_error('Akses ditolak. Anda bukan PIC Approver yang berwenang untuk Form ini.', 403);
+			return;
+		}
+
+		// Ambil riwayat status dari form_status_logs
+		$history = $this->db->order_by('action_at', 'ASC')
+			->get_where('form_status_logs', ['form_id' => $id])
+			->result();
+
+		// Ambil data user untuk mapping action_by → nama
+		$users = $this->db->get_where('users')->result();
+		$ArrUsers = [];
+		foreach ($users as $user) {
+			$ArrUsers[$user->id_user] = $user;
+		}
+
+		$this->template->set([
+			'form'     => $form,
+			'history'  => $history,
+			'ArrUsers' => $ArrUsers,
+			'sts'      => $this->sts,
+		]);
+
+		$this->template->render('forms/approval-form');
+	}
+
+	public function load_form_correction_form($id)
+	{
+		$form = $this->db->get_where('view_forms', ['id' => $id, 'company_id' => $this->company])->row();
+
+		if (!$form) {
+			$this->output->set_status_header(403);
+			show_error('Akses ditolak. Form tidak ditemukan atau bukan milik perusahaan Anda.', 403);
+			return;
+		}
+
+		if ($form->status !== 'COR') {
+			$this->output->set_status_header(403);
+			show_error('Akses ditolak. Form ini tidak dalam status Correction.', 403);
+			return;
+		}
+
+		$history = $this->db->order_by('action_at', 'ASC')
+			->get_where('form_status_logs', ['form_id' => $id])
+			->result();
+
+		$users = $this->db->get_where('users')->result();
+		$ArrUsers = [];
+		foreach ($users as $user) {
+			$ArrUsers[$user->id_user] = $user;
+		}
+
+		$this->template->set([
+			'form'     => $form,
+			'history'  => $history,
+			'ArrUsers' => $ArrUsers,
+			'sts'      => $this->sts,
+		]);
+
+		$this->template->render('forms/correction-form');
+	}
+
+	public function save_correction_form()
+	{
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		$form = $this->db->get_where('view_forms', ['id' => $data['id'], 'company_id' => $this->company])->row();
+
+		if (!$form || $form->status !== 'COR') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau status form tidak valid.']);
+			return;
+		}
+
+		$note = trim($data['note'] ?? '');
+
+		$this->db->trans_begin();
+
+		$this->db->where('id', $form->id)->update('forms', [
+			'status'      => 'REV',
+			'modified_by' => $this->auth->user_id(),
+			'modified_at' => date('Y-m-d H:i:s'),
+		]);
+
+		$this->db->insert('form_status_logs', [
+			'form_id'    => $form->id,
+			'old_status' => 'COR',
+			'new_status' => 'REV',
+			'action_by'  => $this->auth->user_id(),
+			'action_at'  => date('Y-m-d H:i:s'),
+			'note'       => $note,
+		]);
+
+		if ($this->db->trans_status() === false) {
+			$this->db->trans_rollback();
+			echo json_encode(['status' => 0, 'msg' => 'Gagal menyimpan data. Silakan coba lagi.']);
+			return;
+		}
+
+		$this->db->trans_commit();
+		echo json_encode(['status' => 1, 'msg' => 'Form berhasil dikembalikan ke proses Review.']);
+	}
+
+	public function save_approval_form()
+	{
+		// Validasi AJAX request
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		// Verifikasi kepemilikan company
+		$form = $this->db->get_where('view_forms', ['id' => $data['id'], 'company_id' => $this->company])->row();
+
+		if (!$form) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Form tidak ditemukan atau bukan milik perusahaan Anda.']);
+			return;
+		}
+
+		// Verifikasi otorisasi PIC Approver
+		$approver_position = $this->db->get_where('positions', [
+			'id'          => $form->approver_position_id,
+			'assign_user' => $this->auth->user_id(),
+		])->row();
+
+		if (!$approver_position) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Anda bukan PIC Approver yang berwenang untuk Form ini.']);
+			return;
+		}
+
+		// Panggil saveApprove() di FormModel dan return JSON response
+		$Return = $this->FormModel->saveApprove();
+		echo json_encode($Return);
+	}
+
 }
