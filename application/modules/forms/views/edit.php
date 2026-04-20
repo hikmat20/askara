@@ -91,6 +91,41 @@
 						<hr>
 
 						<div class="row">
+							<div class="col-md-6">
+								<div class="mb-3 row">
+									<label class="col-md-4 col-form-label">PIC Reviewer <span class="text-danger">*</span></label>
+									<div class="col-md-8">
+										<select class="form-control select2" name="reviewer_position_id" id="reviewer_position_id">
+											<option value=""></option>
+											<?php if ($positions) foreach ($positions as $position): ?>
+												<option value="<?= $position->id; ?>" <?= (isset($dataForm) && $dataForm->reviewer_position_id == $position->id ? 'selected' : ''); ?>><?= $position->name; ?></option>
+											<?php endforeach; ?>
+										</select>
+										<span class="form-text text-muted">Jabatan yang bertugas mereview form ini.</span>
+										<span class="form-text text-danger invalid-feedback">PIC Reviewer harus di isi</span>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="mb-3 row">
+									<label class="col-md-4 col-form-label">PIC Approver <span class="text-danger">*</span></label>
+									<div class="col-md-8">
+										<select class="form-control select2" name="approver_position_id" id="approver_position_id">
+											<option value=""></option>
+											<?php if ($positions) foreach ($positions as $position): ?>
+												<option value="<?= $position->id; ?>" <?= (isset($dataForm) && $dataForm->approver_position_id == $position->id ? 'selected' : ''); ?>><?= $position->name; ?></option>
+											<?php endforeach; ?>
+										</select>
+										<span class="form-text text-muted">Jabatan yang bertugas menyetujui form ini.</span>
+										<span class="form-text text-danger invalid-feedback">PIC Approver harus di isi</span>
+									</div>
+								</div>
+							</div>
+						</div>
+
+						<hr>
+
+						<div class="row">
 							<label class="col-md-2">Document Type <span class="text-danger">*</span></label>
 							<div class="col-md-6">
 								<div class="form-group mb-0">
@@ -114,47 +149,6 @@
 								<button type="button" data-id="<?= isset($dataForm) ? $dataForm->id : ''; ?>" class="btn btn-block btn-success view" data-toggle="modal" data-target="#modelId"><i class="fa fa-eye" aria-hidden="true"></i> View Form</button>
 							</div>
 						</div>
-						<!-- <hr> -->
-						<!-- <div class="row">
-							<div class="col-md-6">
-								<div class="mb-3 row">
-									<label class="col-md-4">Prepared By <span class="text-danger">*</span></label>
-									<div class="col-md-8">
-										<select class="form-control select2" name="prepared_by" id="prepared_by">
-											<option value=""></option>
-											<?php if ($users) foreach ($users as $user): ?>
-												<option value="<?= $user->id_user; ?>" <?= ($dataForm->prepared_by == $user->id_user) ? 'selected' : ''; ?>><?= $user->full_name; ?></option>
-											<?php endforeach; ?>
-										</select>
-										<span class="form-text text-danger invalid-feedback">harus di isi</span>
-									</div>
-								</div>
-								<div class="mb-3 row">
-									<label class="col-md-4">Reviewer By <span class="text-danger">*</span></label>
-									<div class="col-md-8">
-										<select class="form-control select2" name="reviewer_id" id="reviewer_id">
-											<option value=""></option>
-											<?php if ($positions) foreach ($positions as $position): ?>
-												<option value="<?= $position->id; ?>" <?= ($dataForm->reviewer_id == $position->id ? 'selected' : ''); ?>><?= $position->name; ?></option>
-											<?php endforeach; ?>
-										</select>
-										<span class="form-text text-danger invalid-feedback">harus di isi</span>
-									</div>
-								</div>
-								<div class="mb-3 row">
-									<label class="col-md-4">Approval By <span class="text-danger">*</span></label>
-									<div class="col-md-8">
-										<select class="form-control select2" name="approval_id" id="approval_id">
-											<option value=""></option>
-											<?php if ($positions) foreach ($positions as $position): ?>
-												<option value="<?= $position->id; ?>" <?= ($dataForm->approval_id == $position->id ? 'selected' : ''); ?>><?= $position->name; ?></option>
-											<?php endforeach; ?>
-										</select>
-										<span class="form-text text-danger invalid-feedback">harus di isi</span>
-									</div>
-								</div>
-							</div>
-						</div> -->
 					</div>
 					<div class="d-flex card-footer justify-content-between align-items-center">
 						<button class="btn btn-primary save min-w-100px"><i class="fa fa-save"></i>Save</button>

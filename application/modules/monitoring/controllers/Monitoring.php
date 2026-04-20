@@ -93,6 +93,7 @@ class Monitoring extends Admin_Controller
 		$dtFormCor = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'COR'])->num_rows();
 		$dtFormApv = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'APV'])->num_rows();
 		$dtFormPub = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'PUB'])->num_rows();
+		$dtFormRvi = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'RVI'])->num_rows();
 
 		$Data = $this->db->order_by('created_at', 'ASC')->get_where('directory', ['parent_id' => '0', 'active' => 'Y', 'status !=' => 'DEL'])->result();
 		$RecentFiles = $this->db->order_by('created_at', 'DESC')->get_where('directory', ['parent_id !=' => '0', 'active' => 'Y', 'flag_type' => 'FILE', 'status !=' => 'DEL', 'created_at like' => date('Y-m-d') . "%"])->result();
@@ -120,6 +121,7 @@ class Monitoring extends Admin_Controller
 				'dtFormCor'			=> $dtFormCor,
 				'dtFormApv'			=> $dtFormApv,
 				'dtFormPub'			=> $dtFormPub,
+				'dtFormRvi'			=> $dtFormRvi,
 			]
 		);
 
@@ -858,6 +860,16 @@ class Monitoring extends Admin_Controller
 	{
 		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'REV'])->result();
 
+		// Tandai apakah user saat ini adalah PIC Reviewer untuk setiap form
+		$current_user_id = $this->auth->user_id();
+		foreach ($forms as $form) {
+			$reviewer_position = $this->db->get_where('positions', [
+				'id'          => $form->reviewer_position_id,
+				'assign_user' => $current_user_id,
+			])->row();
+			$form->can_action = (bool) $reviewer_position;
+		}
+
 		$this->template->set([
 			'title'  => 'DAFTAR FORM - REVIEW',
 			'forms'  => $forms,
@@ -871,6 +883,12 @@ class Monitoring extends Admin_Controller
 	{
 		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'COR'])->result();
 
+		// Tandai apakah user saat ini adalah creator/owner form
+		$current_user_id = $this->auth->user_id();
+		foreach ($forms as $form) {
+			$form->can_action = ((int)$form->created_by === (int)$current_user_id);
+		}
+
 		$this->template->set([
 			'title'  => 'DAFTAR FORM - CORRECTION',
 			'forms'  => $forms,
@@ -883,6 +901,16 @@ class Monitoring extends Admin_Controller
 	public function forms_approval()
 	{
 		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'APV'])->result();
+
+		// Tandai apakah user saat ini adalah PIC Approver untuk setiap form
+		$current_user_id = $this->auth->user_id();
+		foreach ($forms as $form) {
+			$approver_position = $this->db->get_where('positions', [
+				'id'          => $form->approver_position_id,
+				'assign_user' => $current_user_id,
+			])->row();
+			$form->can_action = (bool) $approver_position;
+		}
 
 		$this->template->set([
 			'title'  => 'DAFTAR FORM - APPROVAL',
@@ -898,9 +926,10 @@ class Monitoring extends Admin_Controller
 		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'PUB'])->result();
 
 		$this->template->set([
-			'title'  => 'DAFTAR FORM - PUBLISHED',
-			'forms'  => $forms,
-			'sts'    => $this->sts,
+			'title'   => 'DAFTAR FORM - PUBLISHED',
+			'forms'   => $forms,
+			'sts'     => $this->sts,
+			'ArrPosts' => $this->ArrPosts,
 		]);
 
 		$this->template->render('forms/list');
@@ -914,7 +943,7 @@ class Monitoring extends Admin_Controller
 		// Jika form tidak ditemukan atau company_id tidak cocok → 403
 		if (!$form) {
 			$this->output->set_status_header(403);
-			show_error('Akses ditolak. Form tidak ditemukan atau bukan milik perusahaan Anda.', 403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Form tidak ditemukan atau bukan milik perusahaan Anda.']);
 			return;
 		}
 
@@ -926,7 +955,7 @@ class Monitoring extends Admin_Controller
 
 		if (!$reviewer_position) {
 			$this->output->set_status_header(403);
-			show_error('Akses ditolak. Anda bukan PIC Reviewer yang berwenang untuk Form ini.', 403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Anda bukan PIC Reviewer yang berwenang untuk Form ini.']);
 			return;
 		}
 
@@ -942,14 +971,13 @@ class Monitoring extends Admin_Controller
 			$ArrUsers[$user->id_user] = $user;
 		}
 
-		$this->template->set([
+		// Render partial view (tanpa layout) untuk dimuat di dalam modal
+		$this->load->view('monitoring/forms/review-form-modal', [
 			'form'     => $form,
 			'history'  => $history,
 			'ArrUsers' => $ArrUsers,
 			'sts'      => $this->sts,
 		]);
-
-		$this->template->render('forms/review-form');
 	}
 
 	public function save_review_form()
@@ -1030,14 +1058,13 @@ class Monitoring extends Admin_Controller
 			$ArrUsers[$user->id_user] = $user;
 		}
 
-		$this->template->set([
+		// Render partial view (tanpa layout) untuk dimuat di dalam modal
+		$this->load->view('monitoring/forms/approval-form-modal', [
 			'form'     => $form,
 			'history'  => $history,
 			'ArrUsers' => $ArrUsers,
 			'sts'      => $this->sts,
 		]);
-
-		$this->template->render('forms/approval-form');
 	}
 
 	public function load_form_correction_form($id)
@@ -1053,6 +1080,13 @@ class Monitoring extends Admin_Controller
 		if ($form->status !== 'COR') {
 			$this->output->set_status_header(403);
 			show_error('Akses ditolak. Form ini tidak dalam status Correction.', 403);
+			return;
+		}
+
+		// Verifikasi bahwa user adalah creator/owner form
+		if ((int)$form->created_by !== (int)$this->auth->user_id()) {
+			$this->output->set_status_header(403);
+			show_error('Akses ditolak. Hanya pembuat form yang dapat mengajukan koreksi.', 403);
 			return;
 		}
 
@@ -1096,6 +1130,13 @@ class Monitoring extends Admin_Controller
 		if (!$form || $form->status !== 'COR') {
 			$this->output->set_status_header(403);
 			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau status form tidak valid.']);
+			return;
+		}
+
+		// Verifikasi bahwa user adalah creator/owner form
+		if ((int)$form->created_by !== (int)$this->auth->user_id()) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya pembuat form yang dapat mengajukan koreksi.']);
 			return;
 		}
 
@@ -1167,6 +1208,124 @@ class Monitoring extends Admin_Controller
 
 		// Panggil saveApprove() di FormModel dan return JSON response
 		$Return = $this->FormModel->saveApprove();
+		echo json_encode($Return);
+	}
+
+	/* FORM REVISION */
+	public function load_form_revision_form($id)
+	{
+		$form = $this->db->get_where('view_forms', ['id' => $id, 'company_id' => $this->company])->row();
+
+		if (!$form || $form->status !== 'PUB') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau form tidak dalam status Published.']);
+			return;
+		}
+
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan revisi.']);
+			return;
+		}
+
+		$this->load->view('monitoring/forms/revision-form-modal', ['form' => $form]);
+	}
+
+	public function save_form_revision()
+	{
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		if (empty(trim($data['note'] ?? ''))) {
+			echo json_encode(['status' => 0, 'msg' => 'Alasan revisi wajib diisi.']);
+			return;
+		}
+
+		// Verifikasi company & status
+		$form = $this->db->get_where('view_forms', ['id' => $data['id'], 'company_id' => $this->company])->row();
+		if (!$form || $form->status !== 'PUB') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau form tidak dalam status Published.']);
+			return;
+		}
+
+		// Verifikasi user menjabat posisi PM/MR (position id = 1)
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan revisi.']);
+			return;
+		}
+
+		$Return = $this->FormModel->saveFormRevision($data);
+		echo json_encode($Return);
+	}
+
+	/* FORM DELETION */
+	public function load_form_deletion_form($id)
+	{
+		$form = $this->db->get_where('view_forms', ['id' => $id, 'company_id' => $this->company])->row();
+
+		if (!$form || $form->status !== 'PUB') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau form tidak dalam status Published.']);
+			return;
+		}
+
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan penghapusan.']);
+			return;
+		}
+
+		$this->load->view('monitoring/forms/deletion-form-modal', ['form' => $form]);
+	}
+
+	public function save_form_deletion()
+	{
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		if (empty(trim($data['note'] ?? ''))) {
+			echo json_encode(['status' => 0, 'msg' => 'Alasan penghapusan wajib diisi.']);
+			return;
+		}
+
+		// Verifikasi company & status
+		$form = $this->db->get_where('view_forms', ['id' => $data['id'], 'company_id' => $this->company])->row();
+		if (!$form || $form->status !== 'PUB') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau form tidak dalam status Published.']);
+			return;
+		}
+
+		// Verifikasi user menjabat posisi PM/MR (position id = 1)
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan penghapusan.']);
+			return;
+		}
+
+		$Return = $this->FormModel->saveFormDeletion($data);
 		echo json_encode($Return);
 	}
 

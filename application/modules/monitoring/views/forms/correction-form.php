@@ -143,6 +143,9 @@
             note: document.getElementById('note').value.trim()
         };
 
+        // Cegah double-click sebelum Swal muncul
+        btn.disabled = true;
+
         Swal.fire({
             title: 'Yakin sudah diperbaiki?',
             text: 'Form akan dikembalikan ke proses Review.',
@@ -151,9 +154,11 @@
             confirmButtonText: 'Ya, Submit',
             cancelButtonText: 'Batal'
         }).then(function (result) {
-            if (!result.isConfirmed) return;
+            if (!result.isConfirmed) {
+                btn.disabled = false;
+                return;
+            }
 
-            btn.disabled = true;
             btn.innerHTML = '<span class="spinner-border spinner-border-sm"></span> Loading...';
 
             $.ajax({

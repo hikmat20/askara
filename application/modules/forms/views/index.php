@@ -102,8 +102,8 @@
 												<td class="text-center"><?= $review->effective_date; ?></td>
 												<td class="text-center"><?= $review->revision_number; ?></td>
 												<td class="text-center">
-													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<button type="button" class="btn btn-xs	 btn-icon btn-success process-review" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-danger cancelReview" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Cancel Review — kembalikan ke Draft"><i class="fa fa-undo"></i></button>
 													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
 												</td>
 											</tr>
@@ -139,9 +139,9 @@
 												<td class="text-center"><?= $cor->effective_date; ?></td>
 												<td class="text-center"><?= $cor->revision_number; ?></td>
 												<td class="text-center">
-													<button type="button" class="btn btn-xs	btn-icon btn-info view" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs	 btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
-													<button type="button" class="btn btn-xs	btn-icon btn-success toReview" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $cor->id); ?>" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
+													<button type="button" class="btn btn-xs btn-icon btn-success correctionToReview" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Process to Review — setelah koreksi"><i class="fa fa-check"></i></button>
 													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
 												</td>
 											</tr>
@@ -177,8 +177,7 @@
 												<td class="text-center"><?= $apv->effective_date; ?></td>
 												<td class="text-center"><?= $apv->revision_number; ?></td>
 												<td class="text-center">
-													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<button type="button" class="btn btn-xs	 btn-icon btn-success process-approval" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
 												</td>
 											</tr>
@@ -368,140 +367,122 @@
 			}
 		})
 
+		// Cancel Review — kembalikan dari REV ke DFT
+		$(document).on('click', '.cancelReview', function() {
+			let id = $(this).data('id')
+			if (id) {
+				Swal.fire({
+					title: 'Cancel Review?',
+					text: 'Form akan dikembalikan ke status Draft.',
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonText: 'Ya, Cancel Review',
+					cancelButtonText: 'Batal',
+					customClass: {
+						cancelButton: 'btn btn-secondary',
+						confirmButton: 'btn btn-danger'
+					},
+					buttonsStyling: false
+				}).then((value) => {
+					if (value.isConfirmed) {
+						$.ajax({
+							url: base_url + active_controller + 'cancel_review',
+							type: 'POST',
+							dataType: 'JSON',
+							data: { id },
+							success: function(res) {
+								if (res.status == 1) {
+									Swal.fire({
+										title: 'Success!',
+										icon: 'success',
+										text: res.msg,
+										timer: 2000
+									}).then(() => {
+										location.reload();
+									})
+								} else {
+									Swal.fire({
+										title: 'Warning!',
+										icon: 'warning',
+										text: res.msg,
+										timer: 3000
+									})
+								}
+							},
+							error: function() {
+								Swal.fire({
+									title: 'Error!',
+									icon: 'error',
+									text: 'Server timeout, error..',
+									timer: 3000
+								})
+							}
+						})
+					}
+				})
+			}
+		})
+
+		// Correction to Review — kembalikan dari COR ke REV
+		$(document).on('click', '.correctionToReview', function() {
+			let id = $(this).data('id')
+			if (id) {
+				Swal.fire({
+					title: 'Confirm!',
+					text: 'Form sudah dikoreksi dan siap untuk direview kembali?',
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonText: 'Ya, Process to Review',
+					cancelButtonText: 'Batal',
+					customClass: {
+						cancelButton: 'btn btn-secondary',
+						confirmButton: 'btn btn-success'
+					},
+					buttonsStyling: false
+				}).then((value) => {
+					if (value.isConfirmed) {
+						$.ajax({
+							url: base_url + active_controller + 'correction_to_review',
+							type: 'POST',
+							dataType: 'JSON',
+							data: { id },
+							success: function(res) {
+								if (res.status == 1) {
+									Swal.fire({
+										title: 'Success!',
+										icon: 'success',
+										text: res.msg,
+										timer: 2000
+									}).then(() => {
+										location.reload();
+									})
+								} else {
+									Swal.fire({
+										title: 'Warning!',
+										icon: 'warning',
+										text: res.msg,
+										timer: 3000
+									})
+								}
+							},
+							error: function() {
+								Swal.fire({
+									title: 'Error!',
+									icon: 'error',
+									text: 'Server timeout, error..',
+									timer: 3000
+								})
+							}
+						})
+					}
+				})
+			}
+		})
+
 		$(document).on('click', '.process-review', function() {
 			$('#modalId').modal('show')
 			$('#modalId .modal-title').html('<i class="fa fa-check" aria-hidden="true"></i> Process Review')
 			$('#modalId .modal-body').load(base_url + active_controller + 'form_review/' + $(this).data('id'))
-		})
-
-		$(document).on('submit', '#form-review', function(e) {
-			e.preventDefault()
-
-			$('#form-review .form-control').removeClass('is-invalid');
-			$('#form-review .invalid-feedback').html('');
-
-			let btn = $('#save-review')
-			let formdata = new FormData($(this)[0])
-
-			$.ajax({
-				url: siteurl + active_controller + 'saveReview',
-				data: formdata,
-				dataType: 'JSON',
-				type: 'POST',
-				processData: false,
-				contentType: false,
-				cache: false,
-				beforeSend: function() {
-					btn.attr('disabled', true)
-					btn.html('<i class="spinner spinner-border-sm"></i>Loading...')
-				},
-				complete: function() {
-					btn.attr('disabled', false)
-					btn.html('<i class="fab fa-telegram-plane"></i> Submit Review')
-				},
-				success: function(result) {
-					if (result.status == '0') {
-
-						// tampilkan error per field
-						$.each(result.errors, function(field, message) {
-							let input = $('[name="' + field + '"]');
-							input.addClass('is-invalid');
-							input.closest('.mb-3').find('span.invalid-feedback').html(message);
-						});
-						return;
-					}
-
-					Swal.fire({
-						title: 'Success!',
-						text: result.msg,
-						icon: 'success',
-						timer: 2000
-					}).then(() => {
-						location.href = siteurl + active_controller
-					});
-				},
-				error: function() {
-					Swal.fire({
-						title: 'Error!',
-						text: 'Server timeout, becuase error. Please try again!',
-						icon: 'error',
-						timer: 5000
-					})
-				}
-			})
-
-		})
-
-		$(document).on('click', '.process-approval', function() {
-			$('#modalId').modal('show')
-			$('#modalId .modal-title').html('<i class="fa fa-check" aria-hidden="true"></i> Process Approval')
-			$('#modalId .modal-body').load(base_url + active_controller + 'form_approval/' + $(this).data('id'))
-		})
-
-		$(document).on('submit', '#form-approval', function(e) {
-			e.preventDefault()
-			// reset error
-			$('.invalid-feedback').html('');
-			$('#invalid-action').addClass('d-none');
-
-			let btn = $('#save-approval')
-			let formdata = new FormData($(this)[0])
-
-			$.ajax({
-				url: siteurl + active_controller + 'saveApprove',
-				data: formdata,
-				dataType: 'JSON',
-				type: 'POST',
-				processData: false,
-				contentType: false,
-				cache: false,
-				beforeSend: function() {
-					btn.attr('disabled', true)
-					btn.html('<i class="spinner spinner-border-sm mr-3"></i>Loading...')
-				},
-				complete: function() {
-					btn.attr('disabled', false)
-					btn.html('<i class="fab fa-telegram-plane"></i> Submit Approval')
-				},
-				success: function(result) {
-					if (result.status == '0') {
-						// tampilkan error per field
-						console.log(result.errors);
-						$.each(result.errors, function(field, message) {
-							console.log(field);
-							console.log(message);
-
-							let input = $('[name="' + field + '"]');
-							input.addClass('is-invalid');
-							input.closest('.mb-3').find('.invalid-feedback').text(message);
-							console.log(input.closest('.mb-3').find('.invalid-feedback'));
-
-						});
-						if (result.errors['status']) {
-							$('#invalid-action').removeClass('d-none').html(`<p class="mb-0 text-danger">${result.errors['status']}</p>`);
-						}
-						return;
-					}
-
-					Swal.fire({
-						title: 'Success!',
-						text: result.msg,
-						icon: 'success',
-						timer: 2000
-					}).then(() => {
-						location.href = siteurl + active_controller
-					});
-				},
-				error: function() {
-					Swal.fire({
-						title: 'Error!',
-						text: 'Server timeout, becuase error. Please try again!',
-						icon: 'error',
-						timer: 5000
-					})
-				}
-			})
-
 		})
 
 
