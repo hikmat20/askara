@@ -633,4 +633,107 @@ class Form_model extends BF_Model
       return ['status' => 0, 'msg' => $th->getMessage()];
     }
   }
+
+  /**
+   * Review Deletion — PM/MR menyetujui (APV) atau menolak (REJ) pengajuan deletion.
+   * action: 'APV' → lanjut ke approval deletion | 'REJ' → kembalikan ke PUB
+   */
+  public function saveFormRevDeletion($data)
+  {
+    try {
+      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      if (!$form || $form->status !== 'HLD') {
+        throw new Exception('Form tidak ditemukan atau status tidak valid.');
+      }
+
+      $action = $data['action']; // 'APV' atau 'REJ'
+
+      $this->db->trans_begin();
+
+      if ($action === 'APV') {
+        // Lanjut ke tahap approval deletion
+        $this->db->where('id', $form->id)->update('forms', [
+          'deletion_status' => 'APV',
+          'modified_by'     => $this->auth->user_id(),
+          'modified_at'     => date('Y-m-d H:i:s'),
+        ]);
+        $this->_insertStatusLog($form->id, 'HLD', 'HLD', 'Review deletion disetujui — lanjut ke Approval Deletion.');
+        $msg = 'Pengajuan deletion disetujui. Lanjut ke proses Approval Deletion.';
+      } else {
+        // Tolak — kembalikan ke Published
+        $this->db->where('id', $form->id)->update('forms', [
+          'status'          => 'PUB',
+          'deletion_status' => null,
+          'note'            => null,
+          'modified_by'     => $this->auth->user_id(),
+          'modified_at'     => date('Y-m-d H:i:s'),
+        ]);
+        $this->_insertStatusLog($form->id, 'HLD', 'PUB', 'Pengajuan deletion ditolak pada tahap Review.');
+        $msg = 'Pengajuan deletion ditolak. Form dikembalikan ke status Published.';
+      }
+
+      if ($this->db->trans_status() === FALSE) {
+        $this->db->trans_rollback();
+        throw new Exception('Gagal memproses review deletion. Silakan coba lagi.');
+      }
+
+      $this->db->trans_commit();
+      return ['status' => 1, 'msg' => $msg];
+    } catch (\Throwable $th) {
+      $this->db->trans_rollback();
+      return ['status' => 0, 'msg' => $th->getMessage()];
+    }
+  }
+
+  /**
+   * Approval Deletion — PM/MR menyetujui (DEL) atau menolak (REJ) deletion final.
+   * action: 'DEL' → hapus form (status = DEL) | 'REJ' → kembalikan ke PUB
+   */
+  public function saveFormApvDeletion($data)
+  {
+    try {
+      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      if (!$form || $form->status !== 'HLD') {
+        throw new Exception('Form tidak ditemukan atau status tidak valid.');
+      }
+
+      $action = $data['action']; // 'DEL' atau 'REJ'
+
+      $this->db->trans_begin();
+
+      if ($action === 'DEL') {
+        // Hapus — set status DEL
+        $this->db->where('id', $form->id)->update('forms', [
+          'status'          => 'DEL',
+          'deletion_status' => 'DEL',
+          'modified_by'     => $this->auth->user_id(),
+          'modified_at'     => date('Y-m-d H:i:s'),
+        ]);
+        $this->_insertStatusLog($form->id, 'HLD', 'DEL', 'Approval deletion disetujui — form dihapus.');
+        $msg = 'Form berhasil dihapus.';
+      } else {
+        // Tolak — kembalikan ke Published
+        $this->db->where('id', $form->id)->update('forms', [
+          'status'          => 'PUB',
+          'deletion_status' => null,
+          'note'            => null,
+          'modified_by'     => $this->auth->user_id(),
+          'modified_at'     => date('Y-m-d H:i:s'),
+        ]);
+        $this->_insertStatusLog($form->id, 'HLD', 'PUB', 'Pengajuan deletion ditolak pada tahap Approval.');
+        $msg = 'Pengajuan deletion ditolak. Form dikembalikan ke status Published.';
+      }
+
+      if ($this->db->trans_status() === FALSE) {
+        $this->db->trans_rollback();
+        throw new Exception('Gagal memproses approval deletion. Silakan coba lagi.');
+      }
+
+      $this->db->trans_commit();
+      return ['status' => 1, 'msg' => $msg];
+    } catch (\Throwable $th) {
+      $this->db->trans_rollback();
+      return ['status' => 0, 'msg' => $th->getMessage()];
+    }
+  }
 }
