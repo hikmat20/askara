@@ -268,8 +268,7 @@
         <h1 class="text-white pt-0 font-weight-bolder bg-white-o-50 d-inline text-center rounded-lg px-5 py-1">DELETION
             DOCUMENTS</h1>
         <div class="pt-3 mt-4">
-            <h3 class="text-white pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Procedures</h3>
-            <div class="d-flex justify-content-start align-items-center">
+            <h3 class="text-white pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Procedures</h3>            <div class="d-flex justify-content-start align-items-center">
                 <div class="w-250px mr-5 mb-lg-5">
                     <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
                         <div class="card-body p-2 text-center">
@@ -337,6 +336,43 @@
 
             </div>
         </div>
+
+        <!-- DELETION FORMS -->
+        <div class="pt-3 mt-4">
+            <h3 class="text-white pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Forms</h3>
+            <div class="d-flex justify-content-start align-items-center">
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-warning" style="font-size: 48px;"><?= $dtFormDelOPN; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url($this->uri->segment(1) . '/forms_review_deletion'); ?>" class="text-hover-primary"
+                                title="REVIEW DELETION FORMS">
+                                <span class="card-label text-dark text-center font-weight-bolder">REVIEW DELETION FORMS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-danger" style="font-size: 48px;"><?= $dtFormDelAPV; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url($this->uri->segment(1) . '/forms_approval_deletion'); ?>" class="text-hover-primary"
+                                title="APPROVAL DELETION FORMS">
+                                <span class="card-label text-dark text-center font-weight-bolder">APPROVAL DELETION FORMS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 <style>

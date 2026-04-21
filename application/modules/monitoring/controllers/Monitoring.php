@@ -95,6 +95,10 @@ class Monitoring extends Admin_Controller
 		$dtFormPub = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'PUB'])->num_rows();
 		$dtFormRvi = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'RVI'])->num_rows();
 
+		/* FORM DELETION STATISTICS */
+		$dtFormDelOPN = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'OPN'])->num_rows();
+		$dtFormDelAPV = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'APV'])->num_rows();
+
 		$Data = $this->db->order_by('created_at', 'ASC')->get_where('directory', ['parent_id' => '0', 'active' => 'Y', 'status !=' => 'DEL'])->result();
 		$RecentFiles = $this->db->order_by('created_at', 'DESC')->get_where('directory', ['parent_id !=' => '0', 'active' => 'Y', 'flag_type' => 'FILE', 'status !=' => 'DEL', 'created_at like' => date('Y-m-d') . "%"])->result();
 
@@ -122,6 +126,8 @@ class Monitoring extends Admin_Controller
 				'dtFormApv'			=> $dtFormApv,
 				'dtFormPub'			=> $dtFormPub,
 				'dtFormRvi'			=> $dtFormRvi,
+				'dtFormDelOPN'		=> $dtFormDelOPN,
+				'dtFormDelAPV'		=> $dtFormDelAPV,
 			]
 		);
 
@@ -1326,6 +1332,106 @@ class Monitoring extends Admin_Controller
 		}
 
 		$Return = $this->FormModel->saveFormDeletion($data);
+		echo json_encode($Return);
+	}
+
+	/* FORMS DELETION REVIEW & APPROVAL */
+
+	public function forms_review_deletion()
+	{
+		$forms = $this->db->get_where('view_forms', [
+			'company_id'      => $this->company,
+			'status'          => 'HLD',
+			'deletion_status' => 'OPN',
+		])->result();
+
+		$this->template->set([
+			'title'    => 'DAFTAR FORM - REVIEW DELETION',
+			'forms'    => $forms,
+			'sts'      => $this->sts,
+			'ArrPosts' => $this->ArrPosts,
+		]);
+		$this->template->render('forms/deletion-list');
+	}
+
+	public function save_form_rev_deletion()
+	{
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id']) || empty($data['action'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mereview deletion.']);
+			return;
+		}
+
+		$form = $this->db->get_where('view_forms', ['id' => $data['id'], 'company_id' => $this->company])->row();
+		if (!$form || $form->status !== 'HLD') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau status form tidak valid.']);
+			return;
+		}
+
+		$Return = $this->FormModel->saveFormRevDeletion($data);
+		echo json_encode($Return);
+	}
+
+	public function forms_approval_deletion()
+	{
+		$forms = $this->db->get_where('view_forms', [
+			'company_id'      => $this->company,
+			'status'          => 'HLD',
+			'deletion_status' => 'APV',
+		])->result();
+
+		$this->template->set([
+			'title'    => 'DAFTAR FORM - APPROVAL DELETION',
+			'forms'    => $forms,
+			'sts'      => $this->sts,
+			'ArrPosts' => $this->ArrPosts,
+		]);
+		$this->template->render('forms/deletion-list');
+	}
+
+	public function save_form_apv_deletion()
+	{
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id']) || empty($data['action'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat menyetujui deletion.']);
+			return;
+		}
+
+		$form = $this->db->get_where('view_forms', ['id' => $data['id'], 'company_id' => $this->company])->row();
+		if (!$form || $form->status !== 'HLD') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau status form tidak valid.']);
+			return;
+		}
+
+		$Return = $this->FormModel->saveFormApvDeletion($data);
 		echo json_encode($Return);
 	}
 
