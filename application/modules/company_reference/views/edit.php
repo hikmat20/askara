@@ -144,25 +144,23 @@
 
 <!-- Modal -->
 <div class="modal fade" id="modelId" tabindex="-1" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
-	<form id="">
-		<div class="modal-dialog" role="document">
-			<div class="modal-content">
-				<div class="modal-header">
-					<h5 class="modal-title"></h5>
-					<button type="button" class="btn btn-link btn-xs btn-icon" data-dismiss="modal" aria-label="Close">
-						<span aria-hidden="true"><i class="fa fa-times" aria-hidden="true"></i></span>
-					</button>
-				</div>
-				<div class="modal-body">
-				</div>
-				<div class="modal-footer">
-					<button id="modal-save" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
-					<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"
-							aria-hidden="true"></i> Close</button>
-				</div>
+	<div class="modal-dialog" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title"></h5>
+				<button type="button" class="btn btn-link btn-xs btn-icon" data-dismiss="modal" aria-label="Close">
+					<span aria-hidden="true"><i class="fa fa-times" aria-hidden="true"></i></span>
+				</button>
+			</div>
+			<div class="modal-body">
+			</div>
+			<div class="modal-footer">
+				<button id="modal-save" class="btn btn-primary"><i class="fas fa-save"></i> Save</button>
+				<button type="button" class="btn btn-secondary" data-dismiss="modal"><i class="fa fa-times"
+						aria-hidden="true"></i> Close</button>
 			</div>
 		</div>
-	</form>
+	</div>
 </div>
 
 <style>
@@ -447,64 +445,42 @@
 		/* New Compliance */
 		$(document).on('click', '#new-compliance', function() {
 			const branch = "<?= ($this->uri->segment(4)) ?: null; ?>";
-			$('#modelId').modal()
 			$('#modelId .modal-body').html('')
-			$('#modelId form').attr('id', 'form-subject')
 			$('#modelId .modal-title').html('Select Subject Regulation')
 			$('#modelId .modal-body').load(siteurl + active_controller + 'select_subjects/' + branch)
+			$('#modelId').modal('show')
 		})
 
 		$(document).on('click', '#modal-save', function() {
-			$('#form-subject').submit();
-		})
+			const subject_id = $('#modelId .modal-body #subject_id').val()
+			const btn = $(this)
 
-		$(document).on('submit', '#form-subject', function(e) {
-			e.preventDefault();
-			let formdata = new FormData($(this)[0])
-			let btn = $('#modal-save')
+			if (!subject_id) {
+				$('#modelId .modal-body #subject_id').next('.select2-container').find('.select2-selection').addClass('is-invalid')
+				return
+			}
+
+			btn.prop('disabled', true).html('<i class="spinner spinner-border-sm mr-2"></i> Loading...')
+
 			$.ajax({
 				url: siteurl + active_controller + 'save_subject',
-				data: formdata,
 				type: 'POST',
 				dataType: 'JSON',
-				processData: false,
-				contentType: false,
-				cache: false,
-				beforeSend: function() {
-					btn.attr('disabled', true)
-					btn.html('<i class="spinner spinner-border-sm mr-4"></i> Loading...')
-				},
-				complete: function() {
-					btn.attr('disabled', false)
-					btn.html('<i class="fa fa-save"></i>Save')
-				},
+				data: { subject_id: subject_id },
 				success: function(result) {
 					if (result.status == 1) {
-						Swal.fire({
-							title: 'Success!',
-							icon: 'success',
-							text: result.msg,
-							timer: 2000
-						})
-						// $('#modelId').modal('hide')
-						// location.href = siteurl + active_controller + 'edit/' + result.id
+						Swal.fire({ title: 'Success!', icon: 'success', text: result.msg, timer: 2000 })
+						$('#modelId').modal('hide')
 						location.reload()
 					} else {
-						Swal.fire({
-							title: 'Warning!',
-							icon: 'warning',
-							text: result.msg,
-							timer: 2000
-						})
+						Swal.fire({ title: 'Warning!', icon: 'warning', text: result.msg, timer: 2000 })
 					}
 				},
-				error: function(result) {
-					Swal.fire({
-						title: 'Error!',
-						icon: 'error',
-						text: result.statusText + " " + result.msg,
-						timer: 3000
-					})
+				error: function() {
+					Swal.fire({ title: 'Error!', icon: 'error', text: 'Server timeout. Please try again.', timer: 3000 })
+				},
+				complete: function() {
+					btn.prop('disabled', false).html('<i class="fas fa-save"></i> Save')
 				}
 			})
 		})
