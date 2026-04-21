@@ -312,36 +312,55 @@
 </style>
 <script>
 	$(document).ready(function() {
-		oTable = $('.datatable').DataTable({
-			dom: 'Pfrtip',
-			searchPanes: {
-				cascadePanes: true
-			},
-			language: {
-				searchPanes: {
-					i18n: {
-						emptyMessage: "<i></b>No results returned</b></i>"
-					}
+		// Tabel sub-directory (3 kolom: Name, Last update, Opsi)
+		var $subDirTable = $('.datatable').filter(function() {
+			return $(this).find('thead th').length === 3;
+		});
+
+		// Tabel files (7 kolom)
+		var $filesTable = $('.datatable').filter(function() {
+			return $(this).find('thead th').length === 7;
+		});
+
+		if ($subDirTable.length) {
+			oTable = $subDirTable.DataTable({
+				dom: 'frtip',
+				lengthChange: true,
+				paging: true,
+				info: false,
+				pageLength: 20,
+				language: {
+					infoEmpty: "No results returned",
+					zeroRecords: "No results returned",
+					emptyTable: "No results returned",
 				},
-				infoEmpty: "No results returned",
-				zeroRecords: "No results returned",
-				emptyTable: "No results returned",
-			},
-			lengthChange: true,
-			paging: true,
-			info: false,
-			pageLength: 20,
-			columnDefs: [{
-				width: 150,
-				targets: 4
-			}],
-			// scrollCollapse: true
-		})
+			});
+		}
+
+		if ($filesTable.length) {
+			oTable = $filesTable.DataTable({
+				dom: 'frtip',
+				lengthChange: true,
+				paging: true,
+				info: false,
+				pageLength: 20,
+				language: {
+					infoEmpty: "No results returned",
+					zeroRecords: "No results returned",
+					emptyTable: "No results returned",
+				},
+				columnDefs: [{
+					width: 150,
+					targets: 5
+				}],
+			});
+		}
 
 		$(document).on('input paste', '#search', function() {
-			oTable.search($(this).val()).draw();
-		})
-
+			if (typeof oTable !== 'undefined') {
+				oTable.search($(this).val()).draw();
+			}
+		});
 
 	})
 
