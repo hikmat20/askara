@@ -283,11 +283,11 @@ class Company_reference extends Admin_Controller
 					'msg'	 => 'Data not valid, please try again!',
 				);
 			}
-		} catch (\Throwable $th) {
+		} catch (Exception $e) {
 			$this->db->trans_rollback();
 			$Return		= array(
 				'status' => 0,
-				'msg'	 => $th->getMessage(),
+				'msg'	 => $e->getMessage(),
 			);
 		}
 		echo json_encode($Return);

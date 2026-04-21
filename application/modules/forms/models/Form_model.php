@@ -1,59 +1,20 @@
 <?php
 
- if (!defined('BASEPATH')) exit('No direct script access allowed');
+if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Form_model extends BF_Model
 {
 
-  /**
-   * @var string  User Table Name
-   */
   protected $table_name = 'forms';
   protected $key        = 'id';
-
-  /**
-   * @var string Field name to use for the created time column in the DB table
-   * if $set_created is enabled.
-   */
-  protected $created_field = 'created_at';
-
-  /**
-   * @var string Field name to use for the modified time column in the DB
-   * table if $set_modified is enabled.
-   */
+  protected $created_field  = 'created_at';
   protected $modified_field = 'modified_at';
+  protected $set_created    = true;
+  protected $set_modified   = true;
+  protected $soft_deletes   = false;
+  protected $date_format    = 'datetime';
+  protected $log_user       = true;
 
-  /**
-   * @var bool Set the created time automatically on a new record (if true)
-   */
-  protected $set_created = true;
-
-  /**
-   * @var bool Set the modified time automatically on editing a record (if true)
-   */
-  protected $set_modified = true;
-  /**
-   * @var string The type of date/time field used for $created_field and $modified_field.
-   * Valid values are 'int', 'datetime', 'date'.
-   */
-  /**
-   * @var bool Enable/Disable soft deletes.
-   * If false, the delete() method will perform a delete of that row.
-   * If true, the value in $deleted_field will be set to 1.
-   */
-  protected $soft_deletes = false;
-
-  protected $date_format = 'datetime';
-
-  /**
-   * @var bool If true, will log user id in $created_by_field, $modified_by_field,
-   * and $deleted_by_field.
-   */
-  protected $log_user = true;
-
-  /**
-   * Function construct used to load some library, do some actions, etc.
-   */
   public function __construct()
   {
     parent::__construct();
@@ -61,17 +22,17 @@ class Form_model extends BF_Model
 
   public function getAll()
   {
-    return $this->db->get_where('view_forms', ['status !=' => 'DEL'])->result();
+    return $this->db->get_where('view_forms', array('status !=' => 'DEL'))->result();
   }
 
   public function getDraft()
   {
-    return $this->db->get_where('view_forms', ['status' => 'DFT'])->result();
+    return $this->db->get_where('view_forms', array('status' => 'DFT'))->result();
   }
 
   public function getAllByStatus($status)
   {
-    return $this->db->get_where('view_forms', ['status' => $status])->result();
+    return $this->db->get_where('view_forms', array('status' => $status))->result();
   }
 
   public function saveData()
@@ -87,12 +48,11 @@ class Form_model extends BF_Model
       $Data['company_id'] = $this->session->company->id_perusahaan;
 
       // Validasi PIC jika salah satu diisi
-      if (!empty($Data['reviewer_position_id']) || !empty($Data['approver_position_id'])) {
-        $picError = $this->_validatePic(
-          $Data['reviewer_position_id'] ?? null,
-          $Data['approver_position_id'] ?? null,
-          $Data['company_id']
-        );
+      $reviewer_pos_id = isset($Data['reviewer_position_id']) ? $Data['reviewer_position_id'] : null;
+      $approver_pos_id = isset($Data['approver_position_id']) ? $Data['approver_position_id'] : null;
+
+      if (!empty($reviewer_pos_id) || !empty($approver_pos_id)) {
+        $picError = $this->_validatePic($reviewer_pos_id, $approver_pos_id, $Data['company_id']);
         if ($picError !== null) {
           throw new Exception($picError);
         }
@@ -117,145 +77,99 @@ class Form_model extends BF_Model
         $Data['modified_at'] = date('Y-m-d H:i:s');
         $save = $this->update($id, $Data);
       } else {
-        $Data['created_by']  = $this->auth->user_id();
-        $Data['created_at']  = date('Y-m-d H:i:s');
+        $Data['created_by'] = $this->auth->user_id();
+        $Data['created_at'] = date('Y-m-d H:i:s');
         $save = $this->insert($Data);
       }
 
       if (!$save || $this->db->trans_status() === FALSE) {
-        throw new Exception('Failed to save data form . Please try again.');
+        throw new Exception('Failed to save data form. Please try again.');
       }
 
       $this->db->trans_commit();
-      
-      return [
+
+      return array(
         'status' => 1,
-        'msg'    => 'Data Form successfully saved..',
-      ];
-    } catch (\Throwable $th) {
+        'msg'    => 'Data Form successfully saved.',
+      );
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      return [
+      return array(
         'status' => 0,
-        'msg'    => $th->getMessage(),
-      ];
+        'msg'    => $e->getMessage(),
+      );
     }
   }
 
   private function _uploadFile()
   {
     $company_id = $this->session->company->id_perusahaan;
-    $path = FCPATH . "directory/FORMS/{$company_id}/";
+    $path = FCPATH . 'directory/FORMS/' . $company_id . '/';
     $Data = $this->input->post();
-    
+
     if (empty($_FILES['form_file']['name'])) {
-      return [
+      return array(
         'status' => 0,
-        'error' => 'File gagal diupload. Kemungkinan ukuran file melebihi batas server.'
-      ];
+        'error'  => 'File gagal diupload. Kemungkinan ukuran file melebihi batas server.'
+      );
     }
 
     if (!is_dir($path)) {
       mkdir($path, 0755, TRUE);
     }
 
-    $config['upload_path']   = $path; //path folder
-    $config['allowed_types'] = 'pdf|xlsx|xls|docx'; //type yang dapat diakses bisa anda sesuaikan
-    $config['encrypt_name']  = false; //Enkripsi nama yang terupload
+    // PHP 5.6 compatible random string (openssl_random_pseudo_bytes sebagai fallback random_bytes)
+    $randomHex = bin2hex(openssl_random_pseudo_bytes(6));
+
+    $config['upload_path']   = $path;
+    $config['allowed_types'] = 'pdf|xlsx|xls|docx';
+    $config['encrypt_name']  = false;
     $config['max_size']      = 5120;
     $config['remove_spaces'] = true;
-    $config['file_name']     = slugify($Data['number'] . '-' . $Data['name']) . '-' . date('Ymd') . '-' . bin2hex(random_bytes(6));
+    $config['file_name']     = slugify($Data['number'] . '-' . $Data['name']) . '-' . date('Ymd') . '-' . $randomHex;
     $this->upload->initialize($config);
-    if (!$this->upload->do_upload('form_file')) :
+
+    if (!$this->upload->do_upload('form_file')) {
       $error = $this->upload->display_errors();
-      return [
+      return array(
         'status' => 0,
-        'error' => $error
-      ];
-
-    /* Convert to PDF */
-
-    else :
-       $file              = $this->upload->data();
+        'error'  => $error
+      );
+    } else {
+      $file              = $this->upload->data();
       $data['file_name'] = $file['file_name'];
       $data['size']      = $file['file_size'];
       $data['ext']       = $file['file_ext'];
 
-      $excelPath = $file['full_path'];
-      $pdfPath = str_replace('.xlsx', '.pdf', $excelPath);
-      // $convert = $this->_convert_excel_to_pdf($excelPath, $pdfPath);
-   
-      return [
+      return array(
         'status' => 1,
-        'data' => $data
-      ];
-    endif;
+        'data'   => $data
+      );
+    }
   }
 
-
-  private function _convert_excel_to_pdf($excelPath, $pdfPath)
-  {
-    ini_set('memory_limit', '512M');
-    set_time_limit(300);
-
-    // Load PHPExcel
-    // $this->load->library('phpexcel'); // kalau library Anda namanya excel.php
-
-    // Kalau perlu manual require:
-    require_once APPPATH . 'libraries/PHPExcel_NEW/Classes/PHPExcel.php';
-    require_once APPPATH . 'third_party/tcpdf/tcpdf.php';
-  
-    // Load Excel
-    $objPHPExcel = PHPExcel_IOFactory::load($excelPath);
-    
-    // Set PDF Renderer (mPDF)
-    PHPExcel_Settings::setPdfRenderer(
-      PHPExcel_Settings::PDF_RENDERER_TCPDF,
-      APPPATH . 'third_party/tcpdf/' // sesuaikan path Anda
-    );
-
-    $filename = pathinfo($excelPath, PATHINFO_FILENAME);
-    $pdfPath = FCPATH . 'directory/FORMS/1/pdf/' . $filename . '_' . time() . '.pdf';
-    // Create Writer
-    $objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'PDF');
-    $objWriter->save($pdfPath);
-  
-    return $pdfPath;
-  }
-
-  /**
-   * Validasi PIC Reviewer dan PIC Approver.
-   * Memastikan kedua position_id valid, milik company yang sama, dan tidak identik.
-   *
-   * @param int|null $reviewer_position_id
-   * @param int|null $approver_position_id
-   * @param int      $company_id
-   * @return string|null  Pesan error jika tidak valid, null jika valid
-   */
   private function _validatePic($reviewer_position_id, $approver_position_id, $company_id)
   {
-    // Validasi reviewer_position_id
     if (!empty($reviewer_position_id)) {
-      $reviewer = $this->db->get_where('positions', [
+      $reviewer = $this->db->get_where('positions', array(
         'id'         => $reviewer_position_id,
         'company_id' => $company_id,
-      ])->row();
+      ))->row();
       if (!$reviewer) {
         return 'PIC Reviewer tidak valid atau tidak ditemukan untuk perusahaan ini.';
       }
     }
 
-    // Validasi approver_position_id
     if (!empty($approver_position_id)) {
-      $approver = $this->db->get_where('positions', [
+      $approver = $this->db->get_where('positions', array(
         'id'         => $approver_position_id,
         'company_id' => $company_id,
-      ])->row();
+      ))->row();
       if (!$approver) {
         return 'PIC Approver tidak valid atau tidak ditemukan untuk perusahaan ini.';
       }
     }
 
-    // Validasi keduanya tidak boleh sama
     if (!empty($reviewer_position_id) && !empty($approver_position_id)
       && (int)$reviewer_position_id === (int)$approver_position_id
     ) {
@@ -265,19 +179,9 @@ class Form_model extends BF_Model
     return null;
   }
 
-  /**
-   * Insert satu record ke tabel form_status_logs.
-   * Melempar Exception jika insert gagal (untuk trigger rollback).
-   *
-   * @param int         $form_id
-   * @param string      $old_status
-   * @param string      $new_status
-   * @param string|null $note
-   * @throws Exception
-   */
   private function _insertStatusLog($form_id, $old_status, $new_status, $note = null)
   {
-    $log = [
+    $log = array(
       'form_id'    => $form_id,
       'old_status' => $old_status,
       'new_status' => $new_status,
@@ -285,7 +189,7 @@ class Form_model extends BF_Model
       'action_at'  => date('Y-m-d H:i:s'),
       'note'       => $note,
       'created_at' => date('Y-m-d H:i:s'),
-    ];
+    );
 
     $inserted = $this->db->insert('form_status_logs', $log);
     if (!$inserted) {
@@ -301,40 +205,29 @@ class Form_model extends BF_Model
         throw new Exception('ID form tidak valid.');
       }
 
-      $form = $this->db->get_where('forms', ['id' => $id])->row();
+      $form = $this->db->get_where('forms', array('id' => $id))->row();
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
       }
       $old_status = $form->status;
 
       $this->db->trans_begin();
-      $this->update($id, ['status' => 'REV']);
-
-      // Catat log perubahan status
+      $this->update($id, array('status' => 'REV'));
       $this->_insertStatusLog($id, $old_status, 'REV');
 
       if ($this->db->trans_status() === FALSE) {
         $this->db->trans_rollback();
-        throw new Exception('Failed to process data form . Please try again.');
-      } else {
-        $this->db->trans_commit();
-        $Return    = array(
-          'status'    => 1,
-          'msg'      => 'Data Form successfully updated to review..',
-        );
+        throw new Exception('Failed to process data form. Please try again.');
       }
-    } catch (\Throwable $th) {
-      $Return    = [
-        'status'    => 0,
-        'msg'      => $th->getMessage(),
-      ];
+
+      $this->db->trans_commit();
+      return array('status' => 1, 'msg' => 'Data Form successfully updated to review.');
+    } catch (Exception $e) {
+      $this->db->trans_rollback();
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
-    return $Return;
   }
 
-  /**
-   * Cancel Review — kembalikan status dari REV ke DFT.
-   */
   public function cancelReview()
   {
     try {
@@ -343,7 +236,7 @@ class Form_model extends BF_Model
         throw new Exception('ID form tidak valid.');
       }
 
-      $form = $this->db->get_where('forms', ['id' => $id])->row();
+      $form = $this->db->get_where('forms', array('id' => $id))->row();
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
       }
@@ -352,12 +245,11 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_begin();
-      $this->update($id, [
+      $this->update($id, array(
         'status'      => 'DFT',
         'modified_by' => $this->auth->user_id(),
         'modified_at' => date('Y-m-d H:i:s'),
-      ]);
-
+      ));
       $this->_insertStatusLog($id, 'REV', 'DFT');
 
       if ($this->db->trans_status() === FALSE) {
@@ -366,16 +258,13 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_commit();
-      return ['status' => 1, 'msg' => 'Review dibatalkan. Form dikembalikan ke Draft.'];
-    } catch (\Throwable $th) {
+      return array('status' => 1, 'msg' => 'Review dibatalkan. Form dikembalikan ke Draft.');
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      return ['status' => 0, 'msg' => $th->getMessage()];
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
   }
 
-  /**
-   * Correction to Review — ubah status dari COR ke REV setelah koreksi selesai.
-   */
   public function correctionToReview()
   {
     try {
@@ -384,7 +273,7 @@ class Form_model extends BF_Model
         throw new Exception('ID form tidak valid.');
       }
 
-      $form = $this->db->get_where('forms', ['id' => $id])->row();
+      $form = $this->db->get_where('forms', array('id' => $id))->row();
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
       }
@@ -393,12 +282,11 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_begin();
-      $this->update($id, [
+      $this->update($id, array(
         'status'      => 'REV',
         'modified_by' => $this->auth->user_id(),
         'modified_at' => date('Y-m-d H:i:s'),
-      ]);
-
+      ));
       $this->_insertStatusLog($id, 'COR', 'REV');
 
       if ($this->db->trans_status() === FALSE) {
@@ -407,10 +295,10 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_commit();
-      return ['status' => 1, 'msg' => 'Form berhasil dikembalikan ke proses Review.'];
-    } catch (\Throwable $th) {
+      return array('status' => 1, 'msg' => 'Form berhasil dikembalikan ke proses Review.');
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      return ['status' => 0, 'msg' => $th->getMessage()];
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
   }
 
@@ -418,19 +306,17 @@ class Form_model extends BF_Model
   {
     $data = $this->input->post();
     try {
-      // Validasi status yang diizinkan
-      $allowed_statuses = ['APV', 'COR'];
+      $allowed_statuses = array('APV', 'COR');
       if (empty($data['status']) || !in_array($data['status'], $allowed_statuses, true)) {
         throw new Exception('Status review tidak valid. Pilih APV atau COR.');
       }
 
-      // Validasi catatan wajib saat COR
-      if ($data['status'] === 'COR' && empty(trim($data['note'] ?? ''))) {
+      $note = isset($data['note']) ? trim($data['note']) : '';
+      if ($data['status'] === 'COR' && empty($note)) {
         throw new Exception('Catatan wajib diisi jika aksi adalah Kembalikan (COR).');
       }
 
-      // Ambil status lama sebelum transaksi
-      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      $form = $this->db->get_where('forms', array('id' => $data['id']))->row();
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
       }
@@ -438,119 +324,85 @@ class Form_model extends BF_Model
 
       $this->db->trans_begin();
 
-      $updateData = [
+      $updateData = array(
         'status'      => $data['status'],
         'reviewed_by' => $this->auth->user_id(),
         'reviewed_at' => date('Y-m-d H:i:s'),
-      ];
-      if ($data['status'] === 'COR' && !empty($data['note'])) {
-        $updateData['note'] = $data['note'];
+      );
+      if ($data['status'] === 'COR' && !empty($note)) {
+        $updateData['note'] = $note;
       }
 
       $this->update($data['id'], $updateData);
-
-      // Catat log perubahan status
-      $this->_insertStatusLog(
-        $data['id'],
-        $old_status,
-        $data['status'],
-        !empty($data['note']) ? $data['note'] : null
-      );
+      $this->_insertStatusLog($data['id'], $old_status, $data['status'], !empty($note) ? $note : null);
 
       if ($this->db->trans_status() === FALSE) {
         throw new Exception('Failed process review document. Please try again later.');
       }
 
       $this->db->trans_commit();
-      $Return = [
-        'status' => 1,
-        'msg'    => 'Success process review document...'
-      ];
-    } catch (\Throwable $th) {
+      return array('status' => 1, 'msg' => 'Success process review document.');
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      $Return = [
-        'status' => 0,
-        'msg'    => $th->getMessage()
-      ];
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
-
-    return $Return;
   }
 
   public function saveApprove()
-  {    $data = $this->input->post();
+  {
+    $data = $this->input->post();
 
     try {
-      // Validasi status yang diizinkan
-      $allowed_statuses = ['PUB', 'COR'];
+      $allowed_statuses = array('PUB', 'COR');
       if (empty($data['status']) || !in_array($data['status'], $allowed_statuses, true)) {
         throw new Exception('Status approval tidak valid. Pilih PUB atau COR.');
       }
 
-      // Validasi published_date wajib saat PUB
-      if ($data['status'] === 'PUB' && empty(trim($data['published_date'] ?? ''))) {
+      $published_date = isset($data['published_date']) ? trim($data['published_date']) : '';
+      $note           = isset($data['note']) ? trim($data['note']) : '';
+
+      if ($data['status'] === 'PUB' && empty($published_date)) {
         throw new Exception('Tanggal terbit wajib diisi jika aksi adalah Setujui & Publish.');
       }
 
-      // Validasi catatan wajib saat COR
-      if ($data['status'] === 'COR' && empty(trim($data['note'] ?? ''))) {
+      if ($data['status'] === 'COR' && empty($note)) {
         throw new Exception('Catatan wajib diisi jika aksi adalah Kembalikan (COR).');
       }
 
-      // Ambil status lama sebelum transaksi
-      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      $form = $this->db->get_where('forms', array('id' => $data['id']))->row();
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
       }
       $old_status = $form->status;
 
-      $dataUpdate['status'] = $data['status'];
+      $dataUpdate = array('status' => $data['status']);
 
       if ($data['status'] == 'PUB') {
-        $dataUpdate['published_date'] = $data['published_date'];
+        $dataUpdate['published_date'] = $published_date;
         $dataUpdate['approved_by']    = $this->auth->user_id();
         $dataUpdate['approved_at']    = date('Y-m-d H:i:s');
       }
 
       if ($data['status'] == 'COR') {
-        $dataUpdate['note'] = $data['note'];
+        $dataUpdate['note'] = $note;
       }
 
       $this->db->trans_begin();
-
       $this->update($data['id'], $dataUpdate);
-
-      // Catat log perubahan status
-      $this->_insertStatusLog(
-        $data['id'],
-        $old_status,
-        $data['status'],
-        !empty($data['note']) ? $data['note'] : null
-      );
+      $this->_insertStatusLog($data['id'], $old_status, $data['status'], !empty($note) ? $note : null);
 
       if ($this->db->trans_status() === FALSE) {
         throw new Exception('Failed process approve document. Please try again later.');
       }
 
       $this->db->trans_commit();
-      $Return = [
-        'status' => 1,
-        'msg'    => 'Success process approve document...'
-      ];
-    } catch (\Throwable $th) {
+      return array('status' => 1, 'msg' => 'Success process approve document.');
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      $Return = [
-        'status' => 0,
-        'msg'    => $th->getMessage()
-      ];
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
-    return $Return;
   }
 
-  /**
-   * Revision Form — ubah status dari PUB ke RVI.
-   * Dipanggil oleh PM/MR dari halaman monitoring forms published.
-   */
   public function saveFormRevision($data)
   {
     try {
@@ -558,7 +410,7 @@ class Form_model extends BF_Model
         throw new Exception('ID form tidak valid.');
       }
 
-      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      $form = $this->db->get_where('forms', array('id' => $data['id']))->row();
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
       }
@@ -567,14 +419,12 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_begin();
-
-      $this->db->where('id', $form->id)->update('forms', [
-        'status'           => 'RVI',
-        'note'             => $data['note'],
-        'modified_by'      => $this->auth->user_id(),
-        'modified_at'      => date('Y-m-d H:i:s'),
-      ]);
-
+      $this->db->where('id', $form->id)->update('forms', array(
+        'status'      => 'RVI',
+        'note'        => $data['note'],
+        'modified_by' => $this->auth->user_id(),
+        'modified_at' => date('Y-m-d H:i:s'),
+      ));
       $this->_insertStatusLog($form->id, 'PUB', 'RVI', $data['note']);
 
       if ($this->db->trans_status() === FALSE) {
@@ -583,17 +433,13 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_commit();
-      return ['status' => 1, 'msg' => 'Pengajuan revisi berhasil. Form dikembalikan ke status Revision.'];
-    } catch (\Throwable $th) {
+      return array('status' => 1, 'msg' => 'Pengajuan revisi berhasil. Form dikembalikan ke status Revision.');
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      return ['status' => 0, 'msg' => $th->getMessage()];
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
   }
 
-  /**
-   * Deletion Form — ubah status dari PUB ke HLD (deletion_status = OPN).
-   * Dipanggil oleh PM/MR dari halaman monitoring forms published.
-   */
   public function saveFormDeletion($data)
   {
     try {
@@ -601,7 +447,7 @@ class Form_model extends BF_Model
         throw new Exception('ID form tidak valid.');
       }
 
-      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      $form = $this->db->get_where('forms', array('id' => $data['id']))->row();
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
       }
@@ -610,15 +456,13 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_begin();
-
-      $this->db->where('id', $form->id)->update('forms', [
-        'status'           => 'HLD',
-        'deletion_status'  => 'OPN',
-        'note'             => $data['note'],
-        'modified_by'      => $this->auth->user_id(),
-        'modified_at'      => date('Y-m-d H:i:s'),
-      ]);
-
+      $this->db->where('id', $form->id)->update('forms', array(
+        'status'          => 'HLD',
+        'deletion_status' => 'OPN',
+        'note'            => $data['note'],
+        'modified_by'     => $this->auth->user_id(),
+        'modified_at'     => date('Y-m-d H:i:s'),
+      ));
       $this->_insertStatusLog($form->id, 'PUB', 'HLD', $data['note']);
 
       if ($this->db->trans_status() === FALSE) {
@@ -627,47 +471,41 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_commit();
-      return ['status' => 1, 'msg' => 'Pengajuan penghapusan berhasil. Form masuk ke proses Deletion.'];
-    } catch (\Throwable $th) {
+      return array('status' => 1, 'msg' => 'Pengajuan penghapusan berhasil. Form masuk ke proses Deletion.');
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      return ['status' => 0, 'msg' => $th->getMessage()];
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
   }
 
-  /**
-   * Review Deletion — PM/MR menyetujui (APV) atau menolak (REJ) pengajuan deletion.
-   * action: 'APV' → lanjut ke approval deletion | 'REJ' → kembalikan ke PUB
-   */
   public function saveFormRevDeletion($data)
   {
     try {
-      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      $form = $this->db->get_where('forms', array('id' => $data['id']))->row();
       if (!$form || $form->status !== 'HLD') {
         throw new Exception('Form tidak ditemukan atau status tidak valid.');
       }
 
-      $action = $data['action']; // 'APV' atau 'REJ'
+      $action = $data['action'];
 
       $this->db->trans_begin();
 
       if ($action === 'APV') {
-        // Lanjut ke tahap approval deletion
-        $this->db->where('id', $form->id)->update('forms', [
+        $this->db->where('id', $form->id)->update('forms', array(
           'deletion_status' => 'APV',
           'modified_by'     => $this->auth->user_id(),
           'modified_at'     => date('Y-m-d H:i:s'),
-        ]);
+        ));
         $this->_insertStatusLog($form->id, 'HLD', 'HLD', 'Review deletion disetujui — lanjut ke Approval Deletion.');
         $msg = 'Pengajuan deletion disetujui. Lanjut ke proses Approval Deletion.';
       } else {
-        // Tolak — kembalikan ke Published
-        $this->db->where('id', $form->id)->update('forms', [
+        $this->db->where('id', $form->id)->update('forms', array(
           'status'          => 'PUB',
           'deletion_status' => null,
           'note'            => null,
           'modified_by'     => $this->auth->user_id(),
           'modified_at'     => date('Y-m-d H:i:s'),
-        ]);
+        ));
         $this->_insertStatusLog($form->id, 'HLD', 'PUB', 'Pengajuan deletion ditolak pada tahap Review.');
         $msg = 'Pengajuan deletion ditolak. Form dikembalikan ke status Published.';
       }
@@ -678,48 +516,42 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_commit();
-      return ['status' => 1, 'msg' => $msg];
-    } catch (\Throwable $th) {
+      return array('status' => 1, 'msg' => $msg);
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      return ['status' => 0, 'msg' => $th->getMessage()];
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
   }
 
-  /**
-   * Approval Deletion — PM/MR menyetujui (DEL) atau menolak (REJ) deletion final.
-   * action: 'DEL' → hapus form (status = DEL) | 'REJ' → kembalikan ke PUB
-   */
   public function saveFormApvDeletion($data)
   {
     try {
-      $form = $this->db->get_where('forms', ['id' => $data['id']])->row();
+      $form = $this->db->get_where('forms', array('id' => $data['id']))->row();
       if (!$form || $form->status !== 'HLD') {
         throw new Exception('Form tidak ditemukan atau status tidak valid.');
       }
 
-      $action = $data['action']; // 'DEL' atau 'REJ'
+      $action = $data['action'];
 
       $this->db->trans_begin();
 
       if ($action === 'DEL') {
-        // Hapus — set status DEL
-        $this->db->where('id', $form->id)->update('forms', [
+        $this->db->where('id', $form->id)->update('forms', array(
           'status'          => 'DEL',
           'deletion_status' => 'DEL',
           'modified_by'     => $this->auth->user_id(),
           'modified_at'     => date('Y-m-d H:i:s'),
-        ]);
+        ));
         $this->_insertStatusLog($form->id, 'HLD', 'DEL', 'Approval deletion disetujui — form dihapus.');
         $msg = 'Form berhasil dihapus.';
       } else {
-        // Tolak — kembalikan ke Published
-        $this->db->where('id', $form->id)->update('forms', [
+        $this->db->where('id', $form->id)->update('forms', array(
           'status'          => 'PUB',
           'deletion_status' => null,
           'note'            => null,
           'modified_by'     => $this->auth->user_id(),
           'modified_at'     => date('Y-m-d H:i:s'),
-        ]);
+        ));
         $this->_insertStatusLog($form->id, 'HLD', 'PUB', 'Pengajuan deletion ditolak pada tahap Approval.');
         $msg = 'Pengajuan deletion ditolak. Form dikembalikan ke status Published.';
       }
@@ -730,10 +562,10 @@ class Form_model extends BF_Model
       }
 
       $this->db->trans_commit();
-      return ['status' => 1, 'msg' => $msg];
-    } catch (\Throwable $th) {
+      return array('status' => 1, 'msg' => $msg);
+    } catch (Exception $e) {
       $this->db->trans_rollback();
-      return ['status' => 0, 'msg' => $th->getMessage()];
+      return array('status' => 0, 'msg' => $e->getMessage());
     }
   }
 }

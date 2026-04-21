@@ -454,6 +454,10 @@
 			$('#modelId .modal-body').load(siteurl + active_controller + 'select_subjects/' + branch)
 		})
 
+		$(document).on('click', '#modal-save', function() {
+			$('#form-subject').submit();
+		})
+
 		$(document).on('submit', '#form-subject', function(e) {
 			e.preventDefault();
 			let formdata = new FormData($(this)[0])

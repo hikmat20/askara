@@ -1146,7 +1146,7 @@ class Monitoring extends Admin_Controller
 			return;
 		}
 
-		$note = trim($data['note'] ?? '');
+		$note = isset($data['note']) ? trim($data['note']) : '';
 
 		$this->db->trans_begin();
 
@@ -1252,8 +1252,8 @@ class Monitoring extends Admin_Controller
 			return;
 		}
 
-		if (empty(trim($data['note'] ?? ''))) {
-			echo json_encode(['status' => 0, 'msg' => 'Alasan revisi wajib diisi.']);
+		if (empty(trim(isset($data['note']) ? $data['note'] : ''))) {
+			echo json_encode(array('status' => 0, 'msg' => 'Alasan revisi wajib diisi.'));
 			return;
 		}
 
@@ -1311,8 +1311,8 @@ class Monitoring extends Admin_Controller
 			return;
 		}
 
-		if (empty(trim($data['note'] ?? ''))) {
-			echo json_encode(['status' => 0, 'msg' => 'Alasan penghapusan wajib diisi.']);
+		if (empty(trim(isset($data['note']) ? $data['note'] : ''))) {
+			echo json_encode(array('status' => 0, 'msg' => 'Alasan penghapusan wajib diisi.'));
 			return;
 		}
 
