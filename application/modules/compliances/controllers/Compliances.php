@@ -77,14 +77,14 @@ class Compliances extends Admin_Controller
 
     public function index()
     {
-        if (isset($_GET['b']) && $_GET['b']) {
+        // if (isset($_GET['b']) && $_GET['b']) {
             $ArrUsers = [];
             $regulations = '';
             $reference = '';
             $reviews = '';
             $summary = '';
+            $reference = $this->db->get_where('view_references', ['company_id' => $this->company])->row();
 
-            $reference = $this->db->get_where('view_references', ['id' => $_GET['b']])->row();
             if ($reference) {
                 $regulations    = $this->db->get_where('view_ref_regulations', ['reference_id' => $reference->id])->result();
                 $reviews        = $this->db->get_where('compilation_reviews', ['reference_id' => $reference->id])->result();
@@ -112,14 +112,14 @@ class Compliances extends Admin_Controller
                 'ArrReg'        => $ArrReg,
             ]);
             $this->template->render('list');
-        } else {
-            $listCompliance = $this->db->get_where('view_references', ['company_id' => $this->company])->result();
-            $ArrList = [];
-            if ($listCompliance) foreach ($listCompliance as $k => $v) {
-                $ArrList[] = $v;
-            }
-            $this->template->render('index', ['list' => $ArrList]);
-        }
+        // } else {
+        //     $listCompliance = $this->db->get_where('view_references', ['company_id' => $this->company])->result();
+        //     $ArrList = [];
+        //     if ($listCompliance) foreach ($listCompliance as $k => $v) {
+        //         $ArrList[] = $v;
+        //     }
+        //     $this->template->render('index', ['list' => $ArrList]);
+        // }
     }
 
     public function lists($id = null)

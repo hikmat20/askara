@@ -89,11 +89,16 @@
 						<div id="accSub" role="tablist" aria-multiselectable="true">
 							<div class="card mb-3 border-primary overflow-hidden" style="border-radius: 10px;">
 								<div class="card-header bg-light p-4 border-0 cursor-pointer" role="tab" id="sectionDetail">
-									<h5 class="mb-0 text-primary font-weight-bolder" data-toggle="collapse"
-										data-parent="#accSub" href="#sub<?= $k; ?>" aria-expanded="true"
-										aria-controls="sub<?= $k; ?>">
-										<?= $k . ". " . $s->name; ?>
-									</h5>
+									<div class="d-flex justify-content-between align-items-center">
+										<h5 class="mb-0 text-primary font-weight-bolder" data-toggle="collapse"
+											data-parent="#accSub" href="#sub<?= $k; ?>" aria-expanded="true"
+											aria-controls="sub<?= $k; ?>">
+											<?= $k . ". " . $s->name; ?>
+										</h5>
+										<button type="button" class="btn btn-light-danger btn-icon btn-xs delete-subject"
+											data-id="<?= $s->id; ?>" data-row="<?= $k; ?>"><i class="fa fa-trash"
+												aria-hidden="true"></i></button>
+									</div>
 								</div>
 
 								<div id="sub<?= $k; ?>" class="collapse" role="tabpanel" aria-labelledby="sectionDetail">
@@ -342,6 +347,61 @@
 			selectStd('.selectStd', '.dataIdStd')
 		})
 
+		$(document).on('click', '.delete-subject', function () {
+			const id = $(this).data('id')
+			const btn = $(this)
+
+			if (id != undefined && (id !== null || id !== '')) {
+				Swal.fire({
+					title: 'Confirmation!',
+					text: 'Are you sure want to be delete this data?',
+					icon: 'question',
+					showCancelButton: true,
+				}).then((value) => {
+					if (value.isConfirmed) {
+						$.ajax({
+							url: siteurl + active_controller + 'delete_subject',
+							type: 'POST',
+							data: {
+								id
+							},
+							dataType: 'JSON',
+							beforeSend: function () {
+								btn.html(
+									'<span class="spinner-border spinner-border-sm"></span>'
+								).prop('disabled', true)
+							},
+							complete: function () {
+								btn.html('<span class="fa fa-trash"></span>').prop(
+									'disabled', false)
+							},
+							success: function (result) {
+								if (result.status == 1) {
+									Swal.fire('Success!', result.msg, 'success', 1500).then(() => {
+										location.reload()
+									})
+								} else {
+									Swal.fire('Failed!', result.msg, 'warning', 1500)
+								}
+							},
+							error: function () {
+								Swal.fire('Error!', 'Server timeout. Error!', 'error',
+									1500)
+							}
+						})
+					}
+				})
+
+			} else {
+				btn.parents('tr').addClass('table-warning')
+				btn.parents('tr').hide('fast')
+				setTimeout(function () {
+					btn.parents('tr').remove()
+				}, 500);
+			}
+			selectStd('.selectStd', '.dataIdStd')
+		})
+
 		$(document).on('click', '.add_regulation', function () {
 			const n = $(this).data('row')
 			const row = $('table#tableRegulations' + n + ' tbody tr.empty').length
@@ -455,6 +515,8 @@
 		$(document).on('click', '#new-compliance', function () {
 			const branch = "<?= ($this->uri->segment(4)) ?: null; ?>";
 			const reference_id = "<?= $Data->id ?>";
+			console.log(reference_id);
+
 			$('#modelId .modal-body').html('')
 			$('#modelId .modal-title').html('Select Subject Regulation')
 			$('#modelId .modal-body').load(siteurl + active_controller + 'select_subjects/' + branch + "/" + reference_id)
