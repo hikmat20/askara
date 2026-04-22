@@ -126,7 +126,7 @@ class Monitoring_model extends BF_Model
                     throw new Exception('Failed process review document. Please try again later.');
                 } else {
                     $this->db->trans_commit();
-                    
+
                     // Trigger email notification
                     $this->_send_email_notification($data['id'], $data['status'], isset($data['note']) ? $data['note'] : '');
 
@@ -138,11 +138,11 @@ class Monitoring_model extends BF_Model
             } else {
                 throw new Exception('Data not valid. Please try again later.');
             }
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             $this->db->trans_rollback();
             $Return = [
                 'status' => 0,
-                'msg'     => $th->getMessage()
+                'msg'     => $e->getMessage()
             ];
         }
 
@@ -194,7 +194,7 @@ class Monitoring_model extends BF_Model
             } else {
                 throw new ErrorException('Data not found.');
             }
-        } catch (\Throwable $th) {
+        } catch (Exception $th) {
             $this->db->trans_rollback();
             $Return = [
                 'status' => 0,
@@ -242,11 +242,11 @@ class Monitoring_model extends BF_Model
             } else {
                 throw new ErrorException('Data not found.');
             }
-        } catch (\Throwable $th) {
+        } catch (Exception $e) {
             $this->db->trans_rollback();
             $Return = [
                 'status' => 0,
-                'msg'    => $th->getMessage()
+                'msg'    => $e->getMessage()
             ];
         }
         return $Return;
@@ -299,7 +299,7 @@ class Monitoring_model extends BF_Model
             } else {
                 throw new ErrorException('Data not found.');
             }
-        } catch (\Throwable $th) {
+        } catch (Exception $th) {
             $this->db->trans_rollback();
             $this->_update_history($data);
             $Return = [
@@ -352,7 +352,7 @@ class Monitoring_model extends BF_Model
             } else {
                 throw new ErrorException('Data not found.');
             }
-        } catch (\Throwable $th) {
+        } catch (Exception $th) {
             $this->db->trans_rollback();
             $this->_update_history($data);
             $Return = [
@@ -388,7 +388,7 @@ class Monitoring_model extends BF_Model
                         'msg'    => 'Success submit approval deletion document file...'
                     ];
                 }
-        } catch (\Throwable $th) {
+        } catch (Exception $th) {
             $this->db->trans_rollback();
             $this->_update_history($data);
             $Return = [

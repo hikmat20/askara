@@ -1,5 +1,6 @@
 <div class="mb-3 row flex-nowrap">
 	<label for="" class="col-3 col-form-label font-weight-bold">Select Subject</label>
+	<input type="hidden" name="reference_id" id="reference_id" value="<?= $reference_id?>">
 	<div class="col-9">
 		<select name="subject_id" id="subject_id" required class="form-control select2">
 			<option value=""></option>

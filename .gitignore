@@ -18,3 +18,5 @@ assets/images/directory/checksheet/*
 /vendor/
 composer.lock
 assets/logo/
+.kiro/
+tests/
