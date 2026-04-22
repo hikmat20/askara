@@ -403,6 +403,32 @@ class Form_model extends BF_Model
     }
   }
 
+  public function deleteData($id)
+  {
+    try {
+      $form = $this->db->get_where('forms', array('id' => $id))->row();
+      if (!$form) {
+        throw new Exception('Form tidak ditemukan.');
+      }
+
+      $old_status = $form->status;
+
+      $this->db->trans_begin();
+      $this->update($id, ['status' => 'DEL', 'deleted_at' => date('Y-m-d H:i:s')]);
+      $this->_insertStatusLog($id, $old_status, 'DEL', 'Delete Document');
+
+      if ($this->db->trans_status() === FALSE) {
+        throw new Exception('Failed process delete document. Please try again later.');
+      }
+
+      $this->db->trans_commit();
+      return array('status' => 1, 'msg' => 'Success process delete document.');
+    } catch (Exception $e) {
+      $this->db->trans_rollback();
+      return array('status' => 0, 'msg' => $e->getMessage());
+    }
+  }
+
   public function saveFormRevision($data)
   {
     try {
