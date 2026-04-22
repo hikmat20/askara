@@ -242,20 +242,23 @@ class Company_reference extends Admin_Controller
 	}
 
 	/* New Compliance */
-	public function select_subjects($branch = null)
+	public function select_subjects($reference_id, $branch = null)
 	{
-		$axist_subjects = $this->db->get_where('compliance_subject', ['company_id' => $this->company, 'branch_id' => $branch])->result_array();
+		$axist_subjects = $this->db->get_where('compliance_subject', ['company_id' => $this->company, 'reference_id' => $reference_id])->result_array();
 		$subjects	= $this->db->get('subjects')->result();
-		$this->template->render('select_subjects', ['subjects' => $subjects, 'axist_subjects' => $axist_subjects]);
+		$this->template->render('select_subjects', ['subjects' => $subjects, 'axist_subjects' => $axist_subjects,'branch' => $branch,
+			'reference_id' => $reference_id]);
 	}
 
 	public function save_subject()
 	{
 		try {
 			$post 		= $this->input->post();
+		
 			$data =
 				[
 					'subject_id' => $post['subject_id'],
+					'reference_id' => $post['reference_id'],
 					'company_id' => $this->company,
 					'created_at' => date('Y-m-d H:i:s'),
 					'created_by' => $this->auth->user_id(),
@@ -266,22 +269,17 @@ class Company_reference extends Admin_Controller
 				$this->db->insert('compliance_subject', $data);
 				if ($this->db->trans_status() === FALSE) {
 					$this->db->trans_rollback();
-					$Return		= array(
-						'status' => 0,
-						'msg'	 => 'Data Chapter failed to save. Please try again.',
-					);
+					throw new Exception("Subject Regulation Compliance failed to save. Please try again.", 1);
+					
 				} else {
 					$this->db->trans_commit();
 					$Return		= array(
 						'status' => 1,
-						'msg'	 => 'Data Chapter successfully saved..',
+						'msg'	 => 'Subject Regulation Compliance successfully saved..',
 					);
 				}
 			} else {
-				$Return		= array(
-					'status' => 0,
-					'msg'	 => 'Data not valid, please try again!',
-				);
+				throw new Exception("Subject Regulation Compliance failed to save. Please try again.", 1);
 			}
 		} catch (Exception $e) {
 			$this->db->trans_rollback();
