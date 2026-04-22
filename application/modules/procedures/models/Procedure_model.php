@@ -193,11 +193,11 @@ class Procedure_model extends BF_Model
           );
         }
       }
-    } catch (\Throwable $th) {
+    } catch (Exception $e) {
       $this->db->trans_rollback();
       $Return    = array(
         'status'    => 0,
-        'msg'      => $th->getMessage(),
+        'msg'      => $e->getMessage(),
       );
     }
 

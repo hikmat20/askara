@@ -1,4 +1,5 @@
-<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH'))
+	exit('No direct script access allowed');
 
 /*
  * @author Syamsudin
@@ -24,10 +25,10 @@ class Company_reference extends Admin_Controller
 
 	public function index()
 	{
-		$data		= $this->db->get_where('view_references', ['status' => 'OPN', 'company_id' => $this->company])->result();
-		$done		= $this->db->get_where('view_references', ['status' => 'DONE'])->result();
-		$lsStd 		= $this->db->get_where('view_ref_standards')->result();
-		$lsReg 		= $this->db->get_where('view_ref_regulations')->result();
+		$data = $this->db->get_where('view_references', ['status' => 'OPN', 'company_id' => $this->company])->result();
+		$done = $this->db->get_where('view_references', ['status' => 'DONE'])->result();
+		$lsStd = $this->db->get_where('view_ref_standards')->result();
+		$lsReg = $this->db->get_where('view_ref_regulations')->result();
 
 		$ArrStd = [];
 		foreach ($lsStd as $std) {
@@ -40,10 +41,10 @@ class Company_reference extends Admin_Controller
 		}
 
 		$this->template->set([
-			'data' 		=> $data,
-			'done' 		=> $done,
-			'ArrStd' 	=> $ArrStd,
-			'ArrReg' 	=> $ArrReg,
+			'data' => $data,
+			'done' => $done,
+			'ArrStd' => $ArrStd,
+			'ArrReg' => $ArrReg,
 		]);
 
 		$this->template->render('index');
@@ -52,12 +53,12 @@ class Company_reference extends Admin_Controller
 	public function add()
 	{
 		$Companies = $this->db->get_where('companies', ['id_perusahaan' => $this->company])->result();
-		$branch    = $this->db->get_where('company_branch', ['company_id' => $this->company])->result();
+		$branch = $this->db->get_where('company_branch', ['company_id' => $this->company])->result();
 
 		$this->template->set([
-			'title' 		=> 'Add Company Reference',
-			'Companies' 	=> $Companies,
-			'branch' 		=> $branch
+			'title' => 'Add Company Reference',
+			'Companies' => $Companies,
+			'branch' => $branch
 		]);
 
 		$this->template->render('add');
@@ -65,17 +66,18 @@ class Company_reference extends Admin_Controller
 
 	public function edit($id = '', $branch = null)
 	{
-		$Data 			= $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN', 'branch_id' => $branch])->row();
-		$datStd 		= $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
-		$companies 		= $this->db->get_where('companies')->result();
-		$dataReg 		= $this->db->get_where('view_ref_regulations', ['reference_id' => $id, 'branch_id' => $branch])->result();
-		$standards		= $this->db->get_where('requirements', ['status' => '1'])->result();
-		$regulations	= $this->db->get_where('view_regulation_subjects', ['status' => 'PUB'])->result();
-		$subjects 		= $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1', 'branch_id' => $branch])->result();
+		$Data = $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN', 'branch_id' => $branch])->row();
+		$datStd = $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
+		$companies = $this->db->get_where('companies')->result();
+		$dataReg = $this->db->get_where('view_ref_regulations', ['reference_id' => $id, 'branch_id' => $branch])->result();
+		$standards = $this->db->get_where('requirements', ['status' => '1'])->result();
+		$regulations = $this->db->get_where('view_regulation_subjects', ['status' => 'PUB'])->result();
+		$subjects = $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1', 'branch_id' => $branch])->result();
 
-		if ($regulations) foreach ($regulations as $v) {
-			$ArrRegulation[$v->subject_id][$v->regulation_id] = $v->name;
-		}
+		if ($regulations)
+			foreach ($regulations as $v) {
+				$ArrRegulation[$v->subject_id][$v->regulation_id] = $v->name;
+			}
 
 		$ArrReg = [];
 		foreach ($dataReg as $reg) {
@@ -84,15 +86,15 @@ class Company_reference extends Admin_Controller
 
 		if ($Data) {
 			$this->template->set([
-				'title' 		=> 'Edit Company Reference',
-				'Data' 			=> $Data,
-				'datStd' 		=> $datStd,
-				'dataReg' 		=> $dataReg,
-				'Companies' 	=> $companies,
-				'standards' 	=> $standards,
-				'subjects' 		=> $subjects,
-				'ArrReg' 		=> $ArrReg,
-				'ArrRegulation' 	=> json_encode($ArrRegulation),
+				'title' => 'Edit Company Reference',
+				'Data' => $Data,
+				'datStd' => $datStd,
+				'dataReg' => $dataReg,
+				'Companies' => $companies,
+				'standards' => $standards,
+				'subjects' => $subjects,
+				'ArrReg' => $ArrReg,
+				'ArrRegulation' => json_encode($ArrRegulation),
 			]);
 			$this->template->render('edit');
 		} else {
@@ -107,24 +109,24 @@ class Company_reference extends Admin_Controller
 	public function view($id = null, $branch = null)
 	{
 		if ($id) {
-			$Data 			= $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN'])->row();
-			$datStd 		= $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
-			$companies 		= $this->db->get_where('companies')->result();
-			$subjects 		= $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1', 'branch_id' => $branch])->result();
-			$dataReg 		= $this->db->get_where('view_ref_regulations', ['reference_id' => $id])->result();
-			$standards		= $this->db->get_where('requirements', ['status' => '1'])->result();
-			$regulations	= $this->db->get_where('regulations', ['status' => 'PUB'])->result();
+			$Data = $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN'])->row();
+			$datStd = $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
+			$companies = $this->db->get_where('companies')->result();
+			$subjects = $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1', 'branch_id' => $branch])->result();
+			$dataReg = $this->db->get_where('view_ref_regulations', ['reference_id' => $id])->result();
+			$standards = $this->db->get_where('requirements', ['status' => '1'])->result();
+			$regulations = $this->db->get_where('regulations', ['status' => 'PUB'])->result();
 
 			if ($Data) {
 				$this->template->set([
-					'title' 		=> 'View Company Reference',
-					'Data' 			=> $Data,
-					'datStd' 		=> $datStd,
-					'dataReg' 		=> $dataReg,
-					'Companies' 	=> $companies,
-					'standards' 	=> $standards,
-					'subjects' 		=> $subjects,
-					'regulations' 	=> $regulations,
+					'title' => 'View Company Reference',
+					'Data' => $Data,
+					'datStd' => $datStd,
+					'dataReg' => $dataReg,
+					'Companies' => $companies,
+					'standards' => $standards,
+					'subjects' => $subjects,
+					'regulations' => $regulations,
 				]);
 				$this->template->render('view');
 			} else {
@@ -139,37 +141,37 @@ class Company_reference extends Admin_Controller
 
 	public function save()
 	{
-		$Data 		= $this->input->post();
+		$Data = $this->input->post();
 
 		if ($Data) {
 			$this->db->trans_begin();
-			$saved 	= $this->ReferenceModel->saveData($Data);
+			$saved = $this->ReferenceModel->saveData($Data);
 			if (isset($saved['id'])) {
 				if ($this->db->trans_status() === FALSE) {
 					$this->db->trans_rollback();
-					$Return		= array(
-						'status'		=> 0,
-						'msg'			=> 'Data Chapter failed to save. Please try again.',
+					$Return = array(
+						'status' => 0,
+						'msg' => 'Data Chapter failed to save. Please try again.',
 					);
 				} else {
 					$this->db->trans_commit();
-					$Return		= array(
-						'status'		=> 1,
-						'msg'			=> 'Data Chapter successfully saved..',
-						'id'			=> $saved['id']
+					$Return = array(
+						'status' => 1,
+						'msg' => 'Data Chapter successfully saved..',
+						'id' => $saved['id']
 					);
 				}
 			} else {
 				$this->db->trans_rollback();
-				$Return		= array(
-					'status'		=> 0,
-					'msg'			=> 'Data per perusahaan yang dipilih sudah ada atau duplikat.',
+				$Return = array(
+					'status' => 0,
+					'msg' => 'Data per perusahaan yang dipilih sudah ada atau duplikat.',
 				);
 			}
 		} else {
-			$Return		= array(
-				'status'		=> 0,
-				'msg'			=> 'Data not valid, please try again!',
+			$Return = array(
+				'status' => 0,
+				'msg' => 'Data not valid, please try again!',
 			);
 		}
 
@@ -192,19 +194,19 @@ class Company_reference extends Admin_Controller
 				$this->db->trans_rollback();
 				$Return = [
 					'status' => 0,
-					'msg'    => 'Failed to delete data.. Please try again.',
+					'msg' => 'Failed to delete data.. Please try again.',
 				];
 			} else {
 				$this->db->trans_commit();
 				$Return = [
 					'status' => 1,
-					'msg'    => 'Successfully deleted data..',
+					'msg' => 'Successfully deleted data..',
 				];
 			}
 		} else {
 			$Return = [
 				'status' => 0,
-				'msg'    => 'Data not valid. Please try again.',
+				'msg' => 'Data not valid. Please try again.',
 			];
 		}
 
@@ -222,39 +224,75 @@ class Company_reference extends Admin_Controller
 				$this->db->trans_rollback();
 				$Return = [
 					'status' => 0,
-					'msg'    => 'Failed to delete data.. Please try again.',
+					'msg' => 'Failed to delete data.. Please try again.',
 				];
 			} else {
 				$this->db->trans_commit();
 				$Return = [
 					'status' => 1,
-					'msg'    => 'Successfully deleted data..',
+					'msg' => 'Successfully deleted data..',
 				];
 			}
 		} else {
 			$Return = [
 				'status' => 0,
-				'msg'    => 'Data not valid. Please try again.',
+				'msg' => 'Data not valid. Please try again.',
 			];
 		}
 
 		echo json_encode($Return);
 	}
 
+	public function delete_subject()
+	{
+		try {
+			$id = $this->input->post('id');
+			if ($id) {
+				$this->db->trans_begin();
+				$this->db->delete('compliance_subject', ['id' => $id]);
+
+				if ($this->db->trans_status() === FALSE) {
+					$this->db->trans_rollback();
+					throw new Exception('Failed to delete data.. Please try again.', 1);
+				} else {
+					$this->db->trans_commit();
+					$Return = [
+						'status' => 1,
+						'msg' => 'Successfully deleted data..',
+					];
+				}
+			} else {
+				throw new Exception('Data not valid. Please try again.', 1);
+			}
+		} catch (Exception $e) {
+			$Return = [
+				'status' => 0,
+				'msg' => $e->getMessage(),
+			];
+		}
+
+
+		echo json_encode($Return);
+	}
+
 	/* New Compliance */
-	public function select_subjects($reference_id, $branch = null)
+	public function select_subjects($branch = null, $reference_id = null)
 	{
 		$axist_subjects = $this->db->get_where('compliance_subject', ['company_id' => $this->company, 'reference_id' => $reference_id])->result_array();
-		$subjects	= $this->db->get('subjects')->result();
-		$this->template->render('select_subjects', ['subjects' => $subjects, 'axist_subjects' => $axist_subjects,'branch' => $branch,
-			'reference_id' => $reference_id]);
+		$subjects = $this->db->get('subjects')->result();
+		$this->template->render('select_subjects', [
+			'subjects' => $subjects,
+			'axist_subjects' => $axist_subjects,
+			'branch' => $branch,
+			'reference_id' => $reference_id
+		]);
 	}
 
 	public function save_subject()
 	{
 		try {
-			$post 		= $this->input->post();
-		
+			$post = $this->input->post();
+
 			$data =
 				[
 					'subject_id' => $post['subject_id'],
@@ -270,12 +308,12 @@ class Company_reference extends Admin_Controller
 				if ($this->db->trans_status() === FALSE) {
 					$this->db->trans_rollback();
 					throw new Exception("Subject Regulation Compliance failed to save. Please try again.", 1);
-					
+
 				} else {
 					$this->db->trans_commit();
-					$Return		= array(
+					$Return = array(
 						'status' => 1,
-						'msg'	 => 'Subject Regulation Compliance successfully saved..',
+						'msg' => 'Subject Regulation Compliance successfully saved..',
 					);
 				}
 			} else {
@@ -283,9 +321,9 @@ class Company_reference extends Admin_Controller
 			}
 		} catch (Exception $e) {
 			$this->db->trans_rollback();
-			$Return		= array(
+			$Return = array(
 				'status' => 0,
-				'msg'	 => $e->getMessage(),
+				'msg' => $e->getMessage(),
 			);
 		}
 		echo json_encode($Return);

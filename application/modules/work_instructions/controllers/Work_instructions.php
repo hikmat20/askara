@@ -200,4 +200,10 @@ class Work_instructions extends Admin_Controller
 		$Return = $this->WiModel->saveApprove();
 		echo json_encode($Return);
 	}
+
+	public function delete($id)
+	{
+		$Return = $this->WiModel->deleteData($id);
+		echo json_encode($Return);
+	}
 }

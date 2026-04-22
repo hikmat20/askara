@@ -182,11 +182,10 @@
 
 		$(document).on('submit', '#form-add', function(e) {
 			e.preventDefault();
-
 			$('#form-add .form-control').removeClass('is-invalid');
 			$('#form-add .invalid-feedback').html('');
 
-			let btn = $('#save')
+			let btn = $('.save')
 			let formdata = new FormData($(this)[0])
 
 			$.ajax({
