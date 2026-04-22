@@ -253,4 +253,28 @@ class Work_instruction_model extends BF_Model
     }
     return $Return;
   }
+
+    public function deleteData($id)
+    {
+      try {
+        $this->db->trans_begin();
+        $this->update($id, ['status' => 'DEL']);
+        if ($this->db->trans_status() === FALSE) {
+          $this->db->trans_rollback();
+          throw new Exception('Failed to delete data work instruction . Please try again.');
+        } else {
+          $this->db->trans_commit();
+          $Return    = array(
+            'status'    => 1,
+            'msg'      => 'Data work instruction successfully deleted..',
+          );
+        }
+      } catch (\Throwable $th) {
+        $Return    = [
+          'status'    => 0,
+          'msg'      => $th->getMessage(),
+        ];
+      }
+      return $Return;
+    }
 }
