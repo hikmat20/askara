@@ -23,7 +23,7 @@
 			<div class="row mt-10">
 				<div class="col-md-9">
 					<div class="row px-10 px-lg-0 px-md-0">
-						<div class="col-md-3 col-sm-6 col-xs-6 mb-10">
+						<div class="col-12 col-sm-6 col-md-3 mb-10">
 							<div class="card border-0 shadow-sm" style="border-radius: 50px 5px 50px 5px;background-color: rgba(255, 255, 255, 1);">
 								<div class="card-body pb-1 d-flex justify-content-center align-items-center" style="height: 200px;">
 									<img id="myImg1" src="<?= base_url('assets/images/dashboard/folder-file.png'); ?>" alt="" class="img-fluid" style="width: 200px;height: auto;">
@@ -36,7 +36,7 @@
 							</div>
 						</div>
 
-						<div class="col-md-3 col-sm-6 col-xs-6 mb-10">
+						<div class="col-12 col-sm-6 col-md-3 mb-10">
 							<div class="card border-0 shadow-sm " style="border-radius: 50px 5px 50px 5px;background-color: rgba(255, 255, 255, 1);">
 								<div class="card-body pb-1 d-flex justify-content-center align-items-center" style="height: 200px;">
 									<img id="myImg3" src="<?= base_url('assets/images/dashboard/review.png'); ?>" alt="" class="img-fluid" style="width: 200px;height: auto;">
@@ -48,7 +48,7 @@
 								</h3>
 							</div>
 						</div>
-						<div class="col-md-3 col-sm-6 col-xs-6 mb-10">
+						<div class="col-12 col-sm-6 col-md-3 mb-10">
 							<div class="card border-0 shadow-sm " style="border-radius: 50px 5px 50px 5px;background-color: rgba(255, 255, 255, 1);">
 								<div class="card-body pb-1 d-flex justify-content-center align-items-center" style="height: 200px;">
 									<img id="myImg2" src="<?= base_url('assets/images/dashboard/correction.png'); ?>" alt="" class="img-fluid" style="width: 200px;height: auto;">
@@ -60,7 +60,7 @@
 								</h3>
 							</div>
 						</div>
-						<div class="col-md-3 col-sm-6 col-xs-6 mb-10">
+						<div class="col-12 col-sm-6 col-md-3 mb-10">
 							<div class="card border-0 shadow-sm " style="border-radius: 50px 5px 50px 5px;background-color: rgba(255, 255, 255, 1);">
 								<div class="card-body pb-1 d-flex justify-content-center align-items-center" style="height: 200px;">
 									<img id="myImg4" src="<?= base_url('assets/images/dashboard/approval.png'); ?>" alt="" class="img-fluid" style="width: 200px;height: auto;">
@@ -80,7 +80,7 @@
 							<div class="card border-0 shadow-sm " style="border-radius: 50px 5px 50px 5px;background-color: rgba(255, 255, 255, 1);">
 								<div class="card-body pb-1 d-flex justify-content-center align-items-center" style="height: 200px;">
 									<img id="myImg5" src="<?= base_url('assets/images/dashboard/monitoring.png'); ?>" alt="" class="img-fluid" style="width: 200px;height: auto;">
-
+								</div>
 								<h3 class="card-title text-center pt-5 pb-10 px-4 m-0" style="min-height: 50px;">
 									<a href="<?= base_url('/docs/monitoring'); ?>" class="text-hover-primary" title="Monitoring Document">
 										<span class="card-label m-0 text-dark text-center font-weight-bolder">MONITORING DOCUMENTS</span>
