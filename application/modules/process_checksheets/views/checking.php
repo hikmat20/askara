@@ -60,11 +60,7 @@
 									</tr>
 									<tr>
 										<?php for ($i = 1; $i <= $count; $i++) {
-											if(
-												($fChecking[$data->frequency_checking] == 'Daily' && $i == date('d')) || 
-												($fChecking[$data->frequency_checking] == 'Weekly' && $i == $weekOfMonth) ||
-												($fChecking[$data->frequency_checking] == 'Monthly' && $i == date('m'))
-											) {
+											if($current == $i) {
 
 											
 											$weekend = "";
@@ -87,11 +83,7 @@
 											<td><?= $it->item_name; ?></td>
 											<td><?= $it->standard_check; ?></td>
 											<?php for ($i = 1; $i <= $count; $i++) :
-												if(
-													($fChecking[$data->frequency_checking] == 'Daily' && $i == date('d')) || 
-													($fChecking[$data->frequency_checking] == 'Weekly' && $i == $weekOfMonth) ||
-													($fChecking[$data->frequency_checking] == 'Monthly' && $i == date('m'))
-												) {
+												if($current == $i) {
 													
 												$weekend = "";
 												$tanggalkolom = date("Y-m", strtotime($data->periode)) . "-" . $i;

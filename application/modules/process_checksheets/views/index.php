@@ -13,16 +13,17 @@
 					<button type="button" class="btn btn-primary" id="add-folder"><i class="fa fa-plus"></i> New Folder</button>
 				</div>
 				<div class="card-body">
-					<div class="input-group  w-25">
+					<div class="input-group w-25 mb-3">
 						<div class="input-group-text input-group-prepend rounded-right-0"><i class="fa fa-search"></i></div>
 						<input data type="text" name="search" id="search" class="form-control d-inline-block" placeholder="Search">
 					</div>
-					<table class="table table-sm table-bordered datatable">
+					<div class="table-responsive">
+						<table class="table table-sm" id="datatable">
 						<thead class="table-light">
 							<tr>
-								<th class="py-2">Directory Name</th>
+								<th class="py-2 text-left">Directory Name</th>
 								<th class="py-2 text-center" width="20%">Last Created</th>
-								<th class="py-2 text-center" width="50">Opsi</th>
+								<th class="py-2 text-center" width="80">Opsi</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -44,7 +45,8 @@
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
-					</table>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -71,31 +73,29 @@
 </div>
 
 <style>
-	div#DataTables_Table_0_filter {
+	div.dt-search,
+	div.dt-length {
 		display: none;
 	}
 </style>
 
 <script>
 	$(document).ready(function() {
-		oTable = $('.datatable').DataTable({
-			dom: 'Pfrtip',
+		oTable = $('#datatable').DataTable({
+			// dom: 'rtpi',
 			searchPanes: {
-				cascadePanes: true
+				cascadePanes: true,
+				viewCounter: false
 			},
 			language: {
-				searchPanes: {
-					i18n: {
-						emptyMessage: "<i></b>No results returned</b></i>"
-					}
-				},
+				
 				infoEmpty: "No results returned",
 				zeroRecords: "No results returned",
 				emptyTable: "No results returned",
 			},
 			lengthChange: true,
-			// paging: true,
-			info: false,
+			paging: true,
+			info: true,
 			pageLength: 20,
 		})
 

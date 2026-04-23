@@ -15,7 +15,7 @@
 					<button type="button" id="add-folder" class="btn btn-primary"><i class="fa fa-plus"></i> Add Folder</button>
 				</div>
 				<div class="card-body">
-					<div class="d-flex justify-content-between align-items-center">
+					<div class="d-flex justify-content-between align-items-center mb-3">
 						<div class="searching">
 							<div class="input-group">
 								<div class="input-group-text input-group-prepend rounded-right-0"><i class="fa fa-search"></i></div>
@@ -30,12 +30,13 @@
 							<span class="breadcrumb-item active"><?= $sub->name; ?></span>
 						</nav>
 					</div>
-					<table class="table table-sm table-bordered datatable">
+					<div class="table-responsive">
+						<table class="table table-sm" id="datatable">
 						<thead class="table-light">
 							<tr>
-								<th class="p-2">Directory Name</th>
+								<th class="p-2 text-left">Directory Name</th>
 								<th class="p-2 text-center" width="20%">Last Created</th>
-								<th class="p-2 text-center" width="70">Opsi</th>
+								<th class="p-2 text-center" width="80">Opsi</th>
 							</tr>
 						</thead>
 						<tbody>
@@ -57,7 +58,8 @@
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
-					</table>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -102,15 +104,15 @@
 </div>
 
 <style>
-	div#DataTables_Table_0_filter {
+	div.dt-search,
+	div.dt-length {
 		display: none;
 	}
 </style>
 
 <script>
 	$(document).ready(function() {
-		oTable = $('.datatable').DataTable({
-			dom: 'Pfrtip',
+		oTable = $('#datatable').DataTable({
 			searchPanes: {
 				cascadePanes: true
 			},
@@ -126,7 +128,7 @@
 			},
 			lengthChange: true,
 			// paging: true,
-			info: false,
+			info: true,
 			pageLength: 20,
 		})
 
