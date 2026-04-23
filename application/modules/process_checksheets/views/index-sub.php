@@ -15,7 +15,7 @@
 					<button type="button" class="btn btn-primary" id="add-sub-folder"><i class="fa fa-plus"></i> New Folder</button>
 				</div>
 				<div class="card-body">
-					<div class="d-flex justify-content-between align-items-center">
+					<div class="d-flex justify-content-between align-items-center mb-3">
 						<div class="searching">
 							<div class="input-group">
 								<div class="input-group-text input-group-prepend rounded-right-0"><i class="fa fa-search"></i></div>
@@ -28,12 +28,13 @@
 							<span class="breadcrumb-item active"><?= $parent->name; ?></span>
 						</nav>
 					</div>
-					<table class="table table-sm table-bordered datatable">
+					<div class="table-responsive">
+						<table class="table table-sm" id="datatable">
 						<thead class="table-light">
 							<tr>
-								<th class="py-2">Directory Name</th>
+								<th class="py-2 text-left">Directory Name</th>
 								<th class="py-2 text-center" width="20%">Last Created</th>
-								<th class="py-2 text-center" width="50">Opsi</th>
+								<th class="py-2 text-center" width="80">Opsi</th>
 							</tr>
 						</thead>
 
@@ -56,7 +57,8 @@
 								</tr>
 							<?php endforeach; ?>
 						</tbody>
-					</table>
+						</table>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -85,15 +87,16 @@
 </div>
 
 <style>
-	div#DataTables_Table_0_filter {
+	div.dt-search,
+	div.dt-length {
 		display: none;
 	}
 </style>
 
+
 <script>
 	$(document).ready(function() {
-		oTable = $('.datatable').DataTable({
-			dom: 'Pfrtip',
+		oTable = $('#datatable').DataTable({
 			searchPanes: {
 				cascadePanes: true
 			},
@@ -109,7 +112,7 @@
 			},
 			lengthChange: true,
 			// paging: true,
-			info: false,
+			info: 	true,
 			pageLength: 20,
 		})
 
@@ -210,7 +213,6 @@
 
 	$(document).on('click', '.delete', function() {
 		const id = $(this).data('id')
-		alert(id)
 		Swal.fire({
 			title: 'Confirm',
 			text: 'Are sure you want to delete this folder?',

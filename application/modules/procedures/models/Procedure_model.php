@@ -167,6 +167,11 @@ class Procedure_model extends BF_Model
 
   public function processReview($id)
   {
+    $Return = array(
+      'status' => 0,
+      'msg'    => 'Invalid procedure ID.',
+    );
+
     try {
       if ($id) {
         $this->db->trans_begin();
