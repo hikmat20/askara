@@ -31,13 +31,13 @@
                             ?>
                                 <tr>
                                     <td class="text-center" style="vertical-align: middle;"><?= $n; ?></td>
-                                    <td style="vertical-align: middle;"><?= htmlspecialchars($form->nomor ?? '-'); ?></td>
+                                    <td style="vertical-align: middle;"><?= htmlspecialchars(isset($form->nomor) ? $form->nomor : '-'); ?></td>
                                     <td class="font-weight-bolder h6" style="vertical-align: middle;">
-                                        <?= htmlspecialchars($form->name ?? '-'); ?>
+                                        <?= htmlspecialchars(isset($form->name) ? $form->name : '-'); ?>
                                     </td>
-                                    <td style="vertical-align: middle;"><?= htmlspecialchars($form->departement_name ?? '-'); ?></td>
-                                    <td style="vertical-align: middle;"><?= htmlspecialchars($form->reviewer_position_name ?? '-'); ?></td>
-                                    <td style="vertical-align: middle;"><?= htmlspecialchars($form->approver_position_name ?? '-'); ?></td>
+                                    <td style="vertical-align: middle;"><?= htmlspecialchars(isset($form->departement_name) ? $form->departement_name : '-'); ?></td>
+                                    <td style="vertical-align: middle;"><?= htmlspecialchars(isset($form->reviewer_position_name) ? $form->reviewer_position_name : '-'); ?></td>
+                                    <td style="vertical-align: middle;"><?= htmlspecialchars(isset($form->approver_position_name) ? $form->approver_position_name : '-'); ?></td>
                                     <td class="text-center" style="vertical-align: middle;">
                                         <?= isset($sts[$form->status]) ? $sts[$form->status] : htmlspecialchars($form->status); ?>
                                     </td>
@@ -48,7 +48,7 @@
                                                     class="btn btn-sm btn-light-warning btn-open-modal"
                                                     data-id="<?= $form->id; ?>"
                                                     data-type="review"
-                                                    data-title="Review Form — <?= htmlspecialchars($form->name ?? ''); ?>">
+                                                    data-title="Review Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>">
                                                     <i class="fa fa-edit"></i> Review
                                                 </button>
                                             <?php else : ?>
@@ -81,7 +81,7 @@
                                                     class="btn btn-sm btn-light-info btn-open-modal"
                                                     data-id="<?= $form->id; ?>"
                                                     data-type="approval"
-                                                    data-title="Approval Form — <?= htmlspecialchars($form->name ?? ''); ?>">
+                                                    data-title="Approval Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>">
                                                     <i class="fa fa-check"></i> Approval
                                                 </button>
                                             <?php else : ?>
@@ -100,7 +100,7 @@
                                                         class="btn btn-sm btn-light-warning btn-open-modal"
                                                         data-id="<?= $form->id; ?>"
                                                         data-type="revision"
-                                                        data-title="Revision Form — <?= htmlspecialchars($form->name ?? ''); ?>"
+                                                        data-title="Revision Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
                                                         title="Request Revision">
                                                         <i class="far fa-edit"></i> Revision
                                                     </button>
@@ -108,7 +108,7 @@
                                                         class="btn btn-sm btn-light-danger btn-open-modal"
                                                         data-id="<?= $form->id; ?>"
                                                         data-type="deletion"
-                                                        data-title="Deletion Form — <?= htmlspecialchars($form->name ?? ''); ?>"
+                                                        data-title="Deletion Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
                                                         title="Request Deletion">
                                                         <i class="fa fa-trash-alt"></i> Deletion
                                                     </button>
