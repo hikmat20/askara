@@ -34,15 +34,15 @@
                             ?>
                                 <tr>
                                     <td class="text-center" style="vertical-align: middle;"><?= $n; ?></td>
-                                    <td style="vertical-align: middle;"><?= htmlspecialchars($form->nomor ?? '-'); ?></td>
+                                    <td style="vertical-align: middle;"><?= htmlspecialchars(isset($form->nomor) ? $form->nomor : '-'); ?></td>
                                     <td class="font-weight-bolder h6" style="vertical-align: middle;">
-                                        <?= htmlspecialchars($form->name ?? '-'); ?>
+                                        <?= htmlspecialchars(isset($form->name) ? $form->name : '-'); ?>
                                     </td>
-                                    <td style="vertical-align: middle;"><?= htmlspecialchars($form->departement_name ?? '-'); ?></td>
-                                    <td style="vertical-align: middle;"><?= htmlspecialchars($form->reviewer_position_name ?? '-'); ?></td>
-                                    <td style="vertical-align: middle;"><?= htmlspecialchars($form->approver_position_name ?? '-'); ?></td>
+                                    <td style="vertical-align: middle;"><?= htmlspecialchars(isset($form->departement_name) ? $form->departement_name : '-'); ?></td>
+                                    <td style="vertical-align: middle;"><?= htmlspecialchars(isset($form->reviewer_position_name) ? $form->reviewer_position_name : '-'); ?></td>
+                                    <td style="vertical-align: middle;"><?= htmlspecialchars(isset($form->approver_position_name) ? $form->approver_position_name : '-'); ?></td>
                                     <td style="vertical-align: middle; max-width:200px;">
-                                        <small class="text-muted"><?= htmlspecialchars($form->note ?? '-'); ?></small>
+                                        <small class="text-muted"><?= htmlspecialchars(isset($form->note) ? $form->note : '-'); ?></small>
                                     </td>
                                     <td class="text-center" style="vertical-align: middle;">
                                         <?php if ($form->deletion_status === 'OPN') : ?>

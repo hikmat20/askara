@@ -67,23 +67,23 @@
         <table class="table table-sm table-bordered border-dark mb-4">
             <tr>
                 <td width="180"><strong>Nomor Form</strong></td>
-                <td><?= htmlspecialchars($form->nomor ?? '-'); ?></td>
+                <td><?= htmlspecialchars(isset($form->nomor) ? $form->nomor : '-'); ?></td>
             </tr>
             <tr>
                 <td><strong>Nama Form</strong></td>
-                <td><?= htmlspecialchars($form->name ?? '-'); ?></td>
+                <td><?= htmlspecialchars(isset($form->name) ? $form->name : '-'); ?></td>
             </tr>
             <tr>
                 <td><strong>Departemen</strong></td>
-                <td><?= htmlspecialchars($form->departement_name ?? '-'); ?></td>
+                <td><?= htmlspecialchars(isset($form->departement_name) ? $form->departement_name : '-'); ?></td>
             </tr>
             <tr>
                 <td><strong>PIC Reviewer</strong></td>
-                <td><?= htmlspecialchars($form->reviewer_position_name ?? '-'); ?></td>
+                <td><?= htmlspecialchars(isset($form->reviewer_position_name) ? $form->reviewer_position_name : '-'); ?></td>
             </tr>
             <tr>
                 <td><strong>PIC Approver</strong></td>
-                <td><?= htmlspecialchars($form->approver_position_name ?? '-'); ?></td>
+                <td><?= htmlspecialchars(isset($form->approver_position_name) ? $form->approver_position_name : '-'); ?></td>
             </tr>
             <tr>
                 <td><strong>Status</strong></td>
@@ -106,12 +106,12 @@
                                 <span class="font-weight-bolder text-primary"><?= htmlspecialchars($log->action_at); ?></span>
                                 <p class="mb-1">
                                     Status:
-                                    <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars($log->old_status ?? '-'); ?>
+                                    <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars(isset($log->old_status) ? $log->old_status : '-'); ?>
                                     <i class="fa fa-arrow-right mx-1"></i>
-                                    <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars($log->new_status ?? '-'); ?>
+                                    <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars(isset($log->new_status) ? $log->new_status : '-'); ?>
                                 </p>
                                 <p class="mb-1">
-                                    Oleh: <strong><?= isset($ArrUsers[$log->action_by]) ? htmlspecialchars($ArrUsers[$log->action_by]->full_name ?? $ArrUsers[$log->action_by]->username) : 'User #' . $log->action_by; ?></strong>
+                                    Oleh: <strong><?= isset($ArrUsers[$log->action_by]) ? htmlspecialchars(isset($ArrUsers[$log->action_by]->full_name) ? $ArrUsers[$log->action_by]->full_name : $ArrUsers[$log->action_by]->username) : 'User #' . $log->action_by; ?></strong>
                                 </p>
                                 <?php if (!empty($log->note)) : ?>
                                     <p class="mb-0 text-muted">Catatan: <?= htmlspecialchars($log->note); ?></p>
