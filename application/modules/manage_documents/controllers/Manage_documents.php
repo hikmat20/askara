@@ -328,28 +328,16 @@ class Manage_documents extends Admin_Controller
 			if (isset($data['id']) && ($data['id'] != null)) :
 				$ArrFolder['modified_by'] = $this->auth->user_id();
 				$ArrFolder['modified_at'] = date('Y-m-d H:i:s');
-				$old_name = $this->db->get_where('view_directories', ['id' => $data['id']])->row()->name;
-				if (is_dir("./directory/" . $old_name)) {
-					rename("./directory/" . $old_name, "./directory/" . $data['folder_name']);
-				}
 				$this->db->update('directory', $ArrFolder, ['id' => $data['id']]);
 			else :
 				$ArrFolder['id'] = uniqid();
 				$ArrFolder['created_by'] = $this->auth->user_id();
 				$ArrFolder['created_at'] = date('Y-m-d H:i:s');
 				$this->db->insert('directory', $ArrFolder);
-				if (!is_dir('./directory/' . $data['folder_name'])) {
-					mkdir('./directory/' . $data['folder_name'], 0755, TRUE);
-					chmod("./directory/" . $data['folder_name'], 0755);  // octal; correct value of mode
-					chown("./directory/" . $data['folder_name'], 'www-data');
-				}
 			endif;
 
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
-				if (is_dir('./directory/' . $data['folder_name'])) {
-					rmdir('./directory/' . $data['folder_name']);
-				}
 				$Return		= array(
 					'status'		=> 0,
 					'msg'			=> 'Folder failed created'
@@ -416,15 +404,14 @@ class Manage_documents extends Admin_Controller
 		$data = $this->input->post();
 		$mainFolder = $data['folder'];
 		try {
-			$parent_name = $this->db->get_where('view_directories', ['id' => $data['parent_id']])->row()->name;
 			if ($_FILES['image']['name']) {
-				if (!is_dir("./directory/$mainFolder/$this->company/" . $parent_name)) {
-					mkdir("./directory/$mainFolder/$this->company/" . $parent_name, 0755, TRUE);
-					chmod("./directory/$mainFolder/$this->company/" . $parent_name, 0755);  // octal; correct value of mode
-					chown("./directory/$mainFolder/$this->company/" . $parent_name, 'www-data');
+				if (!is_dir("./directory/$mainFolder/$this->company")) {
+					mkdir("./directory/$mainFolder/$this->company", 0755, TRUE);
+					chmod("./directory/$mainFolder/$this->company", 0755);  // octal; correct value of mode
+					chown("./directory/$mainFolder/$this->company", 'www-data');
 				}
 				// $new_name 					= $this->fixForUri($data['description']);
-				$config['upload_path'] 		= "./directory/$mainFolder/$this->company/$parent_name"; //path folder
+				$config['upload_path'] 		= "./directory/$mainFolder/$this->company"; //path folder
 				$config['allowed_types'] 	= 'pdf|xlsx|docx'; //type yang dapat diakses bisa anda sesuaikan
 				$config['encrypt_name'] 	= true; //Enkripsi nama yang terupload
 				$id 						= (!$data['id']) ? uniqid(date('m')) : $data['id'];
@@ -451,8 +438,8 @@ class Manage_documents extends Admin_Controller
 					unset($data['old_file']);
 
 					if ($old_file != null) {
-						if (file_exists("./directory/$mainFolder/$this->company/$parent_name/" . $old_file)) {
-							unlink("./directory/$mainFolder/$this->company/$parent_name/" . $old_file);
+						if (file_exists("./directory/$mainFolder/$this->company/" . $old_file)) {
+							unlink("./directory/$mainFolder/$this->company/" . $old_file);
 						}
 					}
 
