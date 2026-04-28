@@ -382,14 +382,14 @@ class Procedures extends Admin_Controller
 		if ($Data) {
 			$Data['procedure_id'] = $pro_id;
 			if (isset($Data['id']) && $Data['id']) {
-				$Data['relate_doc'] 		= isset($Data['relate_doc']) ? json_encode($Data['relate_doc']) : '-';
-				$Data['relate_ik_doc'] 		= isset($Data['relate_ik_doc']) ? json_encode($Data['relate_ik_doc']) : '-';
+				$Data['relate_doc'] 		= isset($Data['relate_doc']) ? json_encode($Data['relate_doc']) : null;
+				$Data['relate_ik_doc'] 		= isset($Data['relate_ik_doc']) ? json_encode($Data['relate_ik_doc']) : null;
 				$Data['modified_by'] 		= $this->auth->user_id();
 				$Data['modified_at'] 		= date('Y-m-d H:i:s');
 				$this->db->update('procedure_details', $Data, ['id' => $Data['id']]);
 			} else {
-				$Data['relate_doc'] 		= isset($Data['relate_doc']) ? json_encode($Data['relate_doc']) : '-';
-				$Data['relate_ik_doc'] 		= isset($Data['relate_ik_doc']) ? json_encode($Data['relate_ik_doc']) : '-';
+				$Data['relate_doc'] 		= isset($Data['relate_doc']) ? json_encode($Data['relate_doc']) : null;
+				$Data['relate_ik_doc'] 		= isset($Data['relate_ik_doc']) ? json_encode($Data['relate_ik_doc']) : null;
 				$Data['created_by'] 		= $this->auth->user_id();
 				$Data['created_at'] 		= date('Y-m-d H:i:s');
 				$this->db->insert('procedure_details', $Data);
