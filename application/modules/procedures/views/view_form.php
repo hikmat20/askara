@@ -4,7 +4,7 @@ if ($form_type == 'upload_file') {
   $file_path = FCPATH . 'directory/FORMS/1/' . $file_name;
 
   if (!file_exists($file_path)) {
-    echo "File not found: " . $file_path;
+    echo "File not found: " . $file_name;
     return;
   }
   $file_path = base_url('directory/FORMS/1/' . $file_name);

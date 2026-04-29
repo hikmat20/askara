@@ -94,14 +94,16 @@ class Work_instructions extends Admin_Controller
 			}
 		}
 
-		$this->form_validation->set_message('required', '{field} tiidak boleh kosong');
+		$this->form_validation->set_message('required', '{field} tidak boleh kosong');
 		if ($this->form_validation->run() === FALSE) {
-			echo json_encode([
+			return ([
 				'status' => 0,
 				'errors' => $this->form_validation->error_array()
 			]);
-			return;
 		}
+		return ([
+			'status' => 1
+		]);
 	}
 
 	public function save()
@@ -113,7 +115,13 @@ class Work_instructions extends Admin_Controller
 			]);
 			return;
 		}
-		$this->_validation();
+
+		$result = $this->_validation();
+		if ($result['status'] == 0) {
+			echo json_encode($result);
+			return;
+		}
+
 		$Return = $this->WiModel->saveData();
 		echo json_encode($Return);
 	}

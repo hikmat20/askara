@@ -2,7 +2,7 @@
 $path = FCPATH . 'directory/WI/1/' . $file_name;
 
 if (!file_exists($path)) {
-  echo "File not found: " . $path;
+  echo "File not found: " . $file_name;
   return;
 }
 $file_path = base_url('directory/WI/1/' . $file_name);

@@ -30,7 +30,7 @@
 										<th class="p-2" width="50">No.</th>
 										<th class="p-2 text-left">Regulation Name</th>
 										<th class="p-2 text-center">About</th>
-										<th class="p-2" width="170">Category</th>
+										<th class="p-2" width="170">Subject</th>
 										<th class="p-2" width="100">Last Update</th>
 										<th class="p-2" width="100">Status</th>
 										<th class="p-2" width="">Description</th>
