@@ -76,8 +76,8 @@
 				<hr>
 				<!-- REGULATIONS -->
 				<div class="d-flex justify-content-between align-items-center mb-3">
-					<h4 class="font-weight-bolder"><i class="fa fa-list-alt text-primary" aria-hidden="true"></i> List
-						Regulations</h4>
+					<h4 class="font-weight-bolder"><i class="fa fa-list-alt text-primary" aria-hidden="true"></i>
+					List Regulations</h4>
 					<button type="button" class="btn btn-sm btn-success" id="new-compliance"><i class="fa fa-plus"
 							aria-hidden="true"></i> New Compliance</button>
 				</div>
@@ -409,6 +409,8 @@
 			const subId = $(this).data('sub_id')
 			const subject = $(this).data('subject')
 			const ArrRegulation = <?= $ArrRegulation; ?>;
+			console.log(ArrRegulation);
+
 			var html = `
 			<tr class="add">
 				<td class="text-center" style="vertical-align:middle;">
