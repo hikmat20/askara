@@ -66,13 +66,13 @@ class Company_reference extends Admin_Controller
 
 	public function edit($id = '', $branch = null)
 	{
-		$Data = $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN', 'branch_id' => $branch])->row();
-		$datStd = $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
-		$companies = $this->db->get_where('companies')->result();
-		$dataReg = $this->db->get_where('view_ref_regulations', ['reference_id' => $id, 'branch_id' => $branch])->result();
-		$standards = $this->db->get_where('requirements', ['status' => '1'])->result();
-		$regulations = $this->db->get_where('view_regulation_subjects', ['status' => 'PUB'])->result();
-		$subjects = $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1', 'branch_id' => $branch])->result();
+		$Data 		= $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN'])->row();
+		$datStd 	= $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
+		$companies 	= $this->db->get_where('companies')->result();
+		$dataReg 	= $this->db->get_where('view_ref_regulations', ['reference_id' => $id])->result();
+		$standards 	= $this->db->get_where('requirements', ['status' => '1'])->result();
+		$regulations= $this->db->get_where('view_regulation_subjects', ['status' => 'PUB'])->result();
+		$subjects 	= $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1'])->result();
 
 		if ($regulations)
 			foreach ($regulations as $v) {
