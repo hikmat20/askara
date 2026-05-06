@@ -926,6 +926,28 @@ class Monitoring extends Admin_Controller
 
 		$this->template->render('forms/list');
 	}
+	public function forms_revision()
+	{
+		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'RVI'])->result();
+
+		// Tandai apakah user saat ini adalah PIC Approver untuk setiap form
+		$current_user_id = $this->auth->user_id();
+		foreach ($forms as $form) {
+			$approver_position = $this->db->get_where('positions', [
+				'id'          => $form->approver_position_id,
+				'assign_user' => $current_user_id,
+			])->row();
+			$form->can_action = (bool) $approver_position;
+		}
+
+		$this->template->set([
+			'title'  => 'DAFTAR FORM - APPROVAL',
+			'forms'  => $forms,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('forms/list');
+	}
 
 	public function forms_published()
 	{

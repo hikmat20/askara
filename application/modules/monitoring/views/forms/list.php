@@ -93,28 +93,24 @@
                                                 </button>
                                             <?php endif; ?>
 
-                                        <?php else : ?>
-                                            <?php if ($form->status === 'PUB') : ?>
-                                                <?php if (!empty($ArrPosts) && in_array(1, $ArrPosts)) : ?>
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-light-warning btn-open-modal"
-                                                        data-id="<?= $form->id; ?>"
-                                                        data-type="revision"
-                                                        data-title="Revision Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
-                                                        title="Request Revision">
-                                                        <i class="far fa-edit"></i> Revision
-                                                    </button>
-                                                    <button type="button"
-                                                        class="btn btn-sm btn-light-danger btn-open-modal"
-                                                        data-id="<?= $form->id; ?>"
-                                                        data-type="deletion"
+                                        <?php elseif ($form->status === 'PUB') : ?>
+                                            <?php if (!empty($ArrPosts) && in_array($form->approver_position_id, $ArrPosts)) : ?>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-light-warning btn-open-modal"
+                                                    data-id="<?= $form->id; ?>"
+                                                    data-type="revision"
+                                                    data-title="Revision Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
+                                                    title="Request Revision">
+                                                    <i class="far fa-edit"></i> Revision
+                                                </button>
+                                                <button type="button"
+                                                    class="btn btn-sm btn-light-danger btn-open-modal"
+                                                    data-id="<?= $form->id; ?>"
+                                                    data-type="deletion"
                                                         data-title="Deletion Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
                                                         title="Request Deletion">
                                                         <i class="fa fa-trash-alt"></i> Deletion
                                                     </button>
-                                                <?php endif; ?>
-                                            <?php else : ?>
-                                                <span class="text-muted">—</span>
                                             <?php endif; ?>
                                         <?php endif; ?>
                                     </td>
