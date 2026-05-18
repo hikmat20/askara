@@ -604,7 +604,6 @@ class Work_instructions extends Admin_Controller
 		echo json_encode($Return);
 	}
 
-<<<<<<< HEAD
 	/**
 	 * Request revision for published work instruction (PUB -> RVI)
 	 * 
@@ -831,11 +830,5 @@ class Work_instructions extends Admin_Controller
 				'msg' => $e->getMessage()
 			]);
 		}
-=======
-	public function delete($id)
-	{
-		$Return = $this->WiModel->deleteData($id);
-		echo json_encode($Return);
->>>>>>> dev
 	}
 }

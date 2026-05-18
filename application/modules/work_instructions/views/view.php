@@ -1,4 +1,3 @@
-<<<<<<< HEAD
 <div class="row">
         <!-- LEFT SIDE: Document Preview (60%) -->
     <div class="col-lg-7">
@@ -363,16 +362,3 @@ $(document).ready(function() {
     });
 });
 </script>
-=======
-<?php
-$company = $this->session->company->id_perusahaan;
-$path = FCPATH . 'directory/WI/' . $company . '/' . $file_name;
-
-if (!file_exists($path)) {
-  echo "File not found: " . $file_name;
-  return;
-}
-$file_path = base_url('directory/WI/' . $company . '/' . $file_name);
-?>
-<iframe src="<?= $file_path; ?>#toolbar=0&navpanes=0" style="width: 100%;height: 68vh;" frameborder="0"></iframe>
->>>>>>> dev

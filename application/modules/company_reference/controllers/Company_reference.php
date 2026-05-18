@@ -66,15 +66,6 @@ class Company_reference extends Admin_Controller
 
 	public function edit($id = '', $branch = null)
 	{
-<<<<<<< HEAD
-		$Data 			= $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN'])->row();
-		$datStd 		= $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
-		$companies 		= $this->db->get_where('companies')->result();
-		$dataReg 		= $this->db->get_where('view_ref_regulations', ['reference_id' => $id, 'branch_id' => $branch])->result();
-		$standards		= $this->db->get_where('requirements', ['status' => '1'])->result();
-		$regulations	= $this->db->get_where('view_regulation_subjects', ['status' => 'PUB'])->result();
-		$subjects 		= $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1', 'branch_id' => $branch])->result();
-=======
 		$Data 		= $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN'])->row();
 		$datStd 	= $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
 		$companies 	= $this->db->get_where('companies')->result();
@@ -82,7 +73,6 @@ class Company_reference extends Admin_Controller
 		$standards 	= $this->db->get_where('requirements', ['status' => '1'])->result();
 		$regulations= $this->db->get_where('view_regulation_subjects', ['status' => 'PUB'])->result();
 		$subjects 	= $this->db->get_where('view_compliance_subjects', ['company_id' => $this->company, 'status' => '1'])->result();
->>>>>>> dev
 
 		if ($regulations)
 			foreach ($regulations as $v) {
@@ -93,22 +83,6 @@ class Company_reference extends Admin_Controller
 		foreach ($dataReg as $reg) {
 			$ArrReg[$reg->subject][] = $reg;
 		}
-<<<<<<< HEAD
-print_r($Data);
-die();
-		$this->template->set([
-			'title' 		=> 'Edit Company Reference',
-			'Data' 			=> $Data,
-			'datStd' 		=> $datStd,
-			'dataReg' 		=> $dataReg,
-			'Companies' 	=> $companies,
-			'standards' 	=> $standards,
-			'subjects' 		=> $subjects,
-			'ArrReg' 		=> $ArrReg,
-			'ArrRegulation' 	=> json_encode($ArrRegulation),
-		]);
-		$this->template->render('edit');
-=======
 
 		if ($Data) {
 			$this->template->set([
@@ -130,7 +104,6 @@ die();
 			];
 			$this->template->render('../views/errors/html/error_404_custome', $data);
 		}
->>>>>>> dev
 	}
 
 	public function view($id = null, $branch = null)
