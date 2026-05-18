@@ -34,17 +34,20 @@
                                 <tr>
                                     <td class="text-center" style="vertical-align: middle;"><?= $n; ?></td>
                                     <td style="vertical-align: middle;">
-                                        <?= htmlspecialchars($wi->number ? $wi->number : '-'); ?></td>
+                                        <?= htmlspecialchars($wi->number ? $wi->number : '-'); ?>
+                                    </td>
                                     <td class="font-weight-bolder h6" style="vertical-align: middle;">
                                         <?= htmlspecialchars($wi->name ? $wi->name : '-'); ?>
                                     </td>
                                     <td style="vertical-align: middle;">
-                                        <?= htmlspecialchars($wi->departement_name ? $wi->departement_name : '-'); ?></td>
+                                        <?= htmlspecialchars($wi->departement_name ? $wi->departement_name : '-'); ?>
+                                    </td>
                                     <td style="vertical-align: middle;">
                                         <?= htmlspecialchars($wi->reviewer_position_name ? $wi->reviewer_position_name : '-'); ?>
                                     </td>
                                     <td style="vertical-align: middle;">
-                                        <?= htmlspecialchars($wi->approver_position_name ? $wi->: '-'); ?></td>
+                                        <?= htmlspecialchars($wi->approver_position_name ? $wi->approver_position_name : '-'); ?>
+                                    </td>
                                     <td class="text-center" style="vertical-align: middle;">
                                         <?= isset($sts[$wi->status]) ? $sts[$wi->status] : htmlspecialchars($wi->status); ?>
                                         <?php if (isset($wi->is_under_revision) && $wi->is_under_revision == 1): ?>
@@ -58,7 +61,7 @@
                                             <?php if ($can): ?>
                                                 <button type="button" class="btn btn-sm btn-light-warning btn-open-modal"
                                                     data-id="<?= $wi->id; ?>" data-type="review"
-                                                    data-title="Review Work Instruction — <?= htmlspecialchars($wi->name ? $wi->: ''); ?>">
+                                                    data-title="Review Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
                                                     <i class="fa fa-edit"></i> Review
                                                 </button>
                                             <?php else: ?>
@@ -87,7 +90,7 @@
                                             <?php if ($can): ?>
                                                 <button type="button" class="btn btn-sm btn-light-info btn-open-modal"
                                                     data-id="<?= $wi->id; ?>" data-type="approval"
-                                                    data-title="Approval Work Instruction — <?= htmlspecialchars($wi->name ? $wi->: ''); ?>">
+                                                    data-title="Approval Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
                                                     <i class="fa fa-check"></i> Approval
                                                 </button>
                                             <?php else: ?>
@@ -101,7 +104,7 @@
                                         <?php elseif ($wi->status === 'PUB'): ?>
                                             <button type="button" class="btn btn-sm btn-light-primary btn-open-modal"
                                                 data-id="<?= $wi->id; ?>" data-type="view"
-                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->: ''); ?>">
+                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
                                                 <i class="fa fa-eye"></i> View
                                             </button>
 
