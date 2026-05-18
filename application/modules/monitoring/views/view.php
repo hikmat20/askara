@@ -441,10 +441,11 @@
     </div>
 
     <div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
+        <?php if ($data->file_path) : ?>
         <iframe class="w-100" style="height: 70vh;" src="<?= base_url($data->file_path); ?>#toolbar=0&navpanes=0" frameborder="1"></iframe>
-        <?php if ($view_data == false) : ?>
-            <!-- <button type="button" class="btn btn-default revision" data-id="<?= $file->id; ?>" data-type="procedure"><i class="fa fa-info-circle text-"></i>Submit this document for Revision</button>
-            <button type="button" class="btn btn-light-danger deletion" data-id="<?= $file->id; ?>" data-type="procedure"><i class="fa fa-info-circle text-"></i>Submit this document for Deletion</button> -->
+          
+        <?php else: ?>
+            <iframe src="<?= base_url('procedures' . '/printfile/' . $data->id); ?>#toolbar=0&navpanes=0&scrollbar=0" frameborder="0" style="width: 100%;height:70vh"></iframe>
         <?php endif; ?>
     </div>
 

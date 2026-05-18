@@ -82,9 +82,7 @@
 							aria-hidden="true"></i> New Compliance</button>
 				</div>
 
-				<?php if ($subjects)
-					foreach ($subjects as $k => $s):
-						$k++; ?>
+				<?php if ($subjects) foreach ($subjects as $k => $s): $k++; ?>
 
 						<div id="accSub" role="tablist" aria-multiselectable="true">
 							<div class="card mb-3 border-primary overflow-hidden" style="border-radius: 10px;">

@@ -160,19 +160,16 @@ class Monitoring_model extends BF_Model
                     'modified_by' => $this->auth->user_id(),
                     'modified_at' => date('Y-m-d H:i:s'),
                 ];
+                $this->update($data['id'], $dataUpdate);
 
                 if ($data['status'] == 'PUB') {
                     $this->_signature($data, 'approve');
-                    $dataUpdate['approved_by'] = $this->auth->user_id();
-                    $dataUpdate['approved_at'] = date('Y-m-d H:i:s');
-                    $dataUpdate['published_at'] = date('Y-m-d H:i:s');
-
-                    $result = $this->generatePdfFile($data['id']);
-                    if ($result) {
-                        $dataUpdate['file_path'] = $result['filePath'] . $result['filename'];
-                    }
+                    $dataUpdateApprove['approved_by'] = $this->auth->user_id();
+                    $dataUpdateApprove['approved_at'] = date('Y-m-d H:i:s');
+                    $dataUpdateApprove['published_at'] = date('Y-m-d H:i:s');
+                    $this->update($data['id'], $dataUpdateApprove);
+                    $this->generatePdfFile($data['id']);
                 }
-                $this->update($data['id'], $dataUpdate);
 
                 $this->_update_history($data);
                 $this->_logsProcedure($data);
@@ -582,6 +579,7 @@ class Monitoring_model extends BF_Model
             'ArrSign'             => $ArrSign
         ];
 
+        $this->update($procedure_id, ['file_path' => $filePath . $filename]);
 
         $mpdf->SetWatermarkImage(FCPATH . 'assets/logo/1/' . $company->logo, 0.2, [100, 80], [60, 100]);
         $mpdf->showWatermarkImage = true;
@@ -597,7 +595,8 @@ class Monitoring_model extends BF_Model
 
         $mpdf->WriteHTML($page);
         $mpdf->Output($filePath . $filename, 'F');
-        return ['filePath' => $filePath, 'filename' => $filename];
+
+        // return ['filePath' => $filePath, 'filename' => $filename];
     }
 
     public function getHeader($allData)
@@ -666,7 +665,7 @@ class Monitoring_model extends BF_Model
         $target_position_ids = [];
         $target_user_ids = [];
         
-        $subject_prefix = "[Askara Document] ";
+        $subject_prefix = "[ISO-Platform] ";
         $message = "<h3>Notifikasi Dokumen Kontrol</h3>";
         $message .= "<p>Dokumen prosedur <strong>" . $procedure->name . "  (" . $procedure->nomor . ")</strong> mengalami pembaruan status.</p>";
         
@@ -707,7 +706,7 @@ class Monitoring_model extends BF_Model
         if (!empty($note) && $note !== '~') {
             $message .= "<br><p><strong>Catatan Tambahan:</strong><br><i>\"" . $note . "\"</i></p>";
         }
-        $message .= "<br><p>Silakan login ke aplikasi Askara untuk melihat detail dokumen ini.</p>";
+        $message .= "<br><p>Silakan login ke aplikasi untuk melihat detail dokumen ini.</p>";
 
         // Konversi Position_ID menjadi User_ID jika ada target berupa position
         $target_position_ids = array_unique(array_filter($target_position_ids));
@@ -738,7 +737,15 @@ class Monitoring_model extends BF_Model
         // Masukkan antrean (ke Cron / email_queues)
         if (!empty($emails)) {
             $this->load->library('email_runner');
-            $this->email_runner->queue($emails, $subject, $message);
+
+            // Tentukan link spesifik berdasarkan status
+            $action = 'view';
+            if ($new_status == 'REV') $action = 'review';
+            if ($new_status == 'APV') $action = 'approval';
+            
+            $action_url = base_url('monitoring/' . $action);
+            
+            $this->email_runner->queue($emails, $subject, $message, null, $action_url);
         }
     }
 }

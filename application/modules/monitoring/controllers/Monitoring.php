@@ -141,8 +141,8 @@ class Monitoring extends Admin_Controller
 		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users         = $this->db->get_where('view_users')->result();
-		$getForms      = $this->db->get_where('forms', ['procedure_id' => $id])->result();
-		$getGuides     = $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
+		$getForms      = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
+		$getGuides     = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
 		$jabatan       = $this->db->get('positions')->result();
 		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
 		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
