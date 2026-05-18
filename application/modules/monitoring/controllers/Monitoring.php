@@ -99,6 +99,22 @@ class Monitoring extends Admin_Controller
 		$dtFormDelOPN = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'OPN'])->num_rows();
 		$dtFormDelAPV = $this->db->get_where('forms', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'APV'])->num_rows();
 
+		/* WORK INSTRUCTION STATISTICS */
+		// Check if work_instructions table exists
+		if ($this->db->table_exists('work_instructions')) {
+			$dtWiRev = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'REV'])->num_rows();
+			$dtWiCor = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'COR'])->num_rows();
+			$dtWiApv = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'APV'])->num_rows();
+			$dtWiRvi = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'RVI'])->num_rows();
+			$dtWiPub = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'PUB'])->num_rows();
+		} else {
+			$dtWiRev = 0;
+			$dtWiCor = 0;
+			$dtWiApv = 0;
+			$dtWiRvi = 0;
+			$dtWiPub = 0;
+		}
+
 		$Data = $this->db->order_by('created_at', 'ASC')->get_where('directory', ['parent_id' => '0', 'active' => 'Y', 'status !=' => 'DEL'])->result();
 		$RecentFiles = $this->db->order_by('created_at', 'DESC')->get_where('directory', ['parent_id !=' => '0', 'active' => 'Y', 'flag_type' => 'FILE', 'status !=' => 'DEL', 'created_at like' => date('Y-m-d') . "%"])->result();
 
@@ -128,6 +144,11 @@ class Monitoring extends Admin_Controller
 				'dtFormRvi'			=> $dtFormRvi,
 				'dtFormDelOPN'		=> $dtFormDelOPN,
 				'dtFormDelAPV'		=> $dtFormDelAPV,
+				'dtWiRev'			=> $dtWiRev,
+				'dtWiCor'			=> $dtWiCor,
+				'dtWiApv'			=> $dtWiApv,
+				'dtWiRvi'			=> $dtWiRvi,
+				'dtWiPub'			=> $dtWiPub,
 			]
 		);
 
@@ -965,6 +986,12 @@ class Monitoring extends Admin_Controller
 			return;
 		}
 
+		// Get procedure name
+		if (!empty($form->procedure_id)) {
+			$procedure = $this->db->get_where('procedures', ['id' => $form->procedure_id])->row();
+			$form->procedure_name = $procedure ? $procedure->name : null;
+		}
+
 		// Ambil riwayat status dari form_status_logs
 		$history = $this->db->order_by('action_at', 'ASC')
 			->get_where('form_status_logs', ['form_id' => $id])
@@ -1050,6 +1077,14 @@ class Monitoring extends Admin_Controller
 			$this->output->set_status_header(403);
 			show_error('Akses ditolak. Anda bukan PIC Approver yang berwenang untuk Form ini.', 403);
 			return;
+		}
+
+		// Ambil nama procedure jika ada
+		if (!empty($form->procedure_id)) {
+			$procedure = $this->db->get_where('procedures', ['id' => $form->procedure_id])->row();
+			$form->procedure_name = $procedure ? $procedure->name : '-';
+		} else {
+			$form->procedure_name = '-';
 		}
 
 		// Ambil riwayat status dari form_status_logs
@@ -1435,4 +1470,239 @@ class Monitoring extends Admin_Controller
 		echo json_encode($Return);
 	}
 
+	/* WORK INSTRUCTIONS MONITORING */
+
+	public function wi_review()
+	{
+		$work_instructions = $this->db->get_where('view_work_instructions', ['company_id' => $this->company, 'status' => 'REV'])->result();
+
+		// Tandai apakah user saat ini adalah PIC Reviewer untuk setiap WI
+		$current_user_id = $this->auth->user_id();
+		foreach ($work_instructions as $wi) {
+			$reviewer_position = $this->db->get_where('positions', [
+				'id'          => $wi->reviewer_position_id,
+				'assign_user' => $current_user_id,
+			])->row();
+			$wi->can_action = (bool) $reviewer_position;
+		}
+
+		$this->template->set([
+			'title'  => 'DAFTAR WORK INSTRUCTION - REVIEW',
+			'work_instructions'  => $work_instructions,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('work_instructions/list');
+	}
+
+	public function wi_correction()
+	{
+		$work_instructions = $this->db->get_where('view_work_instructions', ['company_id' => $this->company, 'status' => 'COR'])->result();
+
+		// Tandai apakah user saat ini adalah creator/owner WI
+		$current_user_id = $this->auth->user_id();
+		foreach ($work_instructions as $wi) {
+			$wi->can_action = ((int)$wi->created_by === (int)$current_user_id);
+		}
+
+		$this->template->set([
+			'title'  => 'DAFTAR WORK INSTRUCTION - CORRECTION',
+			'work_instructions'  => $work_instructions,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('work_instructions/list');
+	}
+
+	public function wi_approval()
+	{
+		$work_instructions = $this->db->get_where('view_work_instructions', ['company_id' => $this->company, 'status' => 'APV'])->result();
+
+		// Tandai apakah user saat ini adalah PIC Approver untuk setiap WI
+		$current_user_id = $this->auth->user_id();
+		foreach ($work_instructions as $wi) {
+			$approver_position = $this->db->get_where('positions', [
+				'id'          => $wi->approver_position_id,
+				'assign_user' => $current_user_id,
+			])->row();
+			$wi->can_action = (bool) $approver_position;
+		}
+
+		$this->template->set([
+			'title'  => 'DAFTAR WORK INSTRUCTION - APPROVAL',
+			'work_instructions'  => $work_instructions,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('work_instructions/list');
+	}
+
+	public function wi_published()
+	{
+		$work_instructions = $this->db->get_where('view_work_instructions', ['company_id' => $this->company, 'status' => 'PUB'])->result();
+
+		$this->template->set([
+			'title'  => 'DAFTAR WORK INSTRUCTION - PUBLISHED',
+			'work_instructions'  => $work_instructions,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('work_instructions/list');
+	}
+
+	public function wi_revision()
+	{
+		$work_instructions = $this->db->get_where('view_work_instructions', ['company_id' => $this->company, 'status' => 'RVI'])->result();
+
+		$this->template->set([
+			'title'  => 'DAFTAR WORK INSTRUCTION - REVISION',
+			'work_instructions'  => $work_instructions,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('work_instructions/list');
+	}
+
+	public function view_wi($id)
+	{
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $id, 'company_id' => $this->company])->row();
+		
+		if (!$wi) {
+			show_404();
+			return;
+		}
+
+		// Get status logs for audit trail
+		$status_logs = $this->db->order_by('action_at', 'DESC')->get_where('work_instruction_status_logs', ['work_instruction_id' => $id])->result();
+
+		// Get reviewed_by and approved_by user names
+		if (!empty($wi->reviewed_by)) {
+			$reviewed_user = $this->db->get_where('users', ['id_user' => $wi->reviewed_by])->row();
+			$wi->reviewed_by_name = $reviewed_user ? $reviewed_user->full_name : null;
+		}
+
+		if (!empty($wi->approved_by)) {
+			$approved_user = $this->db->get_where('users', ['id_user' => $wi->approved_by])->row();
+			$wi->approved_by_name = $approved_user ? $approved_user->full_name : null;
+		}
+
+		// Get procedure name
+		if (!empty($wi->procedure_id)) {
+			$procedure = $this->db->get_where('procedures', ['id' => $wi->procedure_id])->row();
+			$wi->procedure_name = $procedure ? $procedure->name : null;
+		}
+
+		// Get action_by names for status logs
+		foreach ($status_logs as $log) {
+			$action_user = $this->db->get_where('users', ['id_user' => $log->action_by])->row();
+			$log->action_by_name = $action_user ? $action_user->full_name : null;
+		}
+
+		// VERSION CONTROL: Get version history
+		$this->load->model('work_instructions/Work_instruction_model', 'WiModel');
+		$version_history = $this->WiModel->getVersionHistory($id);
+
+		// VERSION CONTROL: Get current version to display (handles under revision scenario)
+		$current_version = $this->WiModel->getCurrentVersion($id);
+		
+		// If under revision, use file from version history
+		if ($current_version && isset($current_version->is_from_history) && $current_version->is_from_history) {
+			$wi->display_file_name = $current_version->file_name;
+			$wi->display_file_path = $current_version->file_path;
+			$wi->display_ext = $current_version->ext;
+			$wi->display_size = isset($current_version->size) ? $current_version->size : null;
+			$wi->showing_old_version = true;
+		} else {
+			$wi->display_file_name = isset($wi->file_name) ? $wi->file_name : null;
+			$wi->display_file_path = isset($wi->file_path) ? $wi->file_path : null;
+			$wi->display_ext = isset($wi->ext) ? $wi->ext : null;
+			$wi->display_size = isset($wi->size) ? $wi->size : null;
+			$wi->showing_old_version = false;
+		}
+
+		$this->template->set([
+			'wi' => $wi,
+			'status_logs' => $status_logs,
+			'version_history' => $version_history,
+			'sts' => $this->sts,
+		]);
+		
+		$this->template->render('work_instructions/view');
+	}
+
+	/**
+	 * Load WI detail with preview for review modal
+	 */
+	public function load_wi_review_modal($id)
+	{
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $id, 'company_id' => $this->company])->row();
+		
+		if (!$wi) {
+			$this->output->set_status_header(404);
+			echo json_encode(['status' => 0, 'msg' => 'Work Instruction tidak ditemukan.']);
+			return;
+		}
+
+		// Verifikasi bahwa user saat ini adalah PIC Reviewer yang sah
+		$reviewer_position = $this->db->get_where('positions', [
+			'id'          => $wi->reviewer_position_id,
+			'assign_user' => $this->auth->user_id(),
+		])->row();
+
+		if (!$reviewer_position) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Anda bukan PIC Reviewer yang berwenang untuk Work Instruction ini.']);
+			return;
+		}
+
+		// Get procedure name
+		if (!empty($wi->procedure_id)) {
+			$procedure = $this->db->get_where('procedures', ['id' => $wi->procedure_id])->row();
+			$wi->procedure_name = $procedure ? $procedure->name : null;
+		}
+
+		// Load partial view untuk modal
+		$this->load->view('work_instructions/review_modal', [
+			'wi' => $wi,
+			'sts' => $this->sts,
+		]);
+	}
+
+	/**
+	 * Load WI detail with preview for approval modal
+	 */
+	public function load_wi_approval_modal($id)
+	{
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $id, 'company_id' => $this->company])->row();
+		
+		if (!$wi) {
+			$this->output->set_status_header(404);
+			echo json_encode(['status' => 0, 'msg' => 'Work Instruction tidak ditemukan.']);
+			return;
+		}
+
+		// Verifikasi bahwa user saat ini adalah PIC Approver yang sah
+		$approver_position = $this->db->get_where('positions', [
+			'id'          => $wi->approver_position_id,
+			'assign_user' => $this->auth->user_id(),
+		])->row();
+
+		if (!$approver_position) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Anda bukan PIC Approver yang berwenang untuk Work Instruction ini.']);
+			return;
+		}
+
+		// Get procedure name
+		if (!empty($wi->procedure_id)) {
+			$procedure = $this->db->get_where('procedures', ['id' => $wi->procedure_id])->row();
+			$wi->procedure_name = $procedure ? $procedure->name : null;
+		}
+
+		// Load partial view untuk modal
+		$this->load->view('work_instructions/approval_modal', [
+			'wi' => $wi,
+			'sts' => $this->sts,
+		]);
+	}
 }

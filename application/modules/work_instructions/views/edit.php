@@ -90,6 +90,41 @@
 						</div>
 						<hr>
 
+						<!-- PIC Reviewer & Approver Section -->
+						<div class="row">
+							<div class="col-md-6">
+								<div class="mb-3 row">
+									<label class="col-md-4 col-form-label">PIC Reviewer</label>
+									<div class="col-md-8">
+										<select class="form-control select2" name="reviewer_position_id" id="reviewer_position_id">
+											<option value="">-- Pilih PIC Reviewer --</option>
+											<?php if ($positions) foreach ($positions as $position): ?>
+												<option value="<?= $position->id; ?>" <?= (isset($dataWi->reviewer_position_id) && $dataWi->reviewer_position_id == $position->id ? 'selected' : ''); ?>><?= $position->name; ?></option>
+											<?php endforeach; ?>
+										</select>
+										<span class="form-text text-muted">Jabatan yang bertanggung jawab untuk review dokumen</span>
+										<span class="form-text text-danger invalid-feedback"></span>
+									</div>
+								</div>
+							</div>
+							<div class="col-md-6">
+								<div class="mb-3 row">
+									<label class="col-md-4 col-form-label">PIC Approver</label>
+									<div class="col-md-8">
+										<select class="form-control select2" name="approver_position_id" id="approver_position_id">
+											<option value="">-- Pilih PIC Approver --</option>
+											<?php if ($positions) foreach ($positions as $position): ?>
+												<option value="<?= $position->id; ?>" <?= (isset($dataWi->approver_position_id) && $dataWi->approver_position_id == $position->id ? 'selected' : ''); ?>><?= $position->name; ?></option>
+											<?php endforeach; ?>
+										</select>
+										<span class="form-text text-muted">Jabatan yang bertanggung jawab untuk approval dokumen</span>
+										<span class="form-text text-danger invalid-feedback"></span>
+									</div>
+								</div>
+							</div>
+						</div>
+						<hr>
+
 						<div class="row">
 							<label class="col-md-2">Document Type <span class="text-danger">*</span></label>
 							<div class="col-md-6">

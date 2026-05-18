@@ -134,7 +134,7 @@
 
 <!-- Modal: Review / Approval Form -->
 <div class="modal fade" id="modalFormAction" tabindex="-1" role="dialog" aria-labelledby="modalFormActionLabel" aria-hidden="true">
-    <div class="modal-dialog modal-lg" role="document">
+    <div class="modal-dialog modal-xl" role="document">
         <div class="modal-content">
             <div class="modal-header py-3">
                 <h5 class="modal-title font-weight-bolder" id="modalFormActionLabel"></h5>

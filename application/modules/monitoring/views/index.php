@@ -174,6 +174,86 @@
             </div>
         </div>
 
+        <div class="pt-3">
+            <h3 class="text-white pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Work Instructions</h3>
+            <div class="d-flex justify-content-start align-items-center">
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-success" style="font-size: 48px;"><?= $dtWiRev; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/wi_review'); ?>" class="text-hover-primary"
+                                title="REVIEW WORK INSTRUCTIONS">
+                                <span class="card-label text-dark text-center font-weight-bolder">REVIEW WORK INSTRUCTIONS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg " style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-warning" style="font-size: 48px;"><?= $dtWiCor; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/wi_correction'); ?>" class="text-hover-primary"
+                                title="CORRECTION WORK INSTRUCTIONS">
+                                <span class="card-label text-dark text-center font-weight-bolder">CORRECTION WORK INSTRUCTIONS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg " style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-info" style="font-size: 48px;"><?= $dtWiApv; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/wi_approval'); ?>" class="text-hover-primary"
+                                title="APPROVAL WORK INSTRUCTIONS">
+                                <span class="card-label text-dark text-center font-weight-bolder">APPROVAL WORK INSTRUCTIONS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg " style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-danger" style="font-size: 48px;"><?= $dtWiRvi; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/wi_revision'); ?>" class="text-hover-primary"
+                                title="REVISION WORK INSTRUCTIONS">
+                                <span class="card-label text-dark text-center font-weight-bolder">REVISION WORK INSTRUCTIONS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg " style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-primary" style="font-size: 48px;"><?= $dtWiPub; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url('monitoring/wi_published'); ?>" class="text-hover-primary"
+                                title="PUBLISHED WORK INSTRUCTIONS">
+                                <span class="card-label text-dark text-center font-weight-bolder">PUBLISHED WORK INSTRUCTIONS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="pt-3 d-none">
             <h3 class="text-white mt-0 pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Other Document</h3>
             <div class="d-flex justify-content-start align-items-center">

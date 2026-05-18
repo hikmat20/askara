@@ -65,7 +65,7 @@ class Company_reference extends Admin_Controller
 
 	public function edit($id = '', $branch = null)
 	{
-		$Data 			= $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN', 'branch_id' => $branch])->row();
+		$Data 			= $this->db->get_where('view_references', ['id' => $id, 'status' => 'OPN'])->row();
 		$datStd 		= $this->db->get_where('view_ref_standards', ['reference_id' => $id])->result();
 		$companies 		= $this->db->get_where('companies')->result();
 		$dataReg 		= $this->db->get_where('view_ref_regulations', ['reference_id' => $id, 'branch_id' => $branch])->result();
@@ -81,27 +81,20 @@ class Company_reference extends Admin_Controller
 		foreach ($dataReg as $reg) {
 			$ArrReg[$reg->subject][] = $reg;
 		}
-
-		if ($Data) {
-			$this->template->set([
-				'title' 		=> 'Edit Company Reference',
-				'Data' 			=> $Data,
-				'datStd' 		=> $datStd,
-				'dataReg' 		=> $dataReg,
-				'Companies' 	=> $companies,
-				'standards' 	=> $standards,
-				'subjects' 		=> $subjects,
-				'ArrReg' 		=> $ArrReg,
-				'ArrRegulation' 	=> json_encode($ArrRegulation),
-			]);
-			$this->template->render('edit');
-		} else {
-			$data = [
-				'heading' => 'Error!',
-				'message' => 'Data not found..'
-			];
-			$this->template->render('../views/errors/html/error_404_custome', $data);
-		}
+print_r($Data);
+die();
+		$this->template->set([
+			'title' 		=> 'Edit Company Reference',
+			'Data' 			=> $Data,
+			'datStd' 		=> $datStd,
+			'dataReg' 		=> $dataReg,
+			'Companies' 	=> $companies,
+			'standards' 	=> $standards,
+			'subjects' 		=> $subjects,
+			'ArrReg' 		=> $ArrReg,
+			'ArrRegulation' 	=> json_encode($ArrRegulation),
+		]);
+		$this->template->render('edit');
 	}
 
 	public function view($id = null, $branch = null)
