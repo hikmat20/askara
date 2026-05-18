@@ -2,12 +2,12 @@
 	<div class="container mx-auto">
 		<div class="card card-custom">
 			<div class="row">
-				<div class="col-md-4 bg-dark-25 pr-0">
+				<div class="col-md-4 bg-dark-25 pr-md-0 min-h-md-550px">
 					<div class="card-header pb-8 pt-3 h-20px">
 						<span class="card-title text-dark-75"><i class="fa fa-folder mr-2 text-warning"></i>Directories</span>
 					</div>
-					<div class="card-body px-4 py-1 overflow-auto h-500px">
-						<table class="table table-condensed">
+					<div class="card-body px-4 py-1 overflow-auto">
+						<table class="table table-condensed table-borderless">
 							<?php if ($mainFolder) foreach ($mainFolder as $main) : ?>
 								<tr data-id="<?= $main->id; ?>" class="tree-folder cursor-pointer" data-folder="<?= $main->description; ?>" data-parent_id="<?= $main->id; ?>">
 									<td>
@@ -21,12 +21,12 @@
 					</div>
 				</div>
 
-				<div class="col-md-8 pl-0">
-					<div class="card-header px-0 border-1 border-left pb-11 pt-0 h-20px">
+				<div class="col-md-8 pl-md-0 mt-5 mt-md-0 border-left-md">
+					<div class="card-header px-0 pb-11 pt-0 h-20px border-top border-top-md-0">
 						<!-- <input type="hidden" id="active_parent_id" value="ec"> -->
 						<!-- <span class="card-title text-dark-75"><i class="fa fa-file mr-2 text-success"></i>List File & Folder</span> -->
 						<div class="px-1">
-							<ul class="nav nav-light-success nav-pills" id="myTab" role="tablist">
+							<ul class="nav nav-light-success nav-pills flex-nowrap text-nowrap overflow-auto" id="myTab" role="tablist">
 								<li class="nav-item text-primary" data-id="0">
 									<a class="nav-link px-2 disabled" id="back" data-folder="" data-id="0" href="javascript:void(0)">
 										<span class="nav-icon">
@@ -76,9 +76,9 @@
 							</ul>
 						</div>
 					</div>
-					<div id="data-file">
-						<div class="card-body border border-1 border-left py-2 overflow-auto h-550px">
-							<div class="d-flex justify-content-center align-items-center py-10">
+					<div id="data-file" >
+						<div class="card-body py-2 overflow-auto min-h-md-550px">
+							<div class="d-flex justify-content-center align-items-center py-10 ">
 								<img src="<?= base_url('assets\images\dashboard\folder-file.gif'); ?>" alt="" width="300px" class="img-responsive text-center opacity-30">
 							</div>
 						</div>
@@ -260,123 +260,33 @@
 		}
 	});
 
-	$(document).on("dblclick", ".folder-procedure", function() {
-		const id = $(this).data('id');
-		if (id) {
-			$('#data-file').load(siteurl + active_controller + 'list_procedures/' + id)
-			$('#back').data('id', id);
-			$('#add-folder').data('id', id);
-			$('#add-file').data('id', id);
-			$('#refresh').data('id', id);
-			console.log(id);
-		} else {
-			$('#data-file').html(`
-			<div class="card-body border border-1 border-left py-2 overflow-auto h-550px">
-				<div class="d-flex justify-content-center align-items-center py-10">
-					<img src="<?= base_url('assets\images\dashboard\folder-file.gif'); ?>" alt="" width="300px" class="img-responsive text-center opacity-30">
+	function handleDblClick(selector, method) {
+		$(document).on("dblclick", selector, function() {
+			const id = $(this).data('id');
+			if (id) {
+				$('#data-file').load(siteurl + active_controller + method + '/' + id);
+				$('#back').data('id', id);
+				$('#add-folder').data('id', id);
+				$('#add-file').data('id', id);
+				$('#refresh').data('id', id);
+			} else {
+				$('#data-file').html(`
+				<div class="card-body border border-1 border-left py-2 overflow-auto h-550px">
+					<div class="d-flex justify-content-center align-items-center py-10">
+						<img src="<?= base_url('assets/images/dashboard/folder-file.gif'); ?>" alt="" width="300px" class="img-responsive text-center opacity-30">
+					</div>
 				</div>
-			</div>
-			`)
+				`);
+			}
+		});
+	}
 
-		}
-	});
-
-	$(document).on("dblclick", ".procedure", function() {
-		const id = $(this).data('id');
-		if (id) {
-			$('#data-file').load(siteurl + active_controller + 'procedure_details/' + id)
-			$('#back').data('id', id);
-			$('#add-folder').data('id', id);
-			$('#add-file').data('id', id);
-			$('#refresh').data('id', id);
-		} else {
-			$('#data-file').html(`
-			<div class="card-body border border-1 border-left py-2 overflow-auto h-550px">
-				<div class="d-flex justify-content-center align-items-center py-10">
-					<img src="<?= base_url('assets\images\dashboard\folder-file.gif'); ?>" alt="" width="300px" class="img-responsive text-center opacity-30">
-				</div>
-			</div>
-			`)
-
-		}
-	});
-
-	$(document).on("dblclick", ".getProcedure", function() {
-		const id = $(this).data('id');
-		if (id) {
-			$('#data-file').load(siteurl + active_controller + 'getProcedure/' + id)
-			$('#back').data('id', id);
-			$('#add-folder').data('id', id);
-			$('#add-file').data('id', id);
-			$('#refresh').data('id', id);
-		} else {
-			$('#data-file').html(`
-			<div class="card-body border border-1 border-left py-2 overflow-auto h-550px">
-				<div class="d-flex justify-content-center align-items-center py-10">
-					<img src="<?= base_url('assets\images\dashboard\folder-file.gif'); ?>" alt="" width="300px" class="img-responsive text-center opacity-30">
-				</div>
-			</div>
-			`)
-
-		}
-	});
-	$(document).on("dblclick", ".getForms", function() {
-		const id = $(this).data('id');
-		if (id) {
-			$('#data-file').load(siteurl + active_controller + 'getForms/' + id)
-			$('#back').data('id', id);
-			$('#add-folder').data('id', id);
-			$('#add-file').data('id', id);
-			$('#refresh').data('id', id);
-		} else {
-			$('#data-file').html(`
-			<div class="card-body border border-1 border-left py-2 overflow-auto h-550px">
-				<div class="d-flex justify-content-center align-items-center py-10">
-					<img src="<?= base_url('assets\images\dashboard\folder-file.gif'); ?>" alt="" width="300px" class="img-responsive text-center opacity-30">
-				</div>
-			</div>
-			`)
-
-		}
-	});
-	$(document).on("dblclick", ".getGuides", function() {
-		const id = $(this).data('id');
-		if (id) {
-			$('#data-file').load(siteurl + active_controller + 'getGuides/' + id)
-			$('#back').data('id', id);
-			$('#add-folder').data('id', id);
-			$('#add-file').data('id', id);
-			$('#refresh').data('id', id);
-		} else {
-			$('#data-file').html(`
-			<div class="card-body border border-1 border-left py-2 overflow-auto h-550px">
-				<div class="d-flex justify-content-center align-items-center py-10">
-					<img src="<?= base_url('assets\images\dashboard\folder-file.gif'); ?>" alt="" width="300px" class="img-responsive text-center opacity-30">
-				</div>
-			</div>
-			`)
-
-		}
-	});
-	$(document).on("dblclick", ".getRecords", function() {
-		const id = $(this).data('id');
-		if (id) {
-			$('#data-file').load(siteurl + active_controller + 'getRecords/' + id)
-			$('#back').data('id', id);
-			$('#add-folder').data('id', id);
-			$('#add-file').data('id', id);
-			$('#refresh').data('id', id);
-		} else {
-			$('#data-file').html(`
-			<div class="card-body border border-1 border-left py-2 overflow-auto h-550px">
-				<div class="d-flex justify-content-center align-items-center py-10">
-					<img src="<?= base_url('assets\images\dashboard\folder-file.gif'); ?>" alt="" width="300px" class="img-responsive text-center opacity-30">
-				</div>
-			</div>
-			`)
-
-		}
-	});
+	handleDblClick(".folder-procedure", "list_procedures");
+	handleDblClick(".procedure", "procedure_details");
+	handleDblClick(".getProcedure", "getProcedure");
+	handleDblClick(".getForms", "getForms");
+	handleDblClick(".getGuides", "getGuides");
+	handleDblClick(".getRecords", "getRecords");
 
 	$(document).on("click", "#back", function() {
 		let id = $(this).data('id');

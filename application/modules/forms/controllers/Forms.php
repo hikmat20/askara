@@ -310,4 +310,15 @@ class Forms extends Admin_Controller
 		$Return = $this->FormModel->saveApprove();
 		echo json_encode($Return);
 	}
+
+	public function delete()
+	{
+		if (!$this->input->is_ajax_request()) {
+			echo json_encode(['status' => 0, 'msg' => 'Access Denied']);
+			return;
+		}
+		$id = $this->input->post('id');
+		$Return = $this->FormModel->deleteData($id);
+		echo json_encode($Return);
+	}
 }

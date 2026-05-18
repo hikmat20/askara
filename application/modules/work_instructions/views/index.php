@@ -60,6 +60,7 @@
 												<td><?= $draft->procedure_name; ?></td>
 												<td class="text-center"><?= date("d M Y", strtotime($draft->issue_date)); ?></td>
 												<td class="text-center"><?= date("d M Y", strtotime($draft->effective_date)); ?></td>
+<<<<<<< HEAD
 												<td class="text-center"><?= $draft->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
@@ -272,6 +273,13 @@
 															<i class="fa fa-trash-alt"></i>
 														</button>
 													<?php endif; ?>
+=======
+												<td><?= $draft->revision_number; ?></td>
+												<td class="text-center">
+													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs	 btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
+													<button type="button" class="btn btn-xs	 btn-icon btn-danger delete" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button>
+>>>>>>> dev
 												</td>
 											</tr>
 									<?php endforeach;

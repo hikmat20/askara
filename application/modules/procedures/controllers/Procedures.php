@@ -94,7 +94,7 @@ class Procedures extends Admin_Controller
 		$languange 		= ['english'];
 
 		if ($Data) {
-			$Data_detail = $this->db->order_by('number asc')->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$Data_detail = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$grProcess   = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
 			$getForms    = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
 			$getGuides   = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
@@ -152,7 +152,7 @@ class Procedures extends Admin_Controller
 		$languange 		= ['english'];
 
 		if ($Data) {
-			$Data_detail      = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$Data_detail      = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$grProcess        = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
 			$getForms         = $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 			$getGuides        = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
@@ -342,14 +342,14 @@ class Procedures extends Admin_Controller
 		if ($Data_flow) {
 			$Data_flow['procedure_id'] = $pro_id;
 			if (isset($Data_flow['id']) && $Data_flow['id']) {
-				$Data_flow['relate_doc'] 		= isset($Data_flow['relate_doc']) ? json_encode($Data_flow['relate_doc']) : '-';
-				$Data_flow['relate_ik_doc'] 	= isset($Data_flow['relate_ik_doc']) ? json_encode($Data_flow['relate_ik_doc']) : '-';
+				$Data_flow['relate_doc'] 		= isset($Data_flow['relate_doc']) ? json_encode($Data_flow['relate_doc']) : null;
+				$Data_flow['relate_ik_doc'] 	= isset($Data_flow['relate_ik_doc']) ? json_encode($Data_flow['relate_ik_doc']) : null;
 				$Data_flow['modified_by'] 		= $this->auth->user_id();
 				$Data_flow['modified_at'] 		= date('Y-m-d H:i:s');
 				$this->db->update('procedure_details', $Data_flow, ['id' => $Data_flow['id']]);
 			} else {
-				$Data_flow['relate_doc'] 		= isset($Data_flow['relate_doc']) ? json_encode($Data_flow['relate_doc']) : '-';
-				$Data_flow['relate_ik_doc'] 	= isset($Data_flow['relate_ik_doc']) ? json_encode($Data_flow['relate_ik_doc']) : '-';
+				$Data_flow['relate_doc'] 		= isset($Data_flow['relate_doc']) ? json_encode($Data_flow['relate_doc']) : null;
+				$Data_flow['relate_ik_doc'] 	= isset($Data_flow['relate_ik_doc']) ? json_encode($Data_flow['relate_ik_doc']) : null;
 				$Data_flow['created_by'] 		= $this->auth->user_id();
 				$Data_flow['created_at'] 		= date('Y-m-d H:i:s');
 				$this->db->insert('procedure_details', $Data_flow);
@@ -382,14 +382,14 @@ class Procedures extends Admin_Controller
 		if ($Data) {
 			$Data['procedure_id'] = $pro_id;
 			if (isset($Data['id']) && $Data['id']) {
-				$Data['relate_doc'] 		= isset($Data['relate_doc']) ? json_encode($Data['relate_doc']) : '-';
-				$Data['relate_ik_doc'] 		= isset($Data['relate_ik_doc']) ? json_encode($Data['relate_ik_doc']) : '-';
+				$Data['relate_doc'] 		= isset($Data['relate_doc']) ? json_encode($Data['relate_doc']) : null;
+				$Data['relate_ik_doc'] 		= isset($Data['relate_ik_doc']) ? json_encode($Data['relate_ik_doc']) : null;
 				$Data['modified_by'] 		= $this->auth->user_id();
 				$Data['modified_at'] 		= date('Y-m-d H:i:s');
 				$this->db->update('procedure_details', $Data, ['id' => $Data['id']]);
 			} else {
-				$Data['relate_doc'] 		= isset($Data['relate_doc']) ? json_encode($Data['relate_doc']) : '-';
-				$Data['relate_ik_doc'] 		= isset($Data['relate_ik_doc']) ? json_encode($Data['relate_ik_doc']) : '-';
+				$Data['relate_doc'] 		= isset($Data['relate_doc']) ? json_encode($Data['relate_doc']) : null;
+				$Data['relate_ik_doc'] 		= isset($Data['relate_ik_doc']) ? json_encode($Data['relate_ik_doc']) : null;
 				$Data['created_by'] 		= $this->auth->user_id();
 				$Data['created_at'] 		= date('Y-m-d H:i:s');
 				$this->db->insert('procedure_details', $Data);
@@ -565,7 +565,7 @@ class Procedures extends Admin_Controller
 
 		$language = ['english'];
 		if ($proc_id && $id) {
-			$flow       = $this->db->get_where('procedure_details', ['id' => $id])->row();
+			$flow       = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['id' => $id])->row();
 			// $formsx  = $this->db->get_where('forms', ['procedure_id' => $proc_id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
 			$cross_dept = $this->SettingModel->getSettingByName('cross_departement');
 			$forms      = $this->FormModel->find_all_by(['procedure_id' => $proc_id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
@@ -590,7 +590,7 @@ class Procedures extends Admin_Controller
 	{
 		$Data_detail = '';
 		if ($id) {
-			$Data_detail 	= $this->db->order_by('number asc')->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$Data_detail 	= $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$getForms	= $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
 			$getguides	= $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
 			$ArrForms = [];
@@ -1609,7 +1609,7 @@ class Procedures extends Admin_Controller
 		$mpdf->SetHtmlFooter('<div class="text-center" style="color:#595959"><i>- Hardcopy Uncontrol -</i></div>');
 		// watermark
 		$procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
-		$flowDetail          = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+		$flowDetail          = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 		$getForms            = $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 		$getGuides           = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 		$users               = $this->db->get_where('view_users', ['company_id' => $this->company])->result();

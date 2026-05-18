@@ -53,14 +53,14 @@ class Manage_documents extends Admin_Controller
 		$this->template->render('create');
 	}
 
-	public function edit($id)
-	{
-		$this->template->render('create');
-	}
+	// NOTE: edit() dihapus karena tidak memuat data berdasarkan $id.
+	// Jika dibutuhkan, implementasi ulang dengan load data dari DB.
 
 	function menus($ArrFolder, $parent = '0')
 	{
-		// $result = ("SELECT a.id, a.label, a.link, Deriv1.Count FROM `menu` a  LEFT OUTER JOIN (SELECT parent, COUNT(*) AS Count FROM `menu` GROUP BY parent) Deriv1 ON a.id = Deriv1.parent WHERE a.parent=" . $parent);
+		if (!isset($ArrFolder[$parent])) {
+			return '';
+		}
 		$cek_company = '';
 		$html = "<ul class='h6 text-dark'>";
 		foreach ($ArrFolder[$parent] as $val) {
@@ -88,7 +88,8 @@ class Manage_documents extends Admin_Controller
 	{
 		if ($id != '0') {
 			$data_file 	= $this->db->get_where('view_directories', ['parent_id' => $id, 'flag_type !=' => 'LINK', 'status !=' => 'DEL', 'company_id' => $this->company])->result();
-			$prev 		= $this->db->get_where('view_directories', ['id' => $id])->row()->parent_id;
+			$dir_row    = $this->db->get_where('view_directories', ['id' => $id])->row();
+			$prev 		= $dir_row ? $dir_row->parent_id : '0';
 
 			$this->template->set('prev', $prev);
 			$this->template->set('parent_id', $id);
@@ -108,19 +109,9 @@ class Manage_documents extends Admin_Controller
 		}
 	}
 
-	public function check_folder_name($name, $parent_id)
-	{
-		$check 	= $this->db->get_where('view_directories', ['name' => $name, 'parent_id' => $parent_id])->num_rows();
-		if ($check > 0) {
-			for ($i = 0; $i < $check; $i++) {
-				$newName = $name . "(" . $i . ")";
-				echo '<pre>';
-				print_r($newName);
-				echo '<pre>';
-			}
-			exit;
-		}
-	}
+	// NOTE: check_folder_name() dihapus karena berisi output debug (echo/exit)
+	// dan tidak pernah dipanggil dari manapun. Logic duplikasi nama sudah
+	// ditangani di method save().
 
 	public function new_folder($parent_id, $folder)
 	{
@@ -143,20 +134,27 @@ class Manage_documents extends Admin_Controller
 	public function delete_folder()
 	{
 		$id 		= $this->input->post('id');
-		$check_child = $this->db->get_where('view_directories', ['parent_id' => $id])->num_rows();
+
+		// Validasi kepemilikan folder terhadap company aktif
+		$folder = $this->db->get_where('directory', ['id' => $id, 'company_id' => $this->company])->row();
+		if (!$folder) {
+			echo json_encode(['status' => 0, 'msg' => 'Folder tidak ditemukan atau akses ditolak.']);
+			return;
+		}
 
 		$this->db->trans_begin();
 		$this->db->update('directory', ['status' => 'DEL'], ['id' => $id]);
 
-		if ($check_child > 0) {
-			$this->db->update('directory', ['status' => 'DEL', 'modified_by' => $this->auth->user_id(), 'modified_at' => date('Y-m-d H:i:s')], ['parent_id' => $id]);
-		}
+		// Lakukan rekursif delete menggunakan model
+		$user_id = $this->auth->user_id();
+		$date    = date('Y-m-d H:i:s');
+		$this->DOCS->delete_recursive_folder($id, $user_id, $date);
 
 		if ($this->db->trans_status() === FALSE) {
 			$this->db->trans_rollback();
 			$Return		= array(
 				'status'		=> 0,
-				'pesan'			=> 'Folder failed deleted'
+				'msg'			=> 'Folder failed deleted'
 			);
 		} else {
 			$this->db->trans_commit();
@@ -192,7 +190,7 @@ class Manage_documents extends Admin_Controller
 				$this->db->trans_rollback();
 				$Return		= array(
 					'status'		=> 0,
-					'pesan'			=> 'Failed to Review Process'
+					'msg'			=> 'Failed to Review Process'
 				);
 			} else {
 				$this->db->trans_commit();
@@ -286,6 +284,14 @@ class Manage_documents extends Admin_Controller
 	public function delete_file()
 	{
 		$id 		= $this->input->post('id');
+
+		// Validasi kepemilikan file terhadap company aktif
+		$file = $this->db->get_where('directory', ['id' => $id, 'company_id' => $this->company])->row();
+		if (!$file) {
+			echo json_encode(['status' => 0, 'msg' => 'File tidak ditemukan atau akses ditolak.']);
+			return;
+		}
+
 		$this->db->trans_begin();
 		$this->db->update('directory', ['status' => 'DEL', 'modified_by' => $this->auth->user_id(), 'modified_at' => date('Y-m-d H:i:s')], ['id' => $id]);
 
@@ -293,7 +299,7 @@ class Manage_documents extends Admin_Controller
 			$this->db->trans_rollback();
 			$Return		= array(
 				'status'		=> 0,
-				'pesan'			=> 'Folder failed deleted'
+				'msg'			=> 'Folder failed deleted'
 			);
 		} else {
 			$this->db->trans_commit();
@@ -313,7 +319,7 @@ class Manage_documents extends Admin_Controller
 
 		$ArrFolder = [
 			'parent_id' => $data['parent_id'],
-			'name' => $data['folder_name'],
+			'name' => $folder_name,
 			'company_id' => $this->company,
 		];
 
@@ -322,31 +328,19 @@ class Manage_documents extends Admin_Controller
 			if (isset($data['id']) && ($data['id'] != null)) :
 				$ArrFolder['modified_by'] = $this->auth->user_id();
 				$ArrFolder['modified_at'] = date('Y-m-d H:i:s');
-				$old_name = $this->db->get_where('view_directories', ['id' => $data['id']])->row()->name;
-				if (is_dir("./directory/" . $old_name)) {
-					rename("./directory/" . $old_name, "./directory/" . $data['folder_name']);
-				}
 				$this->db->update('directory', $ArrFolder, ['id' => $data['id']]);
 			else :
 				$ArrFolder['id'] = uniqid();
 				$ArrFolder['created_by'] = $this->auth->user_id();
 				$ArrFolder['created_at'] = date('Y-m-d H:i:s');
 				$this->db->insert('directory', $ArrFolder);
-				if (!is_dir('./directory/' . $data['folder_name'])) {
-					mkdir('./directory/' . $data['folder_name'], 0755, TRUE);
-					chmod("./directory/" . $data['folder_name'], 0755);  // octal; correct value of mode
-					chown("./directory/" . $data['folder_name'], 'www-data');
-				}
 			endif;
 
 			if ($this->db->trans_status() === FALSE) {
 				$this->db->trans_rollback();
-				if (is_dir('./directory/' . $data['folder_name'])) {
-					rmdir('./directory/' . $data['folder_name']);
-				}
 				$Return		= array(
 					'status'		=> 0,
-					'pesan'			=> 'Folder faild created'
+					'msg'			=> 'Folder failed created'
 				);
 			} else {
 				$this->db->trans_commit();
@@ -358,7 +352,7 @@ class Manage_documents extends Admin_Controller
 		} else {
 			$Return		= array(
 				'status'		=> 0,
-				'pesan'			=> 'Data not valid'
+				'msg'			=> 'Data not valid'
 			);
 		}
 
@@ -410,15 +404,14 @@ class Manage_documents extends Admin_Controller
 		$data = $this->input->post();
 		$mainFolder = $data['folder'];
 		try {
-			$parent_name = $this->db->get_where('view_directories', ['id' => $data['parent_id']])->row()->name;
 			if ($_FILES['image']['name']) {
-				if (!is_dir("./directory/$mainFolder/$this->company/" . $parent_name)) {
-					mkdir("./directory/$mainFolder/$this->company/" . $parent_name, 0755, TRUE);
-					chmod("./directory/$mainFolder/$this->company/" . $parent_name, 0755);  // octal; correct value of mode
-					chown("./directory/$mainFolder/$this->company/" . $parent_name, 'www-data');
+				if (!is_dir("./directory/$mainFolder/$this->company")) {
+					mkdir("./directory/$mainFolder/$this->company", 0755, TRUE);
+					chmod("./directory/$mainFolder/$this->company", 0755);  // octal; correct value of mode
+					chown("./directory/$mainFolder/$this->company", 'www-data');
 				}
 				// $new_name 					= $this->fixForUri($data['description']);
-				$config['upload_path'] 		= "./directory/$mainFolder/$this->company/$parent_name"; //path folder
+				$config['upload_path'] 		= "./directory/$mainFolder/$this->company"; //path folder
 				$config['allowed_types'] 	= 'pdf|xlsx|docx'; //type yang dapat diakses bisa anda sesuaikan
 				$config['encrypt_name'] 	= true; //Enkripsi nama yang terupload
 				$id 						= (!$data['id']) ? uniqid(date('m')) : $data['id'];
@@ -445,8 +438,8 @@ class Manage_documents extends Admin_Controller
 					unset($data['old_file']);
 
 					if ($old_file != null) {
-						if (file_exists("./directory/$mainFolder/$this->company/$parent_name" . $old_file)) {
-							unlink("./directory/$mainFolder/$this->company/$parent_name" . $old_file);
+						if (file_exists("./directory/$mainFolder/$this->company/" . $old_file)) {
+							unlink("./directory/$mainFolder/$this->company/" . $old_file);
 						}
 					}
 
@@ -457,7 +450,7 @@ class Manage_documents extends Admin_Controller
 						$data['created_by']		= $this->auth->user_id();
 						$data['created_at']		= date('Y-m-d H:i:s');
 						$data['note']			= 'First Upload File';
-						$data['status']			= isset($data['status']) ? $data['status'] : (($data['flag_record'] == 'Y') ? 'PUB' : 'OPN');
+						$data['status']			= isset($data['status']) ? $data['status'] : ((isset($data['flag_record']) && $data['flag_record'] == 'Y') ? 'PUB' : 'OPN');
 						$this->_update_history($data);
 						unset($data['note']);
 						unset($data['folder']);
@@ -508,11 +501,11 @@ class Manage_documents extends Admin_Controller
 		} catch (Exception $e) {
 			$this->db->trans_rollback();
 			$Return = [
-				'status' => 1,
+				'status' => 0,
 				'msg'	 => $e->getMessage()
 			];
-
-			return $Return;
+			echo json_encode($Return);
+			return;
 		}
 
 		if ($this->db->trans_status() === FALSE) {
@@ -547,7 +540,12 @@ class Manage_documents extends Admin_Controller
 	public function view_file($id, $folder = '')
 	{
 		$file 			= $this->db->get_where('view_directories', ['id' => $id])->row();
-		$parent_name 	= $this->db->get_where('view_directories', ['id' => $file->parent_id])->row()->name;
+		if (!$file) {
+			show_404();
+			return;
+		}
+		$parent_row  = $this->db->get_where('view_directories', ['id' => $file->parent_id])->row();
+		$parent_name = $parent_row ? $parent_row->name : '';
 		$this->template->set(
 			[
 				'file' => $file,
@@ -561,19 +559,22 @@ class Manage_documents extends Admin_Controller
 
 	public function viewfile($parent_name, $id)
 	{
-		// $file 			= $this->db->get_where('view_directories', ['id' => $id])->row();
-		// $parent_name 	= $this->db->get_where('view_directories', ['id' => $file->parent_id])->row()->name;
-		// Store the file name into variable
-		// $file = 'filename.pdf';
-		// $filename = 'filename.pdf';
+		// Sanitasi parameter untuk mencegah path traversal
+		$parent_name = basename(str_replace(['..', '\\'], '', $parent_name));
+		$id          = basename(str_replace(['..', '\\'], '', $id));
+
 		$path = "./directory/" . $parent_name . "/" . $id;
-		// Header content type
+
+		if (!file_exists($path)) {
+			show_404();
+			return;
+		}
+
 		header('Content-type: application/pdf');
 		header('Content-Disposition: inline; filename="' . $id . '"');
 		header('Content-Transfer-Encoding: binary');
 		header('Accept-Ranges: bytes');
-		// Read the file
-		@readfile(base_url($path));
+		@readfile($path);
 	}
 
 
@@ -769,7 +770,7 @@ class Manage_documents extends Admin_Controller
 
 				$folder = $this->db->get_where('view_directories', ['id' => $data['parent_id']])->row();
 				$file = $this->db->get_where('view_directories', ['id' => $data['id']])->row();
-				$users = $this->db->get_where('users')->result();
+				$users = $this->db->get('users')->result();
 
 				$ArrUsers = [];
 				foreach ($users as $user) {
@@ -786,9 +787,9 @@ class Manage_documents extends Admin_Controller
 								<th>Aproved By</th>
 							</tr>
 							<tr>
-								<td align='center'>" . $ArrUsers[$file->prepared_by]->full_name . "</td>
-								<td align='center'>" . $ArrUsers[$file->reviewed_by]->full_name . "</td>
-								<td align='center'>" . $ArrUsers[$file->approved_by]->full_name . "</td>
+								<td align='center'>" . (isset($ArrUsers[$file->prepared_by]) ? $ArrUsers[$file->prepared_by]->full_name : 'N/A') . "</td>
+								<td align='center'>" . (isset($ArrUsers[$file->reviewed_by]) ? $ArrUsers[$file->reviewed_by]->full_name : 'N/A') . "</td>
+								<td align='center'>" . (isset($ArrUsers[$file->approved_by]) ? $ArrUsers[$file->approved_by]->full_name : 'N/A') . "</td>
 							</tr>
 							<tr>
 								<td align='center'>$file->created_at</td>
@@ -841,18 +842,30 @@ class Manage_documents extends Admin_Controller
 	public function print_document()
 	{
 		$this->load->library(array('Mpdf'));
-		$folder = $_GET['p'];
-		$file = $_GET['f'];
+
+		// Sanitasi input untuk mencegah path traversal
+		$folder = basename(str_replace(['..', '\\'], '', $this->input->get('p')));
+		$file   = basename(str_replace(['..', '\\'], '', $this->input->get('f')));
+
+		if (empty($folder) || empty($file)) {
+			show_error('Parameter tidak valid.', 400);
+			return;
+		}
+
+		$filePath = 'directory/' . $folder . '/' . $file;
+		if (!file_exists($filePath)) {
+			show_404();
+			return;
+		}
 
 		$mpdf = new mPDF('', '', '', '', '', '', '', '', '', '');
 		$mpdf->SetImportUse();
-		$pagecount = $mpdf->SetSourceFile('directory/' . $folder . '/' . $file);
+		$pagecount = $mpdf->SetSourceFile($filePath);
 		$tplId = $mpdf->ImportPage($pagecount);
 		$mpdf->UseTemplate($tplId);
 		$mpdf->addPage();
 		$mpdf->WriteHTML('Hello World');
-		$newfile = 'directory/' . $folder . '/' . $file;
-		$mpdf->Output($newfile, 'F');
+		$mpdf->Output($filePath, 'F');
 		$mpdf->Output();
 	}
 }

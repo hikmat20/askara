@@ -2,8 +2,16 @@
     <div class="d-flex flex-column-fluid">
         <div class="container">
             <div class="card card-stretch shadow card-custom">
-                <div class="card-header">
+                <div class="card-header d-flex align-items-center justify-content-between">
                     <h2 class="mt-5"><i class="<?= $icon; ?> mr-2"></i><?= $title; ?></h2>
+                    <div class="mt-3">
+                        <a href="<?= site_url('setting/email_settings/template'); ?>" class="btn btn-light-warning font-weight-bold mr-2">
+                            <i class="fa fa-edit mr-1"></i> Edit Template Email
+                        </a>
+                        <a href="<?= site_url('setting/email_settings/queue'); ?>" class="btn btn-light-primary font-weight-bold">
+                            <i class="fa fa-list-alt mr-1"></i> Lihat Email Queue
+                        </a>
+                    </div>
                 </div>
                 <form id="form-email-setting">
                     <div class="card-body">
@@ -149,7 +157,11 @@
                         },
                         success: function(res) {
                             if (res.status == 1) {
-                                Swal.fire('Sukses!', res.msg, 'success');
+                                Swal.fire({
+                                    title: 'Sukses!',
+                                    html: res.msg + '<br><br><a href="' + siteurl + 'setting/email_settings/queue" class="btn btn-sm btn-primary mt-2"><i class="fa fa-list-alt mr-1"></i> Lihat Queue</a>',
+                                    icon: 'success'
+                                });
                             } else {
                                 Swal.fire('Gagal!', res.msg, 'error');
                             }

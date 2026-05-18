@@ -167,6 +167,11 @@ class Procedure_model extends BF_Model
 
   public function processReview($id)
   {
+    $Return = array(
+      'status' => 0,
+      'msg'    => 'Invalid procedure ID.',
+    );
+
     try {
       if ($id) {
         $this->db->trans_begin();
@@ -193,14 +198,13 @@ class Procedure_model extends BF_Model
           );
         }
       }
-    } catch (\Throwable $th) {
+    } catch (\Throwable $e) {
       $this->db->trans_rollback();
       $Return    = array(
         'status'    => 0,
-        'msg'      => $th->getMessage(),
+        'msg'      => $e->getMessage(),
       );
     }
-
     return $Return;
   }
 

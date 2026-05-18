@@ -162,8 +162,8 @@ class Monitoring extends Admin_Controller
 		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users         = $this->db->get_where('view_users')->result();
-		$getForms      = $this->db->get_where('forms', ['procedure_id' => $id])->result();
-		$getGuides     = $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
+		$getForms      = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
+		$getGuides     = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
 		$jabatan       = $this->db->get('positions')->result();
 		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
 		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
@@ -928,6 +928,28 @@ class Monitoring extends Admin_Controller
 	public function forms_approval()
 	{
 		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'APV'])->result();
+
+		// Tandai apakah user saat ini adalah PIC Approver untuk setiap form
+		$current_user_id = $this->auth->user_id();
+		foreach ($forms as $form) {
+			$approver_position = $this->db->get_where('positions', [
+				'id'          => $form->approver_position_id,
+				'assign_user' => $current_user_id,
+			])->row();
+			$form->can_action = (bool) $approver_position;
+		}
+
+		$this->template->set([
+			'title'  => 'DAFTAR FORM - APPROVAL',
+			'forms'  => $forms,
+			'sts'    => $this->sts,
+		]);
+
+		$this->template->render('forms/list');
+	}
+	public function forms_revision()
+	{
+		$forms = $this->db->get_where('view_forms', ['company_id' => $this->company, 'status' => 'RVI'])->result();
 
 		// Tandai apakah user saat ini adalah PIC Approver untuk setiap form
 		$current_user_id = $this->auth->user_id();

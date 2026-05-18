@@ -149,8 +149,8 @@
                             <p>Documents</p>
                         </div>
                         <h6 class="card-title text-center px-4">
-                            <a href="<?= base_url('monitoring/forms_verision'); ?>" class="text-hover-primary"
-                                title="APPROVAL FORMS">
+                            <a href="<?= base_url('monitoring/forms_revision'); ?>" class="text-hover-primary"
+                                title="REVISION FORMS">
                                 <span class="card-label text-dark text-center font-weight-bolder">REVISION FORMS</span>
                             </a>
                         </h6>

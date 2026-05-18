@@ -128,10 +128,31 @@
 					<td class="text-muted p-1">
 						<small for="">
 							<?= isset($ArrCheck[$data->id]->$dayCheck) ? $ArrUsers[$ArrCheck[$data->id]->$dayCheck] . " | " : ''; ?>
-						</small><small for="">
+						</small>
+						<?php 
+							$checkVal = "check" . $i;
+							if (isset($ArrCheckValue[$data->id]->$checkVal)) {
+								$val = $ArrCheckValue[$data->id]->$checkVal;
+								$class = ($val == 'yes') ? 'label-success' : 'label-danger';
+								echo '<label class="label '.$class.'">'.ucfirst($val).'</label> | ';
+							}
+						?>
+						<small for="">
 							<?= isset($ArrCheckDate[$data->id]->$dateCheck) ? $ArrCheckDate[$data->id]->$dateCheck : '' ?>
 						</small>
 					</td>
+				<?php endfor; ?>
+			</tr>
+			<tr>
+				<th rowspan="" class="p-1" width=""></th>
+				<th rowspan="" class="p-1" width=""></th>
+				<th rowspan="" class="p-1 text-right" width="">Note</th>
+				<?php
+				for ($i = 1; $i <= $count; $i++) : ?>
+					<th class="text-muted p-1">
+						<?php $dayNote = 'day' . $i; ?>
+						<?= isset($ArrCheckNote[$data->id]->$dayNote) ? $ArrCheckNote[$data->id]->$dayNote : ''; ?>
+					</th>
 				<?php endfor; ?>
 			</tr>
 		</tfoot>
