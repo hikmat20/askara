@@ -225,7 +225,7 @@
 
         <!-- Version History Card -->
         <?php if (!empty($version_history)) : ?>
-        <div class="card card-custom shadow-sm">
+        <div class="card card-custom shadow-sm mb-3">
             <div class="card-header">
                 <h3 class="card-title font-weight-bolder">
                     <i class="fa fa-code-branch text-info mr-2"></i>Version History
@@ -289,6 +289,8 @@
             </div>
         </div>
         <?php endif; ?>
+
+
     </div>
 </div>
 

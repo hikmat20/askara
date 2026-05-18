@@ -12,11 +12,31 @@
 				</div>
 				<div class="card-body py-3">
 					<!-- Nav tabs -->
+					<ul class="nav nav-tabs nav-pills pb-3" id="myTab" role="tablist">
+						<li class="nav-item" role="presentation">
+							<button class="nav-link active btn-sm" id="Draft-tab" data-toggle="tab" data-target="#Draft" type="button" role="tab" aria-controls="Draft" aria-selected="true">Draft <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataDraft); ?></span></button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link btn-sm" id="Review-tab" data-toggle="tab" data-target="#Review" type="button" role="tab" aria-controls="Review" aria-selected="false">Review <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataReview); ?></span></button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link btn-sm" id="Correction-tab" data-toggle="tab" data-target="#Correction" type="button" role="tab" aria-controls="Correction" aria-selected="false">Correction <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataCorrection); ?></span></button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link btn-sm" id="Approval-tab" data-toggle="tab" data-target="#Approval" type="button" role="tab" aria-controls="Approval" aria-selected="false">Approval <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataApproval); ?></span></button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link btn-sm" id="Revision-tab" data-toggle="tab" data-target="#Revision" type="button" role="tab" aria-controls="Revision" aria-selected="false">Revision <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataRevision); ?></span></button>
+						</li>
+						<li class="nav-item" role="presentation">
+							<button class="nav-link btn-sm" id="Published-tab" data-toggle="tab" data-target="#Published" type="button" role="tab" aria-controls="Published" aria-selected="false">Published <span class="badge badge-circle badge-white text-primary ml-2"><?= count($dataPublished); ?></span></button>
+						</li>
+					</ul>
 
 					<!-- Tab panes -->
 					<div class="tab-content mt-3">
 						<div class="tab-pane fade show active" id="Draft" role="tabpanel" aria-labelledby="Draft-tab">
-							<table class="datatable table table-bordered table-sm table-hover datatable">
+							<table class="datatable table table-bordered border table-sm table-hover datatable">
 								<thead class="table-light">
 									<tr>
 										<th class="p-2" width="50">No.</th>
@@ -26,8 +46,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center" width="100">Rev. Number</th>
-										<!-- <th class="p-2 text-center" width="100">Status</th> -->
-										<th class="p-2" width="100">Opsi</th>
+										<th class="p-2 nosort" width="100">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -41,11 +60,218 @@
 												<td><?= $draft->procedure_name; ?></td>
 												<td class="text-center"><?= date("d M Y", strtotime($draft->issue_date)); ?></td>
 												<td class="text-center"><?= date("d M Y", strtotime($draft->effective_date)); ?></td>
-												<td><?= $draft->revision_number; ?></td>
+												<td class="text-center"><?= $draft->revision_number; ?></td>
 												<td class="text-center">
-													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs	 btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
-													<button type="button" class="btn btn-xs	 btn-icon btn-danger delete" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
+													<button type="button" class="btn btn-xs btn-icon btn-primary toReview" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-check"></i></button>
+												</td>
+											</tr>
+									<?php endforeach;
+									endif; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="Review" role="tabpanel" aria-labelledby="Review-tab">
+							<table class="datatable table table-bordered table-sm table-hover datatable">
+								<thead class="table-light">
+									<tr>
+										<th class="p-2" width="50">No.</th>
+										<th class="p-2">Name</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure Name</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Rev. Number</th>
+										<th class="p-2 text-center" width="150">Opsi</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (isset($dataReview) && $dataReview) :
+										$n = 0;
+										foreach ($dataReview as $review) : $n++; ?>
+											<tr>
+												<td><?= $n; ?></td>
+												<td><?= $review->name; ?></td>
+												<td><?= $review->number; ?></td>
+												<td><?= $review->procedure_name; ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($review->issue_date)); ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($review->effective_date)); ?></td>
+												<td class="text-center"><?= $review->revision_number; ?></td>
+												<td class="text-center">
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<!-- <button type="button" class="btn btn-xs btn-icon btn-success process-review" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Process Review"><i class="fa fa-check"></i></button> -->
+													<button type="button" class="btn btn-xs btn-icon btn-danger cancelReview" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Cancel Review — kembalikan ke Draft"><i class="fa fa-undo"></i></button>
+												</td>
+											</tr>
+									<?php endforeach;
+									endif; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="Correction" role="tabpanel" aria-labelledby="Correction-tab">
+							<table class="datatable table table-bordered table-sm table-hover datatable">
+								<thead class="table-light">
+									<tr>
+										<th class="p-2" width="50">No.</th>
+										<th class="p-2">Name</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure Name</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Rev. Number</th>
+										<th class="p-2 text-center" width="150">Opsi</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (isset($dataCorrection) && $dataCorrection) :
+										$n = 0;
+										foreach ($dataCorrection as $cor) : $n++; ?>
+											<tr>
+												<td><?= $n; ?></td>
+												<td><?= $cor->name; ?></td>
+												<td><?= $cor->number; ?></td>
+												<td><?= $cor->procedure_name; ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($cor->issue_date)); ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($cor->effective_date)); ?></td>
+												<td class="text-center"><?= $cor->revision_number; ?></td>
+												<td class="text-center">
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $cor->id); ?>" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
+													<button type="button" class="btn btn-xs btn-icon btn-success correctionToReview" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Process to Review — setelah koreksi"><i class="fa fa-check"></i></button>
+												</td>
+											</tr>
+									<?php endforeach;
+									endif; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="Approval" role="tabpanel" aria-labelledby="Approval-tab">
+							<table class="datatable table table-bordered table-sm table-hover datatable">
+								<thead class="table-light">
+									<tr>
+										<th class="p-2" width="50">No.</th>
+										<th class="p-2">Name</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure Name</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Rev. Number</th>
+										<th class="p-2 text-center" width="100">Opsi</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (isset($dataApproval) && $dataApproval) :
+										$n = 0;
+										foreach ($dataApproval as $apv) : $n++; ?>
+											<tr>
+												<td><?= $n; ?></td>
+												<td><?= $apv->name; ?></td>
+												<td><?= $apv->number; ?></td>
+												<td><?= $apv->procedure_name; ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($apv->issue_date)); ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($apv->effective_date)); ?></td>
+												<td class="text-center"><?= $apv->revision_number; ?></td>
+												<td class="text-center">
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<button type="button" class="btn btn-xs btn-icon btn-success process-approval" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="Process Approval"><i class="fa fa-check"></i></button>
+												</td>
+											</tr>
+									<?php endforeach;
+									endif; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="Revision" role="tabpanel" aria-labelledby="Revision-tab">
+							<table class="datatable table table-bordered table-sm table-hover datatable">
+								<thead class="table-light">
+									<tr>
+										<th class="p-2" width="50">No.</th>
+										<th class="p-2">Name</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure Name</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Rev. Number</th>
+										<th class="p-2 text-center" width="100">Opsi</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (isset($dataRevision) && $dataRevision) :
+										$n = 0;
+										foreach ($dataRevision as $rev) : $n++; ?>
+											<tr>
+												<td><?= $n; ?></td>
+												<td><?= $rev->name; ?></td>
+												<td><?= $rev->number; ?></td>
+												<td><?= $rev->procedure_name; ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($rev->issue_date)); ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($rev->effective_date)); ?></td>
+												<td class="text-center"><?= $rev->revision_number; ?></td>
+												<td class="text-center">
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+												</td>
+											</tr>
+									<?php endforeach;
+									endif; ?>
+								</tbody>
+							</table>
+						</div>
+						<div class="tab-pane fade" id="Published" role="tabpanel" aria-labelledby="Published-tab">
+							<table class="datatable table table-bordered table-sm table-hover datatable">
+								<thead class="table-light">
+									<tr>
+										<th class="p-2" width="50">No.</th>
+										<th class="p-2">Name</th>
+										<th class="p-2">Number</th>
+										<th class="p-2">Procedure Name</th>
+										<th class="p-2 text-center">Issue Date</th>
+										<th class="p-2 text-center">Effective Date</th>
+										<th class="p-2 text-center">Rev. Number</th>
+										<th class="p-2 text-center" width="100">Opsi</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php if (isset($dataPublished) && $dataPublished) :
+										$n = 0;
+										foreach ($dataPublished as $pub) : $n++; ?>
+											<tr>
+												<td><?= $pub->id; ?></td>
+												<td>
+													<?= $pub->name; ?>
+													<?php if (isset($pub->is_under_revision) && $pub->is_under_revision == 1) : ?>
+														<span class="badge badge-warning ml-2">
+															<i class="fa fa-sync-alt"></i> Under Revision
+														</span>
+													<?php endif; ?>
+												</td>
+												<td><?= $pub->number; ?></td>
+												<td><?= $pub->procedure_name; ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($pub->issue_date)); ?></td>
+												<td class="text-center"><?= date("d M Y", strtotime($pub->effective_date)); ?></td>
+												<td class="text-center"><?= $pub->revision_number; ?></td>
+												<td class="text-center">
+													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $pub->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
+													<?php if (!empty($ArrPosts) && in_array(1, $ArrPosts)) : ?>
+														<button type="button" 
+															class="btn btn-xs btn-icon btn-warning btn-open-wi-modal" 
+															data-id="<?= $pub->id; ?>" 
+															data-type="revision"
+															data-title="Revision WI — <?= htmlspecialchars($pub->name); ?>"
+															data-toggle="tooltip" 
+															title="Request Revision">
+															<i class="far fa-edit"></i>
+														</button>
+														<button type="button" 
+															class="btn btn-xs btn-icon btn-danger btn-open-wi-modal" 
+															data-id="<?= $pub->id; ?>" 
+															data-type="deletion"
+															data-title="Deletion WI — <?= htmlspecialchars($pub->name); ?>"
+															data-toggle="tooltip" 
+															title="Request Deletion">
+															<i class="fa fa-trash-alt"></i>
+														</button>
+													<?php endif; ?>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -76,6 +302,26 @@
 	</div>
 </div>
 
+<!-- Modal untuk Revision/Deletion -->
+<div class="modal fade" id="modalWiAction" tabindex="-1" role="dialog" aria-labelledby="modalWiActionLabel" aria-hidden="true">
+	<div class="modal-dialog modal-lg" role="document">
+		<div class="modal-content">
+			<div class="modal-header py-3">
+				<h5 class="modal-title font-weight-bolder" id="modalWiActionLabel"></h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+					<span aria-hidden="true">&times;</span>
+				</button>
+			</div>
+			<div class="modal-body" id="modalWiActionBody">
+				<div class="text-center py-5">
+					<span class="spinner-border text-primary"></span>
+					<p class="mt-2 text-muted">Memuat data...</p>
+				</div>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
 	$(document).ready(function() {
 		$('button[data-toggle="tab"]').on('shown.bs.tab', function(e) {
@@ -87,14 +333,22 @@
 
 		$('.datatable').DataTable({
 			orderCellsTop: false,
-			responsive: false,
 		});
 
 		$(document).on('click', '.view', function() {
 			let id = $(this).data('id')
+			let tab = $('.nav-link.active').attr('id'); // Get active tab
+			
 			$('#modalId').modal('show')
 			$('#modalId .modal-title').html('<i class="fa fa-eye" aria-hidden="true"></i> View WI')
-			$('#modalId .modal-body').load(siteurl + active_controller + 'view/' + id)
+			
+			// For Published tab, use view_modal to get full version control features
+			if (tab === 'Published-tab') {
+				$('#modalId .modal-body').load(siteurl + active_controller + 'view_modal/' + id)
+			} else {
+				// For other tabs, use regular view
+				$('#modalId .modal-body').load(siteurl + active_controller + 'view/' + id)
+			}
 		})
 
 		$(document).on('click', '.toReview', function() {
@@ -140,6 +394,118 @@
 								}
 							},
 							error: function(res) {
+								Swal.fire({
+									title: 'Error!',
+									icon: 'error',
+									text: 'Server timeout, error..',
+									timer: 3000
+								})
+							}
+						})
+					}
+				})
+			}
+		})
+
+		// Cancel Review — kembalikan dari REV ke DFT
+		$(document).on('click', '.cancelReview', function() {
+			let id = $(this).data('id')
+			if (id) {
+				Swal.fire({
+					title: 'Cancel Review?',
+					text: 'Work Instruction akan dikembalikan ke status Draft.',
+					icon: 'warning',
+					showCancelButton: true,
+					confirmButtonText: 'Ya, Cancel Review',
+					cancelButtonText: 'Batal',
+					customClass: {
+						cancelButton: 'btn btn-secondary',
+						confirmButton: 'btn btn-danger'
+					},
+					buttonsStyling: false
+				}).then((value) => {
+					if (value.isConfirmed) {
+						$.ajax({
+							url: base_url + active_controller + 'cancel_review',
+							type: 'POST',
+							dataType: 'JSON',
+							data: { id },
+							success: function(res) {
+								if (res.status == 1) {
+									Swal.fire({
+										title: 'Success!',
+										icon: 'success',
+										text: res.msg,
+										timer: 2000
+									}).then(() => {
+										location.reload();
+									})
+								} else {
+									Swal.fire({
+										title: 'Warning!',
+										icon: 'warning',
+										text: res.msg,
+										timer: 3000
+									})
+								}
+							},
+							error: function() {
+								Swal.fire({
+									title: 'Error!',
+									icon: 'error',
+									text: 'Server timeout, error..',
+									timer: 3000
+								})
+							}
+						})
+					}
+				})
+			}
+		})
+
+		// Correction to Review — kembalikan dari COR ke REV
+		$(document).on('click', '.correctionToReview', function() {
+			let id = $(this).data('id')
+			if (id) {
+				Swal.fire({
+					title: 'Confirm!',
+					text: 'Work Instruction sudah dikoreksi dan siap untuk direview kembali?',
+					icon: 'question',
+					showCancelButton: true,
+					confirmButtonText: 'Ya, Process to Review',
+					cancelButtonText: 'Batal',
+					customClass: {
+						cancelButton: 'btn btn-secondary',
+						confirmButton: 'btn btn-success'
+					},
+					buttonsStyling: false
+				}).then((value) => {
+					if (value.isConfirmed) {
+						$.ajax({
+							url: base_url + active_controller + 'correction_to_review',
+							type: 'POST',
+							dataType: 'JSON',
+							data: { id },
+							success: function(res) {
+								if (res.status == 1) {
+									Swal.fire({
+										title: 'Success!',
+										icon: 'success',
+										text: res.msg,
+										timer: 2000
+									}).then(() => {
+										location.reload();
+									})
+								} else {
+									Swal.fire({
+										title: 'Warning!',
+										icon: 'warning',
+										text: res.msg,
+										timer: 3000
+									})
+								}
+							},
+							error: function() {
 								Swal.fire({
 									title: 'Error!',
 									icon: 'error',
@@ -374,6 +740,54 @@
 				})
 			}
 		})
+
+		// Handler untuk tombol Revision/Deletion di Published tab
+		$(document).on('click', '.btn-open-wi-modal', function() {
+			var id    = $(this).data('id');
+			var type  = $(this).data('type');
+			var title = $(this).data('title');
+			var url;
+
+			if (type === 'revision') {
+				url = siteurl + active_controller + 'load_wi_revision_form/' + id;
+			} else if (type === 'deletion') {
+				url = siteurl + active_controller + 'load_wi_deletion_form/' + id;
+			}
+
+			$('#modalWiAction .modal-title').text(title);
+			$('#modalWiActionBody').html(
+				'<div class="text-center py-5"><span class="spinner-border text-primary"></span><p class="mt-2 text-muted">Memuat data...</p></div>'
+			);
+			$('#modalWiAction').modal('show');
+
+			$.ajax({
+				url:      url,
+				type:     'GET',
+				success: function (html) {
+					// Cek apakah response adalah JSON error (akses ditolak dari server)
+					try {
+						var json = JSON.parse(html);
+						if (json.status === 0) {
+							$('#modalWiAction').modal('hide');
+							Swal.fire({ icon: 'error', title: 'Akses Ditolak', text: json.msg });
+							return;
+						}
+					} catch (e) {
+						// Bukan JSON, berarti HTML partial — tampilkan di modal
+					}
+					$('#modalWiActionBody').html(html);
+				},
+				error: function (xhr) {
+					$('#modalWiAction').modal('hide');
+					var msg = 'Terjadi kesalahan. Silakan coba lagi.';
+					try {
+						var json = JSON.parse(xhr.responseText);
+						if (json.msg) msg = json.msg;
+					} catch (e) {}
+					Swal.fire({ icon: 'error', title: 'Error', text: msg });
+				}
+			});
+		});
 
 	})
 </script>
