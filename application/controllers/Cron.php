@@ -4,6 +4,7 @@
  * @author Antigravity
  *
  * This controller acts as a background worker (Cron) to send queued emails.
+ * Uses the email_template view to wrap the message body with branded HTML layout.
  */
 
 class Cron extends CI_Controller
@@ -11,10 +12,6 @@ class Cron extends CI_Controller
     public function __construct()
     {
         parent::__construct();
-        // Hanya izinkan akses dari internal / CLI cURL agar tidak ada sembarang orang yg hit
-        if (!$this->input->is_ajax_request() && !is_cli() && strpos($_SERVER['REMOTE_ADDR'], '127.0.0.1') === false) {
-            // Bisa di-protect dengan auth token khusus jika di production server terpisah
-        }
     }
 
     /**
@@ -26,7 +23,7 @@ class Cron extends CI_Controller
         ignore_user_abort(true);
         set_time_limit(0); 
 
-        // 1. Ambil batasan limit email (contoh batch per 5 email)
+        // 1. Ambil batasan limit email (batch per 5 email)
         $queues = $this->db->get_where('email_queues', ['status' => 'PND'], 5)->result();
 
         if (empty($queues)) {
@@ -76,13 +73,67 @@ class Cron extends CI_Controller
         $this->email->initialize($config);
 
         // 4. Looping Pengiriman
+        $body_db = $this->db->get_where('settings', ['setting_name' => 'email_template_body'])->row();
+        $css_db = $this->db->get_where('settings', ['setting_name' => 'email_template_css'])->row();
+
+        // Ambil Overrides Variabel Email (Global)
+        $vars_keys = ['email_vars_company_name', 'email_vars_company_address', 'email_vars_company_logo'];
+        $vars_db = $this->db->where_in('setting_name', $vars_keys)->get('settings')->result();
+        $email_overrides = [];
+        foreach ($vars_db as $v) {
+            $email_overrides[$v->setting_name] = $v->value;
+        }
+
         foreach ($queues as $q) {
             $this->email->clear();
             
             $this->email->from($settings['smtp_user'], 'Askara Notification System');
             $this->email->to($q->to_email);
             $this->email->subject($q->subject);
-            $this->email->message($q->message);
+
+            // Ambil data perusahaan untuk placeholder dinamis (sebagai fallback)
+            $company = $this->db->get_where('companies', ['id_perusahaan' => $q->company_id])->row();
+
+            if ($body_db) {
+                // Gunakan template terpisah (Body & CSS)
+                $htmlBody = $body_db->value;
+                $htmlCss = ($css_db) ? $css_db->value : '';
+                $htmlMessage = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' . $htmlCss . '</style></head><body class="email-template">' . $htmlBody . '</body></html>';
+            } else {
+                // Fallback 1: Template Full HTML dari database (Lama)
+                $old_db = $this->db->get_where('settings', ['setting_name' => 'email_template_html'])->row();
+                if ($old_db) {
+                    $htmlMessage = $old_db->value;
+                } else {
+                    // Fallback 2: Bungkus pesan dengan template HTML fisik (Lama)
+                    $htmlMessage = $this->load->view('setting/email_template', ['message' => $q->message], true);
+                }
+            }
+
+            // Ganti Placeholder Dasar
+            $htmlMessage = str_replace('{{content}}', $q->message, $htmlMessage);
+            $htmlMessage = str_replace('{{subject}}', $q->subject, $htmlMessage);
+
+            // Tentukan Nilai untuk Placeholder (Prioritas: Overrides > Master Perusahaan)
+            $final_name    = (!empty($email_overrides['email_vars_company_name'])) ? $email_overrides['email_vars_company_name'] : ($company ? $company->nm_perusahaan : '');
+            $final_address = (!empty($email_overrides['email_vars_company_address'])) ? $email_overrides['email_vars_company_address'] : ($company ? $company->alamat : '');
+            $final_logo    = '';
+
+            if (!empty($email_overrides['email_vars_company_logo'])) {
+                $final_logo = $email_overrides['email_vars_company_logo'];
+            } elseif ($company && !empty($company->logo)) {
+                $final_logo = base_url($company->path_logo . $company->id_perusahaan . '/' . $company->logo);
+            }
+
+            $htmlMessage = str_replace('{{company_name}}', $final_name, $htmlMessage);
+            $htmlMessage = str_replace('{{company_address}}', $final_address, $htmlMessage);
+            $htmlMessage = str_replace('{{company_logo}}', $final_logo, $htmlMessage);
+
+            // Ganti Action URL (Jika kosong, arahkan ke Home)
+            $final_url = (!empty($q->action_url)) ? $q->action_url : base_url();
+            $htmlMessage = str_replace('{{action_url}}', $final_url, $htmlMessage);
+            
+            $this->email->message($htmlMessage);
 
             if ($this->email->send()) {
                 // Success

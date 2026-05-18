@@ -17,17 +17,25 @@ class Email_runner {
      * @param string|array $to_email (bisa array/string dipisah koma)
      * @param string $subject
      * @param string $message (Isi HTML)
+     * @param int $company_id (Optional)
+     * @param string $action_url (Optional - Link langsung ke dokumen/tombol)
      */
-    public function queue($to_email, $subject, $message)
+    public function queue($to_email, $subject, $message, $company_id = null, $action_url = null)
     {
         if (is_array($to_email)) {
             $to_email = implode(',', $to_email);
         }
 
+        if (!$company_id) {
+            $company_id = isset($this->CI->session->company->id_perusahaan) ? $this->CI->session->company->id_perusahaan : 1;
+        }
+
         $data = [
+            'company_id' => $company_id,
             'to_email'   => $to_email,
             'subject'    => $subject,
             'message'    => $message,
+            'action_url' => $action_url,
             'status'     => 'PND',
             'created_at' => date('Y-m-d H:i:s')
         ];
@@ -36,6 +44,15 @@ class Email_runner {
         $this->CI->db->insert('email_queues', $data);
 
         // Panggil script background agar email mulai dikirim tanpa membuat layar loading
+        $this->_trigger_background_worker();
+    }
+
+    /**
+     * Public wrapper agar controller lain dapat memicu background worker secara manual.
+     * Digunakan saat resend email dari halaman queue list.
+     */
+    public function trigger_worker()
+    {
         $this->_trigger_background_worker();
     }
 
