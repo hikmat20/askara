@@ -1,11 +1,11 @@
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
     <div class="d-flex flex-column-fluid">
-        <div class="container-fluid">
+        <div class="container">
 
             <!-- Page Header -->
             <div class="d-flex align-items-center justify-content-between mb-5">
                 <div>
-                    <h2 class="font-weight-bolder text-dark mb-1"><i class="<?= $icon; ?> mr-2 text-primary"></i><?= $title; ?></h2>
+                    <h2 class="font-weight-bolder text-warning mb-1"><i class="<?= $icon; ?> mr-2 text-primary"></i><?= $title; ?></h2>
                     <div class="text-muted font-size-sm">Monitor status pengiriman semua notifikasi email sistem</div>
                 </div>
                 <div class="d-flex">
@@ -153,18 +153,14 @@
 $(document).ready(function() {
 
     // ─── Summary Counts ───────────────────────────────────────────────────────
-    function loadSummary() {
-        $.get(siteurl + 'setting/email_settings/get_queue_data?draw=1&start=0&length=0', function(res) {
-            $('#count-total').text(res.recordsTotal);
-        });
-    }
-
     function loadCounts() {
-        var statuses = [{id: 'count-pending', s: 'PND'}, {id: 'count-sent', s: 'SND'}, {id: 'count-failed', s: 'FAI'}];
-        statuses.forEach(function(item) {
-            $.get(siteurl + 'setting/email_settings/get_queue_data?draw=1&start=0&length=0&search[value]=' + item.s, function(res) {
-                $('#' + item.id).text(res.recordsFiltered);
-            });
+        $.getJSON(siteurl + 'setting/email_settings/get_queue_counts', function(res) {
+            if (res.status == 1) {
+                $('#count-pending').text(res.pending);
+                $('#count-sent').text(res.sent);
+                $('#count-failed').text(res.failed);
+                $('#count-total').text(res.total);
+            }
         });
     }
 
@@ -180,14 +176,7 @@ $(document).ready(function() {
             url: siteurl + 'setting/email_settings/get_queue_data',
             type: 'GET',
             data: function(d) {
-                if (currentFilter !== '') {
-                    // Kalau ada filter, append ke search
-                    if (d.search.value) {
-                        d.search.value = currentFilter;
-                    } else {
-                        d.search.value = currentFilter;
-                    }
-                }
+                d.status = currentFilter;
                 return d;
             }
         },
@@ -220,7 +209,15 @@ $(document).ready(function() {
         $('.filter-btn').removeClass('active');
         $(this).addClass('active');
         currentFilter = $(this).data('status');
-        table.search(currentFilter).draw();
+        table.draw();
+    });
+
+    // ─── Preview Email ────────────────────────────────────────────────────────
+    $(document).on('click', '.btn-preview', function() {
+        var id = $(this).data('id');
+        var url = siteurl + 'setting/email_settings/preview/' + id;
+        $('#iframe-preview').attr('src', url);
+        $('#modal-preview').modal('show');
     });
 
     // ─── Refresh Button ───────────────────────────────────────────────────────
