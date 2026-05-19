@@ -39,7 +39,7 @@
 							</div>
 						</div>
 
-						<div class="col-md-2 col-md-3 mb-5">
+						<!-- <div class="col-md-2 col-md-3 mb-5">
 							<div class="card border-0 shadow-lg " style="border-radius: 30px 5px 30px 5px;background-color: rgba(255, 255, 255, 0.50);">
 								<div class="card-body pb-1 d-flex justify-content-center align-items-center" style="min-height: 120px;">
 									<img src="<?= base_url('assets/images/dashboard/training.png'); ?>" alt="MATERI TRAINING" class="img-fluid" style="height: 150px;">
@@ -50,7 +50,7 @@
 									</a>
 								</h6>
 							</div>
-						</div>
+						</div> -->
 
 						<div class="col-md-2 col-md-3 mb-5">
 							<div class="card border-0 shadow-lg " style="border-radius: 30px 5px 30px 5px;background-color: rgba(255, 255, 255, 0.50);">
