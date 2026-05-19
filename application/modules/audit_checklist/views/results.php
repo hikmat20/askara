@@ -12,11 +12,11 @@
 						<thead class="text-center table-light">
 							<tr class="text-center">
 								<th width="10">No.</th>
-								<th width="80">Date</th>
+								<th width="100">Date</th>
 								<th class="text-left">Process Name</th>
 								<th width="">Temuan</th>
-								<th width="80" class="text-center">Action</th>
-								<th width="110" class="text-center">Edit Limits</th>
+								<th width="100" class="text-center">Action</th>
+								<th width="150" class="text-center">Edit Limits</th>
 							</tr>
 						</thead>
 						<tbody>

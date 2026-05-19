@@ -103,7 +103,6 @@ class Email_settings extends Admin_Controller
     {
         $this->template->set([
             'title' => 'Email Queue List',
-            'icon'  => 'fa fa-list-alt'
         ]);
         $this->template->render('email_queue');
     }
@@ -117,13 +116,18 @@ class Email_settings extends Admin_Controller
         $start  = intval($this->input->get('start'));
         $length = intval($this->input->get('length'));
         $search = $this->input->get('search')['value'];
+        $status = $this->input->get('status');
 
         $this->db->from('email_queues');
+        
+        if (!empty($status)) {
+            $this->db->where('status', $status);
+        }
+
         if (!empty($search)) {
             $this->db->group_start();
             $this->db->like('to_email', $search);
             $this->db->or_like('subject', $search);
-            $this->db->or_like('status', $search);
             $this->db->group_end();
         }
         $totalFiltered = $this->db->count_all_results('', false);
@@ -146,11 +150,11 @@ class Email_settings extends Admin_Controller
                 $statusBadge = '<span class="label label-light-warning label-inline font-weight-bold">Pending</span>';
             }
 
-            $actionBtn = '';
+            $actionBtn = '<button type="button" class="btn btn-xs btn-light-info btn-icon btn-preview mr-1" data-id="'.$r->id.'" title="Preview Email"><i class="fa fa-eye"></i></button>';
             if ($r->status == 'FAI') {
-                $actionBtn = '<button type="button" class="btn btn-xs btn-primary btn-resend" data-id="'.$r->id.'" title="Kirim Ulang"><i class="fa fa-redo"></i> Resend</button>';
+                $actionBtn .= '<button type="button" class="btn btn-xs btn-primary btn-resend" data-id="'.$r->id.'" title="Kirim Ulang"><i class="fa fa-redo"></i> Resend</button>';
             } elseif ($r->status == 'PND') {
-                $actionBtn = '<button type="button" class="btn btn-xs btn-secondary" disabled><i class="fa fa-clock"></i> Pending</button>';
+                $actionBtn .= '<button type="button" class="btn btn-xs btn-secondary" disabled><i class="fa fa-clock"></i> Pending</button>';
             }
 
             $errorHtml = '';
@@ -216,6 +220,25 @@ class Email_settings extends Admin_Controller
         $this->db->delete('email_queues');
 
         echo json_encode(['status' => 1, 'msg' => 'Riwayat email terkirim berhasil dibersihkan.']);
+    }
+
+    /**
+     * Get summary counts for email queue dashboard
+     */
+    public function get_queue_counts()
+    {
+        $pending = $this->db->where('status', 'PND')->count_all_results('email_queues');
+        $sent    = $this->db->where('status', 'SND')->count_all_results('email_queues');
+        $failed  = $this->db->where('status', 'FAI')->count_all_results('email_queues');
+        $total   = $this->db->count_all('email_queues');
+
+        echo json_encode([
+            'status'  => 1,
+            'pending' => $pending,
+            'sent'    => $sent,
+            'failed'  => $failed,
+            'total'   => $total
+        ]);
     }
 
     /**
@@ -299,6 +322,73 @@ class Email_settings extends Admin_Controller
             $this->db->update('settings', ['value' => $value], ['setting_name' => $name]);
         } else {
             $this->db->insert('settings', ['setting_name' => $name, 'value' => $value]);
+        }
+    }
+
+    /**
+     * Preview queued email HTML fully compiled
+     */
+    public function preview($id)
+    {
+        $q = $this->db->get_where('email_queues', ['id' => $id])->row();
+        if ($q) {
+            // Get email template body and CSS
+            $body_db = $this->db->get_where('settings', ['setting_name' => 'email_template_body'])->row();
+            $css_db  = $this->db->get_where('settings', ['setting_name' => 'email_template_css'])->row();
+
+            // Get Email Variable Overrides
+            $email_vars = [];
+            $vars_keys  = ['email_vars_company_name', 'email_vars_company_address', 'email_vars_company_logo'];
+            $vars_db    = $this->db->where_in('setting_name', $vars_keys)->get('settings')->result();
+            foreach ($vars_db as $v) {
+                $email_vars[$v->setting_name] = $v->value;
+            }
+
+            // Ambil data perusahaan untuk placeholder dinamis (sebagai fallback)
+            $company = $this->db->get_where('companies', ['id_perusahaan' => $q->company_id])->row();
+
+            if ($body_db) {
+                // Gunakan template terpisah (Body & CSS)
+                $htmlBody = $body_db->value;
+                $htmlCss = ($css_db) ? $css_db->value : '';
+                $htmlMessage = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' . $htmlCss . '</style></head><body class="email-template">' . $htmlBody . '</body></html>';
+            } else {
+                // Fallback 1: Template Full HTML dari database (Lama)
+                $old_db = $this->db->get_where('settings', ['setting_name' => 'email_template_html'])->row();
+                if ($old_db) {
+                    $htmlMessage = $old_db->value;
+                } else {
+                    // Fallback 2: Bungkus pesan dengan template HTML fisik (Lama)
+                    $htmlMessage = $this->load->view('setting/email_template', ['message' => $q->message], true);
+                }
+            }
+
+            // Ganti Placeholder Dasar
+            $htmlMessage = str_replace('{{content}}', $q->message, $htmlMessage);
+            $htmlMessage = str_replace('{{subject}}', $q->subject, $htmlMessage);
+
+            // Tentukan Nilai untuk Placeholder (Prioritas: Overrides > Master Perusahaan)
+            $final_name    = (!empty($email_vars['email_vars_company_name'])) ? $email_vars['email_vars_company_name'] : ($company ? $company->nm_perusahaan : '');
+            $final_address = (!empty($email_vars['email_vars_company_address'])) ? $email_vars['email_vars_company_address'] : ($company ? $company->alamat : '');
+            $final_logo    = '';
+
+            if (!empty($email_vars['email_vars_company_logo'])) {
+                $final_logo = base_url('directory/COMPANY/' . $email_vars['email_vars_company_logo']);
+            } elseif ($company && !empty($company->logo)) {
+                $final_logo = base_url($company->path_logo . $company->id_perusahaan . '/' . $company->logo);
+            }
+
+            $htmlMessage = str_replace('{{company_name}}', $final_name, $htmlMessage);
+            $htmlMessage = str_replace('{{company_address}}', $final_address, $htmlMessage);
+            $htmlMessage = str_replace('{{company_logo}}', $final_logo, $htmlMessage);
+
+            // Ganti Action URL (Jika kosong, arahkan ke Home)
+            $final_url = (!empty($q->action_url)) ? $q->action_url : base_url();
+            $htmlMessage = str_replace('{{action_url}}', $final_url, $htmlMessage);
+
+            echo $htmlMessage;
+        } else {
+            echo "Email tidak ditemukan.";
         }
     }
 }

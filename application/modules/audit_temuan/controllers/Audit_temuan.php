@@ -332,7 +332,7 @@ class Audit_temuan extends Admin_Controller
     {
         $dataStd            = $this->db->get_where('view_audit_standard', ['id' => $id, 'status' => '1'])->row();
         $details            = $this->db->get_where('view_audit_temuan_details', ['audit_standard_id' => $id, 'status' => '1'])->result();
-        $dataAudit          = $this->db->get_where('audit_temuan', ['id' => $dataStd->audit_id])->row();
+        $dataAudit          = $this->db->get_where('view_audit_temuan', ['id' => $dataStd->audit_id])->row();
         $pasals             = $this->db->get_where('requirement_details', ['requirement_id' => $dataStd->standard_id])->result();
         $process             = $this->db->get_where('audit_process', ['status' => '1'])->result();
         $auditors           = $this->db->get_where('audit_auditor_badan_sertifikasi', ['badan_sert_id' => $dataAudit->badan_sert_id])->result();
@@ -340,6 +340,7 @@ class Audit_temuan extends Admin_Controller
         $auditorInternal    = $this->db->like('position', '1')->get_where('audit_auditor_consultant', ['status' => '1'])->result();
 
         $this->template->set([
+            'data'              => $dataAudit,
             'standard'          => $dataStd,
             'pasals'            => $pasals,
             'details'           => $details,

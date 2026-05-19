@@ -282,8 +282,14 @@ class Audit_checklist extends Admin_Controller
     function audit($id)
     {
         if ($id) {
+            $existing = $this->db->get_where('audit_checklist_audit', ['checklist_id' => $id, 'status' => '1'])->row();
+            if ($existing) {
+                redirect(site_url($this->uri->segment(1) . '/edit_audit/' . $existing->id));
+                return;
+            }
+
             $cklst        = $this->db->get_where('view_audit_checklist', ['id' => $id, 'status' => '1'])->row();
-            $users      = $this->db->get_where('view_users', ['company_id' => $this->company, 'status' => 'ACT'])->result();
+            $users      = $this->db->get_where('view_users', ['status' => 'ACT'])->result();
 
             $procedures  = $this->db->get_where('procedures', ['company_id' => $this->company, 'status !=' => 'DEL', 'deleted_at' => null])->result();
 
@@ -291,6 +297,14 @@ class Audit_checklist extends Admin_Controller
                 ->where("find_in_set($cklst->procedure_id, procedure_id)")
                 ->where("company_id", $this->company);
             $Cross = $query->get()->result();
+
+            if (empty($Cross)) {
+                $this->db->select('rd.id as chapter_id, rd.chapter, rd.desc_indo, rd.desc_eng, rd.requirement_id, r.name, r.year, r.number')
+                    ->from('requirement_details rd')
+                    ->join('requirements r', 'rd.requirement_id = r.id')
+                    ->where('r.status', '1');
+                $Cross = $this->db->get()->result();
+            }
 
             $ArrData = [];
             foreach ($Cross as $dt) {
@@ -326,6 +340,15 @@ class Audit_checklist extends Admin_Controller
                 ->where("find_in_set($cklst->procedure_id, procedure_id)")
                 ->where(["company_id" => $this->company]);
             $std = $query->get()->result();
+
+            if (empty($std)) {
+                $this->db->select('rd.id, rd.chapter, rd.requirement_id')
+                    ->from('requirement_details rd')
+                    ->join('requirements r', 'rd.requirement_id = r.id')
+                    ->where('r.status', '1');
+                $std = $this->db->get()->result();
+            }
+
             $ArrDtlStd = [];
             foreach ($std as $s) {
                 $ArrDtlStd[$s->requirement_id][] = $s;
@@ -339,6 +362,7 @@ class Audit_checklist extends Admin_Controller
                 'ArrStd'     => $ArrStd,
                 'checklist'  => $checklist,
                 'procedures'  => $procedures,
+                'ArrDtlStd'  => $ArrDtlStd,
             ]);
 
             $this->template->render('audit');
@@ -369,15 +393,23 @@ class Audit_checklist extends Admin_Controller
     function edit_audit($id)
     {
         if ($id) {
-            $audit    = $this->db->get_where('view_audit_checklist_audit', ['id' => $id, 'status' => '1'])->row();
+            $audit    = $this->db->get_where('view_audit_checklist_audit', ['id' => $id])->row();
             $cklst    = $this->db->get_where('view_audit_checklist', ['id' => $audit->checklist_id, 'status' => '1'])->row();
-            $users    = $this->db->get_where('view_users', ['company_id' => $this->company, 'status' => 'ACT'])->result();
+            $users    = $this->db->get_where('view_users', ['status' => 'ACT'])->result();
 
             $procedures  = $this->db->get_where('procedures', ['company_id' => $this->company, 'status !=' => 'DEL', 'deleted_at' => null])->result();
             $query = $this->db->select('*')->from('view_cross_reference_details')
                 ->where("find_in_set($cklst->procedure_id, procedure_id)")
                 ->where("company_id", $this->company);
             $Cross = $query->get()->result();
+
+            if (empty($Cross)) {
+                $this->db->select('rd.id as chapter_id, rd.chapter, rd.desc_indo, rd.desc_eng, rd.requirement_id, r.name, r.year, r.number')
+                    ->from('requirement_details rd')
+                    ->join('requirements r', 'rd.requirement_id = r.id')
+                    ->where('r.status', '1');
+                $Cross = $this->db->get()->result();
+            }
 
             $ArrData = [];
             foreach ($Cross as $dt) {
@@ -406,6 +438,15 @@ class Audit_checklist extends Admin_Controller
                 ->where("find_in_set($cklst->procedure_id, procedure_id)")
                 ->where(["company_id" => $this->company]);
             $std = $query->get()->result();
+
+            if (empty($std)) {
+                $this->db->select('rd.id, rd.chapter, rd.requirement_id')
+                    ->from('requirement_details rd')
+                    ->join('requirements r', 'rd.requirement_id = r.id')
+                    ->where('r.status', '1');
+                $std = $this->db->get()->result();
+            }
+
             $ArrDtlStd = [];
             foreach ($std as $s) {
                 $ArrDtlStd[$s->requirement_id][] = $s;
@@ -442,6 +483,12 @@ class Audit_checklist extends Admin_Controller
         $this->db->where(["requirement_id" => $standard, "company_id" => $this->company]);
         $data = $this->db->get()->result();
 
+        if (empty($data)) {
+            $this->db->select('*')->from('requirement_details');
+            $this->db->where(['requirement_id' => $standard]);
+            $data = $this->db->get()->result();
+        }
+
         $html = '<option></option>';
         if ($data) {
             foreach ($data as $v) {
@@ -454,10 +501,10 @@ class Audit_checklist extends Admin_Controller
     function saveAudit()
     {
         $data       = $this->input->post();
-        $temuan     = $data['temuan'];
-        $detail     = $data['detail'];
-        unset($data['temuan']);
-        unset($data['detail']);
+        $temuan     = isset($data['temuan']) ? $data['temuan'] : [];
+        $detail     = isset($data['detail']) ? $data['detail'] : [];
+        if (isset($data['temuan'])) unset($data['temuan']);
+        if (isset($data['detail'])) unset($data['detail']);
 
         $data['auditor'] = json_encode($data['auditor']);
         $data['auditee'] = json_encode($data['auditee']);
@@ -567,15 +614,23 @@ class Audit_checklist extends Admin_Controller
     function view_audit($id)
     {
         if ($id) {
-            $audit    = $this->db->get_where('view_audit_checklist_audit', ['id' => $id, 'status' => '1'])->row();
+            $audit    = $this->db->get_where('view_audit_checklist_audit', ['id' => $id])->row();
             $cklst    = $this->db->get_where('view_audit_checklist', ['id' => $audit->checklist_id, 'status' => '1'])->row();
-            $users    = $this->db->get_where('view_users', ['company_id' => $this->company, 'status' => 'ACT'])->result();
+            $users    = $this->db->get_where('view_users', ['status' => 'ACT'])->result();
 
             $procedures  = $this->db->get_where('procedures', ['company_id' => $this->company, 'status !=' => 'DEL', 'deleted_at' => null])->result();
             $query = $this->db->select('*')->from('view_cross_reference_details')
                 ->where("find_in_set($cklst->procedure_id, procedure_id)")
                 ->where("company_id", $this->company);
             $Cross = $query->get()->result();
+
+            if (empty($Cross)) {
+                $this->db->select('rd.id as chapter_id, rd.chapter, rd.desc_indo, rd.desc_eng, rd.requirement_id, r.name, r.year, r.number')
+                    ->from('requirement_details rd')
+                    ->join('requirements r', 'rd.requirement_id = r.id')
+                    ->where('r.status', '1');
+                $Cross = $this->db->get()->result();
+            }
 
             $ArrData = [];
             foreach ($Cross as $dt) {
@@ -600,12 +655,20 @@ class Audit_checklist extends Admin_Controller
             }
 
             /* Satndard */
-            $standard = $this->db->get_where('requirements', ['company_id' => $this->company, 'status' => '1'])->result();
+            $standard = $this->db->get_where('requirements', ['status' => '1'])->result();
             $ArrDtlStd = array_column(json_decode(json_encode($standard)), 'name', 'id');
 
             $query = $this->db->select('*')->from('view_cross_reference_details')
                 ->where("company_id", $this->company);
             $Cross = $query->get()->result();
+
+            if (empty($Cross)) {
+                $this->db->select('rd.id, rd.chapter')
+                    ->from('requirement_details rd')
+                    ->join('requirements r', 'rd.requirement_id = r.id')
+                    ->where('r.status', '1');
+                $Cross = $this->db->get()->result();
+            }
             $ArrPro = array_column(json_decode(json_encode($Cross)), 'chapter', 'id');
 
             $AdtAudit = $this->db->get_where('audit_non_checklist_audit_details', ['audit_id' => $audit->id, 'status' => '1'])->result();

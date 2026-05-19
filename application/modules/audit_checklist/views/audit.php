@@ -116,8 +116,7 @@
                     <th width="10">No</th>
                     <th width="">Temuan <span class="text-danger">*</span></th>
                     <th width="150">Kategori</th>
-                    <th width="150">ISO</th>
-                    <th width="250">Pasal</th>
+                    <th width="250">ISO & Pasal</th>
                     <th width="80">Action</th>
                   </tr>
                 </thead>
@@ -141,14 +140,16 @@
                         </select>
                       </td>
                       <td>
-                        <select name="temuan[<?= $k; ?>][standard]" data-row="<?= $k; ?>" class="form-control select2 temuan-standard" data-minimum-results-for-search="Infinity" data-placeholder="Standard">
+                        <select name="temuan[<?= $k; ?>][standard]" data-row="<?= $k; ?>" class="form-control select2 temuan-standard"
+                          data-minimum-results-for-search="Infinity" data-placeholder="Standard">
                           <option value=""></option>
-                          <?php if ($ArrStd) foreach ($ArrStd as $s) : ?>
-                            <option value="<?= $s->requirement_id; ?>" <?= ($s->requirement_id == $a->standard) ? 'selected' : ''; ?>><?= $s->name; ?></option>
-                          <?php endforeach; ?>
+                          <?php if ($ArrStd)
+                            foreach ($ArrStd as $s): ?>
+                              <option value="<?= $s->requirement_id; ?>" <?= ($s->requirement_id == $a->standard) ? 'selected' : ''; ?>>
+                                <?= $s->name; ?></option>
+                            <?php endforeach; ?>
                         </select>
-                      </td>
-                      <td>
+
                         <select name="temuan[<?= $k; ?>][pasal]" id="temuan_pasal_<?= $k; ?>" class="form-control select2 pasal" data-placeholder="Pasal">
                           <option></option>
                           <?php
@@ -172,11 +173,10 @@
               <thead class="table-light">
                 <tr class="text-center">
                   <th width="30">No</th>
-                  <th class="">Checklist</th>
+                  <th class="w-md-250px">Checklist</th>
                   <th class="w-md-400px">Temuan</th>
                   <th width="150">Kategori</th>
-                  <th width="150">ISO</th>
-                  <th width="250">Pasal</th>
+                  <th width="250">ISO & Pasal</th>
                   <th width="30">File</th>
                 </tr>
               </thead>
@@ -206,14 +206,18 @@
                       </select>
                     </td>
                     <td>
-                      <select name="detail[<?= $n; ?>][standard]" data-row="<?= $n; ?>" id="standard_<?= $n; ?>" data-minimum-results-for-search="Infinity" class="form-control select2 standard" data-placeholder="Standard" data-allow-clear="true" data-width="100%">
-                        <option value=""></option>
-                        <?php if ($ArrStd) foreach ($ArrStd as $k => $s) : ?>
-                          <option value="<?= $s->requirement_id; ?>" <?= (isset($ArrDtl) && ($ArrDtl[$v->id]->standard == $s->requirement_id)) ? "selected" : ''; ?>><?= $s->name; ?></option>
-                        <?php endforeach; ?>
-                      </select>
-                    </td>
-                    <td>
+                        <select name="detail[<?= $n; ?>][standard]" data-row="<?= $n; ?>" id="standard_<?= $n; ?>"
+                          data-minimum-results-for-search="Infinity" class="form-control select2 standard" data-placeholder="Standard"
+                          data-allow-clear="true" data-width="100%">
+                          <option value=""></option>
+                          <?php if ($ArrStd)
+                            foreach ($ArrStd as $k => $s): ?>
+                              <option value="<?= $s->requirement_id; ?>"
+                                <?= (isset($ArrDtl) && ($ArrDtl[$v->id]->standard == $s->requirement_id)) ? "selected" : ''; ?>><?= $s->name; ?>
+                              </option>
+                            <?php endforeach; ?>
+                        </select>
+
                       <select name="detail[<?= $n; ?>][pasal]" data-row="<?= $n; ?>" id="pasal_<?= $n; ?>" class="form-control select2" data-placeholder="Pasal" data-allow-clear="true">
                         <option></option>
                         <?php if (isset($ArrDtl)) :
@@ -283,7 +287,11 @@
 
 <script>
   $(document).ready(function() {
-
+	$('.select2').select2({
+		allowClear: true,
+		width: "100%",
+    placeholder:'Choose one'
+	});
     $(document).on('change', '.temuan-standard', function() {
       const e = $(this)
       changeStd(e, '#temuan_pasal_')
@@ -376,14 +384,13 @@
           </select>
         </td>
         <td>
-          <select name="temuan[${n}][standard]" data-row="${n}" class="form-control select2 temuan-standard" data-minimum-results-for-search="Infinity" data-placeholder="Standard">
+         <select name="temuan[${n}][standard]" data-row="${n}" class="form-control select2 temuan-standard" data-minimum-results-for-search="Infinity" data-placeholder="Standard">
           <option value=""></option>
-          <?php if ($ArrStd) foreach ($ArrStd as $k => $s) : ?>
-            <option value="<?= $s->requirement_id; ?>"><?= $s->name; ?></option>
-          <?php endforeach; ?>
+          <?php if ($ArrStd)
+            foreach ($ArrStd as $k => $s): ?>
+                <option value="<?= $s->requirement_id; ?>"><?= $s->name; ?></option>
+            <?php endforeach; ?>
           </select>
-        </td>
-        <td>
           <select name="temuan[${n}][pasal]" id="temuan_pasal_${n}" class="form-control select2 pasal" data-placeholder="Pasal">
            <option></option>
           </select>
@@ -396,7 +403,7 @@
 
       $('.select2').select2({
         allowClear: true,
-        // width: "100%"
+        width: "100%"
       })
 
       $('textarea.summernote').summernote({
