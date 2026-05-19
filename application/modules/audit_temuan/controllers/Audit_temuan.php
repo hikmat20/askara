@@ -13,7 +13,7 @@ class Audit_temuan extends Admin_Controller
     {
         parent::__construct();
         $this->template->set([
-            'title' => 'Temuan Audit',
+            'title' => 'Audit Process',
             'icon' => 'fa fa-clipboard-check'
         ]);
 
@@ -233,6 +233,29 @@ class Audit_temuan extends Admin_Controller
             'details' => $details,
         ]);
         $this->template->render('view');
+    }
+
+    public function view_audit($id = null)
+    {
+        if ($id) {
+            $data               = $this->db->get_where('view_audit_temuan', ['id' => $id, 'status' => 1])->row();
+            $dataStd            = $this->db->get_where('view_audit_standard', ['audit_id' => $id, 'status' => '1'])->result();
+
+            foreach ($dataStd as $std) {
+                $std->findings = $this->db->get_where('view_audit_temuan_details', [
+                    'audit_standard_id' => $std->id,
+                    'status' => '1'
+                ])->result();
+            }
+
+            $this->template->set([
+                'data'              => $data,
+                'dataStd'           => $dataStd,
+            ]);
+            $this->template->render('view_audit');
+        } else {
+            echo "Data tidak ditemukan.";
+        }
     }
 
     function delete_standard()
