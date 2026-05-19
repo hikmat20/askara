@@ -93,7 +93,7 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="modelId" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+<div class="modal fade" id="modelId" data-backdrop="static" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<form id="formTemuan">
@@ -183,7 +183,7 @@
 		</div>
 	</div>
 </div>
-<div class="modal fade" id="modelId2" tabindex="-1" data-backdrop="static" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
+<div class="modal fade" id="modelId2" data-backdrop="static" role="dialog" aria-labelledby="modelTitleId" aria-hidden="true">
 	<div class="modal-dialog modal-lg" role="document">
 		<div class="modal-content">
 			<form id="formEditTemuan">
@@ -207,12 +207,26 @@
 	$(document).ready(function() {
 		$('#dtTemuan').DataTable({
 			autoWidth: false
-		})
+		});
+
+		// Initialize Select2 once, appending to body for perfect positioning and behavior
+		$('#modelId .select2').select2({
+			width: "100%",
+			closeOnSelect: true,
+			allowClear: true,
+			placeholder: "Choose one"
+		});
+
+		// Initialize Summernote once
+		$('#modelId textarea.summernote').summernote({
+			dialogsInBody: true,
+			height: 150
+		});
 
 		/* Tambah Temuan */
 		$(document).on('click', '#add-temuan', function() {
-			$("#modelId").modal()
-		})
+			$("#modelId").modal('show');
+		});
 
 		$(document).on('click', '.edit', function() {
 			const id = $(this).data('id')
