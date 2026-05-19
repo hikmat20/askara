@@ -208,6 +208,7 @@
             //     $('[data-toggle="tooltip"]').tooltip();
             // }
         });
+        table.ajax.reload(null, false);
 
         // ─── Filter by Status ─────────────────────────────────────────────────────
         $('.filter-btn').on('click', function () {
