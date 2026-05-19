@@ -164,8 +164,6 @@ $(document).ready(function() {
         });
     }
 
-    loadCounts();
-
     // ─── Datatables ───────────────────────────────────────────────────────────
     var currentFilter = '';
 
@@ -197,11 +195,11 @@ $(document).ready(function() {
             emptyTable: '<div class="text-center py-5 text-muted"><i class="fa fa-inbox fa-3x mb-3 d-block"></i>Tidak ada data antrean email</div>',
             zeroRecords: '<div class="text-center py-5 text-muted"><i class="fa fa-search fa-3x mb-3 d-block"></i>Tidak ada data yang sesuai pencarian</div>'
         },
-        drawCallback: function() {
-            loadCounts();
-            // Re-init tooltip
-            $('[data-toggle="tooltip"]').tooltip();
-        }
+        // drawCallback: function() {
+        //     loadCounts();
+        //     // Re-init tooltip
+        //     $('[data-toggle="tooltip"]').tooltip();
+        // }
     });
 
     // ─── Filter by Status ─────────────────────────────────────────────────────
