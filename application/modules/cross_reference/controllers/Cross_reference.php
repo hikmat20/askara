@@ -280,7 +280,12 @@ class Cross_reference extends Admin_Controller
 
 	public function print_cross($id = null)
 	{
-		$mpdf = new Mpdf('', '', '', 5, 5, 5, 5);
+		$mpdf = new \Mpdf\Mpdf([
+			'margin_left' => 5,
+			'margin_right' => 5,
+			'margin_top' => 5,
+			'margin_bottom' => 5
+		]);
 
 		$crossStd  		= $this->db->get_where('view_cross_references', ['id' => $id])->row();
 		$dtlCross 		= $this->db->get_where('view_cross_reference_details', ['reference_id' => $id])->result();
@@ -321,7 +326,12 @@ class Cross_reference extends Admin_Controller
 
 	public function print_cross_pasal_to_process($id = null)
 	{
-		$mpdf = new Mpdf('', '', '', 10, 10, 10, 10);
+		$mpdf = new \Mpdf\Mpdf([
+			'margin_left' => 10,
+			'margin_right' => 10,
+			'margin_top' => 10,
+			'margin_bottom' => 10
+		]);
 
 		$Data 			= $this->db->get_where('view_cross_references', ['company_id' => $this->company, 'id' => $id])->row();
 		$Detail 		= $this->db->get_where('requirement_details', ['requirement_id' => $Data->standard_id])->result();
@@ -350,7 +360,12 @@ class Cross_reference extends Admin_Controller
 
 	public function print_process_to_pasal($id = null)
 	{
-		$mpdf = new Mpdf('', '', '', 10, 10, 10, 10);
+		$mpdf = new \Mpdf\Mpdf([
+			'margin_left' => 10,
+			'margin_right' => 10,
+			'margin_top' => 10,
+			'margin_bottom' => 10
+		]);
 
 		$crossStd  		= $this->db->get_where('view_cross_references', ['company_id' => $this->company])->row();
 		$dtlCross 		= $this->db->get_where('view_cross_reference_details', ['reference_id' => $crossStd->reference_id])->result();
