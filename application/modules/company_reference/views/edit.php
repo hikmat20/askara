@@ -6,11 +6,6 @@
 				<a href="<?= base_url($this->uri->segment(1)); ?>" class="btn btn-danger"><i
 						class="fa fa-reply"></i>Back</a>
 			</div>
-<?php
-
-print_r($Data);
-die();
- ?>
 			<div class="card-body">
 				<div class="row flex-nowrap">
 					<label for="" class="col-2  h6 col-form-label font-weight-bold">Company</label>
