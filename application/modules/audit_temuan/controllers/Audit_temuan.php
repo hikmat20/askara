@@ -321,8 +321,6 @@ class Audit_temuan extends Admin_Controller
             if ($std) {
                 $this->_temuan($std);
             } else {
-                print_r("detail ".$id);
-                die();
                 $this->template->render('detail');
             }
         } else {
