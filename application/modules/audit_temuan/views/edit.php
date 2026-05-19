@@ -74,9 +74,20 @@
 <script>
   $(document).ready(() => {
     $('.select2').select2({
-      dropdownParent: $('#modelId2 .modal-body'),
-      width: "100%"
+     	dropdownParent: $('#modelId2 .modal-body'),
+				width: "100%",
+				closeOnSelect: true
     })
+
+//    $('#modelId .select2').select2({
+//				dropdownParent: $('#modelId .modal-body'),
+//				width: "100%",
+//				closeOnSelect: true
+//			});
+//			$('#modelId textarea.summernote').summernote({
+//				dialogsInBody: true,
+//				height: 150
+//			});
 
     $('textarea.summernote').summernote({
       inheritePlacholder: true,
