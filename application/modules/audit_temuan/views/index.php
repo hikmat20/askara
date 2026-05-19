@@ -78,9 +78,8 @@
 			$('.modal-title').html('Add New Audit')
 			$('#modalID').modal()
 			$('#modalID .modal-body').load(url)
-
+			$('#modalID .save').show()
 		})
-
 
 		$(document).on('click', '.edit', function() {
 			const id = $(this).data('id')
@@ -88,6 +87,16 @@
 			$('.modal-title').html('Edit Scope')
 			$('#modalID').modal('show')
 			$('.modal-body').load(url)
+			$('#modalID .save').show()
+		})
+
+		$(document).on('click', '.view', function() {
+			const id = $(this).data('id')
+			const url = siteurl + active_controller + 'view_audit/' + id;
+			$('.modal-title').html('Detail Audit')
+			$('#modalID').modal('show')
+			$('.modal-body').load(url)
+			$('#modalID .save').hide()
 		})
 
 		$(document).on('click', '.save', function(e) {
