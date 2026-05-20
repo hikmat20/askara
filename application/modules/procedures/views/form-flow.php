@@ -1,4 +1,4 @@
-<input type="hidden" name="id" value="<?= $procedure_id; ?>">
+<input type="hidden" name="flow[procedure_id]" value="<?= $procedure_id; ?>">
 <div class="form-group">
 	<label class="">Nomor <span class="text-danger">*</span></label>
 	<div class="">
