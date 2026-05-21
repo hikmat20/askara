@@ -125,13 +125,80 @@ class Setting extends Admin_Controller
 
     public function index()
     {
-        $userActive = $this->db->get_where('view_users', ['status' => 'ACT', 'company_id' => $this->company])->result();
-        $userNonActive = $this->db->get_where('view_users', ['status' => 'NAC', 'company_id' => $this->company])->result();
+        $userActive = $this->get_company_users('ACT');
+        $userNonActive = $this->get_company_users('NAC');
         $this->template->set([
             'userActive' => $userActive,
             'userNonActive' => $userNonActive,
         ]);
         $this->template->render('list');
+    }
+
+    /**
+     * Ambil daftar user per company. Tetap tampil meski group sudah nonaktif
+     * karena relasi user_groups tidak dihapus saat group di-delete.
+     */
+    protected function get_company_users($status)
+    {
+        return $this->db
+            ->select('users.id_user, users.username, users.full_name, users.email, users.phone, users.status, users.photo, user_groups.company_id, user_groups.id_group, groups.nm_group')
+            ->from('users')
+            ->join('user_groups', 'users.id_user = user_groups.user_id', 'inner')
+            ->join('groups', 'user_groups.id_group = groups.id_group', 'left')
+            ->where('user_groups.company_id', $this->company)
+            ->where('users.status', $status)
+            ->order_by('users.full_name', 'ASC')
+            ->get()
+            ->result();
+    }
+
+    public function delete()
+    {
+        $id = $this->input->post('id');
+
+        if (!$id || $id == 1) {
+            echo json_encode([
+                'status' => 0,
+                'msg'    => 'User tidak valid atau user admin tidak dapat dihapus.',
+            ]);
+            return;
+        }
+
+        $user = $this->db->get_where('users', ['id_user' => $id])->row();
+
+        if (!$user) {
+            echo json_encode([
+                'status' => 0,
+                'msg'    => 'User tidak ditemukan.',
+            ]);
+            return;
+        }
+
+        if ($user->status == 'DEL') {
+            echo json_encode([
+                'status' => 0,
+                'msg'    => 'User sudah dihapus sebelumnya.',
+            ]);
+            return;
+        }
+
+        $this->db->trans_begin();
+        $this->db->update('users', ['status' => 'DEL'], ['id_user' => $id]);
+
+        if ($this->db->trans_status() === FALSE) {
+            $this->db->trans_rollback();
+            echo json_encode([
+                'status' => 0,
+                'msg'    => 'Gagal menghapus user. Silakan coba lagi.',
+            ]);
+            return;
+        }
+
+        $this->db->trans_commit();
+        echo json_encode([
+            'status' => 1,
+            'msg'    => 'User berhasil dihapus.',
+        ]);
     }
     public function create()
     {
@@ -199,7 +266,7 @@ class Setting extends Admin_Controller
         $data = $this->users_model->find($id);
 
         if ($data) {
-            if ($data->deleted == 1) {
+            if ($data->deleted == 1 || $data->status == 'DEL') {
                 $this->template->set_message(lang('users_already_deleted'), 'error');
                 redirect('users/setting');
             }
@@ -445,13 +512,21 @@ class Setting extends Admin_Controller
 
     public function check_username($username)
     {
-        $check = $this->db->get_where('users', ['username' => $username])->num_rows();
+        $check = $this->db
+            ->where('username', $username)
+            ->where('status !=', 'DEL')
+            ->get('users')
+            ->num_rows();
         return $check;
     }
 
     public function check_email($email)
     {
-        $check = $this->db->get_where('users', ['email' => $email])->num_rows();
+        $check = $this->db
+            ->where('email', $email)
+            ->where('status !=', 'DEL')
+            ->get('users')
+            ->num_rows();
         return $check;
     }
 

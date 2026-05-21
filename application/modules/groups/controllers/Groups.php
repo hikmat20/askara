@@ -222,7 +222,6 @@ class Groups extends Admin_Controller
         if ($id) {
             $this->db->trans_begin();
             $this->db->update("groups", ['active' => 'N'], ['id_group' => $id]);
-            $this->db->delete("user_groups", ['id_group' => $id]);
         }
         if ($this->db->trans_status() === FALSE) {
             $error = $this->db->error()['message'];

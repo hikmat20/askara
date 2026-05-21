@@ -89,6 +89,11 @@ class Auth
                 return FALSE;
             }
 
+            if ($existUser->status == 'DEL') {
+                $this->ci->template->set_message(lang('users_already_deleted'), 'error');
+                return FALSE;
+            }
+
             if (password_verify($password, $existUser->password)) {
 
                 /* Verifikasi re-Captcha */

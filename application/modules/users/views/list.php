@@ -32,7 +32,8 @@
 									<th><?= lang('users_email') ?></th>
 									<!-- <th><?= lang('users_alamat') ?></th> -->
 									<!-- <th><?= lang('users_kota') ?></th> -->
-									<th><?= lang('users_hp') ?></th>
+									<th class="text-left"><?= lang('users_hp') ?></th>
+									<th><?= lang('level') ?></th>
 									<th width="80"><?= lang('users_st_aktif') ?></th>
 									<th width="50" class="text-center">Opsi</th>
 								</tr>
@@ -51,12 +52,13 @@
 										<td><?= $record->email ?></td>
 										<!-- <td><?= $record->address ?></td> -->
 										<!-- <td><?= $record->city ?></td> -->
-										<td><?= $record->phone ?></td>
+										<td class="text-left"><?= $record->phone ?></td>
+										<td><?= $record->nm_group ?: '-'; ?></td>
 										<td><?= ($record->status == 'ACT') ? "<label class='label label-inline label-primary'>Active</label>" : "<label class='label label-danger label-inline'>Non Active</label>" ?></td>
 										<td class="text-center">
 											<?php if ($record->id_user != '1') : ?>
 												<a class="btn btn-xs btn-icon btn-warning" href="<?= site_url('users/setting/edit/' . $record->id_user); ?>" data-toggle="tooltip" data-placement="left" title="Edit User"><i class="fa fa-pen"></i></a>
-												<a class="btn btn-xs btn-icon btn-danger" data-toggle="tooltip" data-placement="right" title="Delete User"><i class="fa fa-trash"></i></a>
+												<button type="button" class="btn btn-xs btn-icon btn-danger delete-user" data-id="<?= $record->id_user; ?>" data-toggle="tooltip" data-placement="right" title="Hapus User"><i class="fa fa-trash"></i></button>
 											<?php endif; ?>
 										</td>
 									</tr>
@@ -77,7 +79,8 @@
 									<th><?= lang('users_email') ?></th>
 									<!-- <th><?= lang('users_alamat') ?></th> -->
 									<!-- <th><?= lang('users_kota') ?></th> -->
-									<th><?= lang('users_hp') ?></th>
+									<th class="text-left"><?= lang('users_hp') ?></th>
+									<th><?= lang('level') ?></th>
 									<th width="80"><?= lang('users_st_aktif') ?></th>
 									<th width="50" class="text-center">Opsi</th>
 								</tr>
@@ -95,11 +98,12 @@
 										<td><?= $record->email ?></td>
 										<!-- <td><?= $record->address ?></td> -->
 										<!-- <td><?= $record->city ?></td> -->
-										<td><?= $record->phone ?></td>
+										<td class="text-left"><?= $record->phone ?></td>
+										<td><?= $record->nm_group ?: '-'; ?></td>
 										<td><?= ($record->status == 'ACT') ? "<label class='label label-inline label-primary'>Active</label>" : "<label class='label label-danger label-inline'>Non Active</label>" ?></td>
 										<td class="text-center">
 											<a class="btn btn-xs btn-icon btn-warning" href="<?= site_url('users/setting/edit/' . $record->id_user); ?>" data-toggle="tooltip" data-placement="left" title="Edit User"><i class="fa fa-pen"></i></a>
-											<a class="btn btn-xs btn-icon btn-danger" data-toggle="tooltip" data-placement="right" title="Delete User"><i class="fa fa-trash"></i></a>
+											<button type="button" class="btn btn-xs btn-icon btn-danger delete-user" data-id="<?= $record->id_user; ?>" data-toggle="tooltip" data-placement="right" title="Hapus User"><i class="fa fa-trash"></i></button>
 										</td>
 									</tr>
 								<?php endforeach; ?>
@@ -125,9 +129,64 @@
 				}).columns.adjust();
 			});
 
+			const userListColumnDefs = [{
+				targets: 5,
+				type: 'string',
+				className: 'text-left',
+			}];
+
 			$('#example1,#example2').DataTable({
 				scrollCollapse: true,
-				responsive: true
+				responsive: true,
+				columnDefs: userListColumnDefs,
+			});
+		});
+
+		$(document).on('click', '.delete-user', function() {
+			const id = $(this).data('id');
+			Swal.fire({
+				title: 'Konfirmasi',
+				text: 'Yakin ingin menghapus user ini?',
+				icon: 'question',
+				showCancelButton: true,
+				confirmButtonText: 'Ya, Hapus',
+				cancelButtonText: 'Batal',
+			}).then((value) => {
+				if (!value.isConfirmed) {
+					return;
+				}
+				$.ajax({
+					url: siteurl + active_controller + active_function + 'delete',
+					type: 'POST',
+					data: { id },
+					dataType: 'json',
+					success: function(data) {
+						if (data.status == 1) {
+							Swal.fire({
+								title: 'Berhasil',
+								text: data.msg,
+								icon: 'success',
+								timer: 2000,
+								showConfirmButton: false,
+							}).then(() => location.reload());
+						} else {
+							Swal.fire({
+								title: 'Gagal',
+								text: data.msg,
+								icon: 'warning',
+								timer: 3000,
+							});
+						}
+					},
+					error: function() {
+						Swal.fire({
+							title: 'Error',
+							text: 'Terjadi kesalahan saat menghapus user. Silakan coba lagi.',
+							icon: 'error',
+							timer: 3000,
+						});
+					}
+				});
 			});
 		});
 	});
