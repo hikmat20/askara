@@ -94,7 +94,7 @@ class Procedures extends Admin_Controller
 		$languange 		= ['english'];
 
 		if ($Data) {
-			$Data_detail = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$Data_detail = $this->db->order_by("CAST(number AS UNSIGNED)", "ASC", FALSE)->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$grProcess   = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
 			$getForms    = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
 			$getGuides   = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
@@ -1610,8 +1610,8 @@ class Procedures extends Admin_Controller
 		// watermark
 		$procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
 		$flowDetail          = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
-		$getForms            = $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
-		$getGuides           = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
+		$getForms            = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
+		$getGuides           = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
 		$users               = $this->db->get_where('view_users', ['company_id' => $this->company])->result();
 		$jabatan             = $this->db->get('positions')->result();
 		$ArrUsr              = $ArrJab = $ArrDept = $ArrForms = $ArrGuides = [];
