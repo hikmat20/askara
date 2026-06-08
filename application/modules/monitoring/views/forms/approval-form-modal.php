@@ -7,64 +7,32 @@
                     <i class="fa fa-file-pdf text-danger mr-2"></i>Document Preview
                 </h5>
             </div>
-        </form>
-    </div>
+            <div class="card-body p-0">
+                <?php if (!empty($form->file_name)) : ?>
+                    <?php
+                    $file_path = base_url($form->file_path ? $form->file_path : 'directory/FORMS/1/' . $form->file_name);
+                    $file_ext = strtolower($form->ext ? $form->ext : pathinfo($form->file_name, PATHINFO_EXTENSION));
+                    ?>
 
-    <!-- TAB: Detail Form -->
-    <div class="tab-pane fade" id="tab-detail" role="tabpanel">
-        <table class="table table-sm table-bordered border-dark mb-4">
-            <tr>
-                <td width="180"><strong>Nomor Form</strong></td>
-                <td><?= htmlspecialchars(isset($form->nomor) ? $form->nomor : '-'); ?></td>
-            </tr>
-            <tr>
-                <td><strong>Nama Form</strong></td>
-                <td><?= htmlspecialchars(isset($form->name) ? $form->name : '-'); ?></td>
-            </tr>
-            <tr>
-                <td><strong>Departemen</strong></td>
-                <td><?= htmlspecialchars(isset($form->departement_name) ? $form->departement_name : '-'); ?></td>
-            </tr>
-            <tr>
-                <td><strong>PIC Reviewer</strong></td>
-                <td><?= htmlspecialchars(isset($form->reviewer_position_name) ? $form->reviewer_position_name : '-'); ?></td>
-            </tr>
-            <tr>
-                <td><strong>PIC Approver</strong></td>
-                <td><?= htmlspecialchars(isset($form->approver_position_name) ? $form->approver_position_name : '-'); ?></td>
-            </tr>
-            <tr>
-                <td><strong>Status</strong></td>
-                <td><?= isset($sts[$form->status]) ? $sts[$form->status] : htmlspecialchars($form->status); ?></td>
-            </tr>
-        </table>
-    </div>
-
-    <!-- TAB: Riwayat Status -->
-    <div class="tab-pane fade" id="tab-history" role="tabpanel">
-        <?php if (!empty($history)) : ?>
-            <div class="timeline timeline-5">
-                <div class="timeline-items">
-                    <?php foreach ($history as $log) : ?>
-                        <div class="timeline-item">
-                            <div class="timeline-media <?= ($log->new_status === 'APV' || $log->new_status === 'PUB') ? 'bg-light-success' : 'bg-light-danger'; ?>">
-                                <span class="<?= ($log->new_status === 'APV' || $log->new_status === 'PUB') ? 'fa fa-check text-success' : 'fa fa-circle text-danger'; ?>"></span>
-                            </div>
-                            <div class="timeline-desc timeline-desc-light-primary mb-5">
-                                <span class="font-weight-bolder text-primary"><?= htmlspecialchars($log->action_at); ?></span>
-                                <p class="mb-1">
-                                    Status:
-                                    <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars(isset($log->old_status) ? $log->old_status : '-'); ?>
-                                    <i class="fa fa-arrow-right mx-1"></i>
-                                    <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars(isset($log->new_status) ? $log->new_status : '-'); ?>
-                                </p>
-                                <p class="mb-1">
-                                    Oleh: <strong><?= isset($ArrUsers[$log->action_by]) ? htmlspecialchars(isset($ArrUsers[$log->action_by]->full_name) ? $ArrUsers[$log->action_by]->full_name : $ArrUsers[$log->action_by]->username) : 'User #' . $log->action_by; ?></strong>
-                                </p>
-                                <?php if (!empty($log->note)) : ?>
-                                    <p class="mb-0 text-muted">Catatan: <?= htmlspecialchars($log->note); ?></p>
-                                <?php endif; ?>
-                            </div>
+                    <?php if ($file_ext === '.pdf' || $file_ext === 'pdf') : ?>
+                        <!-- PDF Preview -->
+                        <iframe src="<?= $file_path; ?>#toolbar=0"
+                            style="width: 100%; height: 600px; border: none;"
+                            frameborder="0">
+                            <p>Browser Anda tidak mendukung preview PDF.
+                                <a href="<?= $file_path; ?>" target="_blank">Klik di sini untuk download</a>
+                            </p>
+                        </iframe>
+                    <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
+                        <!-- Excel Preview -->
+                        <div class="p-5 text-center">
+                            <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
+                            <h4>Excel Document</h4>
+                            <p class=""><?= htmlspecialchars($form->file_name); ?></p>
+                            <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
+                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-success">
+                                <i class="fa fa-download"></i> Download Excel File
+                            </a>
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
