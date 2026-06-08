@@ -302,6 +302,11 @@ class Work_instruction_model extends BF_Model
       if (!$work_instruction) {
         throw new Exception('Work instruction tidak ditemukan.');
       }
+
+      if (empty($work_instruction->reviewer_position_id) || empty($work_instruction->approver_position_id)) {
+        throw new Exception('Harap mengisi data PIC Reviewer dan PIC Approver terlebih dahulu sebelum mengajukan review.');
+      }
+
       $old_status = $work_instruction->status;
 
       // Step 3: Begin database transaction
@@ -418,6 +423,10 @@ class Work_instruction_model extends BF_Model
       $work_instruction = $this->db->get_where('work_instructions', array('id' => $id))->row();
       if (!$work_instruction) {
         throw new Exception('Work instruction tidak ditemukan.');
+      }
+
+      if (empty($work_instruction->reviewer_position_id) || empty($work_instruction->approver_position_id)) {
+        throw new Exception('Harap mengisi data PIC Reviewer dan PIC Approver terlebih dahulu sebelum mengajukan review.');
       }
 
       if ($work_instruction->status !== 'COR') {
