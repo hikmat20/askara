@@ -57,6 +57,11 @@
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center" style="vertical-align: middle;">
+                                        <button type="button" class="btn btn-info btn-icon rounded-circle view btn-xs shadow-sm btn-open-modal"
+                                                data-id="<?= $wi->id; ?>" data-type="view"
+                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
+                                                <i class="fa fa-eye"></i> 
+                                            </button>
                                         <?php if ($wi->status === 'REV'): ?>
                                             <?php if ($can): ?>
                                                 <button type="button" class="btn btn-sm btn-light-warning btn-open-modal"
@@ -102,12 +107,21 @@
                                             <?php endif; ?>
 
                                         <?php elseif ($wi->status === 'PUB'): ?>
-                                            <button type="button" class="btn btn-sm btn-light-primary btn-open-modal"
-                                                data-id="<?= $wi->id; ?>" data-type="view"
-                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
-                                                <i class="fa fa-eye"></i> View
+                                            
+                                            <button type="button" class="btn btn-warning btn-icon rounded-circle btn-xs shadow-sm btn-open-modal"
+                                                data-id="<?= $wi->id; ?>" data-type="revision"
+                                                data-title="Revision Work Instruction — <?= htmlspecialchars(isset($wi->name) ? $wi->name : ''); ?>"
+                                                title="Request Revision">
+                                                <i class="far fa-edit"></i> 
                                             </button>
-
+                                            <?php if (!empty($ArrPosts) && in_array(1, $ArrPosts)): ?>
+                                                <button type="button" class="btn btn-danger btn-icon rounded-circle btn-xs shadow-sm btn-open-modal"
+                                                    data-id="<?= $wi->id; ?>" data-type="deletion"
+                                                    data-title="Deletion Work Instruction — <?= htmlspecialchars(isset($wi->name) ? $wi->name : ''); ?>"
+                                                    title="Request Deletion">
+                                                    <i class="fa fa-trash-alt"></i> 
+                                                </button>
+                                            <?php endif; ?>
                                         <?php else: ?>
                                             <span class="text-muted">—</span>
                                         <?php endif; ?>
@@ -153,9 +167,11 @@
         var monitoringUrl = '<?= base_url('monitoring'); ?>';
         var urlReview = monitoringUrl + '/load_wi_review_modal/';
         var urlApproval = monitoringUrl + '/load_wi_approval_modal/';
+        var urlRevision = monitoringUrl + '/load_wi_revision_modal/';
+        var urlDeletion = monitoringUrl + '/load_wi_deletion_modal/';
         var urlView = baseUrl + '/view_modal/';
 
-        // Tombol buka modal (REV / APV / VIEW)
+        // Tombol buka modal (REV / APV / VIEW / REVISION / DELETION)
         $(document).on('click', '.btn-open-modal', function () {
             var id = $(this).data('id');
             var type = $(this).data('type');
@@ -164,6 +180,8 @@
 
             if (type === 'review') url = urlReview + id;
             else if (type === 'approval') url = urlApproval + id;
+            else if (type === 'revision') url = urlRevision + id;
+            else if (type === 'deletion') url = urlDeletion + id;
             else if (type === 'view') url = urlView + id;
 
             $('#modalWIActionLabel').text(title);
