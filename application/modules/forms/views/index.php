@@ -243,7 +243,14 @@
 										foreach ($dataPublished as $pub) : $n++; ?>
 											<tr>
 												<td><?= $n; ?></td>
-												<td><?= $pub->name; ?></td>
+												<td>
+													<?= $pub->name; ?>
+													<?php if (isset($pub->is_under_revision) && $pub->is_under_revision == 1) : ?>
+														<span class="badge badge-warning ml-2 py-1 px-2" data-toggle="tooltip" title="Under Revision">
+															<i class="fa fa-sync-alt fa-spin text-dark mr-1"></i>Under Revision
+														</span>
+													<?php endif; ?>
+												</td>
 												<td><?= $pub->number; ?></td>
 												<td><?= $pub->procedure_name; ?></td>
 												<td class="text-center"><?= $pub->issue_date; ?></td>

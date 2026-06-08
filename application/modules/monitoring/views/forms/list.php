@@ -94,15 +94,15 @@
                                             <?php endif; ?>
 
                                         <?php elseif ($form->status === 'PUB') : ?>
-                                            <?php if (!empty($ArrPosts) && in_array($form->approver_position_id, $ArrPosts)) : ?>
-                                                <button type="button"
-                                                    class="btn btn-sm btn-light-warning btn-open-modal"
-                                                    data-id="<?= $form->id; ?>"
-                                                    data-type="revision"
-                                                    data-title="Revision Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
-                                                    title="Request Revision">
-                                                    <i class="far fa-edit"></i> Revision
-                                                </button>
+                                            <button type="button"
+                                            class="btn btn-sm btn-light-warning btn-open-modal"
+                                            data-id="<?= $form->id; ?>"
+                                            data-type="revision"
+                                            data-title="Revision Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
+                                            title="Request Revision">
+                                            <i class="far fa-edit"></i> Revision
+                                        </button>
+                                        <?php if (!empty($ArrPosts) && in_array(1, $ArrPosts)) : ?>
                                                 <button type="button"
                                                     class="btn btn-sm btn-light-danger btn-open-modal"
                                                     data-id="<?= $form->id; ?>"

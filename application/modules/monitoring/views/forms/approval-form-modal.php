@@ -169,6 +169,9 @@
                             <span class="form-text  mb-2">Set published date</span>
                             <input type="date" name="published_date" disabled id="published_date" class="form-control" />
                             <span class="invalid-feedback text-danger d-none" id="invalid-published-date">Published date is required</span>
+
+                            <span class="form-text mt-2 mb-2">Revision Description (Change Log)</span>
+                            <textarea name="revision_description" disabled id="revision_description" rows="3" class="form-control" placeholder="Write version change log..."></textarea>
                         </div>
                     </div>
 
@@ -243,11 +246,13 @@
     $(document).on('change', '#form-approval-form input[name="status"]', function () {
         if ($(this).val() == 'PUB') {
             $('#published_date').prop('disabled', false);
+            $('#revision_description').prop('disabled', false);
             $('#note').prop('disabled', true).val('');
             $('#invalid-published-date').addClass('d-none');
             $('#invalid-note').addClass('d-none');
         } else {
             $('#published_date').prop('disabled', true).val('');
+            $('#revision_description').prop('disabled', true).val('');
             $('#note').prop('disabled', false);
             $('#invalid-published-date').addClass('d-none');
             $('#invalid-note').addClass('d-none');
@@ -261,6 +266,7 @@
         var status        = $('input[name="status"]:checked').val();
         var note          = $('#note').val().trim();
         var publishedDate = $('#published_date').val().trim();
+        var revisionDesc  = $('#revision_description').val().trim();
         var valid         = true;
 
         if (!status) {
@@ -285,7 +291,7 @@
         $.ajax({
             url:      '<?= base_url($this->uri->segment(1) . '/save_approval_form'); ?>',
             type:     'POST',
-            data:     { id: $('#form_id').val(), status: status, note: note, published_date: publishedDate },
+            data:     { id: $('#form_id').val(), status: status, note: note, published_date: publishedDate, revision_description: revisionDesc },
             dataType: 'json',
             success: function (res) {
                 if (res.status == 1) {
