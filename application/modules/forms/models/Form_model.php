@@ -234,6 +234,11 @@ class Form_model extends BF_Model
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
       }
+
+      if (empty($form->reviewer_position_id) || empty($form->approver_position_id)) {
+        throw new Exception('Harap mengisi data PIC Reviewer dan PIC Approver terlebih dahulu sebelum mengajukan review.');
+      }
+
       $old_status = $form->status;
 
       $this->db->trans_begin();
@@ -304,6 +309,10 @@ class Form_model extends BF_Model
       $form = $this->db->get_where('forms', array('id' => $id))->row();
       if (!$form) {
         throw new Exception('Form tidak ditemukan.');
+      }
+
+      if (empty($form->reviewer_position_id) || empty($form->approver_position_id)) {
+        throw new Exception('Harap mengisi data PIC Reviewer dan PIC Approver terlebih dahulu sebelum mengajukan review.');
       }
       
       if ($form->status !== 'COR') {
