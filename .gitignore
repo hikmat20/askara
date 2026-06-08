@@ -20,3 +20,6 @@ composer.lock
 assets/logo/
 .kiro/
 tests/
+document-version-control
+assets/images/dashboard/
+*sql/

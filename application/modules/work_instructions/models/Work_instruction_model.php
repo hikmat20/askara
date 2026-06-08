@@ -313,6 +313,9 @@ class Work_instruction_model extends BF_Model
       // Step 5: Insert status log with transition DFT→REV
       $this->_insertStatusLog($id, $old_status, 'REV');
 
+      // Trigger email notification
+      $this->_send_email_notification($id, 'REV');
+
       // Step 6: Commit transaction or rollback if failed
       if ($this->db->trans_status() === FALSE) {
         $this->db->trans_rollback();
@@ -437,6 +440,9 @@ class Work_instruction_model extends BF_Model
       // Step 6: Insert status log with transition COR→REV
       $this->_insertStatusLog($id, $old_status, 'REV');
 
+      // Trigger email notification
+      $this->_send_email_notification($id, 'REV');
+
       // Step 7: Commit transaction or rollback if failed
       if ($this->db->trans_status() === FALSE) {
         $this->db->trans_rollback();
@@ -514,6 +520,9 @@ class Work_instruction_model extends BF_Model
 
       // Step 8: Call _insertStatusLog() with appropriate transition
       $this->_insertStatusLog($data['id'], $old_status, $data['status'], $note);
+
+      // Trigger email notification
+      $this->_send_email_notification($data['id'], $data['status'], $note);
 
       // Step 9: Commit transaction or rollback if failed
       if ($this->db->trans_status() === FALSE) {
@@ -624,6 +633,9 @@ class Work_instruction_model extends BF_Model
       $note = ($data['status'] === 'COR') ? trim($data['note']) : null;
       $this->_insertStatusLog($data['id'], $old_status, $data['status'], $note);
 
+      // Trigger email notification
+      $this->_send_email_notification($data['id'], $data['status'], $note);
+
       // Step 13: Commit transaction or rollback if failed
       if ($this->db->trans_status() === FALSE) {
         $this->db->trans_rollback();
@@ -697,6 +709,9 @@ class Work_instruction_model extends BF_Model
       // Step 6: Insert status log with note
       $log_note = $note ? $note : 'Request revision';
       $this->_insertStatusLog($id, $old_status, 'RVI', $log_note);
+
+      // Trigger email notification
+      $this->_send_email_notification($id, 'RVI', $log_note);
 
       // Step 7: Commit transaction or rollback if failed
       if ($this->db->trans_status() === FALSE) {
@@ -983,4 +998,100 @@ class Work_instruction_model extends BF_Model
       }
       return $Return;
     }
+
+  /**
+   * Mengirim notifikasi email sesuai perubahan status (Workflow)
+   */
+  private function _send_email_notification($work_instruction_id, $new_status, $note = '')
+  {
+      $work_instruction = $this->db->get_where('work_instructions', ['id' => $work_instruction_id])->row();
+      if (!$work_instruction) return;
+
+      // Tentukan target *position_id* dan *user_id* berdasarkan status baru
+      $target_position_ids = [];
+      $target_user_ids = [];
+      
+      $subject_prefix = "[ISO-Platform] ";
+      $message = "<h3>Notifikasi Dokumen Kontrol</h3>";
+      $message .= "<p>Dokumen work instruction <strong>" . $work_instruction->name . " (" . $work_instruction->number . ")</strong> mengalami pembaruan status.</p>";
+      
+      switch ($new_status) {
+          case 'REV':
+              $target_position_ids[] = $work_instruction->reviewer_position_id;
+              $subject = $subject_prefix . "Membutuhkan Review Anda";
+              $message .= "<p>Dokumen telah diajukan kepada Anda untuk proses <strong>Review</strong>. Harap segera diperiksa.</p>";
+              break;
+          case 'COR':
+              $target_user_ids[] = $work_instruction->created_by;
+              if ($work_instruction->reviewer_position_id) $target_position_ids[] = $work_instruction->reviewer_position_id;
+              $subject = $subject_prefix . "Dokumen Membutuhkan Koreksi";
+              $message .= "<p>Dokumen Anda dikembalikan karena membutuhkan <strong>Koreksi</strong>.</p>";
+              break;
+          case 'APV':
+              $target_position_ids[] = $work_instruction->approver_position_id;
+              $subject = $subject_prefix . "Membutuhkan Approval Anda";
+              $message .= "<p>Dokumen telah lolos review dan kini menunggu tahapan akhir <strong>Approval</strong> dari Anda.</p>";
+              break;
+          case 'PUB':
+              $target_user_ids[] = $work_instruction->created_by;
+              $target_position_ids[] = $work_instruction->reviewer_position_id;
+              $target_position_ids[] = $work_instruction->approver_position_id;
+              $subject = $subject_prefix . "Dokumen Telah Rilis (Published)";
+              $message .= "<p>Dokumen telah disetujui secara keseluruhan dan resmi berstatus <strong>Published / Rilis</strong>.</p>";
+              break;
+          case 'RVI':
+              $target_user_ids[] = $work_instruction->created_by;
+              if ($work_instruction->reviewer_position_id) $target_position_ids[] = $work_instruction->reviewer_position_id;
+              $subject = $subject_prefix . "Pengajuan Revisi Dokumen";
+              $message .= "<p>Terdapat pengajuan <strong>Revisi</strong> pada dokumen ini.</p>";
+              break;
+          default:
+              return;
+      }
+
+      if (!empty($note) && $note !== '~') {
+          $message .= "<br><p><strong>Catatan Tambahan:</strong><br><i>\"" . $note . "\"</i></p>";
+      }
+      $message .= "<br><p>Silakan login ke aplikasi untuk melihat detail dokumen ini.</p>";
+
+      // Konversi Position_ID menjadi User_ID jika ada target berupa position
+      $target_position_ids = array_unique(array_filter($target_position_ids));
+      if (!empty($target_position_ids)) {
+          $this->db->where_in('id', $target_position_ids);
+          $positions = $this->db->get('positions')->result();
+          foreach ($positions as $pos) {
+              if ($pos->assign_user) {
+                  $target_user_ids[] = $pos->assign_user; // Kumpulkan assign_user (user_id asli)
+              }
+          }
+      }
+
+      $target_user_ids = array_unique(array_filter($target_user_ids)); 
+      if (empty($target_user_ids)) return;
+
+      // Ambil email user
+      $this->db->where_in('id_user', $target_user_ids);
+      $users = $this->db->get('users')->result();
+
+      $emails = [];
+      foreach ($users as $u) {
+          if (!empty($u->email)) {
+              $emails[] = $u->email;
+          }
+      }
+
+      // Masukkan antrean (ke Cron / email_queues)
+      if (!empty($emails)) {
+          $this->load->library('email_runner');
+
+          // Tentukan link spesifik berdasarkan status
+          $action = 'view';
+          if ($new_status == 'REV') $action = 'review';
+          if ($new_status == 'APV') $action = 'approval';
+          
+          $action_url = base_url('monitoring/' . $action);
+          
+          $this->email_runner->queue($emails, $subject, $message, null, $action_url);
+      }
+  }
 }

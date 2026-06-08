@@ -87,28 +87,60 @@ class Forms extends Admin_Controller
 
 	public function view($id = '')
 	{
-		// $this->load->library('OnlyOfficeJWT');
+		$dataForm = $this->FormModel->find_data('view_forms', $id, 'id');
 
-		$result = $this->FormModel->find_data('view_forms', $id, 'id');
-		// $file_path = 'http://192.168.2.127:8080/askara/directory/FORMS/1/' . $result->file_name;
+		if (!$dataForm || $dataForm->company_id != $this->company) {
+			show_error('Anda tidak memiliki akses ke data ini.', 403);
+			return;
+		}
 
-		// $payload = [
-		// 	"document" => [
-		// 		"fileType" => "xlsx",
-		// 		"key" => $result->file_name,
-		// 		"title" => $result->file_name,
-		// 		"url" => $file_path
-		// 	],
-		// 	"documentType" => "cell",
-		// 	"editorConfig" => [
-		// 		"mode" => "view"
-		// 	]
-		// ];
+		// VERSION CONTROL: Get dynamic current version to display
+		$display_form = $this->FormModel->getCurrentVersion($id);
+		
+		// Get version history
+		$version_history = $this->FormModel->getVersionHistory($id);
 
-		// $token           = $this->onlyofficejwt->generate($payload);
-		// $data['payload'] = $payload;
-		// // $data['token']   = $token;
-		$this->template->render('view', $result);
+		// Get status logs
+		$this->db->select('fsl.*, u.full_name as action_by_name');
+		$this->db->from('form_status_logs fsl');
+		$this->db->join('users u', 'fsl.action_by = u.id_user', 'left');
+		$this->db->where('fsl.form_id', $id);
+		$this->db->order_by('fsl.action_at', 'ASC');
+		$status_logs = $this->db->get()->result();
+
+		// Fetch names for reviewed_by and approved_by
+		$reviewed_by_name = '-';
+		if ($dataForm->reviewed_by) {
+			$rev_user = $this->db->get_where('users', ['id_user' => $dataForm->reviewed_by])->row();
+			if ($rev_user) $reviewed_by_name = $rev_user->full_name;
+		}
+		
+		$approved_by_name = '-';
+		if ($dataForm->approved_by) {
+			$apv_user = $this->db->get_where('users', ['id_user' => $dataForm->approved_by])->row();
+			if ($apv_user) $approved_by_name = $apv_user->full_name;
+		}
+
+		$sts = [
+			'DFT' => '<span class="badge badge-light">Draft</span>',
+			'COR' => '<span class="badge badge-warning">Correction</span>',
+			'REV' => '<span class="badge badge-info">Review</span>',
+			'APV' => '<span class="badge badge-success">Approval</span>',
+			'RVI' => '<span class="badge badge-danger">Revision</span>',
+			'PUB' => '<span class="badge badge-primary">Published</span>',
+			'HLD' => '<span class="badge badge-warning">On Hold</span>',
+			'DEL' => '<span class="badge badge-secondary">Deleted</span>',
+		];
+
+		$this->template->render('view', compact(
+			'dataForm',
+			'display_form',
+			'version_history',
+			'status_logs',
+			'reviewed_by_name',
+			'approved_by_name',
+			'sts'
+		));
 	}
 
 	private function _validation()
@@ -320,5 +352,109 @@ class Forms extends Admin_Controller
 		$id = $this->input->post('id');
 		$Return = $this->FormModel->deleteData($id);
 		echo json_encode($Return);
+	}
+
+	/**
+	 * View specific version of form
+	 * 
+	 * URL: forms/view_version/{id}/{version}
+	 */
+	public function view_version($id = null, $version = null)
+	{
+		if ($id === null || $version === null) {
+			show_404();
+			return;
+		}
+
+		if (!$this->_checkCompanyIsolation($id)) {
+			$this->output->set_status_header(403);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'Access Denied: You do not have permission to access this document.'
+			]);
+			return;
+		}
+
+		$version_data = $this->FormModel->getVersionByNumber($id, $version);
+
+		if (!$version_data) {
+			$this->output->set_status_header(404);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'Version not found: The requested version does not exist.'
+			]);
+			return;
+		}
+
+		$file_path = FCPATH . $version_data->file_path;
+		if (!file_exists($file_path)) {
+			$this->output->set_status_header(404);
+			log_message('error', 'Version file not found: ' . $version_data->file_path . ' for form_id: ' . $id . ', version: ' . $version);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'File not found: The document file may have been deleted or moved.'
+			]);
+			return;
+		}
+
+		$this->load->view('version_modal', ['version' => $version_data]);
+	}
+
+	/**
+	 * Download specific version of form
+	 * 
+	 * URL: forms/download_version/{id}/{version}
+	 */
+	public function download_version($id = null, $version = null)
+	{
+		if ($id === null || $version === null) {
+			show_404();
+			return;
+		}
+
+		if (!$this->_checkCompanyIsolation($id)) {
+			$this->output->set_status_header(403);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'Access Denied: You do not have permission to access this document.'
+			]);
+			return;
+		}
+
+		$version_data = $this->FormModel->getVersionByNumber($id, $version);
+
+		if (!$version_data) {
+			$this->output->set_status_header(404);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'Version not found: The requested version does not exist.'
+			]);
+			return;
+		}
+
+		$file_path = FCPATH . $version_data->file_path;
+
+		if (!file_exists($file_path)) {
+			$this->output->set_status_header(404);
+			log_message('error', 'Version file not found: ' . $version_data->file_path . ' for form_id: ' . $id . ', version: ' . $version);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'File not found: The document file may have been deleted or moved.'
+			]);
+			return;
+		}
+
+		$this->load->helper('download');
+		$file_data = file_get_contents($file_path);
+		force_download($version_data->file_name, $file_data);
+	}
+
+	private function _checkCompanyIsolation($form_id)
+	{
+		$form = $this->db->get_where('forms', ['id' => $form_id])->row();
+		if (!$form) {
+			return false;
+		}
+		return ($form->company_id == $this->company);
 	}
 }

@@ -52,8 +52,12 @@
                                     </div>
                                     <span class="form-text text-muted pl-7">Form akan dipublikasikan. Wajib mengisi tanggal terbit.</span>
                                     <div class="pl-7 mt-2" id="published-date-wrapper" style="display:none;">
+                                        <label class="col-form-label font-weight-bold">Tanggal Terbit</label>
                                         <input type="date" name="published_date" id="published_date" class="form-control" style="max-width:220px;" />
                                         <span id="invalid-published-date" class="d-none text-danger">Tanggal terbit wajib diisi jika aksi adalah Setujui &amp; Publish.</span>
+
+                                        <label class="col-form-label font-weight-bold mt-2 d-block">Revision Description (Change Log)</label>
+                                        <textarea name="revision_description" id="revision_description" rows="3" class="form-control" placeholder="Write version change log..."></textarea>
                                     </div>
                                 </div>
 
@@ -152,6 +156,7 @@
 (function () {
     var publishedDateWrapper = document.getElementById('published-date-wrapper');
     var noteEl               = document.getElementById('note');
+    var revisionDescEl       = document.getElementById('revision_description');
 
     document.querySelectorAll('input[name="status"]').forEach(function (radio) {
         radio.addEventListener('change', function () {
@@ -162,12 +167,17 @@
                 noteEl.disabled = true;
                 noteEl.value = '';
                 document.getElementById('invalid-note').classList.add('d-none');
+                if (revisionDescEl) revisionDescEl.disabled = false;
             } else if (this.value === 'COR') {
                 publishedDateWrapper.style.display = 'none';
                 document.getElementById('published_date').value = '';
                 document.getElementById('invalid-published-date').classList.add('d-none');
                 noteEl.disabled = false;
                 noteEl.focus();
+                if (revisionDescEl) {
+                    revisionDescEl.disabled = true;
+                    revisionDescEl.value = '';
+                }
             }
         });
     });
@@ -176,6 +186,7 @@
         var status         = document.querySelector('input[name="status"]:checked');
         var note           = noteEl.value.trim();
         var publishedDate  = document.getElementById('published_date').value.trim();
+        var revisionDesc   = revisionDescEl ? revisionDescEl.value.trim() : '';
         var valid          = true;
 
         if (!status) {
@@ -196,10 +207,11 @@
         if (!valid) return;
 
         var formData = {
-            id:             document.getElementById('form_id').value,
-            status:         status.value,
-            note:           note,
-            published_date: publishedDate
+            id:                   document.getElementById('form_id').value,
+            status:               status.value,
+            note:                 note,
+            published_date:       publishedDate,
+            revision_description: revisionDesc
         };
 
         $.ajax({
