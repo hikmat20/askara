@@ -16,8 +16,7 @@
                         <h6 class="card-title text-center px-4">
                             <a href="<?= base_url($this->uri->segment(1) . "/review"); ?>" class="text-hover-primary"
                                 title="REVIEW DOCUMENTS">
-                                <span class="card-label text-dark text-center font-weight-bolder">REVIEW
-                                    DOCUMENTS</span>
+                                <span class="card-label text-dark text-center font-weight-bolder">REVIEW DOCUMENTS</span>
                             </a>
                         </h6>
                     </div>
@@ -33,8 +32,7 @@
                         <h6 class="card-title text-center px-4">
                             <a href="<?= base_url($this->uri->segment(1) . "/correction"); ?>"
                                 class="text-hover-primary" title="CORRECTION DOCUMENTS">
-                                <span class="card-label text-dark text-center font-weight-bolder">CORRECTION
-                                    DOCUMENTS</span>
+                                <span class="card-label text-dark text-center font-weight-bolder">CORRECTION DOCUMENTS</span>
                             </a>
                         </h6>
                     </div>
@@ -50,8 +48,7 @@
                         <h6 class="card-title text-center px-4">
                             <a href="<?= base_url($this->uri->segment(1) . "/approval"); ?>" class="text-hover-primary"
                                 title="APPROVAL DOCUMENTS">
-                                <span class="card-label text-dark text-center font-weight-bolder">APPROVAL
-                                    DOCUMENTS</span>
+                                <span class="card-label text-dark text-center font-weight-bolder">APPROVAL DOCUMENTS</span>
                             </a>
                         </h6>
                     </div>
@@ -67,8 +64,7 @@
                         <h6 class="card-title text-center px-4">
                             <a href="<?= base_url($this->uri->segment(1) . "/revision"); ?>" class="text-hover-primary"
                                 title="REVISION DOCUMENT">
-                                <span class="card-label text-dark text-center font-weight-bolder">REVISION
-                                    DOCUMENTS</span>
+                                <span class="card-label text-dark text-center font-weight-bolder">REVISION DOCUMENTS</span>
                             </a>
                         </h6>
                     </div>
@@ -84,8 +80,7 @@
                         <h6 class="card-title text-center px-4">
                             <a href="<?= base_url($this->uri->segment(1) . "/publised"); ?>" class="text-hover-primary"
                                 title="PUBLISH DOCUMENT">
-                                <span class="card-label text-dark text-center font-weight-bolder">PUBLISH
-                                    DOCUMENTS</span>
+                                <span class="card-label text-dark text-center font-weight-bolder">PUBLISH DOCUMENTS</span>
                             </a>
                         </h6>
                     </div>
