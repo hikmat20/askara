@@ -42,6 +42,11 @@
                                         <?= isset($sts[$form->status]) ? $sts[$form->status] : htmlspecialchars($form->status); ?>
                                     </td>
                                     <td class="text-center" style="vertical-align: middle;">
+                                        <button type="button" class="btn btn-info btn-icon rounded-circle btn-xs shadow-sm btn-open-modal"
+                                                data-id="<?= $form->id; ?>" data-type="view"
+                                            data-title="View Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>">
+                                            <i class="fa fa-eye"></i>
+                                        </button>
                                         <?php if ($form->status === 'REV') : ?>
                                             <?php if ($can) : ?>
                                                 <button type="button"
@@ -95,21 +100,21 @@
 
                                         <?php elseif ($form->status === 'PUB') : ?>
                                             <button type="button"
-                                            class="btn btn-sm btn-light-warning btn-open-modal"
+                                            class="btn btn-warning btn-icon rounded-circle btn-xs shadow-sm btn-open-modal"
                                             data-id="<?= $form->id; ?>"
                                             data-type="revision"
                                             data-title="Revision Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
                                             title="Request Revision">
-                                            <i class="far fa-edit"></i> Revision
+                                            <i class="far fa-edit"></i> 
                                         </button>
                                         <?php if (!empty($ArrPosts) && in_array(1, $ArrPosts)) : ?>
                                                 <button type="button"
-                                                    class="btn btn-sm btn-light-danger btn-open-modal"
+                                                    class="btn btn-danger btn-icon rounded-circle btn-xs shadow-sm btn-open-modal"
                                                     data-id="<?= $form->id; ?>"
                                                     data-type="deletion"
                                                         data-title="Deletion Form — <?= htmlspecialchars(isset($form->name) ? $form->name : ''); ?>"
                                                         title="Request Deletion">
-                                                        <i class="fa fa-trash-alt"></i> Deletion
+                                                        <i class="fa fa-trash-alt"></i> 
                                                     </button>
                                             <?php endif; ?>
                                         <?php endif; ?>
@@ -155,8 +160,9 @@
     var urlApproval = baseUrl + '/load_form_approval_form/';
     var urlRevision = baseUrl + '/load_form_revision_form/';
     var urlDeletion = baseUrl + '/load_form_deletion_form/';
+    var urlView     = baseUrl + '/load_form_view_modal/';
 
-    // Tombol buka modal (REV / APV / revision / deletion)
+    // Tombol buka modal (REV / APV / revision / deletion / view)
     $(document).on('click', '.btn-open-modal', function () {
         var id    = $(this).data('id');
         var type  = $(this).data('type');
@@ -167,6 +173,7 @@
         else if (type === 'approval') url = urlApproval + id;
         else if (type === 'revision') url = urlRevision + id;
         else if (type === 'deletion') url = urlDeletion + id;
+        else if (type === 'view')     url = urlView     + id;
 
         $('#modalFormActionLabel').text(title);
         $('#modalFormActionBody').html(

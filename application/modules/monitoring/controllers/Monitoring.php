@@ -1285,11 +1285,11 @@ class Monitoring extends Admin_Controller
 			return;
 		}
 
-		if (!in_array(1, $this->ArrPosts)) {
-			$this->output->set_status_header(403);
-			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan revisi.']);
-			return;
-		}
+		// if (!in_array(1, $this->ArrPosts)) {
+		// 	$this->output->set_status_header(403);
+		// 	echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan revisi.']);
+		// 	return;
+		// }
 
 		$this->load->view('monitoring/forms/revision-form-modal', ['form' => $form]);
 	}
@@ -1351,6 +1351,70 @@ class Monitoring extends Admin_Controller
 		}
 
 		$this->load->view('monitoring/forms/deletion-form-modal', ['form' => $form]);
+	}
+
+	public function load_form_view_modal($id)
+	{
+		$form = $this->db->get_where('view_forms', ['id' => $id, 'company_id' => $this->company])->row();
+		
+		if (!$form) {
+			$this->output->set_status_header(404);
+			echo json_encode(['status' => 0, 'msg' => 'Form tidak ditemukan atau Anda tidak memiliki akses.']);
+			return;
+		}
+
+		// Get procedure name
+		if (!empty($form->procedure_id)) {
+			$procedure = $this->db->get_where('procedures', ['id' => $form->procedure_id])->row();
+			$form->procedure_name = $procedure ? $procedure->name : null;
+		}
+
+		// Get status logs
+		$this->db->select('fsl.*, u.full_name as action_by_name');
+		$this->db->from('form_status_logs fsl');
+		$this->db->join('users u', 'u.id_user = fsl.action_by', 'left');
+		$this->db->where('fsl.form_id', $id);
+		$this->db->order_by('fsl.action_at', 'DESC');
+		$status_logs = $this->db->get()->result();
+
+		// Get reviewed_by and approved_by user names
+		if (!empty($form->reviewed_by)) {
+			$reviewed_user = $this->db->get_where('users', ['id_user' => $form->reviewed_by])->row();
+			$form->reviewed_by_name = $reviewed_user ? $reviewed_user->full_name : null;
+		}
+
+		if (!empty($form->approved_by)) {
+			$approved_user = $this->db->get_where('users', ['id_user' => $form->approved_by])->row();
+			$form->approved_by_name = $approved_user ? $approved_user->full_name : null;
+		}
+
+		// VERSION CONTROL: Get version history
+		$version_history = $this->FormModel->getVersionHistory($id);
+
+		// VERSION CONTROL: Get current version to display (handles under revision scenario)
+		$current_version = $this->FormModel->getCurrentVersion($id);
+		
+		// If under revision, use file from version history
+		if ($current_version && isset($current_version->is_from_history) && $current_version->is_from_history) {
+			$form->display_file_name = $current_version->file_name;
+			$form->display_file_path = $current_version->file_path;
+			$form->display_ext = $current_version->ext;
+			$form->display_size = isset($current_version->size) ? $current_version->size : null;
+			$form->showing_old_version = true;
+		} else {
+			$form->display_file_name = isset($form->file_name) ? $form->file_name : null;
+			$form->display_file_path = isset($form->file_path) ? $form->file_path : null;
+			$form->display_ext = isset($form->ext) ? $form->ext : null;
+			$form->display_size = isset($form->size) ? $form->size : null;
+			$form->showing_old_version = false;
+		}
+
+		$this->load->view('monitoring/forms/view-form-modal', [
+			'form' => $form,
+			'status_logs' => $status_logs,
+			'version_history' => $version_history,
+			'sts' => $this->sts,
+		]);
 	}
 
 	public function save_form_deletion()
@@ -1726,5 +1790,37 @@ class Monitoring extends Admin_Controller
 			'wi' => $wi,
 			'sts' => $this->sts,
 		]);
+	}
+
+	public function load_wi_revision_modal($id)
+	{
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $id, 'company_id' => $this->company])->row();
+
+		if (!$wi || $wi->status !== 'PUB') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau work instruction tidak dalam status Published.']);
+			return;
+		}
+
+		$this->load->view('monitoring/work_instructions/revision_modal', ['wi' => $wi]);
+	}
+
+	public function load_wi_deletion_modal($id)
+	{
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $id, 'company_id' => $this->company])->row();
+
+		if (!$wi || $wi->status !== 'PUB') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau work instruction tidak dalam status Published.']);
+			return;
+		}
+
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan penghapusan.']);
+			return;
+		}
+
+		$this->load->view('monitoring/work_instructions/deletion_modal', ['wi' => $wi]);
 	}
 }
