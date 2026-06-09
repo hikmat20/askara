@@ -13,60 +13,58 @@
                 </h5>
             </div>
             <div class="card-body p-0">
-                <?php if (!empty($form->display_file_name)) : ?>
+                <?php if (!empty($form->file_name)): ?>
                     <?php
-                    $file_path = base_url($form->display_file_path ? $form->display_file_path : 'directory/FORMS/1/' . $form->display_file_name);
-                    $file_ext = strtolower($form->display_ext ? $form->display_ext : pathinfo($form->display_file_name, PATHINFO_EXTENSION));
+                    $file_path = base_url('directory/FORMS/1/' . $form->file_name);
+                    $file_ext = strtolower($form->ext ? $form->ext : pathinfo($form->file_name, PATHINFO_EXTENSION));
                     ?>
-
-                    <?php if ($file_ext === '.pdf' || $file_ext === 'pdf') : ?>
+                
+                    <?php if ($file_ext === '.pdf' || $file_ext === 'pdf'): ?>
                         <!-- PDF Preview -->
-                        <iframe src="<?= $file_path; ?>#toolbar=0"
-                            style="width: 100%; height: 600px; border: none;"
-                            frameborder="0">
+                        <iframe src="<?= $file_path; ?>#toolbar=0" style="width: 100%; height: 600px; border: none;" frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF.
                                 <a href="<?= $file_path; ?>" target="_blank">Klik di sini untuk download</a>
                             </p>
                         </iframe>
-                    <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
+                    <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])): ?>
                         <!-- Excel Preview -->
                         <div class="p-5 text-center">
                             <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
                             <h4>Excel Document</h4>
-                            <p class=""><?= htmlspecialchars($form->display_file_name); ?></p>
-                            <p class="">Size: <?= isset($form->display_size) ? number_format($form->display_size) . ' KB' : '-'; ?></p>
+                            <p class=""><?= htmlspecialchars($form->file_name); ?></p>
+                            <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
                             <a href="<?= $file_path; ?>" target="_blank" class="btn btn-success">
                                 <i class="fa fa-download"></i> Download Excel File
                             </a>
                         </div>
-                    <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
+                    <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])): ?>
                         <!-- Word Preview -->
                         <div class="p-5 text-center">
                             <i class="fa fa-file-word fa-5x text-primary mb-3"></i>
                             <h4>Word Document</h4>
-                            <p class=""><?= htmlspecialchars($form->display_file_name); ?></p>
-                            <p class="">Size: <?= isset($form->display_size) ? number_format($form->display_size) . ' KB' : '-'; ?></p>
+                            <p class=""><?= htmlspecialchars($form->file_name); ?></p>
+                            <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
                             <a href="<?= $file_path; ?>" target="_blank" class="btn btn-primary">
                                 <i class="fa fa-download"></i> Download Word File
                             </a>
                         </div>
-                    <?php else : ?>
+                    <?php else: ?>
                         <!-- Unknown file type -->
                         <div class="p-5 text-center">
                             <i class="fa fa-file fa-5x text-secondary mb-3"></i>
                             <h4>Document File</h4>
-                            <p class=""><?= htmlspecialchars($form->display_file_name); ?></p>
-                            <p class="">Size: <?= isset($form->display_size) ? number_format($form->display_size) . ' KB' : '-'; ?></p>
+                            <p class=""><?= htmlspecialchars($form->file_name); ?></p>
+                            <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
                             <a href="<?= $file_path; ?>" target="_blank" class="btn btn-secondary">
                                 <i class="fa fa-download"></i> Download File
                             </a>
                         </div>
                     <?php endif; ?>
-                <?php else : ?>
+                <?php else: ?>
                     <div class="p-5 text-center">
                         <i class="fa fa-exclamation-triangle fa-5x text-warning mb-3"></i>
                         <h4>No Document File</h4>
-                        <p class="">Tidak ada file dokumen yang di-upload untuk Form ini.</p>
+                        <p class="">Tidak ada file dokumen yang di-upload untuk Work Instruction ini.</p>
                     </div>
                 <?php endif; ?>
             </div>

@@ -57,11 +57,7 @@
                                         <?php endif; ?>
                                     </td>
                                     <td class="text-center" style="vertical-align: middle;">
-                                        <button type="button" class="btn btn-info btn-icon rounded-circle view btn-xs shadow-sm btn-open-modal"
-                                                data-id="<?= $wi->id; ?>" data-type="view"
-                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
-                                                <i class="fa fa-eye"></i> 
-                                            </button>
+                                        
                                         <?php if ($wi->status === 'REV'): ?>
                                             <?php if ($can): ?>
                                                 <button type="button" class="btn btn-sm btn-light-warning btn-open-modal"
@@ -70,6 +66,11 @@
                                                     <i class="fa fa-edit"></i> Review
                                                 </button>
                                             <?php else: ?>
+                                                <button type="button" class="btn btn-info btn-icon rounded-circle view btn-xs shadow-sm btn-open-modal"
+                                                data-id="<?= $wi->id; ?>" data-type="view"
+                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
+                                                <i class="fa fa-eye"></i> 
+                                            </button>
                                                 <button type="button" class="btn btn-sm btn-secondary btn-no-access"
                                                     data-msg="Akses ditolak. Anda bukan PIC Reviewer yang berwenang untuk Work Instruction ini."
                                                     disabled>
@@ -84,6 +85,11 @@
                                                     <i class="fa fa-wrench"></i> Correction
                                                 </a>
                                             <?php else: ?>
+                                                <button type="button" class="btn btn-info btn-icon rounded-circle view btn-xs shadow-sm btn-open-modal"
+                                                data-id="<?= $wi->id; ?>" data-type="view"
+                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
+                                                <i class="fa fa-eye"></i> 
+                                            </button>
                                                 <button type="button" class="btn btn-sm btn-secondary btn-no-access"
                                                     data-msg="Akses ditolak. Hanya pembuat Work Instruction yang dapat mengajukan koreksi."
                                                     disabled>
@@ -99,6 +105,11 @@
                                                     <i class="fa fa-check"></i> Approval
                                                 </button>
                                             <?php else: ?>
+                                                <button type="button" class="btn btn-info btn-icon rounded-circle view btn-xs shadow-sm btn-open-modal"
+                                                data-id="<?= $wi->id; ?>" data-type="view"
+                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
+                                                <i class="fa fa-eye"></i> 
+                                            </button>
                                                 <button type="button" class="btn btn-sm btn-secondary btn-no-access"
                                                     data-msg="Akses ditolak. Anda bukan PIC Approver yang berwenang untuk Work Instruction ini."
                                                     disabled>
@@ -107,7 +118,11 @@
                                             <?php endif; ?>
 
                                         <?php elseif ($wi->status === 'PUB'): ?>
-                                            
+                                            <button type="button" class="btn btn-info btn-icon rounded-circle view btn-xs shadow-sm btn-open-modal"
+                                                data-id="<?= $wi->id; ?>" data-type="view"
+                                                data-title="View Work Instruction — <?= htmlspecialchars($wi->name ? $wi->name : ''); ?>">
+                                                <i class="fa fa-eye"></i>
+                                            </button>
                                             <button type="button" class="btn btn-warning btn-icon rounded-circle btn-xs shadow-sm btn-open-modal"
                                                 data-id="<?= $wi->id; ?>" data-type="revision"
                                                 data-title="Revision Work Instruction — <?= htmlspecialchars(isset($wi->name) ? $wi->name : ''); ?>"
@@ -147,7 +162,7 @@
         <div class="modal-content">
             <div class="modal-header py-3">
                 <h5 class="modal-title font-weight-bolder" id="modalWIActionLabel"></h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Tutup">
+                <button type="button" class="btn" data-dismiss="modal" aria-label="Tutup">
                     <span aria-hidden="true">&times;</span>
                 </button>
             </div>
@@ -156,6 +171,9 @@
                     <span class="spinner-border text-primary"></span>
                     <p class="mt-2 text-muted">Memuat data...</p>
                 </div>
+            </div>
+            <div class="modal-footer py-2">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>

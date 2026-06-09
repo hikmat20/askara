@@ -47,7 +47,7 @@
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center" width="100">Rev. Number</th>
 										<!-- <th class="p-2 text-center">Status</th> -->
-										<th class="p-2 nosort" width="100">Opsi</th>
+										<th class="p-2 nosort text-center" width="140">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -86,7 +86,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center">Revision Number</th>
-										<th class="p-2 text-center" width="100">Opsi</th>
+										<th class="p-2 text-center" width="160">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -214,7 +214,9 @@
 												<td class="text-center"><?= $rev->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs	 btn-icon btn-info view" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<button type="button" class="btn btn-xs	 btn-icon btn-success process-rev" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
+													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $rev->id); ?>" class="btn btn-xs btn-icon btn-warning edit"
+														data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
+													<button type="button" class="btn btn-xs	 btn-icon btn-success toReview" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Process to Approval"><i class="fa fa-check"></i></button>
 													<!-- <button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Delete Data"><i class="fa fa-trash"></i></button> -->
 												</td>
 											</tr>
