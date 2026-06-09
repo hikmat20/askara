@@ -429,8 +429,8 @@ class Work_instruction_model extends BF_Model
         throw new Exception('Harap mengisi data PIC Reviewer dan PIC Approver terlebih dahulu sebelum mengajukan review.');
       }
 
-      if ($work_instruction->status !== 'COR') {
-        throw new Exception('Work instruction tidak dalam status koreksi. Resubmit hanya dapat dilakukan untuk dokumen dengan status COR.');
+      if ($work_instruction->status !== 'COR' && $work_instruction->status !== 'RVI') {
+        throw new Exception('Work instruction tidak dalam status koreksi atau revisi. Resubmit hanya dapat dilakukan untuk dokumen dengan status COR atau RVI.');
       }
 
       $old_status = $work_instruction->status;

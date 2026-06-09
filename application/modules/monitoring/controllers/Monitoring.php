@@ -1323,11 +1323,11 @@ class Monitoring extends Admin_Controller
 		}
 
 		// Verifikasi user menjabat posisi PM/MR (position id = 1)
-		if (!in_array(1, $this->ArrPosts)) {
-			$this->output->set_status_header(403);
-			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan revisi.']);
-			return;
-		}
+		// if (!in_array(1, $this->ArrPosts)) {
+			// $this->output->set_status_header(403);
+			// echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mengajukan revisi.']);
+			// return;
+		// }
 
 		$Return = $this->FormModel->saveFormRevision($data);
 		echo json_encode($Return);
