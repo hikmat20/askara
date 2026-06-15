@@ -68,15 +68,20 @@ class Documents_list extends Admin_Controller
 	function buildBreadcumb($data)
 	{
 		// $Breadcumb = [];
+		if (!$data || !is_array($data) || !isset($data['parent_id'])) {
+			return [];
+		}
+
 		$data = $this->db->get_where('directory', ['id' => $data['parent_id']])->row();
 
 		if ($data) {
 			if ($data->parent_id != '0') {
 				$Breadcumb[] =  $data;
 			}
-			return isset($Breadcumb) ? $Breadcumb : '';
-			$this->buildBreadcumb($data);
+			return isset($Breadcumb) ? $Breadcumb : [];
 		}
+		
+		return [];
 	}
 
 	public function show($id)
