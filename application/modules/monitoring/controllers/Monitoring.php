@@ -3,6 +3,7 @@ defined('BASEPATH') or exit('No direct script access allowed');
 
 class Monitoring extends Admin_Controller
 {
+	public $sts;
 	/*
  * @author Yunaz
  * @copyright Copyright (c) 2016, Yunaz
@@ -15,6 +16,7 @@ class Monitoring extends Admin_Controller
 
 		$this->load->model('monitoring/monitoring_model', 'Monitoring');
 		$this->load->model('forms/form_model', 'FormModel');
+		$this->load->model('work_instructions/Work_instruction_model', 'WiModel');
 		$this->template->set_theme('dashboard');
 		$this->template->page_icon('fa fa-dashboard');
 
@@ -107,12 +109,16 @@ class Monitoring extends Admin_Controller
 			$dtWiApv = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'APV'])->num_rows();
 			$dtWiRvi = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'RVI'])->num_rows();
 			$dtWiPub = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'PUB'])->num_rows();
+			$dtWiDelREV = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'REV'])->num_rows();
+			$dtWiDelAPV = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'APV'])->num_rows();
 		} else {
 			$dtWiRev = 0;
 			$dtWiCor = 0;
 			$dtWiApv = 0;
 			$dtWiRvi = 0;
 			$dtWiPub = 0;
+			$dtWiDelREV = 0;
+			$dtWiDelAPV = 0;
 		}
 
 		$Data = $this->db->order_by('created_at', 'ASC')->get_where('directory', ['parent_id' => '0', 'active' => 'Y', 'status !=' => 'DEL'])->result();
@@ -149,6 +155,8 @@ class Monitoring extends Admin_Controller
 				'dtWiApv'			=> $dtWiApv,
 				'dtWiRvi'			=> $dtWiRvi,
 				'dtWiPub'			=> $dtWiPub,
+				'dtWiDelREV'		=> $dtWiDelREV,
+				'dtWiDelAPV'		=> $dtWiDelAPV,
 			]
 		);
 
@@ -1631,6 +1639,7 @@ class Monitoring extends Admin_Controller
 			'title'  => 'DAFTAR WORK INSTRUCTION - PUBLISHED',
 			'work_instructions'  => $work_instructions,
 			'sts'    => $this->sts,
+			'ArrPosts' => $this->ArrPosts,
 		]);
 
 		$this->template->render('work_instructions/list');
@@ -1822,5 +1831,103 @@ class Monitoring extends Admin_Controller
 		}
 
 		$this->load->view('monitoring/work_instructions/deletion_modal', ['wi' => $wi]);
+	}
+
+	public function wi_review_deletion()
+	{
+		$work_instructions = $this->db->get_where('view_work_instructions', [
+			'company_id'      => $this->company,
+			'status'          => 'HLD',
+			'deletion_status' => 'REV',
+		])->result();
+
+		$this->template->set([
+			'title'             => 'DAFTAR WORK INSTRUCTION - REVIEW DELETION',
+			'work_instructions' => $work_instructions,
+			'sts'               => $this->sts,
+			'ArrPosts'          => $this->ArrPosts,
+		]);
+		$this->template->render('work_instructions/deletion-list');
+	}
+
+	public function save_wi_rev_deletion()
+	{
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id']) || empty($data['action'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat mereview deletion.']);
+			return;
+		}
+
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $data['id'], 'company_id' => $this->company])->row();
+		if (!$wi || $wi->status !== 'HLD') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau status work instruction tidak valid.']);
+			return;
+		}
+
+		$Return = $this->WiModel->saveWiRevDeletion($data);
+		echo json_encode($Return);
+	}
+
+	public function wi_approval_deletion()
+	{
+		$work_instructions = $this->db->get_where('view_work_instructions', [
+			'company_id'      => $this->company,
+			'status'          => 'HLD',
+			'deletion_status' => 'APV',
+		])->result();
+
+		$this->template->set([
+			'title'             => 'DAFTAR WORK INSTRUCTION - APPROVAL DELETION',
+			'work_instructions' => $work_instructions,
+			'sts'               => $this->sts,
+			'ArrPosts'          => $this->ArrPosts,
+		]);
+		$this->template->render('work_instructions/deletion-list');
+	}
+
+	public function save_wi_apv_deletion()
+	{
+		if (!$this->input->is_ajax_request()) {
+			$this->output->set_status_header(400);
+			echo json_encode(['status' => 0, 'msg' => 'Invalid request.']);
+			return;
+		}
+
+		$data = $this->input->post();
+
+		if (empty($data['id']) || empty($data['action'])) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+			return;
+		}
+
+		if (!in_array(1, $this->ArrPosts)) {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak. Hanya PM/MR yang dapat menyetujui deletion.']);
+			return;
+		}
+
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $data['id'], 'company_id' => $this->company])->row();
+		if (!$wi || $wi->status !== 'HLD') {
+			$this->output->set_status_header(403);
+			echo json_encode(['status' => 0, 'msg' => 'Akses ditolak atau status work instruction tidak valid.']);
+			return;
+		}
+
+		$Return = $this->WiModel->saveWiApvDeletion($data);
+		echo json_encode($Return);
 	}
 }
