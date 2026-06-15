@@ -34,55 +34,40 @@
 
 <body>
 
-    <table>
-        <tbody>
-            <tr>
-                <td width="100"><strong>Company</strong></td>
-                <td>:</td>
-                <td>Company Name</td>
-            </tr>
-        </tbody>
-    </table>
-    <hr>
     <h2>Standard : <?= $crossStd->name; ?></h2>
 
     <?php if ($lsProcedure) : ?>
-        <table class="bordered">
+        <table class="bordered" style="width: 100%;">
             <thead>
                 <tr>
-                    <th>No</th>
-                    <th width="180">Pasal</th>
-                    <th>Description</th>
+                    <th colspan="3" style="text-align: center;"><h3>CROSS REFERENCE <?= $crossStd->name ?> PROCESSES TO PASAL</h3></th>
+                </tr>
+                <tr>
+                    <th width="40" style="text-align: center;">No.</th>
+                    <th width="280" style="text-align: left;">Procedure Name</th>
+                    <th style="text-align: left;">Pasal</th>
                 </tr>
             </thead>
             <tbody>
                 <?php $n = 0;
-                foreach ($lsProcedure as $p) : $n++;
-                    if ($DataStd[$p]) : ?>
+                foreach ($lsProcedure as $p) : 
+                    if (isset($procedures[$p])) : $n++; ?>
                         <tr>
-                            <td colspan="3">
-                                <strong><?= $n . ". " . $procedures[$p]->name; ?></strong>
+                            <td style="text-align: center; vertical-align: top;"><?= $n; ?></td>
+                            <td style="vertical-align: top;"><?= strtoupper($procedures[$p]->name); ?></td>
+                            <td style="vertical-align: top;">
+                                <?php 
+                                if (isset($DataStd[$p]) && $DataStd[$p]) {
+                                    foreach ($DataStd[$p] as $dt) {
+                                        echo htmlspecialchars($dt->chapter) . "<br>";
+                                    }
+                                } else {
+                                    echo "-";
+                                }
+                                ?>
                             </td>
                         </tr>
-                        <?php $i = 0;
-                        foreach ($DataStd[$p] as $dt) : $i++; ?>
-                            <tr>
-                                <td><?= $i; ?></td>
-                                <td><?= $dt->chapter; ?></td>
-                                <td>
-                                    <?php if ($dt->desc_indo) : ?>
-                                        <strong>Indonesian:</strong>
-                                        <?= $dt->desc_indo; ?>
-                                    <?php endif; ?>
-                                    <br>
-                                    <?php if ($dt->desc_eng) : ?>
-                                        <strong>English:</strong>
-                                        <?= $dt->desc_eng; ?>
-                                    <?php endif; ?>
-                                </td>
-                            </tr>
-                    <?php endforeach;
-                    endif; ?>
+                    <?php endif; ?>
                 <?php endforeach; ?>
             </tbody>
         </table>

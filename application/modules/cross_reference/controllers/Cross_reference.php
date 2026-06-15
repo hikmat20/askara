@@ -14,6 +14,8 @@ if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 class Cross_reference extends Admin_Controller
 {
+	public $status;
+
 	public function __construct()
 	{
 		parent::__construct();
@@ -367,35 +369,37 @@ class Cross_reference extends Admin_Controller
 			'margin_bottom' => 10
 		]);
 
-		$crossStd  		= $this->db->get_where('view_cross_references', ['company_id' => $this->company])->row();
-		$dtlCross 		= $this->db->get_where('view_cross_reference_details', ['reference_id' => $crossStd->reference_id])->result();
+		$company = $this->db->get_where('companies', ['id_perusahaan' => $this->company])->row();
+		$crossStd = $this->db->get_where('view_cross_references', ['company_id' => $this->company])->row();
+
+		if (!$crossStd) {
+			echo "No cross reference standard found for this company.";
+			return;
+		}
+
+		$dtlCross 		= $this->db->get_where('view_cross_reference_details', ['reference_id' => $crossStd->id])->result();
 
 		$procedures 	= $this->db->get_where('procedures', ['company_id' => $this->company, 'status !=' => 'DEL'])->result();
+		$procedures_by_id = [];
 		$lsProcedure 	= [];
-		$ArrDtlCross 	= [];
 		$DataStd 		= [];
 
-		foreach ($dtlCross as $dtl) {
-			$ArrDtlCross[] = explode(",", $dtl->procedure_id);
+		foreach ($procedures as $pro) {
+			$procedures_by_id[$pro->id] = $pro;
+			$lsProcedure[$pro->id] = $pro->id;
+
+			$this->db->select('*')->from('view_cross_reference_details');
+			$this->db->where("find_in_set({$pro->id}, procedure_id)");
+			$this->db->where("reference_id", $crossStd->id);
+			$this->db->where("company_id", $this->company);
+			$DataStd[$pro->id] = $this->db->get()->result();
 		}
 
-
-		foreach ($ArrDtlCross as $arr) {
-			foreach ($arr as $value) {
-				$lsProcedure[$value] = $value;
-				if ($value) {
-					$this->db->select('*')->from('view_cross_reference_details');
-					$this->db->where("find_in_set($value, procedure_id)");
-					$this->db->where("reference_id", $crossStd->reference_id);
-					$this->db->where("company_id", $this->company);
-					$DataStd[$value] = $this->db->get()->result();
-				}
-			}
-		}
 		$Data = [
+			'company'       => $company,
 			'crossStd' 		=> $crossStd,
 			'DataStd' 		=> $DataStd,
-			'procedures' 	=> $procedures,
+			'procedures' 	=> $procedures_by_id,
 			'lsProcedure' 	=> $lsProcedure,
 		];
 
