@@ -104,13 +104,20 @@ class Monitoring extends Admin_Controller
 		/* WORK INSTRUCTION STATISTICS */
 		// Check if work_instructions table exists
 		if ($this->db->table_exists('work_instructions')) {
-			$dtWiRev = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'REV'])->num_rows();
-			$dtWiCor = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'COR'])->num_rows();
-			$dtWiApv = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'APV'])->num_rows();
-			$dtWiRvi = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'RVI'])->num_rows();
-			$dtWiPub = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'PUB'])->num_rows();
-			$dtWiDelREV = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'REV'])->num_rows();
-			$dtWiDelAPV = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'APV'])->num_rows();
+			$dtWiRevQ = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'REV']);
+			$dtWiRev = $dtWiRevQ ? $dtWiRevQ->num_rows() : 0;
+			$dtWiCorQ = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'COR']);
+			$dtWiCor = $dtWiCorQ ? $dtWiCorQ->num_rows() : 0;
+			$dtWiApvQ = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'APV']);
+			$dtWiApv = $dtWiApvQ ? $dtWiApvQ->num_rows() : 0;
+			$dtWiRviQ = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'RVI']);
+			$dtWiRvi = $dtWiRviQ ? $dtWiRviQ->num_rows() : 0;
+			$dtWiPubQ = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'PUB']);
+			$dtWiPub = $dtWiPubQ ? $dtWiPubQ->num_rows() : 0;
+			$dtWiDelREVQ = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'REV']);
+			$dtWiDelREV = $dtWiDelREVQ ? $dtWiDelREVQ->num_rows() : 0;
+			$dtWiDelAPVQ = $this->db->get_where('work_instructions', ['company_id' => $this->company, 'status' => 'HLD', 'deletion_status' => 'APV']);
+			$dtWiDelAPV = $dtWiDelAPVQ ? $dtWiDelAPVQ->num_rows() : 0;
 		} else {
 			$dtWiRev = 0;
 			$dtWiCor = 0;
