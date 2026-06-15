@@ -448,6 +448,42 @@
             </div>
         </div>
 
+        <!-- DELETION WORK INSTRUCTIONS -->
+        <div class="pt-3 mt-4">
+            <h3 class="text-white pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Work Instructions</h3>
+            <div class="d-flex justify-content-start align-items-center">
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-warning" style="font-size: 48px;"><?= $dtWiDelREV; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url($this->uri->segment(1) . '/wi_review_deletion'); ?>" class="text-hover-primary"
+                                title="REVIEW DELETION WORK INSTRUCTIONS">
+                                <span class="card-label text-dark text-center font-weight-bolder">REVIEW DELETION WORK INSTRUCTIONS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-danger" style="font-size: 48px;"><?= $dtWiDelAPV; ?></h5>
+                            <p>Documents</p>
+                        </div>
+                        <h6 class="card-title text-center px-4">
+                            <a href="<?= base_url($this->uri->segment(1) . '/wi_approval_deletion'); ?>" class="text-hover-primary"
+                                title="APPROVAL DELETION WORK INSTRUCTIONS">
+                                <span class="card-label text-dark text-center font-weight-bolder">APPROVAL DELETION WORK INSTRUCTIONS</span>
+                            </a>
+                        </h6>
+                    </div>
+                </div>
+            </div>
+        </div>
+
     </div>
 </div>
 <style>

@@ -1008,6 +1008,97 @@ class Work_instruction_model extends BF_Model
       return $Return;
     }
 
+  public function saveWiRevDeletion($data)
+  {
+    try {
+      $wi = $this->db->get_where('work_instructions', array('id' => $data['id']))->row();
+      if (!$wi || $wi->status !== 'HLD') {
+        throw new Exception('Work instruction tidak ditemukan atau status tidak valid.');
+      }
+
+      $action = $data['action'];
+
+      $this->db->trans_begin();
+
+      if ($action === 'APV') {
+        $this->update($wi->id, array(
+          'deletion_status' => 'APV',
+          'modified_by'     => $this->auth->user_id(),
+          'modified_at'     => date('Y-m-d H:i:s'),
+        ));
+        $this->_insertStatusLog($wi->id, 'HLD', 'HLD', 'Review deletion disetujui — lanjut to Approval Deletion.');
+        $msg = 'Pengajuan deletion disetujui. Lanjut ke proses Approval Deletion.';
+      } else {
+        $this->update($wi->id, array(
+          'status'          => 'PUB',
+          'deletion_status' => null,
+          'note'            => null,
+          'modified_by'     => $this->auth->user_id(),
+          'modified_at'     => date('Y-m-d H:i:s'),
+        ));
+        $this->_insertStatusLog($wi->id, 'HLD', 'PUB', 'Pengajuan deletion ditolak pada tahap Review.');
+        $msg = 'Pengajuan deletion ditolak. Work instruction dikembalikan ke status Published.';
+      }
+
+      if ($this->db->trans_status() === FALSE) {
+        $this->db->trans_rollback();
+        throw new Exception('Gagal memproses review deletion. Silakan coba lagi.');
+      }
+
+      $this->db->trans_commit();
+      return array('status' => 1, 'msg' => $msg);
+    } catch (Exception $e) {
+      $this->db->trans_rollback();
+      return array('status' => 0, 'msg' => $e->getMessage());
+    }
+  }
+
+  public function saveWiApvDeletion($data)
+  {
+    try {
+      $wi = $this->db->get_where('work_instructions', array('id' => $data['id']))->row();
+      if (!$wi || $wi->status !== 'HLD') {
+        throw new Exception('Work instruction tidak ditemukan atau status tidak valid.');
+      }
+
+      $action = $data['action'];
+
+      $this->db->trans_begin();
+
+      if ($action === 'DEL') {
+        $this->update($wi->id, array(
+          'status'          => 'DEL',
+          'deletion_status' => 'DEL',
+          'modified_by'     => $this->auth->user_id(),
+          'modified_at'     => date('Y-m-d H:i:s'),
+        ));
+        $this->_insertStatusLog($wi->id, 'HLD', 'DEL', 'Approval deletion disetujui — work instruction dihapus.');
+        $msg = 'Work instruction berhasil dihapus.';
+      } else {
+        $this->update($wi->id, array(
+          'status'          => 'PUB',
+          'deletion_status' => null,
+          'note'            => null,
+          'modified_by'     => $this->auth->user_id(),
+          'modified_at'     => date('Y-m-d H:i:s'),
+        ));
+        $this->_insertStatusLog($wi->id, 'HLD', 'PUB', 'Pengajuan deletion ditolak pada tahap Approval.');
+        $msg = 'Pengajuan deletion ditolak. Work instruction dikembalikan ke status Published.';
+      }
+
+      if ($this->db->trans_status() === FALSE) {
+        $this->db->trans_rollback();
+        throw new Exception('Gagal memproses approval deletion. Silakan coba lagi.');
+      }
+
+      $this->db->trans_commit();
+      return array('status' => 1, 'msg' => $msg);
+    } catch (Exception $e) {
+      $this->db->trans_rollback();
+      return array('status' => 0, 'msg' => $e->getMessage());
+    }
+  }
+
   /**
    * Mengirim notifikasi email sesuai perubahan status (Workflow)
    */
