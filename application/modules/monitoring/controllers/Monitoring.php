@@ -1631,6 +1631,7 @@ class Monitoring extends Admin_Controller
 			'title'  => 'DAFTAR WORK INSTRUCTION - PUBLISHED',
 			'work_instructions'  => $work_instructions,
 			'sts'    => $this->sts,
+			'ArrPosts' => $this->ArrPosts,
 		]);
 
 		$this->template->render('work_instructions/list');
