@@ -7,21 +7,20 @@
   <title><?= isset($idt->nm_perusahaan) ? $idt->nm_perusahaan : 'not-set'; ?><?= isset($template['title']) ? ' | ' . $template['title'] : ''; ?></title>
   <meta name="description" content="Updates and statistics" />
   <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no" />
-  <link rel="shortcut icon" href="<?= base_url('assets/logo/'.$this->session->company->id_perusahaan.'/'.$this->session->company->logo); ?>" />
+  <link rel="shortcut icon" href="<?= base_url(); ?>assets/img/logo.png" />
 
   <link rel="stylesheet" href="https://fonts.googleapis.com/css?family=Poppins:300,400,500,600,700" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/global/plugins.bundle1036.css" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/css/style.bundle1036.css" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.css" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/fullcalendar/fullcalendar.bundle1036.css" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jstree/jstree.bundle.css" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.css" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/global/plugins.bundle1036.css?v=2.1.1" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.css?v=2.1.1" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/fullcalendar/fullcalendar.bundle1036.css?v=2.1.1" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/css/style.bundle1036.css?v=2.1.1" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jstree/jstree.bundle.css?v=2.1.1" rel="stylesheet" type="text/css" />
+  <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.bundle1036.css" rel="stylesheet" type="text/css" />
   <link href="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/monthpicker/MonthPicker.css" rel="stylesheet" type="text/css" />
   <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/flatpickr/dist/flatpickr.min.css">
-  <script src="<?= base_url('themes\dashboard\assets\plugins\global\jquery-3.3.1.min.js'); ?>"></script>
+  <script src="<?= base_url('assets/plugins/jQuery/jquery-2.2.3.min.js'); ?>"></script>
   <link href="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\jquery-ui\jquery-ui.min.css" rel="stylesheet" type="text/css" />
   <link href="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\summernote\summernote-bs4.min.css" rel="stylesheet" type="text/css" />
-  <link href="<?= base_url(); ?>themes\dashboard\assets\css\loading-skeleton.css" rel="stylesheet" type="text/css" />
 
   <script src="<?= base_url('themes/dashboard/assets/plugins/custom/pdf/pdf.js'); ?>"></script>
   <script src="<?= base_url('themes/dashboard/assets/plugins/custom/pdf/pdf.worker.js'); ?>"></script>
@@ -32,86 +31,6 @@
     var base_url = siteurl;
     var active_controller = '<?php echo $this->uri->segment(1); ?>' + '/';
     var active_function = '<?php echo $this->uri->segment(2); ?>' + '/';
-
-
-    $(document).ready(function() {
-      Object.assign(DataTable.defaults, {
-        responsive: true,
-        autoWidth: false,
-        destroy: true,
-        processing: true,
-        lengthChange: true,
-        stateSave: true,
-        stateDuration: 60,
-        deferLoading: 20,
-        layout: {
-          topEnd: {
-            search: {
-              placeholder: 'Search'
-            }
-          },
-          topStart: 'pageLength',
-          bottomStart: 'info',
-          bottomEnd: 'paging',
-        },
-        aaSorting: [
-          [0, "asc"]
-        ],
-        lengthMenu: [10, 20, 25, 50, 100, 250, 500, 1000, {
-          label: 'All',
-          value: 99999999
-        }],
-        pageLength: 20,
-        pagingType: 'simple_numbers',
-        language: {
-          search: "",
-          sLengthMenu: "_MENU_",
-          sInfo: "Showing <b>_START_</b> to <b>_END_</b> from <b>_TOTAL_</b> data",
-          sInfoFiltered: "(filtered from _MAX_ total entries)",
-          oPaginate: {
-            sPrevious: "<i class='fa fa-chevron-left' aria-hidden='true'></i>",
-            sNext: "<i class='fa fa-chevron-right' aria-hidden='true'></i>"
-          }
-        },
-        columnDefs: [{
-          "targets": 'no-sort',
-          "orderable": false,
-        }, {
-          "targets": 'text-center',
-          "className": 'text-center',
-        }, {
-          "targets": 'text-right',
-          "className": 'text-right',
-        }, {
-          "targets": 'fw-bold',
-          "className": 'font-wight-bold',
-        }, {
-          "targets": 'text-center-bold',
-          "className": 'text-center font-wight-bold',
-        }],
-        responsive: {
-          "breakpoints": [{
-              "name": 'desktop',
-              "width": Infinity
-            },
-            {
-              "name": 'tablet',
-              "width": 1148
-            },
-            {
-              "name": 'mobile',
-              "width": 680
-            },
-            {
-              "name": 'mobile-p',
-              "width": 320
-            }
-          ],
-        },
-      });
-
-
-    })
   </script>
 
 
@@ -224,7 +143,7 @@
       left: -300px;
       width: 300px;
     }
-
+ 
     .loaders {
       display: -webkit-box;
       display: -ms-flexbox;
@@ -297,10 +216,6 @@
         opacity: 0.5;
       }
     }
-
-    .tox-tinymce {
-      height: 0px;
-    }
   </style>
 </head>
 <!-- 0c18a9 -->
@@ -308,7 +223,7 @@
 <body id="kt_body" class="header-fixed header-mobile-fixed aside-enabled aside-static page-loading" style="background-image: url(<?= base_url('assets/images/bg-primary.png'); ?>);background-repeat:repeat-y;background-size:cover;background-position:top;background-attachment:cover">
   <div id="kt_header_mobile" class="header-mobile header-mobile-fixed">
     <a href="<?= base_url('/'); ?>">
-      <img alt="Logo" src="<?= base_url('assets/logo/') . $this->session->company->logo; ?>" class="max-h-30px" />
+      <img alt="Logo" src="<?= base_url('assets/img/logo.png'); ?>" class="max-h-30px" />
     </a>
     <div class="d-flex align-items-center">
       <button class=" btn btn-icon" onclick="$('#kt_aside_toggle').click()">
@@ -365,9 +280,9 @@
         <!--begin::Menu Nav-->
 
         <div class="text-center">
-          <img src="<?= base_url('assets/logo/') . $this->session->company->id_perusahaan . '/' . $this->session->company->logo; ?>" width="100px" class="img-fluid" alt="Logo">
+          <img src="<?= base_url('assets/img/logo-2.png'); ?>" width="50px" class="img-fluid" alt="Logo">
           <h5 for="" class="text-center"><strong>
-              <!-- <?= $this->session->company->nm_perusahaan ?> -->
+              <?= $this->session->company->nm_perusahaan ?>
             </strong></h5>
         </div>
         <hr class="mb-0">
@@ -461,6 +376,12 @@
                   </div>
                 </div>
               </div> -->
+
+              <div class="topbar-item mr-2">
+                <a href="<?= base_url('assets/files/Manual Book Rumah ISO.pdf'); ?>" target="_blank" class="btn btn-sm btn-light-primary font-weight-bold" title="Manual Book">
+                  <i class="fa fa-book mr-1"></i> Manual Book
+                </a>
+              </div>
 
               <div class="topbar-item mr-3">
                 <span class="bg-white rounded py-2 h6 my-0 pl-3 pr-10" style="margin-right:-30px"><?= $userData->full_name; ?></span>
