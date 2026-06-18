@@ -146,6 +146,7 @@
 </div>
 
 <script>
+document.addEventListener("DOMContentLoaded", function() {
 	$(document).ready(function() {
 		$('#kt_tree_2').jstree({
 			"core": {
@@ -804,4 +805,5 @@
 			}
 		});
 	}
+});
 </script>

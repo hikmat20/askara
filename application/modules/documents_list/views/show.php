@@ -25,9 +25,9 @@
             <iframe src="<?= $file->link_form; ?>#toolbar=0&navpanes=0" frameborder="0" width="100%"></iframe>
         <?php endif; ?>
         <?php if ($file->ext == '.pdf' || $file->ext == '.PDF') : ?>
-            <iframe src="<?= base_url("directory/" . (isset($type) ? $type . '/' : '') . "$company/" . str_replace(":", "-", $dir_name) . "/$file->file_name"); ?>#toolbar=0&navpanes=0" frameborder="0" width="100%" style="height:60vh;"></iframe>
+            <iframe src="<?= base_url("directory/" . (isset($type) ? $type . '/' : '') . "$company/$file->file_name"); ?>#toolbar=0&navpanes=0" frameborder="0" width="100%" style="height:60vh;"></iframe>
         <?php else : ?>
-            <iframe src="https://docs.google.com/gview?embedded=true&url=<?= base_url("directory/" . (isset($type) ? $type . '/' : '') . "$company/" . str_replace(":", "-", $dir_name) . "/$file->file_name"); ?>&rm=minimal#toolbar=0&navpanes=0" frameborder="0" width="100%" height="70vh"></iframe>
+            <iframe src="https://docs.google.com/gview?embedded=true&url=<?= base_url("directory/" . (isset($type) ? $type . '/' : '') . "$company/$file->file_name"); ?>&rm=minimal#toolbar=0&navpanes=0" frameborder="0" width="100%" height="70vh"></iframe>
         <?php endif; ?>
     </div>
     <div class="tab-pane fade" id="home" role="tabpanel" aria-labelledby="home-tab">
