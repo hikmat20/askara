@@ -11,7 +11,7 @@
 							<tr class="text-center">
 								<th width="40">No</th>
 								<th>Process</th>
-								<th>Department</th>
+								<th>Department - Company</th>
 								<th>Auditor</th>
 								<th width="120">Tanggal</th>
 								<th width="120">Jam</th>

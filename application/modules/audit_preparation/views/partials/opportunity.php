@@ -6,11 +6,12 @@
 	<div class="row mb-3">
 		<div class="col-md-4">
 			<label class="font-weight-bold">Issue <span class="text-danger">*</span></label>
-			<input type="text" id="issue_text" class="form-control" placeholder="Input issue" maxlength="500">
+			<input type="text" id="issue_text" class="form-control" placeholder="Customer claim naik terutama masalah terlambat delivery" maxlength="500">
 		</div>
 		<div class="col-md-4">
 			<label class="font-weight-bold">Proses / Prosedur <span class="text-danger">*</span></label>
-			<select id="select_procedure_multi" class="form-control select2" multiple="multiple" data-placeholder="Select Proses/Prosedur">
+			<select id="select_procedure_multi" class="form-control select2" multiple="multiple" data-placeholder="Customer claim & Delivery & Planning">
+				<option></option>
 				<?php if (!empty($procedures)) foreach ($procedures as $proc) : ?>
 					<option value="<?= $proc->id; ?>" data-name="<?= htmlspecialchars(strip_tags($proc->name)); ?>"><?= strip_tags($proc->name); ?></option>
 				<?php endforeach; ?>
@@ -98,10 +99,27 @@
 
 <script>
 $(document).ready(function() {
-	$('#select_procedure_multi').select2({
-		allowClear: true,
-		width: '100%',
-		placeholder: 'Select Proses/Prosedur'
+	// Init Select2 on tab shown to avoid hidden-tab rendering issues
+	function initProcedureSelect2() {
+		if ($('#select_procedure_multi').hasClass('select2-hidden-accessible')) {
+			$('#select_procedure_multi').select2('destroy');
+		}
+		$('#select_procedure_multi').select2({
+			allowClear: true,
+			width: '100%',
+			placeholder: 'Customer claim & Delivery & Planning'
+		});
+	}
+
+	// Initialize immediately if tab is already visible, or on tab show
+	if ($('#tab-opportunity').hasClass('active') || $('#tab-opportunity').is(':visible')) {
+		initProcedureSelect2();
+	}
+	$('button[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+		var target = $(e.target).data('target') || $(e.target).attr('href');
+		if (target === '#tab-opportunity') {
+			initProcedureSelect2();
+		}
 	});
 
 	// When procedure selection changes, generate investigasi input fields
@@ -121,7 +139,7 @@ $(document).ready(function() {
 			container.append(
 				'<div class="mb-2">' +
 				'<label class="small text-muted mb-0">' + procName + ':</label>' +
-				'<input type="text" class="form-control form-control-sm investigasi-field" data-proc-id="' + procId + '" data-proc-name="' + procName + '" placeholder="Investigasi untuk ' + procName + '">' +
+				'<input type="text" class="form-control form-control-sm investigasi-field" data-proc-id="' + procId + '" data-proc-name="' + procName + '" placeholder="Apakah perbaikan dilakukan sampai ke akar masalah ? Check corrective action atas claim yang terjadi">' +
 				'</div>'
 			);
 		});

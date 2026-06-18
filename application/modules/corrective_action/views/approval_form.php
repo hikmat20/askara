@@ -23,7 +23,7 @@
 						</div>
 						<div class="col-md-6">
 							<div class="form-group">
-								<label class="font-weight-bold">Department</label>
+								<label class="font-weight-bold">Department - Company</label>
 								<p class="form-control-plaintext"><?= isset($header->department_name) && $header->department_name ? $header->department_name : '-'; ?></p>
 							</div>
 						</div>

@@ -28,8 +28,8 @@
 									<td class="text-center"><?= $v->audit_scope; ?></td>
 									<td class="text-center"><?= date('d-m-Y', strtotime($v->created_at)); ?></td>
 									<td class="text-center">
-										<a href="<?= site_url('pelaksanaan_audit/schedules/' . $v->id); ?>" class="btn btn-xs btn-primary" title="Audit">
-											<i class="fa fa-clipboard-check mr-1"></i> Audit
+										<a href="<?= site_url('summary_temuan/view/' . $v->id); ?>" class="btn btn-xs btn-icon btn-info" title="Summary">
+											<i class="fa fa-chart-bar"></i>
 										</a>
 									</td>
 								</tr>

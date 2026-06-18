@@ -26,6 +26,8 @@
       <option value="">-- Select Audit Scope --</option>
       <option value="Audit Khusus" <?= (isset($program->audit_scope) && $program->audit_scope == 'Audit Khusus') ? 'selected' : ''; ?>>Audit Khusus</option>
       <option value="Audit Regular" <?= (isset($program->audit_scope) && $program->audit_scope == 'Audit Regular') ? 'selected' : ''; ?>>Audit Regular</option>
+      <option value="Audit Product" <?= (isset($program->audit_scope) && $program->audit_scope == 'Audit Product') ? 'selected' : ''; ?>>Audit Product</option>
+      <option value="Audit Process" <?= (isset($program->audit_scope) && $program->audit_scope == 'Audit Process') ? 'selected' : ''; ?>>Audit Process</option>
     </select>
     <span class="invalid-feedback">Audit Scope can't be empty</span>
   </div>

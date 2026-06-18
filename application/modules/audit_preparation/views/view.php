@@ -160,7 +160,7 @@
 										<th width="40">No</th>
 										<th>Proses</th>
 										<th>Auditor</th>
-										<th>Department</th>
+										<th>Department - Company</th>
 										<th width="110">Tanggal</th>
 										<th width="80">Mulai</th>
 										<th width="80">Selesai</th>
@@ -181,6 +181,8 @@
 														}
 														echo implode(', ', $auditee_names);
 													?>
+												<?php elseif (!empty($sched->auditee_name_free)) : ?>
+													<?= htmlspecialchars($sched->auditee_name_free); ?>
 												<?php else : ?>
 													-
 												<?php endif; ?>

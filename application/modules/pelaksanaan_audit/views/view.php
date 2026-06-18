@@ -4,7 +4,7 @@
 			<div class="card card-stretch shadow card-custom">
 				<div class="card-header justify-content-between d-flex align-items-center">
 					<h2 class="m-0"><i class="<?= $icon; ?> text-primary mr-2"></i>View Pelaksanaan Audit</h2>
-					<a href="<?= site_url('pelaksanaan_audit'); ?>" class="btn btn-danger"><i class="fa fa-reply"></i> Kembali</a>
+					<a href="<?= site_url('pelaksanaan_audit/schedules/' . $schedule->program_id); ?>" class="btn btn-danger"><i class="fa fa-reply"></i> Kembali</a>
 				</div>
 
 				<div class="card-body">
@@ -14,8 +14,9 @@
 						<table class="table table-bordered table-sm">
 							<tr><th width="200">Prosedur</th><td><?= !empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free); ?></td></tr>
 							<tr><th>Date</th><td><?= date('d/m/Y', strtotime($schedule->audit_date)); ?></td></tr>
-							<tr><th>Department</th><td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td></tr>
+							<tr><th>Department - Company</th><td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td></tr>
 							<tr><th>Auditor</th><td><?= isset($schedule->auditor_name) ? $schedule->auditor_name : '-'; ?></td></tr>
+							<tr><th>Auditee</th><td><?= isset($audit_data->auditee_text) && $audit_data->auditee_text ? nl2br(htmlspecialchars($audit_data->auditee_text)) : '-'; ?></td></tr>
 						</table>
 					</div>
 
@@ -60,7 +61,7 @@
 						<?php if (!empty($audit_temuan)) : ?>
 							<table class="table table-bordered table-sm">
 								<thead class="text-center table-light">
-									<tr><th width="30">No</th><th>Temuan</th><th width="100">Kategori</th><th width="130">ISO</th><th width="150">Pasal</th><th width="80">Evidence</th></tr>
+									<tr><th width="30">No</th><th>Temuan</th><th width="100">Kategori</th><th width="130">Reference Standard</th><th style="width:400px;min-width:400px;max-width:400px;">Pasal</th><th width="80">Evidence</th></tr>
 								</thead>
 								<tbody>
 									<?php foreach ($audit_temuan as $k => $tm) : $k++; ?>
@@ -73,7 +74,14 @@
 												<?php endif; ?>
 											</td>
 											<td><?php if ($tm->iso_id) : $iso = $this->db->get_where('requirements', ['id' => $tm->iso_id])->row(); echo $iso ? htmlspecialchars($iso->name) : '-'; endif; ?></td>
-											<td><?php if ($tm->pasal_id) : $pasal = $this->db->get_where('requirement_details', ['id' => $tm->pasal_id])->row(); echo $pasal ? htmlspecialchars($pasal->chapter) : '-'; endif; ?></td>
+											<td><?php if ($tm->pasal_id) :
+												$pasal_ids = json_decode($tm->pasal_id, true);
+												if (!is_array($pasal_ids)) $pasal_ids = [$tm->pasal_id];
+												foreach ($pasal_ids as $pid) {
+													$pasal = $this->db->get_where('requirement_details', ['id' => $pid])->row();
+													if ($pasal) echo htmlspecialchars($pasal->chapter) . '<br>';
+												}
+											endif; ?></td>
 											<td class="text-center">
 												<?php if (!empty($tm->file_name)) : ?>
 													<a href="<?= base_url('directory/AUDIT_PELAKSANAAN/' . $this->session->company->id_perusahaan . '/' . $schedule->schedule_id . '/' . $tm->file_name); ?>" target="_blank" class="text-success"><i class="fa fa-download"></i></a>

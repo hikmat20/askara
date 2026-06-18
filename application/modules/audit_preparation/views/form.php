@@ -90,12 +90,12 @@
 				});
 				targetPane.find('.select2-schedule-auditee').each(function() {
 					if (!$(this).hasClass('select2-hidden-accessible')) {
-						$(this).select2({ placeholder: "Select Department", allowClear: true, width: "100%" });
+						$(this).select2({ placeholder: "Select Department - Company", allowClear: true, width: "100%" });
 					}
 				});
 				// Also init generic .select2 that haven't been initialized
 				targetPane.find('select.select2').each(function() {
-					if (!$(this).hasClass('select2-hidden-accessible')) {
+					if (!$(this).hasClass('select2-hidden-accessible') && $(this).attr('id') !== 'select_procedure_multi') {
 						$(this).select2({ width: '100%' });
 					}
 				});

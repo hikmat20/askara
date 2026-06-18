@@ -1,3 +1,9 @@
+<style>
+#form-ca textarea.textarea-counter {
+	overflow: hidden;
+	resize: none;
+}
+</style>
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 	<div class="d-flex flex-column-fluid">
 		<div class="container">
@@ -32,7 +38,7 @@
 								</div>
 								<div class="col-md-6">
 									<div class="form-group row mb-2">
-										<label class="col-sm-4 col-form-label font-weight-bold">Department</label>
+										<label class="col-sm-4 col-form-label font-weight-bold">Department - Company</label>
 										<div class="col-sm-8">
 											<p class="form-control-plaintext"><?= isset($header->department_name) && $header->department_name ? $header->department_name : '-'; ?></p>
 										</div>
@@ -103,7 +109,7 @@
 									<!-- Fakta -->
 									<div class="form-group">
 										<label class="font-weight-bold">Fakta <span class="text-danger">*</span></label>
-										<textarea name="detail[<?= $t->id; ?>][fakta]" class="form-control textarea-counter" maxlength="2000" rows="3" placeholder="Masukkan fakta yang ditemukan..."><?= $detail ? htmlspecialchars($detail->fakta) : ''; ?></textarea>
+										<textarea name="detail[<?= $t->id; ?>][fakta]" class="form-control textarea-counter" maxlength="2000" rows="3" placeholder="1. Prosedur tidak pernah di review ulang sejak dibuat tanggal…&#10;2. Perusahaan membuat ERP, dan mulai menerapkan program sejak…&#10;3. Pada saat ERP sudah diterapkan prosedur tidak dirubah&#10;4. Tidak ada pembahasani terhadap existing sistem saat mau menggunakan ERP"><?= $detail ? htmlspecialchars($detail->fakta) : ''; ?></textarea>
 										<small class="form-text text-muted text-right">
 											<span class="char-count"><?= $detail ? strlen($detail->fakta) : 0; ?></span>/2000
 										</small>
@@ -112,7 +118,7 @@
 									<!-- Kesimpulan Penyebab -->
 									<div class="form-group">
 										<label class="font-weight-bold">Kesimpulan Penyebab <span class="text-danger">*</span></label>
-										<textarea name="detail[<?= $t->id; ?>][penyebab]" class="form-control textarea-counter" maxlength="2000" rows="3" placeholder="Masukkan kesimpulan penyebab..."><?= $detail ? htmlspecialchars($detail->kesimpulan_penyebab) : ''; ?></textarea>
+										<textarea name="detail[<?= $t->id; ?>][penyebab]" class="form-control textarea-counter" maxlength="2000" rows="3" placeholder="Ketika ada perubahan yang menyangkut ke sistem yang dijalankan di perusahaan,  tidak dilakukan evaluasi risiko terhadap existing sistem yang ada, akibatnya sistem sudah berubah, tapi prosedur belum berubah"><?= $detail ? htmlspecialchars($detail->kesimpulan_penyebab) : ''; ?></textarea>
 										<small class="form-text text-muted text-right">
 											<span class="char-count"><?= $detail ? strlen($detail->kesimpulan_penyebab) : 0; ?></span>/2000
 										</small>
@@ -121,7 +127,7 @@
 									<!-- Correction -->
 									<div class="form-group">
 										<label class="font-weight-bold">Correction <span class="text-danger">*</span></label>
-										<textarea name="detail[<?= $t->id; ?>][correction]" class="form-control textarea-counter" maxlength="2000" rows="3" placeholder="Masukkan tindakan koreksi..."><?= $detail ? htmlspecialchars($detail->correction) : ''; ?></textarea>
+										<textarea name="detail[<?= $t->id; ?>][correction]" class="form-control textarea-counter" maxlength="2000" rows="3" placeholder="Revisi prosedur sesuai perubahan yang sudah di lakukan"><?= $detail ? htmlspecialchars($detail->correction) : ''; ?></textarea>
 										<small class="form-text text-muted text-right">
 											<span class="char-count"><?= $detail ? strlen($detail->correction) : 0; ?></span>/2000
 										</small>
@@ -130,7 +136,7 @@
 									<!-- Corrective Action -->
 									<div class="form-group">
 										<label class="font-weight-bold">Corrective Action <span class="text-danger">*</span></label>
-										<textarea name="detail[<?= $t->id; ?>][corrective_action]" class="form-control textarea-counter" maxlength="2000" rows="3" placeholder="Masukkan tindakan perbaikan..."><?= $detail ? htmlspecialchars($detail->corrective_action) : ''; ?></textarea>
+										<textarea name="detail[<?= $t->id; ?>][corrective_action]" class="form-control textarea-counter" maxlength="2000" rows="3" placeholder="Perbaikan prosedur manajemen of change untuk menambahkan scope dari manajemen of change termasuk rencana perubahan sistem, misalnya dari manual ke digital"><?= $detail ? htmlspecialchars($detail->corrective_action) : ''; ?></textarea>
 										<small class="form-text text-muted text-right">
 											<span class="char-count"><?= $detail ? strlen($detail->corrective_action) : 0; ?></span>/2000
 										</small>
@@ -178,6 +184,22 @@ $(document).ready(function() {
 	$('.textarea-counter').on('keyup', function() {
 		var len = $(this).val().length;
 		$(this).closest('.form-group').find('.char-count').text(len);
+	});
+
+	// Auto-resize textareas to fit content (no scroll)
+	function autoResizeTextarea(el) {
+		el.style.height = 'auto';
+		el.style.height = el.scrollHeight + 'px';
+	}
+
+	// Apply on page load
+	$('#form-ca textarea.textarea-counter').each(function() {
+		autoResizeTextarea(this);
+	});
+
+	// Apply on input
+	$(document).on('input', '#form-ca textarea.textarea-counter', function() {
+		autoResizeTextarea(this);
 	});
 
 	// Save function (AJAX with FormData)

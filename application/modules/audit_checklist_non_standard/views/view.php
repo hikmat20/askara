@@ -17,7 +17,7 @@
 								<td><?= !empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free); ?></td>
 							</tr>
 							<tr>
-								<th>Department</th>
+								<th>Department - Company</th>
 								<td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td>
 							</tr>
 							<tr>

@@ -258,6 +258,7 @@ class Audit_preparation extends Admin_Controller
         $schedProcessFree = isset($data['schedule_process_name_free']) ? $data['schedule_process_name_free'] : [];
         $schedAuditorIds = isset($data['schedule_auditor_id']) ? $data['schedule_auditor_id'] : [];
         $schedAuditeeIds = isset($data['schedule_auditee_id']) ? $data['schedule_auditee_id'] : [];
+        $schedAuditeeFree = isset($data['schedule_auditee_name_free']) ? $data['schedule_auditee_name_free'] : [];
         $schedDates = isset($data['schedule_date']) ? $data['schedule_date'] : [];
         $schedStartTimes = isset($data['schedule_start_time']) ? $data['schedule_start_time'] : [];
         $schedEndTimes = isset($data['schedule_end_time']) ? $data['schedule_end_time'] : [];
@@ -293,6 +294,7 @@ class Audit_preparation extends Admin_Controller
                 if (empty($processId) && empty($freeText)) continue;
 
                 $recordId = isset($schedRecordIds[$k]) ? $schedRecordIds[$k] : '';
+                $auditeeFreeText = isset($schedAuditeeFree[$k]) ? trim($schedAuditeeFree[$k]) : '';
                 $schedData = [
                     'program_id'        => $program_id,
                     'process_id'        => !empty($processId) ? $processId : null,
@@ -301,6 +303,7 @@ class Audit_preparation extends Admin_Controller
                     'audit_date'        => isset($schedDates[$k]) ? $schedDates[$k] : null,
                     'start_time'        => isset($schedStartTimes[$k]) ? $schedStartTimes[$k] : null,
                     'end_time'          => isset($schedEndTimes[$k]) ? $schedEndTimes[$k] : null,
+                    'auditee_name_free' => $auditeeFreeText,
                     'status'            => '1',
                 ];
 
@@ -359,6 +362,158 @@ class Audit_preparation extends Admin_Controller
             $count = $result->max_seq + 1;
         }
         return $prefix . sprintf("%03d", $count);
+    }
+
+    /**
+     * Send Email - sends audit schedule email to all auditors assigned in schedules
+     * Subject: "Jadwal Audit"
+     * Content: Program info + schedule table
+     */
+    public function send_email()
+    {
+        $id = $this->input->post('id');
+
+        if (!$id) {
+            echo json_encode(['status' => 0, 'msg' => 'Data not valid. Please try again.']);
+            return;
+        }
+
+        $program = $this->audit_program_model->getProgramById($id);
+
+        if (!$program) {
+            echo json_encode(['status' => 0, 'msg' => 'Audit Program tidak ditemukan.']);
+            return;
+        }
+
+        // Get schedules with auditor info
+        $schedules = $this->audit_program_model->getSchedules($id);
+        foreach ($schedules as &$schedule) {
+            $schedule->auditees = $this->audit_program_model->getScheduleAuditees($schedule->id);
+        }
+
+        if (empty($schedules)) {
+            echo json_encode(['status' => 0, 'msg' => 'Tidak ada jadwal audit untuk dikirim.']);
+            return;
+        }
+
+        // Collect unique auditor emails from schedules
+        $auditor_ids = [];
+        foreach ($schedules as $sched) {
+            if (!empty($sched->auditor_id)) {
+                $auditor_ids[] = $sched->auditor_id;
+            }
+        }
+        $auditor_ids = array_unique($auditor_ids);
+
+        if (empty($auditor_ids)) {
+            echo json_encode(['status' => 0, 'msg' => 'Tidak ada auditor yang terdaftar di jadwal.']);
+            return;
+        }
+
+        // Get auditor emails
+        $this->db->where_in('id', $auditor_ids);
+        $this->db->where('status', '1');
+        $auditors = $this->db->get('audit_auditor_consultant')->result();
+
+        $emails = [];
+        foreach ($auditors as $aud) {
+            if (!empty($aud->email)) {
+                $emails[] = $aud->email;
+            }
+        }
+
+        if (empty($emails)) {
+            echo json_encode(['status' => 0, 'msg' => 'Auditor tidak memiliki alamat email.']);
+            return;
+        }
+
+        // Build email body HTML
+        $body = $this->_buildEmailBody($program, $schedules);
+
+        // Load CI email library and send
+        $this->load->library('email');
+
+        $config = get_smtp_config();
+        $smtp_user = $config['smtp_user'];
+
+        $this->email->initialize($config);
+        $this->email->from($smtp_user, 'Sentral Sistem - Audit');
+        $this->email->to($emails);
+        $this->email->subject('Jadwal Audit');
+        $this->email->message($body);
+
+        if ($this->email->send()) {
+            echo json_encode(['status' => 1, 'msg' => 'Email berhasil dikirim ke ' . count($emails) . ' auditor.']);
+        } else {
+            $error = $this->email->print_debugger(['headers']);
+            log_message('error', 'Email send failed: ' . $error);
+            echo json_encode(['status' => 0, 'msg' => 'Gagal mengirim email. Silakan cek konfigurasi email.']);
+        }
+    }
+
+    /**
+     * Build HTML email body for audit schedule notification
+     *
+     * @param object $program Program data
+     * @param array $schedules Schedule data with auditees
+     * @return string HTML email body
+     */
+    private function _buildEmailBody($program, $schedules)
+    {
+        $html = '<!DOCTYPE html><html><head><meta charset="utf-8"></head><body style="font-family: Arial, sans-serif; font-size: 14px; color: #333;">';
+        $html .= '<h2 style="color: #2c3e50;">Jadwal Audit</h2>';
+
+        // Program info table
+        $html .= '<table style="border-collapse: collapse; width: 100%; margin-bottom: 20px;" border="1" cellpadding="8">';
+        $html .= '<tr><th style="text-align:left; background:#f8f9fa; width:200px;">ID Program</th><td>' . htmlspecialchars($program->id) . '</td></tr>';
+        $html .= '<tr><th style="text-align:left; background:#f8f9fa;">Perusahaan</th><td>' . htmlspecialchars($program->company) . '</td></tr>';
+        $html .= '<tr><th style="text-align:left; background:#f8f9fa;">Lead Auditor</th><td>' . htmlspecialchars($program->auditor_name) . '</td></tr>';
+        $html .= '<tr><th style="text-align:left; background:#f8f9fa;">Ruang Lingkup</th><td>' . htmlspecialchars($program->audit_scope) . '</td></tr>';
+        $html .= '</table>';
+
+        // Schedule table
+        $html .= '<h3 style="color: #2c3e50;"><i class="fa fa-calendar-alt"></i> Jadwal Audit</h3>';
+        $html .= '<table style="border-collapse: collapse; width: 100%;" border="1" cellpadding="8">';
+        $html .= '<thead><tr style="background: #f8f9fa; text-align: center;">';
+        $html .= '<th>No</th><th>Proses</th><th>Auditor</th><th>Department - Company</th><th>Tanggal</th><th>Mulai</th><th>Selesai</th>';
+        $html .= '</tr></thead><tbody>';
+
+        foreach ($schedules as $k => $sched) {
+            $process = !empty($sched->process_name) ? strip_tags($sched->process_name) : htmlspecialchars($sched->process_name_free);
+            $auditor = htmlspecialchars($sched->auditor_name);
+
+            // Department
+            $dept = '-';
+            if (!empty($sched->auditees)) {
+                $auditee_names = [];
+                foreach ($sched->auditees as $aud) {
+                    $auditee_names[] = $aud->department_name;
+                }
+                $dept = implode(', ', $auditee_names);
+            } elseif (!empty($sched->auditee_name_free)) {
+                $dept = htmlspecialchars($sched->auditee_name_free);
+            }
+
+            $date = date('d-m-Y', strtotime($sched->audit_date));
+            $start = substr($sched->start_time, 0, 5);
+            $end = substr($sched->end_time, 0, 5);
+
+            $html .= '<tr>';
+            $html .= '<td style="text-align:center;">' . ($k + 1) . '</td>';
+            $html .= '<td>' . $process . '</td>';
+            $html .= '<td>' . $auditor . '</td>';
+            $html .= '<td>' . $dept . '</td>';
+            $html .= '<td style="text-align:center;">' . $date . '</td>';
+            $html .= '<td style="text-align:center;">' . $start . '</td>';
+            $html .= '<td style="text-align:center;">' . $end . '</td>';
+            $html .= '</tr>';
+        }
+
+        $html .= '</tbody></table>';
+        $html .= '<br><p style="color: #7f8c8d; font-size: 12px;">Email ini dikirim otomatis dari Sentral Sistem - Audit Module.</p>';
+        $html .= '</body></html>';
+
+        return $html;
     }
 
     /**
@@ -603,7 +758,7 @@ class Audit_preparation extends Admin_Controller
 
         // 3. Validate Audit Scope: not empty, must be valid option
         $audit_scope = isset($data['audit_scope']) ? $data['audit_scope'] : '';
-        $valid_scopes = ['Audit Khusus', 'Audit Regular'];
+        $valid_scopes = ['Audit Khusus', 'Audit Regular', 'Audit Product', 'Audit Process'];
         if (empty($audit_scope)) {
             $errors[] = 'Audit Scope must be selected.';
         } elseif (!in_array($audit_scope, $valid_scopes)) {
@@ -650,9 +805,10 @@ class Audit_preparation extends Admin_Controller
                 if (empty($data['schedule_auditor_id'][$index])) {
                     $errors[] = "Schedule row {$row_num}: Auditor must be selected.";
                 }
-                // Department is now single select
-                if (empty($data['schedule_auditee_id'][$index])) {
-                    $errors[] = "Schedule row {$row_num}: Department must be selected.";
+                // Department is now single select or free text
+                $auditeeFreeText = isset($data['schedule_auditee_name_free'][$index]) ? trim($data['schedule_auditee_name_free'][$index]) : '';
+                if (empty($data['schedule_auditee_id'][$index]) && empty($auditeeFreeText)) {
+                    $errors[] = "Schedule row {$row_num}: Department must be selected or filled.";
                 }
 
                 $audit_date = isset($data['schedule_date'][$index]) ? $data['schedule_date'][$index] : '';

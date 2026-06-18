@@ -37,6 +37,7 @@
 											<td class="text-center">
 												<a href="<?= site_url('audit_preparation/edit/' . $v->id); ?>" class="btn btn-xs btn-icon btn-primary" title="Edit"><i class="fa fa-edit" aria-hidden="true"></i></a>
 												<a href="<?= site_url('audit_preparation/view/' . $v->id); ?>" class="btn btn-xs btn-icon btn-info" title="View"><i class="fa fa-eye" aria-hidden="true"></i></a>
+												<button type="button" class="btn btn-xs btn-icon btn-success send-email" data-id="<?= $v->id; ?>" title="Kirim Email"><i class="fa fa-envelope" aria-hidden="true"></i></button>
 												<button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $v->id; ?>" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i></button>
 											</td>
 										</tr>
@@ -57,6 +58,49 @@
 			fixedHeader: true,
 			processing: true,
 			destroy: true
+		});
+
+		$(document).on('click', '.send-email', function(e) {
+			const id = $(this).data('id');
+			const btn = $(this);
+			Swal.fire({
+				title: 'Kirim Email Jadwal Audit?',
+				icon: 'question',
+				text: 'Email akan dikirim ke semua Auditor yang terdaftar di jadwal. Lanjutkan?',
+				showCancelButton: true,
+				confirmButtonText: 'Ya, Kirim',
+				cancelButtonText: 'Batal'
+			}).then((result) => {
+				if (result.isConfirmed) {
+					btn.attr('disabled', true).html('<i class="spinner spinner-border-sm"></i>');
+					$.post(siteurl + 'audit_preparation/send_email', {id: id}, function(res) {
+						btn.attr('disabled', false).html('<i class="fa fa-envelope"></i>');
+						if (res.status == 1) {
+							Swal.fire({
+								title: 'Success!',
+								icon: 'success',
+								text: res.msg,
+								timer: 3000
+							});
+						} else {
+							Swal.fire({
+								title: 'Warning!',
+								icon: 'warning',
+								text: res.msg,
+								timer: 4000
+							});
+						}
+					}, 'json').fail(function() {
+						btn.attr('disabled', false).html('<i class="fa fa-envelope"></i>');
+						Swal.fire({
+							title: 'Error!',
+							icon: 'error',
+							text: 'Server timeout, because error!',
+							timer: 4000
+						});
+					});
+				}
+			});
 		});
 
 		$(document).on('click', '.delete', function(e) {

@@ -14,7 +14,7 @@
 										<th width="3%">No</th>
 										<th>Tanggal</th>
 										<th>Proses</th>
-										<th>Department</th>
+										<th>Department - Company</th>
 										<th>Auditor</th>
 										<th>Temuan</th>
 										<th>Kategori</th>

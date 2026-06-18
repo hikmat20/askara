@@ -49,7 +49,7 @@ foreach ($files as $f) {
                                 <td><?= !empty($header->audit_date) ? date('d-m-Y', strtotime($header->audit_date)) : '-'; ?></td>
                             </tr>
                             <tr>
-                                <th>Department</th>
+                                <th>Department - Company</th>
                                 <td><?= !empty($header->department_name) ? htmlspecialchars($header->department_name) : '-'; ?></td>
                             </tr>
                             <tr>
