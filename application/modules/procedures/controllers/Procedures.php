@@ -235,6 +235,7 @@ class Procedures extends Admin_Controller
 
 		unset($Data['revision']);
 		unset($Data['bilingual']);
+		unset($Data['DataTables_Table_0_length']);
 
 		if ($Data) {
 			if (isset($_FILES)) {
