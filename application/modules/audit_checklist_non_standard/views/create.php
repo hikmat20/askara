@@ -20,7 +20,7 @@
 									<td><?= !empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free); ?></td>
 								</tr>
 								<tr>
-									<th>Department</th>
+									<th>Department - Company</th>
 									<td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td>
 								</tr>
 								<tr>
@@ -83,7 +83,7 @@
 												<tr class="checklist-row">
 													<td class="text-center row-number"><?= $k + 1; ?></td>
 													<td>
-														<input type="text" name="checklist[<?= $k; ?>][text]" class="form-control checklist-input" value="<?= htmlspecialchars($item->checklist_text); ?>" placeholder="Input checklist item">
+														<input type="text" name="checklist[<?= $k; ?>][text]" class="form-control checklist-input" value="<?= htmlspecialchars($item->checklist_text); ?>" placeholder="Apakah laporan kinerja vendor (on-time delivery rate) direview secara berkala?">
 													</td>
 													<td class="text-center">
 														<button type="button" class="btn btn-xs btn-icon btn-danger btn-delete-checklist" title="Delete"><i class="fa fa-trash"></i></button>
@@ -94,7 +94,7 @@
 											<tr class="checklist-row">
 												<td class="text-center row-number">1</td>
 												<td>
-													<input type="text" name="checklist[0][text]" class="form-control checklist-input" placeholder="Input checklist item">
+													<input type="text" name="checklist[0][text]" class="form-control checklist-input" placeholder="Apakah laporan kinerja vendor (on-time delivery rate) direview secara berkala?">
 												</td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs btn-icon btn-danger btn-delete-checklist" title="Delete"><i class="fa fa-trash"></i></button>
@@ -125,7 +125,7 @@ $(document).ready(function() {
 	$('#btn-add-checklist').on('click', function() {
 		var html = '<tr class="checklist-row">' +
 			'<td class="text-center row-number"></td>' +
-			'<td><input type="text" name="checklist[' + rowIndex + '][text]" class="form-control checklist-input" placeholder="Input checklist item"></td>' +
+			'<td><input type="text" name="checklist[' + rowIndex + '][text]" class="form-control checklist-input" placeholder="Apakah laporan kinerja vendor (on-time delivery rate) direview secara berkala?"></td>' +
 			'<td class="text-center"><button type="button" class="btn btn-xs btn-icon btn-danger btn-delete-checklist" title="Delete"><i class="fa fa-trash"></i></button></td>' +
 			'</tr>';
 		$('#table-checklist tbody').append(html);

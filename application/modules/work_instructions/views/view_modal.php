@@ -11,6 +11,13 @@
                         </span>
                     <?php endif; ?>
                 </h3>
+                <?php if (!empty($wi->display_file_name) && $this->auth->is_admin()) : ?>
+                    <div class="card-toolbar">
+                        <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-sm btn-light-primary">
+                            <i class="fa fa-download"></i> Download
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="card-body p-0">
                 <?php if (!empty($wi->display_file_name)) : ?>
@@ -25,7 +32,9 @@
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF. 
-                                <a href="<?= $file_path; ?>" target="_blank">Klik di sini untuk download</a>
+                                <?php if ($this->auth->is_admin()) : ?>
+                                    <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank">Klik di sini untuk download</a>
+                                <?php endif; ?>
                             </p>
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
@@ -33,33 +42,45 @@
                         <div class="p-5 text-center">
                             <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
                             <h4>Excel Document</h4>
-                            <p class=""><?= htmlspecialchars($wi->display_file_name); ?></p>
-                            <p class="">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-success">
-                                <i class="fa fa-download"></i> Download Excel File
-                            </a>
+                            <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
+                            <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
+                            <?php if ($this->auth->is_admin()) : ?>
+                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-success">
+                                    <i class="fa fa-download"></i> Download Excel File
+                                </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                            <?php endif; ?>
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
                         <div class="p-5 text-center">
                             <i class="fa fa-file-word fa-5x text-primary mb-3"></i>
                             <h4>Word Document</h4>
-                            <p class=""><?= htmlspecialchars($wi->display_file_name); ?></p>
-                            <p class="">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-primary">
-                                <i class="fa fa-download"></i> Download Word File
-                            </a>
+                            <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
+                            <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
+                            <?php if ($this->auth->is_admin()) : ?>
+                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-primary">
+                                    <i class="fa fa-download"></i> Download Word File
+                                </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                            <?php endif; ?>
                         </div>
                     <?php else : ?>
                         <!-- Unknown file type -->
                         <div class="p-5 text-center">
                             <i class="fa fa-file fa-5x text-secondary mb-3"></i>
                             <h4>Document File</h4>
-                            <p class=""><?= htmlspecialchars($wi->display_file_name); ?></p>
-                            <p class="">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-secondary">
-                                <i class="fa fa-download"></i> Download File
-                            </a>
+                            <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
+                            <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
+                            <?php if ($this->auth->is_admin()) : ?>
+                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-secondary">
+                                    <i class="fa fa-download"></i> Download File
+                                </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 <?php else : ?>
@@ -278,10 +299,14 @@
                                         data-version="<?= $version->version_number; ?>">
                                     <i class="fa fa-eye"></i> View
                                 </button>
-                                <a href="<?= base_url('work_instructions/download_version/' . $wi->id . '/' . $version->version_number); ?>" 
-                                   class="btn btn-sm btn-primary">
-                                    <i class="fa fa-download"></i> Download
-                                </a>
+                                <?php if ($this->auth->is_admin()) : ?>
+                                    <a href="<?= base_url('work_instructions/download_version/' . $wi->id . '/' . $version->version_number); ?>" 
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fa fa-download"></i> Download
+                                    </a>
+                                <?php else : ?>
+                                    <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

@@ -18,8 +18,9 @@
 									<tr class="text-center">
 										<th width="10">No.</th>
 										<th class="text-left">Name</th>
-										<th class="text-center">Description</th>
 										<th class="text-center">Position</th>
+										<th class="text-center">Email</th>
+										<th class="text-center">Description</th>
 										<th width="50" class="text-center">Action</th>
 									</tr>
 								</thead>
@@ -28,17 +29,17 @@
 										<tr>
 											<td class="text-center"><?= $k; ?></td>
 											<td><?= $v->name; ?></td>
-											<td><?= $v->description; ?></td>
 											<td>
 												<?php
-												$arr =[];
+												$arr = [];
 												if ($v->position) foreach (json_decode($v->position) as $pos) {
 													$arr[] = $position[$pos];
-												}; 
+												}
 												echo implode(', ', $arr);
 												?>
-
 											</td>
+											<td><?= isset($v->email) ? $v->email : ''; ?></td>
+											<td><?= $v->description; ?></td>
 											<td class="text-center">
 												<button type="button" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $v->id; ?>"><i class="fa fa-edit" aria-hidden="true"></i></button>
 												<button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $v->id; ?>"><i class="fa fa-trash" aria-hidden="true"></i></button>

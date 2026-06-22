@@ -24,7 +24,7 @@
   <!-- Custom CSS -->
   <link rel="stylesheet" href="<?= base_url('assets/css/styles.css') ?>">
   <!-- jQuery 2.2.3 -->
-  <script src="<?= base_url('assets/plugins/jQuery/jquery-2.2.3.min.js') ?>"></script>
+  <script src="<?= base_url('assets/login/js/jquery-3.3.1.min.js') ?>"></script>
   <script src="<?= base_url('assets/plugins/daterangepicker/moment.min.js')?>"></script>
   <script src="<?=base_url('assets/plugins/slimScroll/jquery.slimscroll.min.js');?>"></script>
 

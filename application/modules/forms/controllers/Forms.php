@@ -447,6 +447,76 @@ class Forms extends Admin_Controller
 		force_download($version_data->file_name, $file_data);
 	}
 
+	/**
+	 * Download active/current version of form
+	 * 
+	 * URL: forms/download/{id}
+	 * 
+	 * @param int $id Form ID
+	 * @return void
+	 */
+	public function download($id = null)
+	{
+		if ($id === null) {
+			show_404();
+			return;
+		}
+
+		if (!$this->_checkCompanyIsolation($id)) {
+			$this->output->set_status_header(403);
+			show_error('Access Denied: You do not have permission to access this document.', 403);
+			return;
+		}
+
+		$form = $this->FormModel->find_data('view_forms', $id, 'id');
+		if (!$form) {
+			show_404();
+			return;
+		}
+
+		// VERSION CONTROL: Get dynamic current version to display
+		$display_form = $this->FormModel->getCurrentVersion($id);
+		if (!$display_form) {
+			show_404();
+			return;
+		}
+
+		if ($display_form->form_type !== 'upload_file') {
+			// If form is link based, redirect to it
+			if (filter_var($display_form->link_form, FILTER_VALIDATE_URL)) {
+				redirect($display_form->link_form);
+				return;
+			}
+		}
+
+		$file_name = '';
+		$file_path = '';
+
+		if (isset($display_form->is_from_history) && $display_form->is_from_history) {
+			$file_name = $display_form->file_name;
+			$file_path = $display_form->file_path;
+		} else {
+			$file_name = $display_form->file_name;
+			$file_path = 'directory/FORMS/' . $form->company_id . '/' . $display_form->file_name;
+		}
+
+		if (!empty($file_name)) {
+			// Get full file path on server
+			$clean_path = ltrim($file_path, './');
+			$full_path = FCPATH . $clean_path;
+
+			// Validate file exists on server
+			if (file_exists($full_path)) {
+				$this->load->helper('download');
+				$file_data = file_get_contents($full_path);
+				force_download($file_name, $file_data);
+				exit;
+			}
+		}
+
+		show_error('File not found: The document file may have been deleted or moved.', 404);
+	}
+
 	private function _checkCompanyIsolation($form_id)
 	{
 		$form = $this->db->get_where('forms', ['id' => $form_id])->row();

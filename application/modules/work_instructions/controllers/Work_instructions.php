@@ -354,6 +354,65 @@ class Work_instructions extends Admin_Controller
 		force_download($version_data->file_name, $file_data);
 	}
 
+	/**
+	 * Download active/current version of work instruction
+	 * 
+	 * URL: work_instructions/download/{id}
+	 * 
+	 * @param int $id Work instruction ID
+	 * @return void
+	 */
+	public function download($id = null)
+	{
+		if ($id === null) {
+			show_404();
+			return;
+		}
+
+		// Check company isolation - verify work instruction belongs to user's company
+		if (!$this->_checkCompanyIsolation($id)) {
+			$this->output->set_status_header(403);
+			show_error('Access Denied: You do not have permission to access this document.', 403);
+			return;
+		}
+
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $id])->row();
+		if (!$wi) {
+			show_404();
+			return;
+		}
+
+		// VERSION CONTROL: Get current version to display (handles under revision scenario)
+		$current_version = $this->WiModel->getCurrentVersion($id);
+		
+		$file_name = '';
+		$file_path = '';
+
+		if ($current_version && isset($current_version->is_from_history) && $current_version->is_from_history) {
+			$file_name = $current_version->file_name;
+			$file_path = $current_version->file_path;
+		} else {
+			$file_name = $wi->file_name;
+			$file_path = $wi->file_path;
+		}
+
+		if (!empty($file_name)) {
+			// Get full file path on server
+			$clean_path = ltrim($file_path, './');
+			$full_path = FCPATH . $clean_path;
+
+			// Validate file exists on server
+			if (file_exists($full_path)) {
+				$this->load->helper('download');
+				$file_data = file_get_contents($full_path);
+				force_download($file_name, $file_data);
+				exit;
+			}
+		}
+
+		show_error('File not found: The document file may have been deleted or moved.', 404);
+	}
+
 	private function _validation()
 	{
 		$this->load->library('form_validation');

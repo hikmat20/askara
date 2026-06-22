@@ -13,6 +13,10 @@
     </select>
   </div>
   <div class="form-group">
+    <label class="h6 font-weight-bold mb-5">Email <span class="text-danger">*</span></label>
+    <input type="email" name="email" value="<?= isset($data->email) ? $data->email : ''; ?>" placeholder="Email" class="form-control form-control-lg required" aria-describedby="helpId">
+  </div>
+  <div class="form-group">
     <label class="h6 font-weight-bold mb-5">Description</label>
     <textarea name="description" placeholder="Description" rows="5" class="form-control  form-control-lg" aria-describedby="helpId"><?= $data->description; ?></textarea>
   </div>

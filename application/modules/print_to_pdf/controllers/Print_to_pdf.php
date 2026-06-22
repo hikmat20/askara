@@ -27,6 +27,24 @@ class Print_to_pdf extends CI_Controller
         $mpdf->showImageErrors = true;
         $mpdf->curlAllowUnsafeSslRequests = true;
         $procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
+        if (!$procedure) {
+            show_404();
+            return;
+        }
+
+        $download = $this->input->get('download');
+        if ($download) {
+            if (!empty($procedure->file_path)) {
+                $clean_path = ltrim($procedure->file_path, './');
+                $full_path = FCPATH . $clean_path;
+                if (file_exists($full_path)) {
+                    $this->load->helper('download');
+                    force_download($full_path, NULL);
+                    exit;
+                }
+            }
+        }
+
         $flowDetail          = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
         $getForms            = $this->db->get_where('dir_forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
         $getGuides           = $this->db->get_where('dir_guides', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
@@ -103,7 +121,11 @@ class Print_to_pdf extends CI_Controller
         // 8️⃣ PASTIKAN BUFFER BERSIH
 
         $mpdf->WriteHTML($page);
-        $mpdf->Output('procedure.pdf', 'I');
+        if ($download) {
+            $mpdf->Output(trim($procedure->name) . '.pdf', 'D');
+        } else {
+            $mpdf->Output('procedure.pdf', 'I');
+        }
         exit; // ⬅️ WAJIB & BENAR
     }
 

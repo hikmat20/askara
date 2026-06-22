@@ -17,6 +17,54 @@ class Pelaksanaan_audit_model extends BF_Model
     }
 
     // =========================================================================
+    // PROGRAM & SCHEDULE DATA
+    // =========================================================================
+
+    /**
+     * Get all active audit programs with lead auditor name (for index page)
+     */
+    public function getActivePrograms()
+    {
+        return $this->db->select('audit_program.*, audit_auditor_consultant.name as auditor_name')
+            ->from('audit_program')
+            ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program.lead_auditor_id', 'left')
+            ->where('audit_program.status', '1')
+            ->order_by('audit_program.created_at', 'DESC')
+            ->get()
+            ->result();
+    }
+
+    /**
+     * Get schedules for a specific program
+     */
+    public function getSchedulesByProgram($program_id)
+    {
+        return $this->db->select('
+                audit_program_schedule.id as schedule_id,
+                audit_program_schedule.program_id,
+                audit_program_schedule.process_id,
+                audit_program_schedule.audit_date,
+                audit_program_schedule.start_time,
+                audit_program_schedule.end_time,
+                audit_program_schedule.process_name_free,
+                procedures.name as process_name,
+                audit_auditor_consultant.name as auditor_name,
+                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name
+            ')
+            ->from('audit_program_schedule')
+            ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
+            ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
+            ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
+            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
+            ->where('audit_program_schedule.program_id', $program_id)
+            ->where('audit_program_schedule.status', '1')
+            ->order_by('audit_program_schedule.audit_date', 'ASC')
+            ->order_by('audit_program_schedule.start_time', 'ASC')
+            ->get()
+            ->result();
+    }
+
+    // =========================================================================
     // SCHEDULE DATA (from audit_program_schedule)
     // =========================================================================
 
@@ -33,7 +81,7 @@ class Pelaksanaan_audit_model extends BF_Model
                 audit_program_schedule.process_name_free,
                 procedures.name as process_name,
                 audit_auditor_consultant.name as auditor_name,
-                audit_department.department_name,
+                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
                 audit_program.company,
                 audit_program.id as program_code
             ')
@@ -45,7 +93,6 @@ class Pelaksanaan_audit_model extends BF_Model
             ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.status', '1')
             ->where('audit_program.status', '1')
-            ->where('(audit_program_schedule.id IN (SELECT DISTINCT schedule_id FROM audit_checklist_non_standard WHERE status = "1") OR audit_program_schedule.process_id IN (SELECT DISTINCT procedure_id FROM audit_checklist WHERE status = "1"))', null, false)
             ->order_by('audit_program_schedule.audit_date', 'DESC')
             ->order_by('audit_program_schedule.start_time', 'ASC')
             ->get()
@@ -64,7 +111,7 @@ class Pelaksanaan_audit_model extends BF_Model
                 audit_program_schedule.process_name_free,
                 procedures.name as process_name,
                 audit_auditor_consultant.name as auditor_name,
-                audit_department.department_name,
+                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
                 audit_program.company,
                 audit_program.id as program_code
             ')
@@ -203,6 +250,14 @@ class Pelaksanaan_audit_model extends BF_Model
         ])->result();
     }
 
+    public function getAuditFreeChecklist($audit_id)
+    {
+        return $this->db->get_where('pelaksanaan_audit_free_checklist', [
+            'audit_id' => $audit_id,
+            'status'   => '1'
+        ])->result();
+    }
+
     // =========================================================================
     // SAVE AUDIT
     // =========================================================================
@@ -215,6 +270,7 @@ class Pelaksanaan_audit_model extends BF_Model
         $schedule_id = $data['schedule_id'];
         $ns_details = isset($data['ns_detail']) ? $data['ns_detail'] : [];
         $std_details = isset($data['std_detail']) ? $data['std_detail'] : [];
+        $free_checklist = isset($data['free_checklist']) ? $data['free_checklist'] : [];
         $conformity = isset($data['conformity']) ? $data['conformity'] : [];
         $temuan = isset($data['temuan']) ? $data['temuan'] : [];
 
@@ -224,17 +280,19 @@ class Pelaksanaan_audit_model extends BF_Model
         if ($existing) {
             $audit_id = $existing->id;
             $this->db->update('pelaksanaan_audit', [
+                'auditee_text' => isset($data['auditee_text']) ? $data['auditee_text'] : null,
                 'modified_at' => $now,
                 'modified_by' => $userId,
             ], ['id' => $audit_id]);
         } else {
             $audit_id = $this->generateAuditId();
             $this->db->insert('pelaksanaan_audit', [
-                'id'          => $audit_id,
-                'schedule_id' => $schedule_id,
-                'status'      => '1',
-                'created_at'  => $now,
-                'created_by'  => $userId,
+                'id'           => $audit_id,
+                'schedule_id'  => $schedule_id,
+                'auditee_text' => isset($data['auditee_text']) ? $data['auditee_text'] : null,
+                'status'       => '1',
+                'created_at'   => $now,
+                'created_by'   => $userId,
             ]);
         }
 
@@ -243,6 +301,9 @@ class Pelaksanaan_audit_model extends BF_Model
 
         // Save Standard Details
         $this->saveStdDetails($audit_id, $std_details, $userId, $now);
+
+        // Save Free Checklist
+        $this->saveFreeChecklist($audit_id, $free_checklist, $userId, $now);
 
         // Save Conformity/Strong Point
         $this->saveConformity($audit_id, $conformity, $userId, $now);
@@ -350,6 +411,35 @@ class Pelaksanaan_audit_model extends BF_Model
         }
     }
 
+    private function saveFreeChecklist($audit_id, $items, $userId, $now)
+    {
+        // Soft delete existing
+        $this->db->update('pelaksanaan_audit_free_checklist', ['status' => '0'], ['audit_id' => $audit_id]);
+
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $checklist_text = isset($item['checklist_text']) ? trim($item['checklist_text']) : '';
+                if ($checklist_text === '') continue;
+
+                $insertData = [
+                    'audit_id'       => $audit_id,
+                    'checklist_text' => $checklist_text,
+                    'catatan'        => isset($item['catatan']) ? $item['catatan'] : '',
+                    'status'         => '1',
+                    'created_at'     => $now,
+                    'created_by'     => $userId,
+                ];
+
+                if (isset($item['id']) && $item['id']) {
+                    $insertData['id'] = $item['id'];
+                    $this->db->update('pelaksanaan_audit_free_checklist', $insertData, ['id' => $item['id']]);
+                } else {
+                    $this->db->insert('pelaksanaan_audit_free_checklist', $insertData);
+                }
+            }
+        }
+    }
+
     private function saveConformity($audit_id, $items, $userId, $now)
     {
         // Soft delete existing
@@ -397,12 +487,23 @@ class Pelaksanaan_audit_model extends BF_Model
                 $description = isset($item['description']) ? trim($item['description']) : '';
                 if ($description === '') continue;
 
+                // Handle pasal_id as array (multiselect) -> store as JSON
+                $pasal_id = null;
+                if (isset($item['pasal_id'])) {
+                    if (is_array($item['pasal_id'])) {
+                        $filtered = array_filter($item['pasal_id']);
+                        $pasal_id = !empty($filtered) ? json_encode(array_values($filtered)) : null;
+                    } else {
+                        $pasal_id = $item['pasal_id'];
+                    }
+                }
+
                 $insertData = [
                     'audit_id'    => $audit_id,
                     'description' => $description,
                     'kategori'    => isset($item['kategori']) ? $item['kategori'] : '',
                     'iso_id'      => isset($item['iso_id']) ? $item['iso_id'] : null,
-                    'pasal_id'    => isset($item['pasal_id']) ? $item['pasal_id'] : null,
+                    'pasal_id'    => $pasal_id,
                     'status'      => '1',
                     'created_at'  => $now,
                     'created_by'  => $userId,

@@ -11,7 +11,7 @@
         <div class="mb-3 row">
             <label class="col-3 col-form-label font-weight-bold">Issue Description <span class="text-danger">*</span></label>
             <div class="col-9">
-                <textarea id="issue_description" class="form-control required" rows="3" maxlength="2000" placeholder="Enter issue description"></textarea>
+                <textarea id="issue_description" class="form-control required" rows="3" maxlength="2000" placeholder="Pelaksanaan audit bisa lebih tajam dalam menemukan kelemahan sistem. “Kita sudah menerapkan sistem sejak 5 tahun yang lalu, tapi saya merasakan bahwa sistem kita masih sekedar dokumen saja, aktualnya masih banyak problem."></textarea>
                 <small class="text-muted"><span id="issue_desc_count">0</span>/2000 characters</small>
                 <span class="invalid-feedback">Issue Description can't be empty</span>
             </div>
@@ -19,7 +19,7 @@
         <div class="mb-3 row">
             <label class="col-3 col-form-label font-weight-bold">Improvement</label>
             <div class="col-9">
-                <textarea id="management_input" class="form-control" rows="3" maxlength="2000" placeholder="Enter management input/direction"></textarea>
+                <textarea id="management_input" class="form-control" rows="3" maxlength="2000" placeholder="Pelaksanaan audit tidak hanya cek dokumen, tetapi melakukan cek hasil"></textarea>
                 <small class="text-muted"><span id="mgmt_input_count">0</span>/2000 characters</small>
             </div>
         </div>

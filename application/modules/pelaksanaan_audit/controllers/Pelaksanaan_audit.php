@@ -21,11 +21,39 @@ class Pelaksanaan_audit extends Admin_Controller
     }
 
     /**
-     * Index - shows two tabs: Konsep and Simulasi
+     * Index - shows audit programs (parent level), same as Jadwal & Persiapan Audit
      */
     public function index()
     {
-        $schedules = $this->model->getAllSchedules();
+        $programs = $this->model->getActivePrograms();
+        $this->template->set('programs', $programs);
+        $this->template->render('index');
+    }
+
+    /**
+     * Schedules - shows list of proses/schedules for a given program
+     *
+     * @param string $program_id
+     */
+    public function schedules($program_id = null)
+    {
+        if (!$program_id) {
+            show_404();
+            return;
+        }
+
+        $program = $this->db->select('audit_program.*, audit_auditor_consultant.name as auditor_name')
+            ->from('audit_program')
+            ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program.lead_auditor_id', 'left')
+            ->where('audit_program.id', $program_id)
+            ->get()->row();
+
+        if (!$program) {
+            show_404();
+            return;
+        }
+
+        $schedules = $this->model->getSchedulesByProgram($program_id);
 
         // Check which schedules already have audit data
         $has_audit = [];
@@ -33,9 +61,10 @@ class Pelaksanaan_audit extends Admin_Controller
             $has_audit[$s->schedule_id] = $this->model->countAuditByScheduleId($s->schedule_id) > 0;
         }
 
+        $this->template->set('program', $program);
         $this->template->set('schedules', $schedules);
         $this->template->set('has_audit', $has_audit);
-        $this->template->render('index');
+        $this->template->render('schedules');
     }
 
     /**
@@ -72,27 +101,30 @@ class Pelaksanaan_audit extends Admin_Controller
         $audit_data = $this->model->getAuditByScheduleId($schedule_id);
         $audit_ns_details = [];
         $audit_std_details = [];
+        $audit_free_checklist = [];
         $audit_conformity = [];
         $audit_temuan = [];
 
         if ($audit_data) {
             $audit_ns_details = $this->model->getAuditNsDetails($audit_data->id);
             $audit_std_details = $this->model->getAuditStdDetails($audit_data->id);
+            $audit_free_checklist = $this->model->getAuditFreeChecklist($audit_data->id);
             $audit_conformity = $this->model->getAuditConformity($audit_data->id);
             $audit_temuan = $this->model->getAuditTemuan($audit_data->id);
         }
 
         $this->template->set([
-            'schedule'          => $schedule,
-            'issues'            => $issues,
-            'ns_checklist'      => $ns_checklist,
-            'std_checklist'     => $std_checklist,
-            'standards'         => $standards,
-            'audit_data'        => $audit_data,
-            'audit_ns_details'  => $audit_ns_details,
-            'audit_std_details' => $audit_std_details,
-            'audit_conformity'  => $audit_conformity,
-            'audit_temuan'      => $audit_temuan,
+            'schedule'              => $schedule,
+            'issues'                => $issues,
+            'ns_checklist'          => $ns_checklist,
+            'std_checklist'         => $std_checklist,
+            'standards'             => $standards,
+            'audit_data'            => $audit_data,
+            'audit_ns_details'      => $audit_ns_details,
+            'audit_std_details'     => $audit_std_details,
+            'audit_free_checklist'  => $audit_free_checklist,
+            'audit_conformity'      => $audit_conformity,
+            'audit_temuan'          => $audit_temuan,
         ]);
         $this->template->render('audit');
     }
@@ -332,28 +364,93 @@ class Pelaksanaan_audit extends Admin_Controller
         $audit_data = $this->model->getAuditByScheduleId($schedule_id);
         $audit_ns_details = [];
         $audit_std_details = [];
+        $audit_free_checklist = [];
         $audit_conformity = [];
         $audit_temuan = [];
 
         if ($audit_data) {
             $audit_ns_details = $this->model->getAuditNsDetails($audit_data->id);
             $audit_std_details = $this->model->getAuditStdDetails($audit_data->id);
+            $audit_free_checklist = $this->model->getAuditFreeChecklist($audit_data->id);
             $audit_conformity = $this->model->getAuditConformity($audit_data->id);
             $audit_temuan = $this->model->getAuditTemuan($audit_data->id);
         }
 
         $this->template->set([
-            'schedule'          => $schedule,
-            'issues'            => $issues,
-            'ns_checklist'      => $ns_checklist,
-            'std_checklist'     => $std_checklist,
-            'standards'         => $standards,
-            'audit_data'        => $audit_data,
-            'audit_ns_details'  => $audit_ns_details,
-            'audit_std_details' => $audit_std_details,
-            'audit_conformity'  => $audit_conformity,
-            'audit_temuan'      => $audit_temuan,
+            'schedule'              => $schedule,
+            'issues'                => $issues,
+            'ns_checklist'          => $ns_checklist,
+            'std_checklist'         => $std_checklist,
+            'standards'             => $standards,
+            'audit_data'            => $audit_data,
+            'audit_ns_details'      => $audit_ns_details,
+            'audit_std_details'     => $audit_std_details,
+            'audit_free_checklist'  => $audit_free_checklist,
+            'audit_conformity'      => $audit_conformity,
+            'audit_temuan'          => $audit_temuan,
         ]);
         $this->template->render('view');
+    }
+
+    /**
+     * Print PDF - generate PDF report of pelaksanaan audit
+     *
+     * @param int $schedule_id
+     */
+    public function print_pdf($schedule_id = null)
+    {
+        if (!$schedule_id) {
+            show_404();
+            return;
+        }
+
+        $schedule = $this->model->getScheduleById($schedule_id);
+        if (!$schedule) {
+            show_404();
+            return;
+        }
+
+        $issues = $this->model->getIssuesByProcess($schedule->program_id, $schedule->process_id);
+        $ns_checklist = $this->model->getNonStandardChecklist($schedule_id);
+        $std_checklist = $this->model->getStandardChecklist($schedule->process_id, $this->company);
+        $standards = $this->model->getRequirements();
+
+        $audit_data = $this->model->getAuditByScheduleId($schedule_id);
+        $audit_ns_details = [];
+        $audit_std_details = [];
+        $audit_free_checklist = [];
+        $audit_conformity = [];
+        $audit_temuan = [];
+
+        if ($audit_data) {
+            $audit_ns_details = $this->model->getAuditNsDetails($audit_data->id);
+            $audit_std_details = $this->model->getAuditStdDetails($audit_data->id);
+            $audit_free_checklist = $this->model->getAuditFreeChecklist($audit_data->id);
+            $audit_conformity = $this->model->getAuditConformity($audit_data->id);
+            $audit_temuan = $this->model->getAuditTemuan($audit_data->id);
+        }
+
+        $data = [
+            'schedule'              => $schedule,
+            'issues'                => $issues,
+            'ns_checklist'          => $ns_checklist,
+            'std_checklist'         => $std_checklist,
+            'standards'             => $standards,
+            'audit_data'            => $audit_data,
+            'audit_ns_details'      => $audit_ns_details,
+            'audit_std_details'     => $audit_std_details,
+            'audit_free_checklist'  => $audit_free_checklist,
+            'audit_conformity'      => $audit_conformity,
+            'audit_temuan'          => $audit_temuan,
+        ];
+
+        $html = $this->load->view('pelaksanaan_audit/pdf', $data, true);
+
+        // Load mPDF directly from MPDF_ folder
+        require_once(APPPATH . 'libraries/MPDF_/mpdf.php');
+        $mpdf = new mPDF('utf-8', 'A4', 0, '', 15, 15, 15, 15, 0, 0);
+        $mpdf->SetTitle('Pelaksanaan Audit - ' . $schedule->schedule_id);
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Pelaksanaan_Audit_' . $schedule->schedule_id . '.pdf', 'I');
     }
 }
