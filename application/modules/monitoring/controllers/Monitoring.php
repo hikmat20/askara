@@ -891,11 +891,11 @@ class Monitoring extends Admin_Controller
 	/* FORMS */
 	public function view_form($id)
 	{
-		$wi = $this->Monitoring->getWi($id);
+		$form = $this->db->get_where('view_forms', ['id' => $id])->row();
 		$this->template->set([
-			'wi' => $wi,
+			'form' => $form,
 		]);
-		$this->template->render('view_wi');
+		$this->template->render('view_form');
 	}
 
 	public function forms_review()

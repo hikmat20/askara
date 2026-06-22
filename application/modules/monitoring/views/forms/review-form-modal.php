@@ -20,7 +20,7 @@
                             style="width: 100%; height: 600px; border: none;"
                             frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF.
-                                <a href="<?= $file_path; ?>" target="_blank">Klik di sini untuk download</a>
+                                <a href="<?= base_url('forms/download/' . $form->id); ?>" target="_blank">Klik di sini untuk download</a>
                             </p>
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
@@ -30,7 +30,7 @@
                             <h4>Excel Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-success">
+                            <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-success">
                                 <i class="fa fa-download"></i> Download Excel File
                             </a>
                         </div>
@@ -41,7 +41,7 @@
                             <h4>Word Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-primary">
+                            <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-primary">
                                 <i class="fa fa-download"></i> Download Word File
                             </a>
                         </div>
@@ -52,7 +52,7 @@
                             <h4>Document File</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-secondary">
+                            <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-secondary">
                                 <i class="fa fa-download"></i> Download File
                             </a>
                         </div>

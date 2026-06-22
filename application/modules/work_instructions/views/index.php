@@ -46,7 +46,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center" width="100">Rev. Number</th>
-										<th class="p-2 nosort" width="100">Opsi</th>
+										<th class="p-2 nosort" width="80">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -63,8 +63,18 @@
 												<td class="text-center"><?= $draft->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
-													<button type="button" class="btn btn-xs btn-icon btn-primary toReview" data-id="<?= $draft->id; ?>" data-toggle="tooltip" title="Process to Review"><i class="fa fa-check"></i></button>
+													<div class="dropdown open d-inline">
+														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId_draft_<?= $draft->id; ?>" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
+															<i class="fa fa-cog"></i>
+														</button>
+														<div class="dropdown-menu" aria-labelledby="triggerId_draft_<?= $draft->id; ?>">
+															<a href="<?= base_url('work_instructions/download/' . $draft->id); ?>" class="dropdown-item" title="Download WI"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item edit" data-id="<?= $draft->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item toReview" data-id="<?= $draft->id; ?>" title="Process to Review"><i class="fa fa-check mr-2 text-primary"></i>Process to Review</a>
+														</div>
+													</div>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -83,7 +93,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center">Rev. Number</th>
-										<th class="p-2 text-center" width="150">Opsi</th>
+										<th class="p-2 text-center" width="80">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -100,8 +110,16 @@
 												<td class="text-center"><?= $review->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<!-- <button type="button" class="btn btn-xs btn-icon btn-success process-review" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Process Review"><i class="fa fa-check"></i></button> -->
-													<button type="button" class="btn btn-xs btn-icon btn-danger cancelReview" data-id="<?= $review->id; ?>" data-toggle="tooltip" title="Cancel Review — kembalikan ke Draft"><i class="fa fa-undo"></i></button>
+													<div class="dropdown open d-inline">
+														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId_review_<?= $review->id; ?>" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
+															<i class="fa fa-cog"></i>
+														</button>
+														<div class="dropdown-menu" aria-labelledby="triggerId_review_<?= $review->id; ?>">
+															<a href="<?= base_url('work_instructions/download/' . $review->id); ?>" class="dropdown-item" title="Download WI"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item cancelReview" data-id="<?= $review->id; ?>" title="Cancel Review"><i class="fa fa-undo mr-2 text-danger"></i>Cancel Review</a>
+														</div>
+													</div>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -120,7 +138,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center">Rev. Number</th>
-										<th class="p-2 text-center" width="150">Opsi</th>
+										<th class="p-2 text-center" width="80">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -137,8 +155,18 @@
 												<td class="text-center"><?= $cor->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $cor->id); ?>" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
-													<button type="button" class="btn btn-xs btn-icon btn-success correctionToReview" data-id="<?= $cor->id; ?>" data-toggle="tooltip" title="Process to Review — setelah koreksi"><i class="fa fa-check"></i></button>
+													<div class="dropdown open d-inline">
+														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId_cor_<?= $cor->id; ?>" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
+															<i class="fa fa-cog"></i>
+														</button>
+														<div class="dropdown-menu" aria-labelledby="triggerId_cor_<?= $cor->id; ?>">
+															<a href="<?= base_url('work_instructions/download/' . $cor->id); ?>" class="dropdown-item" title="Download WI"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $cor->id); ?>" class="dropdown-item edit" data-id="<?= $cor->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item correctionToReview" data-id="<?= $cor->id; ?>" title="Process to Review"><i class="fa fa-check mr-2 text-primary"></i>Process to Review</a>
+														</div>
+													</div>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -157,7 +185,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center">Rev. Number</th>
-										<th class="p-2 text-center" width="100">Opsi</th>
+										<th class="p-2 text-center" width="80">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -174,7 +202,16 @@
 												<td class="text-center"><?= $apv->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<button type="button" class="btn btn-xs btn-icon btn-success process-approval" data-id="<?= $apv->id; ?>" data-toggle="tooltip" title="Process Approval"><i class="fa fa-check"></i></button>
+													<div class="dropdown open d-inline">
+														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId_apv_<?= $apv->id; ?>" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
+															<i class="fa fa-cog"></i>
+														</button>
+														<div class="dropdown-menu" aria-labelledby="triggerId_apv_<?= $apv->id; ?>">
+															<a href="<?= base_url('work_instructions/download/' . $apv->id); ?>" class="dropdown-item" title="Download WI"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item process-approval" data-id="<?= $apv->id; ?>" title="Process Approval"><i class="fa fa-check mr-2 text-primary"></i>Process Approval</a>
+														</div>
+													</div>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -193,7 +230,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center">Rev. Number</th>
-										<th class="p-2 text-center" width="100">Opsi</th>
+										<th class="p-2 text-center" width="80">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -210,8 +247,18 @@
 												<td class="text-center"><?= $rev->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $rev->id); ?>" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Edit Data"><i class="fa fa-edit"></i></a>
-													<button type="button" class="btn btn-xs btn-icon btn-success correctionToReview" data-id="<?= $rev->id; ?>" data-toggle="tooltip" title="Process to Review — setelah koreksi"><i class="fa fa-check"></i></button>
+													<div class="dropdown open d-inline">
+														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId_rev_<?= $rev->id; ?>" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
+															<i class="fa fa-cog"></i>
+														</button>
+														<div class="dropdown-menu" aria-labelledby="triggerId_rev_<?= $rev->id; ?>">
+															<a href="<?= base_url('work_instructions/download/' . $rev->id); ?>" class="dropdown-item" title="Download WI"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $rev->id); ?>" class="dropdown-item edit" data-id="<?= $rev->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item correctionToReview" data-id="<?= $rev->id; ?>" title="Process to Review"><i class="fa fa-check mr-2 text-primary"></i>Process to Review</a>
+														</div>
+													</div>
 												</td>
 											</tr>
 									<?php endforeach;
@@ -230,7 +277,7 @@
 										<th class="p-2 text-center">Issue Date</th>
 										<th class="p-2 text-center">Effective Date</th>
 										<th class="p-2 text-center">Rev. Number</th>
-										<th class="p-2 text-center" width="100">Opsi</th>
+										<th class="p-2 text-center" width="80">Opsi</th>
 									</tr>
 								</thead>
 								<tbody>
@@ -254,26 +301,28 @@
 												<td class="text-center"><?= $pub->revision_number; ?></td>
 												<td class="text-center">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $pub->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
-													<?php if (!empty($ArrPosts) && in_array(1, $ArrPosts)) : ?>
-														<button type="button" 
-															class="btn btn-xs btn-icon btn-warning btn-open-wi-modal" 
-															data-id="<?= $pub->id; ?>" 
-															data-type="revision"
-															data-title="Revision WI — <?= htmlspecialchars($pub->name); ?>"
-															data-toggle="tooltip" 
-															title="Request Revision">
-															<i class="far fa-edit"></i>
+													<div class="dropdown open d-inline">
+														<button class="btn btn-success btn-xs btn-icon" type="button" id="triggerId_pub_<?= $pub->id; ?>" data-toggle="dropdown" title="Opsi" aria-haspopup="true" aria-expanded="false">
+															<i class="fa fa-cog"></i>
 														</button>
-														<button type="button" 
-															class="btn btn-xs btn-icon btn-danger btn-open-wi-modal" 
-															data-id="<?= $pub->id; ?>" 
-															data-type="deletion"
-															data-title="Deletion WI — <?= htmlspecialchars($pub->name); ?>"
-															data-toggle="tooltip" 
-															title="Request Deletion">
-															<i class="fa fa-trash-alt"></i>
-														</button>
-													<?php endif; ?>
+														<div class="dropdown-menu" aria-labelledby="triggerId_pub_<?= $pub->id; ?>">
+															<a href="<?= base_url('work_instructions/download/' . $pub->id); ?>" class="dropdown-item" title="Download WI"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php if (!empty($ArrPosts) && in_array(1, $ArrPosts)) : ?>
+																<div class="dropdown-divider my-0"></div>
+																<a href="javascript:void(0)" class="dropdown-item btn-open-wi-modal" 
+																	data-id="<?= $pub->id; ?>" 
+																	data-type="revision"
+																	data-title="Revision WI — <?= htmlspecialchars($pub->name); ?>"
+																	title="Request Revision"><i class="far fa-edit mr-2 text-warning"></i>Request Revision</a>
+																<div class="dropdown-divider my-0"></div>
+																<a href="javascript:void(0)" class="dropdown-item btn-open-wi-modal" 
+																	data-id="<?= $pub->id; ?>" 
+																	data-type="deletion"
+																	data-title="Deletion WI — <?= htmlspecialchars($pub->name); ?>"
+																	title="Request Deletion"><i class="fa fa-trash-alt mr-2 text-danger"></i>Request Deletion</a>
+															<?php endif; ?>
+														</div>
+													</div>
 												</td>
 											</tr>
 									<?php endforeach;

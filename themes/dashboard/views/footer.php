@@ -214,11 +214,11 @@
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/prismjs/prismjs.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/scripts.bundle1036.js?"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/fullcalendar/fullcalendar.bundle1036.js?"></script>
- <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.js"></script>
+ <!-- <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.js"></script> -->
+ <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/datatables/datatables.bundle1036.js"></script>
  <!-- <script src="<?= base_url('themes\dashboard\assets\plugins\custom\select2\select21036.js'); ?>"></script> -->
  <script src="<?= base_url(); ?>themes/dashboard/assets/js/pages/widgets1036.js?"></script>
  <script src="<?= base_url(); ?>themes\dashboard\assets\plugins\custom\summernote\summernote-bs4.min.js"></script>
-
  <script src="https://cdn.jsdelivr.net/npm/flatpickr"></script>
  <script src="<?= base_url(); ?>themes/dashboard/assets/plugins/custom/jquery-ui/jquery-ui.min.js"></script>
  <script src="<?= base_url('themes/dashboard/assets/plugins/custom/monthpicker/MonthPicker.js'); ?>"></script>

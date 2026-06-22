@@ -441,6 +441,14 @@
     </div>
 
     <div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
+        <?php if ($this->auth->is_admin()) : ?>
+            <div class="mb-3 text-right">
+                <a href="<?= base_url('procedures/printfile/' . $data->id . '?download=1'); ?>" 
+                   target="_blank" class="btn btn-sm btn-primary">
+                    <i class="fa fa-download"></i> Download Document
+                </a>
+            </div>
+        <?php endif; ?>
         <?php if ($data->file_path) : ?>
         <iframe class="w-100" style="height: 70vh;" src="<?= base_url($data->file_path); ?>#toolbar=0&navpanes=0" frameborder="1"></iframe>
           

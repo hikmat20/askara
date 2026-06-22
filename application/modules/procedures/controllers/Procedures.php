@@ -1609,6 +1609,24 @@ class Procedures extends Admin_Controller
 		$mpdf->SetHtmlFooter('<div class="text-center" style="color:#595959"><i>- Hardcopy Uncontrol -</i></div>');
 		// watermark
 		$procedure           = $this->db->get_where('view_procedures', ['id' => $id])->row();
+		if (!$procedure) {
+			show_404();
+			return;
+		}
+
+		$download = $this->input->get('download');
+		if ($download) {
+			if (!empty($procedure->file_path)) {
+				$clean_path = ltrim($procedure->file_path, './');
+				$full_path = FCPATH . $clean_path;
+				if (file_exists($full_path)) {
+					$this->load->helper('download');
+					force_download($full_path, NULL);
+					exit;
+				}
+			}
+		}
+
 		$flowDetail          = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 		$getForms            = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
 		$getGuides           = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
@@ -1713,7 +1731,11 @@ class Procedures extends Admin_Controller
 		$page = convert_ol_to_table($page);
 
 		$mpdf->WriteHTML($page);
-		$mpdf->Output('', 'I');
+		if ($download) {
+			$mpdf->Output(trim($procedure->name) . '.pdf', 'D');
+		} else {
+			$mpdf->Output('', 'I');
+		}
 	}
 
 	public function printOut($id)

@@ -2,7 +2,7 @@
     <!-- LEFT SIDE: Document Preview (60%) -->
     <div class="col-lg-7">
         <div class="card card-custom shadow-sm mb-3">
-            <div class="card-header py-2">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
                 <h5 class="card-title font-weight-bolder mb-0">
                     <i class="fa fa-file-pdf text-danger mr-2"></i>Document Preview
                     <?php if (isset($form->showing_old_version) && $form->showing_old_version) : ?>
@@ -11,6 +11,13 @@
                         </span>
                     <?php endif; ?>
                 </h5>
+                <?php if (!empty($form->file_name) && $this->auth->is_admin()) : ?>
+                    <div class="card-toolbar">
+                        <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-sm btn-light-primary">
+                            <i class="fa fa-download"></i> Download
+                        </a>
+                    </div>
+                <?php endif; ?>
             </div>
             <div class="card-body p-0">
                 <?php if (!empty($form->file_name)): ?>
@@ -23,7 +30,9 @@
                         <!-- PDF Preview -->
                         <iframe src="<?= $file_path; ?>#toolbar=0" style="width: 100%; height: 600px; border: none;" frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF.
-                                <a href="<?= $file_path; ?>" target="_blank">Klik di sini untuk download</a>
+                                <?php if ($this->auth->is_admin()) : ?>
+                                    <a href="<?= base_url('forms/download/' . $form->id); ?>" target="_blank">Klik di sini untuk download</a>
+                                <?php endif; ?>
                             </p>
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])): ?>
@@ -33,9 +42,13 @@
                             <h4>Excel Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-success">
-                                <i class="fa fa-download"></i> Download Excel File
-                            </a>
+                            <?php if ($this->auth->is_admin()) : ?>
+                                <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-success">
+                                    <i class="fa fa-download"></i> Download Excel File
+                                </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                            <?php endif; ?>
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])): ?>
                         <!-- Word Preview -->
@@ -44,9 +57,13 @@
                             <h4>Word Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-primary">
-                                <i class="fa fa-download"></i> Download Word File
-                            </a>
+                            <?php if ($this->auth->is_admin()) : ?>
+                                <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-primary">
+                                    <i class="fa fa-download"></i> Download Word File
+                                </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                            <?php endif; ?>
                         </div>
                     <?php else: ?>
                         <!-- Unknown file type -->
@@ -55,9 +72,13 @@
                             <h4>Document File</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <a href="<?= $file_path; ?>" target="_blank" class="btn btn-secondary">
-                                <i class="fa fa-download"></i> Download File
-                            </a>
+                            <?php if ($this->auth->is_admin()) : ?>
+                                <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-secondary">
+                                    <i class="fa fa-download"></i> Download File
+                                </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 <?php else: ?>
@@ -256,10 +277,14 @@
                             <?php endif; ?>
                             
                             <div class="mt-3">
-                                <a href="<?= base_url('forms/download_version/' . $form->id . '/' . $version->version_number); ?>" 
-                                   class="btn btn-sm btn-primary">
-                                    <i class="fa fa-download"></i> Download
-                                </a>
+                                <?php if ($this->auth->is_admin()) : ?>
+                                    <a href="<?= base_url('forms/download_version/' . $form->id . '/' . $version->version_number); ?>" 
+                                       class="btn btn-sm btn-primary">
+                                        <i class="fa fa-download"></i> Download
+                                    </a>
+                                <?php else : ?>
+                                    <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

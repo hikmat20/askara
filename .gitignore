@@ -23,3 +23,4 @@ tests/
 document-version-control
 assets/images/dashboard/
 *sql/
+AGENTS.md
