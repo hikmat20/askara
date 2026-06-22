@@ -73,6 +73,8 @@
 															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item edit" data-id="<?= $draft->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
 															<a href="javascript:void(0)" class="dropdown-item toReview" data-id="<?= $draft->id; ?>" title="Process to Review"><i class="fa fa-check mr-2 text-primary"></i>Process to Review</a>
+															<div class="dropdown-divider my-0"></div>
+															<a href="javascript:void(0)" class="dropdown-item delete" data-id="<?= $draft->id; ?>" title="Delete Data"><i class="fa fa-trash mr-2 text-danger"></i>Delete</a>
 														</div>
 													</div>
 												</td>

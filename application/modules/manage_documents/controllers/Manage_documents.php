@@ -414,6 +414,7 @@ class Manage_documents extends Admin_Controller
 				$config['upload_path'] 		= "./directory/$mainFolder/$this->company"; //path folder
 				$config['allowed_types'] 	= 'pdf|xlsx|docx'; //type yang dapat diakses bisa anda sesuaikan
 				$config['encrypt_name'] 	= true; //Enkripsi nama yang terupload
+				$config['max_size'] 		= 10240; // Maksimum 10MB
 				$id 						= (!$data['id']) ? uniqid(date('m')) : $data['id'];
 
 

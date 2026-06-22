@@ -890,4 +890,26 @@ class Work_instructions extends Admin_Controller
 			]);
 		}
 	}
+
+	public function delete()
+	{
+		if (!$this->input->is_ajax_request()) {
+			echo json_encode(['status' => 0, 'msg' => 'Access Denied']);
+			return;
+		}
+		$id = $this->input->post('id');
+		
+		// Check company isolation
+		if (!$this->_checkCompanyIsolation($id)) {
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'Access Denied: Work instruction tidak ditemukan atau tidak dapat diakses.'
+			]);
+			return;
+		}
+
+		$Return = $this->WiModel->deleteData($id);
+		echo json_encode($Return);
+	}
 }
+
