@@ -589,17 +589,16 @@
 					<div class="modal-dialog modal-dialog-centered modal-lg" role="document">
 						<div class="modal-content">
 							<div class="modal-header">
-								<h5 class="modal-title">Modal title</h5>
-								<button type="button" class="close" onclick="$('#content_modal').html('')" data-dismiss="modal" aria-label="Close">
-									<span aria-hidden="true">&times;</span>
+								<h5 class="modal-title" id="content_title"></h5>
+								<button type="button" class="btn btn-sm" data-dismiss="modal" aria-label="Close">
+									<i class="fa fa-times" aria-hidden="true"></i>
 								</button>
 							</div>
 							<div class="modal-body" id="content_modal">
 							</div>
-							<!-- <div class="modal-footer justify-content-between align-items-center">
-								<button type="submit" class="btn btn-primary save"><i class="fa fa-save"></i>Save</button>
-								<button type="button" class="btn btn-danger" onclick="$('#content_modal').html('')" data-dismiss="modal"><i class="fa fa-times"></i>Cancel</button>
-							</div> -->
+							<div class="modal-footer justify-content-end">
+								<button type="button" class="btn btn-danger btn-sm w-100px" data-dismiss="modal"><i class="fa fa-times"></i>Cancel</button>
+							</div>
 						</div>
 					</div>
 				</div>
@@ -636,6 +635,7 @@
 			const url = siteurl + active_controller + 'add_flow/' + proc_id
 			$('#content_modal').load(url)
 			$('#modelId').modal('show')
+			$('#content_title').html('Add Detail Process')
 		})
 
 		$(document).on('click', '#wadd_flow', function() {
