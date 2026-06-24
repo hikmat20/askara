@@ -446,11 +446,18 @@ class Pelaksanaan_audit extends Admin_Controller
 
         $html = $this->load->view('pelaksanaan_audit/pdf', $data, true);
 
-        // Load mPDF directly from MPDF_ folder
-        require_once(APPPATH . 'libraries/MPDF_/mpdf.php');
-        $mpdf = new mPDF('utf-8', 'A4', 0, '', 15, 15, 15, 15, 0, 0);
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 15,
+            'margin_bottom' => 15,
+            'tempDir' => APPPATH . 'cache/mpdf'
+        ]);
         $mpdf->SetTitle('Pelaksanaan Audit - ' . $schedule->schedule_id);
         $mpdf->WriteHTML($html);
+        if (ob_get_contents()) ob_clean();
         $mpdf->Output('Pelaksanaan_Audit_' . $schedule->schedule_id . '.pdf', 'I');
     }
 }
