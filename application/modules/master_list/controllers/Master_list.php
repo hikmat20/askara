@@ -20,22 +20,36 @@ class Master_list extends Admin_Controller
      */
     public function index()
     {
-        $filter = $this->input->get('filter') ?: '';
-        $status = $this->input->get('status') ?: 'all';
+        $filter         = $this->input->get('filter') ?: '';
+        $status         = $this->input->get('status') ?: 'all';
+        $departement_id = $this->input->get('departement_id') ?: '';
+        $effective_date = $this->input->get('effective_date') ?: '';
+        $last_version   = $this->input->get('last_version') !== null ? $this->input->get('last_version') : '';
+        $doc_status     = $this->input->get('doc_status') ?: '';
+
+        $filters = [
+            'departement_id' => $departement_id,
+            'effective_date' => $effective_date,
+            'last_version'   => $last_version,
+            'doc_status'     => $doc_status,
+        ];
 
         // Get group_procedure for department mapping
         $groups = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
         $grp_map = [];
         foreach ($groups as $g) { $grp_map[$g->id] = $g->name; }
 
+        // Get departments for dropdown filter
+        $departments = $this->db->order_by('name', 'ASC')->get_where('departements', ['status' => '1'])->result();
+
         $data = [];
 
         if ($filter == 'sop') {
-            $data = $this->_getSOP($status);
+            $data = $this->_getSOP($status, $filters);
         } elseif ($filter == 'ik') {
-            $data = $this->_getIK($status);
+            $data = $this->_getIK($status, $filters);
         } elseif ($filter == 'form') {
-            $data = $this->_getForm($status);
+            $data = $this->_getForm($status, $filters);
         }
 
         // Count per status for badges
@@ -44,13 +58,18 @@ class Master_list extends Admin_Controller
         $count_form = $this->_countByStatus('dir_forms');
 
         $this->template->set([
-            'filter'     => $filter,
-            'status'     => $status,
-            'data'       => $data,
-            'grp_map'    => $grp_map,
-            'count_sop'  => $count_sop,
-            'count_ik'   => $count_ik,
-            'count_form' => $count_form,
+            'filter'         => $filter,
+            'status'         => $status,
+            'data'           => $data,
+            'grp_map'        => $grp_map,
+            'count_sop'      => $count_sop,
+            'count_ik'       => $count_ik,
+            'count_form'     => $count_form,
+            'departments'    => $departments,
+            'departement_id' => $departement_id,
+            'effective_date' => $effective_date,
+            'last_version'   => $last_version,
+            'doc_status'     => $doc_status,
         ]);
         $this->template->render('index');
     }
@@ -58,21 +77,36 @@ class Master_list extends Admin_Controller
     /**
      * Get SOP (procedures) data
      */
-    private function _getSOP($status)
+    private function _getSOP($status, $filters = [])
     {
-        $this->db->select('procedures.*, group_procedure.name as department')
+        $this->db->select('procedures.*, group_procedure.name as group_name,departements.name as departement_name')
             ->from('procedures')
             ->join('group_procedure', 'group_procedure.id = procedures.group_procedure', 'left')
+            ->join('departements', 'departements.id = procedures.departement_id', 'left')
             ->where('procedures.company_id', $this->company)
             ->where_not_in('procedures.status', ['DEL', 'HLD'])
             ->where('procedures.deleted_at IS NULL');
 
-        if ($status == 'publish') {
-            $this->db->where('procedures.status', 'PUB');
-        } elseif ($status == 'draft') {
-            $this->db->where('procedures.status', 'DFT');
-        } elseif ($status == 'waiting') {
-            $this->db->where_in('procedures.status', ['REV', 'APV']);
+        if (!empty($filters['doc_status'])) {
+            $this->db->where('procedures.status', $filters['doc_status']);
+        } else {
+            if ($status == 'publish') {
+                $this->db->where('procedures.status', 'PUB');
+            } elseif ($status == 'draft') {
+                $this->db->where('procedures.status', 'DFT');
+            } elseif ($status == 'waiting') {
+                $this->db->where_in('procedures.status', ['REV', 'APV']);
+            }
+        }
+
+        if (!empty($filters['departement_id'])) {
+            $this->db->where('procedures.departement_id', $filters['departement_id']);
+        }
+        if (!empty($filters['effective_date'])) {
+            $this->db->where('procedures.revision_date', $filters['effective_date']);
+        }
+        if (isset($filters['last_version']) && $filters['last_version'] !== '') {
+            $this->db->where('procedures.revision', $filters['last_version']);
         }
 
         $results = $this->db->order_by('procedures.revision_date', 'DESC')->order_by('procedures.created_at', 'DESC')->get()->result();
@@ -108,7 +142,7 @@ class Master_list extends Admin_Controller
     /**
      * Get IK (dir_guides) data
      */
-    private function _getIK($status)
+    private function _getIK($status, $filters = [])
     {
         $this->db->select('view_work_instructions.*, procedures.nomor as procedure_nomor')
             ->from('view_work_instructions')
@@ -116,12 +150,26 @@ class Master_list extends Admin_Controller
             ->where('view_work_instructions.company_id', $this->company)
             ->where('view_work_instructions.status !=', 'DEL');
 
-        if ($status == 'publish') {
-            $this->db->where('view_work_instructions.status', 'PUB');
-        } elseif ($status == 'draft') {
-            $this->db->where_in('view_work_instructions.status', ['DFT', 'OPN', 'COR', 'RVI']);
-        } elseif ($status == 'waiting') {
-            $this->db->where_in('view_work_instructions.status', ['REV', 'APV']);
+        if (!empty($filters['doc_status'])) {
+            $this->db->where('view_work_instructions.status', $filters['doc_status']);
+        } else {
+            if ($status == 'publish') {
+                $this->db->where('view_work_instructions.status', 'PUB');
+            } elseif ($status == 'draft') {
+                $this->db->where_in('view_work_instructions.status', ['DFT', 'OPN', 'COR', 'RVI']);
+            } elseif ($status == 'waiting') {
+                $this->db->where_in('view_work_instructions.status', ['REV', 'APV']);
+            }
+        }
+
+        if (!empty($filters['departement_id'])) {
+            $this->db->where('view_work_instructions.departement_id', $filters['departement_id']);
+        }
+        if (!empty($filters['effective_date'])) {
+            $this->db->where('view_work_instructions.effective_date', $filters['effective_date']);
+        }
+        if (isset($filters['last_version']) && $filters['last_version'] !== '') {
+            $this->db->where('view_work_instructions.revision_number', $filters['last_version']);
         }
 
         return $this->db->order_by('view_work_instructions.effective_date', 'DESC')->order_by('view_work_instructions.created_at', 'DESC')->get()->result();
@@ -130,7 +178,7 @@ class Master_list extends Admin_Controller
     /**
      * Get Form (dir_forms) data
      */
-    private function _getForm($status)
+    private function _getForm($status, $filters = [])
     {
         $this->db->select('view_forms.*, procedures.nomor as procedure_nomor')
             ->from('view_forms')
@@ -138,12 +186,26 @@ class Master_list extends Admin_Controller
             ->where('view_forms.company_id', $this->company)
             ->where('view_forms.status !=', 'DEL');
 
-        if ($status == 'publish') {
-            $this->db->where('view_forms.status', 'PUB');
-        } elseif ($status == 'draft') {
-            $this->db->where_in('view_forms.status', ['DFT', 'OPN', 'COR', 'RVI']);
-        } elseif ($status == 'waiting') {
-            $this->db->where_in('view_forms.status', ['REV', 'APV']);
+        if (!empty($filters['doc_status'])) {
+            $this->db->where('view_forms.status', $filters['doc_status']);
+        } else {
+            if ($status == 'publish') {
+                $this->db->where('view_forms.status', 'PUB');
+            } elseif ($status == 'draft') {
+                $this->db->where_in('view_forms.status', ['DFT', 'OPN', 'COR', 'RVI']);
+            } elseif ($status == 'waiting') {
+                $this->db->where_in('view_forms.status', ['REV', 'APV']);
+            }
+        }
+
+        if (!empty($filters['departement_id'])) {
+            $this->db->where('view_forms.departement_id', $filters['departement_id']);
+        }
+        if (!empty($filters['effective_date'])) {
+            $this->db->where('view_forms.effective_date', $filters['effective_date']);
+        }
+        if (isset($filters['last_version']) && $filters['last_version'] !== '') {
+            $this->db->where('view_forms.revision_number', $filters['last_version']);
         }
 
         return $this->db->order_by('view_forms.effective_date', 'DESC')->order_by('view_forms.created_at', 'DESC')->get()->result();
@@ -197,12 +259,25 @@ class Master_list extends Admin_Controller
      */
     public function export_excel()
     {
-        $filter = $this->input->get('filter') ?: 'sop';
+        $filter         = $this->input->get('filter') ?: 'sop';
+        $status         = $this->input->get('status') ?: 'all';
+        $departement_id = $this->input->get('departement_id') ?: '';
+        $effective_date = $this->input->get('effective_date') ?: '';
+        $last_version   = $this->input->get('last_version') !== null ? $this->input->get('last_version') : '';
+        $doc_status     = $this->input->get('doc_status') ?: '';
+
+        $filters = [
+            'departement_id' => $departement_id,
+            'effective_date' => $effective_date,
+            'last_version'   => $last_version,
+            'doc_status'     => $doc_status,
+        ];
+
         $data = [];
 
-        if ($filter == 'sop') { $data = $this->_getSOP('all'); }
-        elseif ($filter == 'ik') { $data = $this->_getIK('all'); }
-        elseif ($filter == 'form') { $data = $this->_getForm('all'); }
+        if ($filter == 'sop') { $data = $this->_getSOP($status, $filters); }
+        elseif ($filter == 'ik') { $data = $this->_getIK($status, $filters); }
+        elseif ($filter == 'form') { $data = $this->_getForm($status, $filters); }
 
         require_once(APPPATH . 'libraries/PHPExcel.php');
         $objPHPExcel = new PHPExcel();
@@ -227,7 +302,7 @@ class Master_list extends Admin_Controller
             foreach ($data as $k => $v) {
                 $cross_ref = isset($v->cross_reference) ? str_replace(['<br>', '- '], ["\n", '- '], strip_tags($v->cross_reference, '')) : '-';
                 $sheet->setCellValue('A' . $row, $k + 1);
-                $sheet->setCellValue('B' . $row, isset($v->department) ? $v->department : '-');
+                $sheet->setCellValue('B' . $row, isset($v->departement_name) ? $v->departement_name : (isset($v->department) ? $v->department : '-'));
                 $sheet->setCellValue('C' . $row, $v->nomor);
                 $sheet->setCellValue('D' . $row, strip_tags($v->name));
                 $sheet->setCellValue('E' . $row, $v->created_at ? date('d-m-Y', strtotime($v->created_at)) : '-');
@@ -273,12 +348,25 @@ class Master_list extends Admin_Controller
      */
     public function print_pdf()
     {
-        $filter = $this->input->get('filter') ?: 'sop';
+        $filter         = $this->input->get('filter') ?: 'sop';
+        $status         = $this->input->get('status') ?: 'all';
+        $departement_id = $this->input->get('departement_id') ?: '';
+        $effective_date = $this->input->get('effective_date') ?: '';
+        $last_version   = $this->input->get('last_version') !== null ? $this->input->get('last_version') : '';
+        $doc_status     = $this->input->get('doc_status') ?: '';
+
+        $filters = [
+            'departement_id' => $departement_id,
+            'effective_date' => $effective_date,
+            'last_version'   => $last_version,
+            'doc_status'     => $doc_status,
+        ];
+
         $data = [];
 
-        if ($filter == 'sop') { $data = $this->_getSOP('all'); }
-        elseif ($filter == 'ik') { $data = $this->_getIK('all'); }
-        elseif ($filter == 'form') { $data = $this->_getForm('all'); }
+        if ($filter == 'sop') { $data = $this->_getSOP($status, $filters); }
+        elseif ($filter == 'ik') { $data = $this->_getIK($status, $filters); }
+        elseif ($filter == 'form') { $data = $this->_getForm($status, $filters); }
 
         $html_data = [
             'filter' => $filter,

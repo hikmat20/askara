@@ -78,11 +78,64 @@
 						</div>
 						<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
 						<div>
-							<a href="<?= site_url('master_list/export_excel?filter=' . $filter); ?>" class="btn btn-sm btn-outline-success mr-1"><i class="fa fa-file-excel mr-1"></i> Export Excel</a>
-							<a href="<?= site_url('master_list/print_pdf?filter=' . $filter); ?>" class="btn btn-sm btn-outline-danger" target="_blank"><i class="fa fa-file-pdf mr-1"></i> Print PDF</a>
+							<a href="<?= site_url('master_list/export_excel?filter=' . $filter . '&status=' . $status . '&departement_id=' . $departement_id . '&effective_date=' . $effective_date . '&last_version=' . $last_version . '&doc_status=' . $doc_status); ?>" class="btn btn-sm btn-outline-success mr-1"><i class="fa fa-file-excel mr-1"></i> Export Excel</a>
+							<a href="<?= site_url('master_list/print_pdf?filter=' . $filter . '&status=' . $status . '&departement_id=' . $departement_id . '&effective_date=' . $effective_date . '&last_version=' . $last_version . '&doc_status=' . $doc_status); ?>" class="btn btn-sm btn-outline-danger" target="_blank"><i class="fa fa-file-pdf mr-1"></i> Print PDF</a>
 						</div>
 						<?php endif; ?>
 					</div>
+
+					<!-- Advanced Filters -->
+					<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
+					<div class="card bg-light mb-4">
+						<div class="card-body p-3">
+							<form id="filterForm" class="row align-items-end">
+								<div class="col-md-3">
+									<div class="form-group mb-2 mb-md-0">
+										<label class="font-weight-bold font-size-sm">Department</label>
+										<select name="departement_id" id="filterDept" class="form-control form-control-sm">
+											<option value="">-- Semua Department --</option>
+											<?php if (isset($departments)) foreach ($departments as $dept) : ?>
+												<option value="<?= $dept->id; ?>" <?= isset($departement_id) && $departement_id == $dept->id ? 'selected' : ''; ?>><?= $dept->name; ?></option>
+											<?php endforeach; ?>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group mb-2 mb-md-0">
+										<label class="font-weight-bold font-size-sm">Effective Date</label>
+										<input type="date" name="effective_date" id="filterEffDate" class="form-control form-control-sm" value="<?= isset($effective_date) ? $effective_date : ''; ?>">
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group mb-2 mb-md-0">
+										<label class="font-weight-bold font-size-sm">Last Version</label>
+										<input type="number" name="last_version" id="filterVersion" class="form-control form-control-sm" placeholder="Contoh: 0" value="<?= isset($last_version) && $last_version !== '' ? $last_version : ''; ?>" min="0">
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group mb-2 mb-md-0">
+										<label class="font-weight-bold font-size-sm">Status</label>
+										<select name="doc_status" id="filterStatus" class="form-control form-control-sm">
+											<option value="">-- Semua Status --</option>
+											<option value="DFT" <?= isset($doc_status) && $doc_status == 'DFT' ? 'selected' : ''; ?>>Draft</option>
+											<option value="OPN" <?= isset($doc_status) && $doc_status == 'OPN' ? 'selected' : ''; ?>>New / Open</option>
+											<option value="REV" <?= isset($doc_status) && $doc_status == 'REV' ? 'selected' : ''; ?>>Review</option>
+											<option value="COR" <?= isset($doc_status) && $doc_status == 'COR' ? 'selected' : ''; ?>>Correction</option>
+											<option value="APV" <?= isset($doc_status) && $doc_status == 'APV' ? 'selected' : ''; ?>>Approval</option>
+											<option value="PUB" <?= isset($doc_status) && $doc_status == 'PUB' ? 'selected' : ''; ?>>Published</option>
+											<option value="RVI" <?= isset($doc_status) && $doc_status == 'RVI' ? 'selected' : ''; ?>>Revision</option>
+											<option value="HLD" <?= isset($doc_status) && $doc_status == 'HLD' ? 'selected' : ''; ?>>Hold</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-2 text-right">
+									<button type="submit" class="btn btn-sm btn-primary mr-1"><i class="fa fa-filter mr-1"></i> Filter</button>
+									<button type="button" id="btnResetFilter" class="btn btn-sm btn-secondary"><i class="fa fa-undo mr-1"></i> Reset</button>
+								</div>
+							</form>
+						</div>
+					</div>
+					<?php endif; ?>
 
 					<!-- Status Filter & Table (only show when filter selected) -->
 					<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
@@ -108,7 +161,7 @@
 								<?php if ($data) foreach ($data as $k => $v) : $k++; ?>
 									<tr>
 										<td class="text-center"><?= $k; ?></td>
-										<td><?= isset($v->department) ? $v->department : '-'; ?></td>
+										<td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
 										<td><?= $v->nomor; ?></td>
 										<td><?= $v->name; ?></td>
 										<td class="text-center"><?= $v->created_at ? date('d-m-Y', strtotime($v->created_at)) : '-'; ?></td>
@@ -221,6 +274,27 @@ $(document).ready(function() {
 		} else {
 			window.location.href = siteurl + 'master_list';
 		}
+	});
+
+	$('#filterForm').on('submit', function(e) {
+		e.preventDefault();
+		var filter  = $('#filterSelect').val();
+		var dept    = $('#filterDept').val();
+		var effDate = $('#filterEffDate').val();
+		var version = $('#filterVersion').val();
+		var status  = $('#filterStatus').val();
+
+		var url = siteurl + 'master_list?filter=' + filter + '&status=<?= $status; ?>';
+		if (dept) url += '&departement_id=' + dept;
+		if (effDate) url += '&effective_date=' + effDate;
+		if (version !== '') url += '&last_version=' + version;
+		if (status) url += '&doc_status=' + status;
+
+		window.location.href = url;
+	});
+
+	$('#btnResetFilter').on('click', function() {
+		window.location.href = siteurl + 'master_list?filter=<?= $filter; ?>&status=all';
 	});
 });
 </script>
