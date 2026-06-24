@@ -321,10 +321,18 @@ class Master_list extends Admin_Controller
 
         $html = $this->load->view('master_list/pdf', $html_data, true);
 
-        require_once(APPPATH . 'libraries/MPDF_/mpdf.php');
-        $mpdf = new mPDF('utf-8', 'A4-L', 0, '', 10, 10, 10, 10, 0, 0);
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4-L',
+            'margin_left' => 10,
+            'margin_right' => 10,
+            'margin_top' => 10,
+            'margin_bottom' => 10,
+            'tempDir' => APPPATH . 'cache/mpdf'
+        ]);
         $mpdf->SetTitle('Master List ' . strtoupper($filter));
         $mpdf->WriteHTML($html);
+        if (ob_get_contents()) ob_clean();
         $mpdf->Output('Master_List_' . strtoupper($filter) . '_' . date('Ymd') . '.pdf', 'I');
     }
 }
