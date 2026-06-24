@@ -43,21 +43,21 @@
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-check-circle text-success mb-1"></i>
-								<div class="font-size-h2 font-weight-bold text-success"><?= $count_sop['publish']; ?></div>
+								<div class="font-size-h2 font-weight-bold text-success"><?= $count_sop['publish'] + $count_ik['publish'] + $count_form['publish']; ?></div>
 								<div class="text-muted">Publish</div>
 							</div>
 						</div>
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-clock text-warning mb-1"></i>
-								<div class="font-size-h2 font-weight-bold text-warning"><?= $count_sop['waiting']; ?></div>
+								<div class="font-size-h2 font-weight-bold text-warning"><?= $count_sop['waiting'] + $count_ik['waiting'] + $count_form['waiting']; ?></div>
 								<div class="text-muted">Waiting Approve</div>
 							</div>
 						</div>
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-pencil-alt text-secondary mb-1"></i>
-								<div class="font-size-h2 font-weight-bold text-secondary"><?= $count_sop['draft']; ?></div>
+								<div class="font-size-h2 font-weight-bold text-secondary"><?= $count_sop['draft'] + $count_ik['draft'] + $count_form['draft']; ?></div>
 								<div class="text-muted">Draft</div>
 							</div>
 						</div>
@@ -144,16 +144,16 @@
 								<?php if ($data) foreach ($data as $k => $v) : $k++; ?>
 									<tr>
 										<td class="text-center"><?= $k; ?></td>
-										<td><?= isset($v->department) ? $v->department : '-'; ?></td>
+										<td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
 										<td><?= isset($v->procedure_nomor) ? $v->procedure_nomor : '-'; ?></td>
-										<td><?= isset($v->procedure_name) ? $v->procedure_name : '-'; ?></td>
+										<td><?= isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-'; ?></td>
 										<td><?= $v->name; ?></td>
-										<td class="text-center"><?= isset($v->proc_created_at) && $v->proc_created_at ? date('d-m-Y', strtotime($v->proc_created_at)) : '-'; ?></td>
-										<td class="text-center"><?= isset($v->revision) && $v->revision ? 'Rev. ' . $v->revision : '-'; ?></td>
-										<td class="text-center"><?= isset($v->revision_date) && $v->revision_date ? date('d-m-Y', strtotime($v->revision_date)) : '-'; ?></td>
+										<td class="text-center"><?= isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
+										<td class="text-center"><?= isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-'; ?></td>
+										<td class="text-center"><?= isset($v->effective_date) && $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-'; ?></td>
 										<td class="text-center"><?php
-											$sts = isset($v->proc_status) ? $v->proc_status : '';
-											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
+											$sts = isset($v->status) ? $v->status : '';
+											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','OPN'=>'<span class="label label-primary label-inline">New</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
 											echo isset($sts_map[$sts]) ? $sts_map[$sts] : $sts;
 										?></td>
 									</tr>
@@ -181,16 +181,16 @@
 								<?php if ($data) foreach ($data as $k => $v) : $k++; ?>
 									<tr>
 										<td class="text-center"><?= $k; ?></td>
-										<td><?= isset($v->department) ? $v->department : '-'; ?></td>
+										<td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
 										<td><?= isset($v->procedure_nomor) ? $v->procedure_nomor : '-'; ?></td>
-										<td><?= isset($v->procedure_name) ? $v->procedure_name : '-'; ?></td>
+										<td><?= isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-'; ?></td>
 										<td><?= $v->name; ?></td>
-										<td class="text-center"><?= isset($v->proc_created_at) && $v->proc_created_at ? date('d-m-Y', strtotime($v->proc_created_at)) : '-'; ?></td>
-										<td class="text-center"><?= isset($v->revision) && $v->revision ? 'Rev. ' . $v->revision : '-'; ?></td>
-										<td class="text-center"><?= isset($v->revision_date) && $v->revision_date ? date('d-m-Y', strtotime($v->revision_date)) : '-'; ?></td>
+										<td class="text-center"><?= isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
+										<td class="text-center"><?= isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-'; ?></td>
+										<td class="text-center"><?= isset($v->effective_date) && $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-'; ?></td>
 										<td class="text-center"><?php
-											$sts = isset($v->proc_status) ? $v->proc_status : '';
-											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
+											$sts = isset($v->status) ? $v->status : '';
+											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','OPN'=>'<span class="label label-primary label-inline">New</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
 											echo isset($sts_map[$sts]) ? $sts_map[$sts] : $sts;
 										?></td>
 									</tr>
