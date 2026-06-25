@@ -711,92 +711,92 @@
 
 			if (group_procedure !== undefined && (group_procedure == '' || group_procedure == null)) {
 				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty Group Procedure, please input Group Procedure  first.....',
+					title: "Warning!",
+					text: 'Empty Group Procedure, please input Group Procedure first.',
 					icon: "warning"
 				});
-				$('#group_procedure').addClass('is-invalid')
-				// $('#approvalDocs').addClass('show');
+				$('#group_procedure').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
 				return false;
 			}
 			if (status !== undefined && (status == '' || status == null)) {
 				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty Status, please input Status first.....',
+					title: "Warning!",
+					text: 'Empty Status, please input Status first.',
 					icon: "warning"
 				});
-				$('#status').addClass('is-invalid')
-				// $('#approvalDocs').addClass('show');
+				$('#status').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
 				return false;
 			}
 			if (name !== undefined && (name == '' || name == null)) {
 				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty Name Procedure, please input Name Procedure first.....',
+					title: "Warning!",
+					text: 'Empty Name Procedure, please input Name Procedure first.',
 					icon: "warning"
 				});
-				$('#name').addClass('is-invalid')
-				// $('#approvalDocs').addClass('show');
+				$('#name').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
 				return false;
 			}
 			if (scope !== undefined && (scope == '' || scope == null)) {
 				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty Ruang Lingkup, please input Ruang Lingkup first.....',
+					title: "Warning!",
+					text: 'Empty Ruang Lingkup, please input Ruang Lingkup first.',
 					icon: "warning"
 				});
-				$('#scope').addClass('is-invalid')
-				// $('#approvalDocs').addClass('show');
+				$('#scope').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
 				return false;
 			}
 			if (object !== undefined && (object == '' || object == null)) {
 				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty Objective Process, please input Objective Process first.....',
+					title: "Warning!",
+					text: 'Empty Objective Process, please input Objective Process first.',
 					icon: "warning"
 				});
-				$('#object').addClass('is-invalid')
-				// $('#approvalDocs').addClass('show');
+				$('#object').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
 				return false;
 			}
 			if (performance !== undefined && (performance == '' || performance == null)) {
 				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty Performa Indikator, please input Performa Indikator first.....',
+					title: "Warning!",
+					text: 'Empty Performa Indikator, please input Performa Indikator first.',
 					icon: "warning"
 				});
-				$('#performance').addClass('is-invalid')
-				// $('#approvalDocs').addClass('show');
+				$('#performance').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
 				return false;
 			}
 			if (prepared_by !== undefined && (prepared_by == '' || prepared_by == null)) {
 				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty User Prepared, please input User Prepared  first.....',
+					title: "Warning!",
+					text: 'Empty User Prepared, please input User Prepared first.',
 					icon: "warning"
 				});
-				$('#prepared_by').addClass('is-invalid')
-				$('#approvalDocs').addClass('show');
+				$('#prepared_by').addClass('is-invalid');
+				$('#approvalDocs').collapse('show');
 				return false;
 			}
 			if ((reviewer_id == '' && reviewer_id != undefined) || (reviewer_id == null && reviewer_id != undefined)) {
 				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty reviewer, please input reviewer first.....',
+					title: "Warning!",
+					text: 'Empty reviewer, please input reviewer first.',
 					icon: "warning"
 				});
-				$('#reviewer_id').addClass('is-invalid')
-				$('#approvalDocs').addClass('show');
+				$('#reviewer_id').addClass('is-invalid');
+				$('#approvalDocs').collapse('show');
 				return false;
 			}
 			if ((approval_id == '' && approval_id != undefined) || (approval_id == null && approval_id != undefined)) {
 				Swal.fire({
-					title: "Error Message!",
+					title: "Warning!",
 					text: 'Empty approval, please input approval first!',
 					icon: "warning"
 				});
-				$('#approval_id').addClass('is-invalid')
-				$('#approvalDocs').addClass('show');
+				$('#approval_id').addClass('is-invalid');
+				$('#approvalDocs').collapse('show');
 				return false;
 			}
 

@@ -3,14 +3,14 @@
 	<label class="">Nomor <span class="text-danger">*</span></label>
 	<div class="">
 		<input type="hidden" name="flow[id]" class="form-control" value="<?= ($flow) ? $flow->id : ''; ?>">
-		<input type="text" name="flow[number]" id="number" class="form-control" value="<?= ($flow) ? $flow->number : ''; ?>" required placeholder="Nomor" aria-describedby="helpId">
+		<input type="text" name="flow[number]" id="number" class="form-control" value="<?= ($flow) ? $flow->number : ''; ?>" placeholder="Nomor" aria-describedby="helpId">
 		<small class="text-danger invalid-feedback">Nomor</small>
 	</div>
 </div>
 <div class="form-group">
 	<label class="">PIC <span class="text-danger">*</span></label>
 	<div class="">
-		<input type="text" name="flow[pic]" id="pic" class="form-control" value="<?= ($flow) ? $flow->pic : ''; ?>" required placeholder="PIC" aria-describedby="helpId">
+		<input type="text" name="flow[pic]" id="pic" class="form-control" value="<?= ($flow) ? $flow->pic : ''; ?>" placeholder="PIC" aria-describedby="helpId">
 		<small class="text-danger invalid-feedback">PIC</small>
 	</div>
 </div>
@@ -129,7 +129,7 @@
 			['color', ['color']],
 			['para', ['ul', 'ol', 'paragraph', 'alphaList']],
 			// ['table', ['table']],
-			// ['insert', ['link', 'picture', 'video']],
+			['insert', ['link', 'picture']],
 			['view', ['fullscreen', 'codeview', 'help']],
 		],
 		buttons: {
