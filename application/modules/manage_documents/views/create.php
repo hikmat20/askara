@@ -145,37 +145,58 @@
 	</div>
 </div>
 
+<div class="modal fade" id="move-modal" tabindex="-1" role="dialog" aria-hidden="true">
+	<div class="modal-dialog modal-dialog-centered" role="document">
+		<div class="modal-content">
+			<div class="modal-header">
+				<h5 class="modal-title">Move Item</h5>
+				<button type="button" class="close" data-dismiss="modal" aria-label="Close">
+					<i aria-hidden="true" class="ki ki-close"></i>
+				</button>
+			</div>
+			<div class="modal-body" id="move-form-data">
+			</div>
+			<div class="modal-footer">
+				<button type="button" id="save-move" class="btn btn-light-primary font-weight-bold">Move</button>
+				<button type="button" class="btn btn-light-warning font-weight-bold" data-dismiss="modal">Close</button>
+			</div>
+		</div>
+	</div>
+</div>
+
 <script>
 document.addEventListener("DOMContentLoaded", function() {
 	$(document).ready(function() {
-		$('#kt_tree_2').jstree({
-			"core": {
-				"themes": {
-					"responsive": true
-				}
-			},
-			"types": {
-				"default": {
-					"icon": "fa fa-folder text-warning"
+		if (typeof $.fn.jstree !== 'undefined') {
+			$('#kt_tree_2').jstree({
+				"core": {
+					"themes": {
+						"responsive": true
+					}
 				},
-				"file": {
-					"icon": "fa fa-file  text-success"
-				}
-			},
-			"plugins": ["types"]
-		});
+				"types": {
+					"default": {
+						"icon": "fa fa-folder text-warning"
+					},
+					"file": {
+						"icon": "fa fa-file  text-success"
+					}
+				},
+				"plugins": ["types"]
+			});
 
-		// handle link clicks in tree nodes(support target="_blank" as well)
-		$('#kt_tree_2').on('select_node.jstree', function(e, data) {
-			var link = $('#' + data.selected).find('a');
-			if (link.attr("href") != "#" && link.attr("href") != "javascript:;" && link.attr("href") != "") {
-				if (link.attr("target") == "_blank") {
-					link.attr("href").target = "_blank";
+			// handle link clicks in tree nodes(support target="_blank" as well)
+			$('#kt_tree_2').on('select_node.jstree', function(e, data) {
+				var link = $('#' + data.selected).find('a');
+				if (link.attr("href") != "#" && link.attr("href") != "javascript:;" && link.attr("href") != "") {
+					if (link.attr("target") == "_blank") {
+						link.attr("href").target = "_blank";
+					}
+					document.location.href = link.attr("href");
+					return false;
 				}
-				document.location.href = link.attr("href");
-				return false;
-			}
-		});
+			});
+		}
 		// interaction and events
 	})
 
@@ -343,6 +364,7 @@ document.addEventListener("DOMContentLoaded", function() {
 		let folder_name = $('#folder_name').val()
 		let id = $('#id').val()
 		let parent_id = $('#parent_id').val()
+		let folder = $('input[name="folder"]').val() || ''
 		if (folder_name == '') {
 			$('#folder_name').addClass('is-invalid');
 			$('#feedback').removeClass('d-none');
@@ -356,6 +378,7 @@ document.addEventListener("DOMContentLoaded", function() {
 					id,
 					parent_id,
 					folder_name,
+					folder,
 				},
 				success: function(res) {
 					if (res.status == '1') {
@@ -365,7 +388,7 @@ document.addEventListener("DOMContentLoaded", function() {
 							icon: 'success',
 							timer: 2000
 						})
-						$('#data-file').load(siteurl + active_controller + 'load_file/' + parent_id)
+						$('#data-file').load(siteurl + active_controller + 'load_file/' + parent_id + '/' + folder)
 						$('#new-folder').modal('hide')
 						$('#folder_name').val('')
 					} else {
@@ -675,10 +698,63 @@ document.addEventListener("DOMContentLoaded", function() {
 		});
 	}
 
-	function rename(id) {
+	function rename(id, folder) {
 		$('#new-folder').modal('show')
-		$('#form-data').load(siteurl + active_controller + 'rename/' + id)
+		$('#form-data').load(siteurl + active_controller + 'rename/' + id + '/' + folder)
 	}
+
+	function move(id, folder) {
+		$('#move-modal').modal('show')
+		$('#move-form-data').load(siteurl + active_controller + 'move/' + id + '/' + folder)
+	}
+
+	$(document).on('click', '#save-move', function() {
+		let id = $('#move_item_id').val();
+		let destination_id = $('#destination_id').val();
+		let folder = $('input[name="folder"]').val() || '';
+		
+		if (!destination_id) {
+			$('#destination_id').addClass('is-invalid');
+			return false;
+		}
+
+		$.ajax({
+			url: base_url + active_controller + 'save_move',
+			type: 'POST',
+			dataType: 'JSON',
+			data: {
+				id: id,
+				destination_id: destination_id
+			},
+			success: function(res) {
+				if (res.status == '1') {
+					Swal.fire({
+						title: 'Success!!',
+						text: res.msg,
+						icon: 'success',
+						timer: 2000
+					});
+					$('#move-modal').modal('hide');
+					$('#data-file').load(siteurl + active_controller + 'load_file/' + res.parent_id + '/' + folder);
+				} else {
+					Swal.fire({
+						title: 'Failed!!',
+						icon: 'warning',
+						text: res.msg,
+						timer: 2000
+					});
+				}
+			},
+			error: function() {
+				Swal.fire({
+					title: 'Error!',
+					icon: 'error',
+					text: 'Server timeout, because error.',
+					timer: 3000
+				});
+			}
+		});
+	});
 
 	function upload_file(parent_id, main = '') {
 		if (main) {
@@ -805,5 +881,14 @@ document.addEventListener("DOMContentLoaded", function() {
 			}
 		});
 	}
+
+	window.rename = rename;
+	window.move = move;
+	window.new_folder = new_folder;
+	window.review_process = review_process;
+	window.upload_file = upload_file;
+	window.edit_file = edit_file;
+	window.delete_file = delete_file;
+	window.delete_folder = delete_folder;
 });
 </script>

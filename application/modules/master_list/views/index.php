@@ -43,21 +43,21 @@
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-check-circle text-success mb-1"></i>
-								<div class="font-size-h2 font-weight-bold text-success"><?= $count_sop['publish']; ?></div>
+								<div class="font-size-h2 font-weight-bold text-success"><?= $count_sop['publish'] + $count_ik['publish'] + $count_form['publish']; ?></div>
 								<div class="text-muted">Publish</div>
 							</div>
 						</div>
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-clock text-warning mb-1"></i>
-								<div class="font-size-h2 font-weight-bold text-warning"><?= $count_sop['waiting']; ?></div>
+								<div class="font-size-h2 font-weight-bold text-warning"><?= $count_sop['waiting'] + $count_ik['waiting'] + $count_form['waiting']; ?></div>
 								<div class="text-muted">Waiting Approve</div>
 							</div>
 						</div>
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-pencil-alt text-secondary mb-1"></i>
-								<div class="font-size-h2 font-weight-bold text-secondary"><?= $count_sop['draft']; ?></div>
+								<div class="font-size-h2 font-weight-bold text-secondary"><?= $count_sop['draft'] + $count_ik['draft'] + $count_form['draft']; ?></div>
 								<div class="text-muted">Draft</div>
 							</div>
 						</div>
@@ -78,11 +78,64 @@
 						</div>
 						<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
 						<div>
-							<a href="<?= site_url('master_list/export_excel?filter=' . $filter); ?>" class="btn btn-sm btn-outline-success mr-1"><i class="fa fa-file-excel mr-1"></i> Export Excel</a>
-							<a href="<?= site_url('master_list/print_pdf?filter=' . $filter); ?>" class="btn btn-sm btn-outline-danger" target="_blank"><i class="fa fa-file-pdf mr-1"></i> Print PDF</a>
+							<a href="<?= site_url('master_list/export_excel?filter=' . $filter . '&status=' . $status . '&departement_id=' . $departement_id . '&effective_date=' . $effective_date . '&last_version=' . $last_version . '&doc_status=' . $doc_status); ?>" class="btn btn-sm btn-outline-success mr-1"><i class="fa fa-file-excel mr-1"></i> Export Excel</a>
+							<a href="<?= site_url('master_list/print_pdf?filter=' . $filter . '&status=' . $status . '&departement_id=' . $departement_id . '&effective_date=' . $effective_date . '&last_version=' . $last_version . '&doc_status=' . $doc_status); ?>" class="btn btn-sm btn-outline-danger" target="_blank"><i class="fa fa-file-pdf mr-1"></i> Print PDF</a>
 						</div>
 						<?php endif; ?>
 					</div>
+
+					<!-- Advanced Filters -->
+					<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
+					<div class="card bg-light mb-4">
+						<div class="card-body p-3">
+							<form id="filterForm" class="row align-items-end">
+								<div class="col-md-3">
+									<div class="form-group mb-2 mb-md-0">
+										<label class="font-weight-bold font-size-sm">Department</label>
+										<select name="departement_id" id="filterDept" class="form-control form-control-sm">
+											<option value="">-- Semua Department --</option>
+											<?php if (isset($departments)) foreach ($departments as $dept) : ?>
+												<option value="<?= $dept->id; ?>" <?= isset($departement_id) && $departement_id == $dept->id ? 'selected' : ''; ?>><?= $dept->name; ?></option>
+											<?php endforeach; ?>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-3">
+									<div class="form-group mb-2 mb-md-0">
+										<label class="font-weight-bold font-size-sm">Effective Date</label>
+										<input type="date" name="effective_date" id="filterEffDate" class="form-control form-control-sm" value="<?= isset($effective_date) ? $effective_date : ''; ?>">
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group mb-2 mb-md-0">
+										<label class="font-weight-bold font-size-sm">Last Version</label>
+										<input type="number" name="last_version" id="filterVersion" class="form-control form-control-sm" placeholder="Contoh: 0" value="<?= isset($last_version) && $last_version !== '' ? $last_version : ''; ?>" min="0">
+									</div>
+								</div>
+								<div class="col-md-2">
+									<div class="form-group mb-2 mb-md-0">
+										<label class="font-weight-bold font-size-sm">Status</label>
+										<select name="doc_status" id="filterStatus" class="form-control form-control-sm">
+											<option value="">-- Semua Status --</option>
+											<option value="DFT" <?= isset($doc_status) && $doc_status == 'DFT' ? 'selected' : ''; ?>>Draft</option>
+											<option value="OPN" <?= isset($doc_status) && $doc_status == 'OPN' ? 'selected' : ''; ?>>New / Open</option>
+											<option value="REV" <?= isset($doc_status) && $doc_status == 'REV' ? 'selected' : ''; ?>>Review</option>
+											<option value="COR" <?= isset($doc_status) && $doc_status == 'COR' ? 'selected' : ''; ?>>Correction</option>
+											<option value="APV" <?= isset($doc_status) && $doc_status == 'APV' ? 'selected' : ''; ?>>Approval</option>
+											<option value="PUB" <?= isset($doc_status) && $doc_status == 'PUB' ? 'selected' : ''; ?>>Published</option>
+											<option value="RVI" <?= isset($doc_status) && $doc_status == 'RVI' ? 'selected' : ''; ?>>Revision</option>
+											<option value="HLD" <?= isset($doc_status) && $doc_status == 'HLD' ? 'selected' : ''; ?>>Hold</option>
+										</select>
+									</div>
+								</div>
+								<div class="col-md-2 text-right">
+									<button type="submit" class="btn btn-sm btn-primary mr-1"><i class="fa fa-filter mr-1"></i> Filter</button>
+									<button type="button" id="btnResetFilter" class="btn btn-sm btn-secondary"><i class="fa fa-undo mr-1"></i> Reset</button>
+								</div>
+							</form>
+						</div>
+					</div>
+					<?php endif; ?>
 
 					<!-- Status Filter & Table (only show when filter selected) -->
 					<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
@@ -108,7 +161,7 @@
 								<?php if ($data) foreach ($data as $k => $v) : $k++; ?>
 									<tr>
 										<td class="text-center"><?= $k; ?></td>
-										<td><?= isset($v->department) ? $v->department : '-'; ?></td>
+										<td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
 										<td><?= $v->nomor; ?></td>
 										<td><?= $v->name; ?></td>
 										<td class="text-center"><?= $v->created_at ? date('d-m-Y', strtotime($v->created_at)) : '-'; ?></td>
@@ -144,16 +197,16 @@
 								<?php if ($data) foreach ($data as $k => $v) : $k++; ?>
 									<tr>
 										<td class="text-center"><?= $k; ?></td>
-										<td><?= isset($v->department) ? $v->department : '-'; ?></td>
+										<td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
 										<td><?= isset($v->procedure_nomor) ? $v->procedure_nomor : '-'; ?></td>
-										<td><?= isset($v->procedure_name) ? $v->procedure_name : '-'; ?></td>
+										<td><?= isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-'; ?></td>
 										<td><?= $v->name; ?></td>
-										<td class="text-center"><?= isset($v->proc_created_at) && $v->proc_created_at ? date('d-m-Y', strtotime($v->proc_created_at)) : '-'; ?></td>
-										<td class="text-center"><?= isset($v->revision) && $v->revision ? 'Rev. ' . $v->revision : '-'; ?></td>
-										<td class="text-center"><?= isset($v->revision_date) && $v->revision_date ? date('d-m-Y', strtotime($v->revision_date)) : '-'; ?></td>
+										<td class="text-center"><?= isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
+										<td class="text-center"><?= isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-'; ?></td>
+										<td class="text-center"><?= isset($v->effective_date) && $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-'; ?></td>
 										<td class="text-center"><?php
-											$sts = isset($v->proc_status) ? $v->proc_status : '';
-											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
+											$sts = isset($v->status) ? $v->status : '';
+											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','OPN'=>'<span class="label label-primary label-inline">New</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
 											echo isset($sts_map[$sts]) ? $sts_map[$sts] : $sts;
 										?></td>
 									</tr>
@@ -181,16 +234,16 @@
 								<?php if ($data) foreach ($data as $k => $v) : $k++; ?>
 									<tr>
 										<td class="text-center"><?= $k; ?></td>
-										<td><?= isset($v->department) ? $v->department : '-'; ?></td>
+										<td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
 										<td><?= isset($v->procedure_nomor) ? $v->procedure_nomor : '-'; ?></td>
-										<td><?= isset($v->procedure_name) ? $v->procedure_name : '-'; ?></td>
+										<td><?= isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-'; ?></td>
 										<td><?= $v->name; ?></td>
-										<td class="text-center"><?= isset($v->proc_created_at) && $v->proc_created_at ? date('d-m-Y', strtotime($v->proc_created_at)) : '-'; ?></td>
-										<td class="text-center"><?= isset($v->revision) && $v->revision ? 'Rev. ' . $v->revision : '-'; ?></td>
-										<td class="text-center"><?= isset($v->revision_date) && $v->revision_date ? date('d-m-Y', strtotime($v->revision_date)) : '-'; ?></td>
+										<td class="text-center"><?= isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
+										<td class="text-center"><?= isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-'; ?></td>
+										<td class="text-center"><?= isset($v->effective_date) && $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-'; ?></td>
 										<td class="text-center"><?php
-											$sts = isset($v->proc_status) ? $v->proc_status : '';
-											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
+											$sts = isset($v->status) ? $v->status : '';
+											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','OPN'=>'<span class="label label-primary label-inline">New</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
 											echo isset($sts_map[$sts]) ? $sts_map[$sts] : $sts;
 										?></td>
 									</tr>
@@ -221,6 +274,27 @@ $(document).ready(function() {
 		} else {
 			window.location.href = siteurl + 'master_list';
 		}
+	});
+
+	$('#filterForm').on('submit', function(e) {
+		e.preventDefault();
+		var filter  = $('#filterSelect').val();
+		var dept    = $('#filterDept').val();
+		var effDate = $('#filterEffDate').val();
+		var version = $('#filterVersion').val();
+		var status  = $('#filterStatus').val();
+
+		var url = siteurl + 'master_list?filter=' + filter + '&status=<?= $status; ?>';
+		if (dept) url += '&departement_id=' + dept;
+		if (effDate) url += '&effective_date=' + effDate;
+		if (version !== '') url += '&last_version=' + version;
+		if (status) url += '&doc_status=' + status;
+
+		window.location.href = url;
+	});
+
+	$('#btnResetFilter').on('click', function() {
+		window.location.href = siteurl + 'master_list?filter=<?= $filter; ?>&status=all';
 	});
 });
 </script>

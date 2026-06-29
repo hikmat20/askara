@@ -23,8 +23,8 @@
 											<a class="dropdown-item <?= ($list->status != 'OPN' || $list->flag_record == 'Y') ? 'disabled' : ''; ?>" onclick=" review_process('<?= $list->id; ?>','<?= $list->parent_id; ?>')" href="#"><i class="fab fa-telegram text-success mr-2"></i>Process to Review</a>
 											<div class="dropdown-divider"></div>
 										<?php endif; ?>
-										<a class="dropdown-item" onclick="rename('<?= $list->id; ?>')" href="#"><i class="fa fa-edit text-info mr-2"></i>Rename</a>
-										<a class="dropdown-item" href="#"><i class="fa fa-arrows-alt text-primary mr-2"></i>Move</a>
+										<a class="dropdown-item" onclick="rename('<?= $list->id; ?>', '<?= $main; ?>')" href="#"><i class="fa fa-edit text-info mr-2"></i>Rename</a>
+										<a class="dropdown-item" onclick="move('<?= $list->id; ?>', '<?= $main; ?>')" href="#"><i class="fa fa-arrows-alt text-primary mr-2"></i>Move</a>
 										<a class="dropdown-item <?= ($list->flag_type == 'FOLDER') ? 'd-none' : ''; ?>" onclick="delete_file('<?= $list->id; ?>','<?= $list->parent_id; ?>')" href="#"><i class="fa fa-trash text-danger mr-2"></i>Delete</a>
 										<a class="dropdown-item <?= ($list->flag_type == 'FILE') ? 'd-none' : ''; ?>" onclick="delete_folder('<?= $list->id; ?>','<?= $list->parent_id; ?>')" href="#"><i class="fa fa-trash text-danger mr-2"></i>Delete</a>
 									</div>

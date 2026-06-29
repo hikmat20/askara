@@ -462,19 +462,9 @@ class Setting extends Admin_Controller
             $this->db->update('users', $data, ['id_user' => $data['id_user']]);
         } else {
             $check_check_username   =  $this->check_username($data['username']);
-            $check_check_email      =  $this->check_email($data['email']);
             if ($check_check_username > 0) {
                 $return = [
                     'msg' => 'the Username is already registered, please use a different username',
-                    'status' => 0
-                ];
-                echo json_encode($return);
-                return false;
-            }
-
-            if ($check_check_email > 0) {
-                $return = [
-                    'msg' => 'the Email is already registered, please use a different Email',
                     'status' => 0
                 ];
                 echo json_encode($return);

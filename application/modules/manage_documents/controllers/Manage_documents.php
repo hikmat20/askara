@@ -120,7 +120,7 @@ class Manage_documents extends Admin_Controller
 		$this->template->render('form');
 	}
 
-	public function rename($id)
+	public function rename($id, $folder = '')
 	{
 		$data = $this->db->get_where('view_directories', ['id' => $id])->row();
 
@@ -128,7 +128,143 @@ class Manage_documents extends Admin_Controller
 		$this->template->set('parent_id', $data->parent_id);
 		$this->template->set('rename', true);
 		$this->template->set('title', 'Rename');
+		$this->template->set('folder', $folder);
 		$this->template->render('form');
+	}
+
+	public function move($id, $folder = '')
+	{
+		$data = $this->db->get_where('view_directories', ['id' => $id])->row();
+		if (!$data) {
+			echo 'Data tidak ditemukan';
+			return;
+		}
+
+		// Cari root folder (parent_id = '0') yang ber-description = $folder
+		$root = $this->db->get_where('directory', [
+			'parent_id' => '0',
+			'description' => $folder,
+			'company_id' => $this->company
+		])->row();
+
+		if (!$root) {
+			echo 'Folder root tidak ditemukan';
+			return;
+		}
+
+		$excluded_ids = [$id];
+		if ($data->flag_type == 'FOLDER') {
+			$subfolders = $this->db->get_where('directory', ['status !=' => 'DEL', 'flag_type' => 'FOLDER'])->result();
+			$excluded_ids = $this->_get_descendant_folders($id, $subfolders);
+			$excluded_ids[] = $id;
+		}
+
+		$all_folders = $this->db->get_where('directory', [
+			'flag_type' => 'FOLDER',
+			'status !=' => 'DEL',
+			'company_id' => $this->company
+		])->result();
+
+		$valid_folders = [];
+		if (!in_array($root->id, $excluded_ids)) {
+			$root->name_hierarchical = '[Root] ' . $root->name;
+			$valid_folders[] = $root;
+		}
+
+		$hierarchical_folders = $this->_build_folder_hierarchy($root->id, $all_folders, $excluded_ids, 1);
+		$valid_folders = array_merge($valid_folders, $hierarchical_folders);
+
+		$this->template->set('data', $data);
+		$this->template->set('folders', $valid_folders);
+		$this->template->set('folder', $folder);
+		$this->template->render('move_form');
+	}
+
+	private function _build_folder_hierarchy($parent_id, $all_folders, $excluded_ids, $depth = 0)
+	{
+		$result = [];
+		foreach ($all_folders as $f) {
+			if ($f->parent_id == $parent_id) {
+				if (in_array($f->id, $excluded_ids)) {
+					continue;
+				}
+				$indent = str_repeat('    ', $depth) . ($depth > 0 ? '└─ ' : '');
+				$f->name_hierarchical = $indent . $f->name;
+				$result[] = $f;
+				$children = $this->_build_folder_hierarchy($f->id, $all_folders, $excluded_ids, $depth + 1);
+				$result = array_merge($result, $children);
+			}
+		}
+		return $result;
+	}
+
+	private function _get_descendant_folders($parent_id, $all_folders)
+	{
+		$descendants = [];
+		foreach ($all_folders as $f) {
+			if ($f->parent_id == $parent_id) {
+				$descendants[] = $f->id;
+				$descendants = array_merge($descendants, $this->_get_descendant_folders($f->id, $all_folders));
+			}
+		}
+		return $descendants;
+	}
+
+	private function _is_descendant($folder_id, $root_id, $all_folders)
+	{
+		if ($folder_id == $root_id) {
+			return true;
+		}
+		foreach ($all_folders as $f) {
+			if ($f->id == $folder_id) {
+				if ($f->parent_id == '0') {
+					return false;
+				}
+				return $this->_is_descendant($f->parent_id, $root_id, $all_folders);
+			}
+		}
+		return false;
+	}
+
+	public function save_move()
+	{
+		$id             = $this->input->post('id');
+		$destination_id = $this->input->post('destination_id');
+
+		if (!$id || !$destination_id) {
+			echo json_encode(['status' => 0, 'msg' => 'Data tidak lengkap']);
+			return;
+		}
+
+		$item = $this->db->get_where('directory', ['id' => $id, 'company_id' => $this->company])->row();
+		$dest = $this->db->get_where('directory', ['id' => $destination_id, 'company_id' => $this->company])->row();
+
+		if (!$item || !$dest) {
+			echo json_encode(['status' => 0, 'msg' => 'Item atau folder tujuan tidak valid.']);
+			return;
+		}
+
+		if ($id == $destination_id) {
+			echo json_encode(['status' => 0, 'msg' => 'Tidak bisa memindahkan folder ke dirinya sendiri.']);
+			return;
+		}
+
+		$this->db->trans_begin();
+		$this->db->update('directory', [
+			'parent_id' => $destination_id,
+			'modified_by' => $this->auth->user_id(),
+			'modified_at' => date('Y-m-d H:i:s')
+		], ['id' => $id]);
+
+		if ($this->db->trans_status() === FALSE) {
+			$this->db->trans_rollback();
+			$Return = ['status' => 0, 'msg' => 'Gagal memindahkan item'];
+		} else {
+			$this->db->trans_commit();
+			$Return = ['status' => 1, 'msg' => 'Berhasil memindahkan item', 'parent_id' => $destination_id];
+		}
+
+		echo json_encode($Return);
 	}
 
 	public function delete_folder()
@@ -314,7 +450,12 @@ class Manage_documents extends Admin_Controller
 	public function save()
 	{
 		$data 				= $this->input->post();
-		$check_folder_name 	= $this->db->get_where('view_directories', ['name' => $data['folder_name'], 'parent_id' => $data['parent_id']])->num_rows();
+		$id					= isset($data['id']) ? $data['id'] : '';
+		if ($id) {
+			$check_folder_name 	= $this->db->get_where('view_directories', ['name' => $data['folder_name'], 'parent_id' => $data['parent_id'], 'id !=' => $id])->num_rows();
+		} else {
+			$check_folder_name 	= $this->db->get_where('view_directories', ['name' => $data['folder_name'], 'parent_id' => $data['parent_id']])->num_rows();
+		}
 		$folder_name 		= ($check_folder_name > 0) ? $data['folder_name'] . "(" . $check_folder_name . ")" : $data['folder_name'];
 
 		$ArrFolder = [

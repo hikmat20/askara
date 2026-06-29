@@ -20,22 +20,36 @@ class Master_list extends Admin_Controller
      */
     public function index()
     {
-        $filter = $this->input->get('filter') ?: '';
-        $status = $this->input->get('status') ?: 'all';
+        $filter         = $this->input->get('filter') ?: '';
+        $status         = $this->input->get('status') ?: 'all';
+        $departement_id = $this->input->get('departement_id') ?: '';
+        $effective_date = $this->input->get('effective_date') ?: '';
+        $last_version   = $this->input->get('last_version') !== null ? $this->input->get('last_version') : '';
+        $doc_status     = $this->input->get('doc_status') ?: '';
+
+        $filters = [
+            'departement_id' => $departement_id,
+            'effective_date' => $effective_date,
+            'last_version'   => $last_version,
+            'doc_status'     => $doc_status,
+        ];
 
         // Get group_procedure for department mapping
         $groups = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
         $grp_map = [];
         foreach ($groups as $g) { $grp_map[$g->id] = $g->name; }
 
+        // Get departments for dropdown filter
+        $departments = $this->db->order_by('name', 'ASC')->get_where('departements', ['status' => '1'])->result();
+
         $data = [];
 
         if ($filter == 'sop') {
-            $data = $this->_getSOP($status);
+            $data = $this->_getSOP($status, $filters);
         } elseif ($filter == 'ik') {
-            $data = $this->_getIK($status);
+            $data = $this->_getIK($status, $filters);
         } elseif ($filter == 'form') {
-            $data = $this->_getForm($status);
+            $data = $this->_getForm($status, $filters);
         }
 
         // Count per status for badges
@@ -44,13 +58,18 @@ class Master_list extends Admin_Controller
         $count_form = $this->_countByStatus('dir_forms');
 
         $this->template->set([
-            'filter'     => $filter,
-            'status'     => $status,
-            'data'       => $data,
-            'grp_map'    => $grp_map,
-            'count_sop'  => $count_sop,
-            'count_ik'   => $count_ik,
-            'count_form' => $count_form,
+            'filter'         => $filter,
+            'status'         => $status,
+            'data'           => $data,
+            'grp_map'        => $grp_map,
+            'count_sop'      => $count_sop,
+            'count_ik'       => $count_ik,
+            'count_form'     => $count_form,
+            'departments'    => $departments,
+            'departement_id' => $departement_id,
+            'effective_date' => $effective_date,
+            'last_version'   => $last_version,
+            'doc_status'     => $doc_status,
         ]);
         $this->template->render('index');
     }
@@ -58,21 +77,36 @@ class Master_list extends Admin_Controller
     /**
      * Get SOP (procedures) data
      */
-    private function _getSOP($status)
+    private function _getSOP($status, $filters = [])
     {
-        $this->db->select('procedures.*, group_procedure.name as department')
+        $this->db->select('procedures.*, group_procedure.name as group_name,departements.name as departement_name')
             ->from('procedures')
             ->join('group_procedure', 'group_procedure.id = procedures.group_procedure', 'left')
+            ->join('departements', 'departements.id = procedures.departement_id', 'left')
             ->where('procedures.company_id', $this->company)
             ->where_not_in('procedures.status', ['DEL', 'HLD'])
             ->where('procedures.deleted_at IS NULL');
 
-        if ($status == 'publish') {
-            $this->db->where('procedures.status', 'PUB');
-        } elseif ($status == 'draft') {
-            $this->db->where('procedures.status', 'DFT');
-        } elseif ($status == 'waiting') {
-            $this->db->where_in('procedures.status', ['REV', 'APV']);
+        if (!empty($filters['doc_status'])) {
+            $this->db->where('procedures.status', $filters['doc_status']);
+        } else {
+            if ($status == 'publish') {
+                $this->db->where('procedures.status', 'PUB');
+            } elseif ($status == 'draft') {
+                $this->db->where('procedures.status', 'DFT');
+            } elseif ($status == 'waiting') {
+                $this->db->where_in('procedures.status', ['REV', 'APV']);
+            }
+        }
+
+        if (!empty($filters['departement_id'])) {
+            $this->db->where('procedures.departement_id', $filters['departement_id']);
+        }
+        if (!empty($filters['effective_date'])) {
+            $this->db->where('procedures.revision_date', $filters['effective_date']);
+        }
+        if (isset($filters['last_version']) && $filters['last_version'] !== '') {
+            $this->db->where('procedures.revision', $filters['last_version']);
         }
 
         $results = $this->db->order_by('procedures.revision_date', 'DESC')->order_by('procedures.created_at', 'DESC')->get()->result();
@@ -108,59 +142,73 @@ class Master_list extends Admin_Controller
     /**
      * Get IK (dir_guides) data
      */
-    private function _getIK($status)
+    private function _getIK($status, $filters = [])
     {
-        $this->db->select('dir_guides.name, dir_guides.number, dir_guides.status as guide_status, 
-            procedures.name as procedure_name, procedures.nomor as procedure_nomor, 
-            procedures.created_at as proc_created_at, procedures.revision, procedures.revision_date, procedures.status as proc_status,
-            group_procedure.name as department')
-            ->from('dir_guides')
-            ->join('procedures', 'procedures.id = dir_guides.procedure_id', 'left')
-            ->join('group_procedure', 'group_procedure.id = procedures.group_procedure', 'left')
-            ->where('dir_guides.company_id', $this->company)
-            ->where('dir_guides.status !=', 'DEL')
-            ->where('dir_guides.deleted_at IS NULL')
-            ->where('(procedures.status IS NULL OR procedures.status NOT IN ("DEL","HLD"))')
-            ->where('(procedures.deleted_at IS NULL)');
+        $this->db->select('view_work_instructions.*, procedures.nomor as procedure_nomor')
+            ->from('view_work_instructions')
+            ->join('procedures', 'procedures.id = view_work_instructions.procedure_id', 'left')
+            ->where('view_work_instructions.company_id', $this->company)
+            ->where('view_work_instructions.status !=', 'DEL');
 
-        if ($status == 'publish') {
-            $this->db->where('dir_guides.status', 'PUB');
-        } elseif ($status == 'draft') {
-            $this->db->where_in('dir_guides.status', ['OPN', 'DFT']);
-        } elseif ($status == 'waiting') {
-            $this->db->where_in('dir_guides.status', ['REV', 'APV']);
+        if (!empty($filters['doc_status'])) {
+            $this->db->where('view_work_instructions.status', $filters['doc_status']);
+        } else {
+            if ($status == 'publish') {
+                $this->db->where('view_work_instructions.status', 'PUB');
+            } elseif ($status == 'draft') {
+                $this->db->where_in('view_work_instructions.status', ['DFT', 'OPN', 'COR', 'RVI']);
+            } elseif ($status == 'waiting') {
+                $this->db->where_in('view_work_instructions.status', ['REV', 'APV']);
+            }
         }
 
-        return $this->db->order_by('procedures.revision_date', 'DESC')->order_by('procedures.created_at', 'DESC')->get()->result();
+        if (!empty($filters['departement_id'])) {
+            $this->db->where('view_work_instructions.departement_id', $filters['departement_id']);
+        }
+        if (!empty($filters['effective_date'])) {
+            $this->db->where('view_work_instructions.effective_date', $filters['effective_date']);
+        }
+        if (isset($filters['last_version']) && $filters['last_version'] !== '') {
+            $this->db->where('view_work_instructions.revision_number', $filters['last_version']);
+        }
+
+        return $this->db->order_by('view_work_instructions.effective_date', 'DESC')->order_by('view_work_instructions.created_at', 'DESC')->get()->result();
     }
 
     /**
      * Get Form (dir_forms) data
      */
-    private function _getForm($status)
+    private function _getForm($status, $filters = [])
     {
-        $this->db->select('dir_forms.name, dir_forms.number, dir_forms.status as form_status,
-            procedures.name as procedure_name, procedures.nomor as procedure_nomor,
-            procedures.created_at as proc_created_at, procedures.revision, procedures.revision_date, procedures.status as proc_status,
-            group_procedure.name as department')
-            ->from('dir_forms')
-            ->join('procedures', 'procedures.id = dir_forms.procedure_id', 'left')
-            ->join('group_procedure', 'group_procedure.id = procedures.group_procedure', 'left')
-            ->where('dir_forms.company_id', $this->company)
-            ->where('dir_forms.status !=', 'DEL')
-            ->where('dir_forms.deleted_at IS NULL')
-            ->where('(procedures.status IS NULL OR procedures.status NOT IN ("DEL","HLD"))')
-            ->where('(procedures.deleted_at IS NULL)');
+        $this->db->select('view_forms.*, procedures.nomor as procedure_nomor')
+            ->from('view_forms')
+            ->join('procedures', 'procedures.id = view_forms.procedure_id', 'left')
+            ->where('view_forms.company_id', $this->company)
+            ->where('view_forms.status !=', 'DEL');
 
-        if ($status == 'publish') {
-            $this->db->where('dir_forms.status', 'PUB');
-        } elseif ($status == 'draft') {
-            $this->db->where_in('dir_forms.status', ['OPN', 'DFT']);
-        } elseif ($status == 'waiting') {
-            $this->db->where_in('dir_forms.status', ['REV', 'APV']);
+        if (!empty($filters['doc_status'])) {
+            $this->db->where('view_forms.status', $filters['doc_status']);
+        } else {
+            if ($status == 'publish') {
+                $this->db->where('view_forms.status', 'PUB');
+            } elseif ($status == 'draft') {
+                $this->db->where_in('view_forms.status', ['DFT', 'OPN', 'COR', 'RVI']);
+            } elseif ($status == 'waiting') {
+                $this->db->where_in('view_forms.status', ['REV', 'APV']);
+            }
         }
 
-        return $this->db->order_by('procedures.revision_date', 'DESC')->order_by('procedures.created_at', 'DESC')->get()->result();
+        if (!empty($filters['departement_id'])) {
+            $this->db->where('view_forms.departement_id', $filters['departement_id']);
+        }
+        if (!empty($filters['effective_date'])) {
+            $this->db->where('view_forms.effective_date', $filters['effective_date']);
+        }
+        if (isset($filters['last_version']) && $filters['last_version'] !== '') {
+            $this->db->where('view_forms.revision_number', $filters['last_version']);
+        }
+
+        return $this->db->order_by('view_forms.effective_date', 'DESC')->order_by('view_forms.created_at', 'DESC')->get()->result();
     }
 
     /**
@@ -180,47 +228,27 @@ class Master_list extends Admin_Controller
             $this->db->reset_query();
             $waiting = $this->db->where('company_id', $this->company)->where('deleted_at IS NULL')->where_in('status', ['REV', 'APV'])->count_all_results($table);
         } else {
-            // IK & Form: count based on procedure parent status
-            $join_table = ($table == 'dir_guides') ? 'dir_guides' : 'dir_forms';
+            // IK & Form: count based on work_instructions or forms status
+            $target_table = ($table == 'dir_guides') ? 'work_instructions' : 'forms';
 
-            $all = $this->db->from($join_table)
-                ->join('procedures', 'procedures.id = ' . $join_table . '.procedure_id', 'left')
-                ->where($join_table . '.company_id', $this->company)
-                ->where($join_table . '.status !=', 'DEL')
-                ->where($join_table . '.deleted_at IS NULL')
-                ->where('(procedures.status IS NULL OR procedures.status NOT IN ("DEL","HLD"))')
-                ->where('(procedures.deleted_at IS NULL)')
-                ->count_all_results();
+            $all = $this->db->where('company_id', $this->company)
+                ->where_not_in('status', ['DEL', 'HLD'])
+                ->count_all_results($target_table);
 
             $this->db->reset_query();
-            $pub = $this->db->from($join_table)
-                ->join('procedures', 'procedures.id = ' . $join_table . '.procedure_id', 'left')
-                ->where($join_table . '.company_id', $this->company)
-                ->where($join_table . '.status !=', 'DEL')
-                ->where($join_table . '.deleted_at IS NULL')
-                ->where('procedures.status', 'PUB')
-                ->where('procedures.deleted_at IS NULL')
-                ->count_all_results();
+            $pub = $this->db->where('company_id', $this->company)
+                ->where('status', 'PUB')
+                ->count_all_results($target_table);
 
             $this->db->reset_query();
-            $draft = $this->db->from($join_table)
-                ->join('procedures', 'procedures.id = ' . $join_table . '.procedure_id', 'left')
-                ->where($join_table . '.company_id', $this->company)
-                ->where($join_table . '.status !=', 'DEL')
-                ->where($join_table . '.deleted_at IS NULL')
-                ->where('procedures.status', 'DFT')
-                ->where('procedures.deleted_at IS NULL')
-                ->count_all_results();
+            $draft = $this->db->where('company_id', $this->company)
+                ->where_in('status', ['DFT', 'OPN', 'COR', 'RVI'])
+                ->count_all_results($target_table);
 
             $this->db->reset_query();
-            $waiting = $this->db->from($join_table)
-                ->join('procedures', 'procedures.id = ' . $join_table . '.procedure_id', 'left')
-                ->where($join_table . '.company_id', $this->company)
-                ->where($join_table . '.status !=', 'DEL')
-                ->where($join_table . '.deleted_at IS NULL')
-                ->where_in('procedures.status', ['REV', 'APV'])
-                ->where('procedures.deleted_at IS NULL')
-                ->count_all_results();
+            $waiting = $this->db->where('company_id', $this->company)
+                ->where_in('status', ['REV', 'APV'])
+                ->count_all_results($target_table);
         }
 
         return ['all' => $all, 'publish' => $pub, 'draft' => $draft, 'waiting' => $waiting];
@@ -231,12 +259,25 @@ class Master_list extends Admin_Controller
      */
     public function export_excel()
     {
-        $filter = $this->input->get('filter') ?: 'sop';
+        $filter         = $this->input->get('filter') ?: 'sop';
+        $status         = $this->input->get('status') ?: 'all';
+        $departement_id = $this->input->get('departement_id') ?: '';
+        $effective_date = $this->input->get('effective_date') ?: '';
+        $last_version   = $this->input->get('last_version') !== null ? $this->input->get('last_version') : '';
+        $doc_status     = $this->input->get('doc_status') ?: '';
+
+        $filters = [
+            'departement_id' => $departement_id,
+            'effective_date' => $effective_date,
+            'last_version'   => $last_version,
+            'doc_status'     => $doc_status,
+        ];
+
         $data = [];
 
-        if ($filter == 'sop') { $data = $this->_getSOP('all'); }
-        elseif ($filter == 'ik') { $data = $this->_getIK('all'); }
-        elseif ($filter == 'form') { $data = $this->_getForm('all'); }
+        if ($filter == 'sop') { $data = $this->_getSOP($status, $filters); }
+        elseif ($filter == 'ik') { $data = $this->_getIK($status, $filters); }
+        elseif ($filter == 'form') { $data = $this->_getForm($status, $filters); }
 
         require_once(APPPATH . 'libraries/PHPExcel.php');
         $objPHPExcel = new PHPExcel();
@@ -261,7 +302,7 @@ class Master_list extends Admin_Controller
             foreach ($data as $k => $v) {
                 $cross_ref = isset($v->cross_reference) ? str_replace(['<br>', '- '], ["\n", '- '], strip_tags($v->cross_reference, '')) : '-';
                 $sheet->setCellValue('A' . $row, $k + 1);
-                $sheet->setCellValue('B' . $row, isset($v->department) ? $v->department : '-');
+                $sheet->setCellValue('B' . $row, isset($v->departement_name) ? $v->departement_name : (isset($v->department) ? $v->department : '-'));
                 $sheet->setCellValue('C' . $row, $v->nomor);
                 $sheet->setCellValue('D' . $row, strip_tags($v->name));
                 $sheet->setCellValue('E' . $row, $v->created_at ? date('d-m-Y', strtotime($v->created_at)) : '-');
@@ -279,14 +320,14 @@ class Master_list extends Admin_Controller
             $row = 2;
             foreach ($data as $k => $v) {
                 $sheet->setCellValue('A' . $row, $k + 1);
-                $sheet->setCellValue('B' . $row, isset($v->department) ? $v->department : '-');
+                $sheet->setCellValue('B' . $row, isset($v->departement_name) ? $v->departement_name : '-');
                 $sheet->setCellValue('C' . $row, isset($v->procedure_nomor) ? $v->procedure_nomor : '-');
                 $sheet->setCellValue('D' . $row, isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-');
                 $sheet->setCellValue('E' . $row, strip_tags($v->name));
-                $sheet->setCellValue('F' . $row, isset($v->proc_created_at) && $v->proc_created_at ? date('d-m-Y', strtotime($v->proc_created_at)) : '-');
-                $sheet->setCellValue('G' . $row, isset($v->revision) && $v->revision ? 'Rev. ' . $v->revision : '-');
-                $sheet->setCellValue('H' . $row, isset($v->revision_date) && $v->revision_date ? date('d-m-Y', strtotime($v->revision_date)) : '-');
-                $sts = isset($v->proc_status) ? $v->proc_status : '';
+                $sheet->setCellValue('F' . $row, isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-');
+                $sheet->setCellValue('G' . $row, isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-');
+                $sheet->setCellValue('H' . $row, isset($v->effective_date) && $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-');
+                $sts = isset($v->status) ? $v->status : '';
                 $sheet->setCellValue('I' . $row, isset($sts_labels[$sts]) ? $sts_labels[$sts] : $sts);
                 $row++;
             }
@@ -307,12 +348,25 @@ class Master_list extends Admin_Controller
      */
     public function print_pdf()
     {
-        $filter = $this->input->get('filter') ?: 'sop';
+        $filter         = $this->input->get('filter') ?: 'sop';
+        $status         = $this->input->get('status') ?: 'all';
+        $departement_id = $this->input->get('departement_id') ?: '';
+        $effective_date = $this->input->get('effective_date') ?: '';
+        $last_version   = $this->input->get('last_version') !== null ? $this->input->get('last_version') : '';
+        $doc_status     = $this->input->get('doc_status') ?: '';
+
+        $filters = [
+            'departement_id' => $departement_id,
+            'effective_date' => $effective_date,
+            'last_version'   => $last_version,
+            'doc_status'     => $doc_status,
+        ];
+
         $data = [];
 
-        if ($filter == 'sop') { $data = $this->_getSOP('all'); }
-        elseif ($filter == 'ik') { $data = $this->_getIK('all'); }
-        elseif ($filter == 'form') { $data = $this->_getForm('all'); }
+        if ($filter == 'sop') { $data = $this->_getSOP($status, $filters); }
+        elseif ($filter == 'ik') { $data = $this->_getIK($status, $filters); }
+        elseif ($filter == 'form') { $data = $this->_getForm($status, $filters); }
 
         $html_data = [
             'filter' => $filter,

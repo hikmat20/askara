@@ -239,6 +239,7 @@ class Procedures extends Admin_Controller
 		unset($Data['DataTables_Table_1_length']);
 		unset($Data['DataTables_Table_2_length']);
 		unset($Data['DataTables_Table_3_length']);
+		unset($Data['procedure_id']);
 
 		if ($Data) {
 			if (isset($_FILES)) {

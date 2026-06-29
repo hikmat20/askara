@@ -65,14 +65,14 @@ $sts_labels = ['DFT'=>'Draft','REV'=>'Review','APV'=>'Approval','PUB'=>'Publishe
         <?php foreach ($data as $k => $v) : ?>
             <tr>
                 <td class="text-center"><?= $k + 1; ?></td>
-                <td><?= isset($v->department) ? $v->department : '-'; ?></td>
+                <td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
                 <td><?= isset($v->procedure_nomor) ? $v->procedure_nomor : '-'; ?></td>
-                <td><?= isset($v->procedure_name) ? $v->procedure_name : '-'; ?></td>
+                <td><?= isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-'; ?></td>
                 <td><?= $v->name; ?></td>
-                <td class="text-center"><?= isset($v->proc_created_at) && $v->proc_created_at ? date('d-m-Y', strtotime($v->proc_created_at)) : '-'; ?></td>
-                <td class="text-center"><?= isset($v->revision) && $v->revision ? 'Rev. ' . $v->revision : '-'; ?></td>
-                <td class="text-center"><?= isset($v->revision_date) && $v->revision_date ? date('d-m-Y', strtotime($v->revision_date)) : '-'; ?></td>
-                <?php $sts = isset($v->proc_status) ? $v->proc_status : ''; ?>
+                <td class="text-center"><?= isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
+                <td class="text-center"><?= isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-'; ?></td>
+                <td class="text-center"><?= isset($v->effective_date) && $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-'; ?></td>
+                <?php $sts = isset($v->status) ? $v->status : ''; ?>
                 <td class="text-center"><?= isset($sts_labels[$sts]) ? $sts_labels[$sts] : $sts; ?></td>
             </tr>
         <?php endforeach; ?>

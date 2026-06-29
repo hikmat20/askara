@@ -1408,55 +1408,155 @@
 			let formdata = new FormData($(this)[0])
 			let btn = $('#save')
 
-			$('#description').removeClass('is-invalid')
+			$('#departement_id').removeClass('is-invalid')
+			$('#group_procedure').removeClass('is-invalid')
+			$('#nomor').removeClass('is-invalid')
+			$('#status').removeClass('is-invalid')
+			$('#name').removeClass('is-invalid')
+			$('#object').removeClass('is-invalid')
+			$('#scope').removeClass('is-invalid')
+			$('#performance').removeClass('is-invalid')
 			$('#prepared_by').removeClass('is-invalid')
-			$('#approval_id').removeClass('is-invalid')
 			$('#reviewer_id').removeClass('is-invalid')
-			$('#distribute_id').removeClass('is-invalid')
-			$('#image').removeClass('is-invalid')
+			$('#approval_id').removeClass('is-invalid')
+			$('#revision_description').removeClass('is-invalid')
 
-			const description = $('#description').val();
+			const departement_id = $('#departement_id').val();
+			const group_procedure = $('#group_procedure').val();
+			const nomor = $('#nomor').val();
+			const status = $('#status').val();
+			const name = $('#name').val();
+			const object = $('#object').val();
+			const scope = $('#scope').val();
+			const performance = $('#performance').val();
 			const prepared_by = $('#prepared_by').val();
 			const reviewer_id = $('#reviewer_id').val();
 			const approval_id = $('#approval_id').val();
-			const distribute_id = $('#distribute_id').val();
-			const id_master = $('#id_master').val();
-			const image = $('#image').val();
-			const parent_id = $('#parent_id').val();
+			const revision_description = $('#revision_description').val();
 
-			// console.log(description);
-			if (prepared_by !== undefined && (prepared_by == '' || prepared_by == null)) {
-				Swal.fire({
-					title: "Error Message!",
-					text: 'Empty User Prepared, please input User Prepared  first.....',
-					icon: "warning"
-				});
-				$('#prepared_by').addClass('is-invalid')
-				$('#approvalDocs').addClass('show');
-				return false;
+			if ($('#revision_description').length > 0) {
+				if (revision_description == '' || revision_description == null) {
+					Swal.fire({
+						title: "Warning!",
+						text: 'Empty Deskripsi Revisi, please input Deskripsi Revisi first.',
+						icon: "warning"
+					});
+					$('#revision_description').addClass('is-invalid');
+					$('#detailRevision').collapse('show');
+					return false;
+				}
 			}
 
-			// if ((reviewer_id == '' && reviewer_id != undefined) || (reviewer_id == null && reviewer_id != undefined)) {
-			// 	Swal.fire({
-			// 		title: "Error Message!",
-			// 		text: 'Empty reviewer, please input reviewer first.....',
-			// 		icon: "warning"
-			// 	});
-			// 	$('#reviewer_id').addClass('is-invalid')
-			// 	$('#approvalDocs').addClass('show');
-			// 	return false;
-			// }
-
-			// if ((approval_id == '' && approval_id != undefined) || (approval_id == null && approval_id != undefined)) {
-			// 	Swal.fire({
-			// 		title: "Error Message!",
-			// 		text: 'Empty approval, please input approval first!',
-			// 		icon: "warning"
-			// 	});
-			// 	$('#approval_id').addClass('is-invalid')
-			// 	$('#approvalDocs').addClass('show');
-			// 	return false;
-			// }
+			if (departement_id !== undefined && (departement_id == '' || departement_id == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Departement, please input Departement first.',
+					icon: "warning"
+				});
+				$('#departement_id').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
+				return false;
+			}
+			if (group_procedure !== undefined && (group_procedure == '' || group_procedure == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Kelompok Proses, please input Kelompok Proses first.',
+					icon: "warning"
+				});
+				$('#group_procedure').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
+				return false;
+			}
+			if (nomor !== undefined && (nomor == '' || nomor == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Nomor, please input Nomor first.',
+					icon: "warning"
+				});
+				$('#nomor').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
+				return false;
+			}
+			if (status !== undefined && (status == '' || status == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Status, please input Status first.',
+					icon: "warning"
+				});
+				$('#status').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
+				return false;
+			}
+			if (name !== undefined && (name == '' || name == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Nama Proses, please input Nama Proses first.',
+					icon: "warning"
+				});
+				$('#name').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
+				return false;
+			}
+			if (object !== undefined && (object == '' || object == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Objektif Proses, please input Objektif Proses first.',
+					icon: "warning"
+				});
+				$('#object').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
+				return false;
+			}
+			if (scope !== undefined && (scope == '' || scope == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Ruang Lingkup, please input Ruang Lingkup first.',
+					icon: "warning"
+				});
+				$('#scope').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
+				return false;
+			}
+			if (performance !== undefined && (performance == '' || performance == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Performa Indikator, please input Performa Indikator first.',
+					icon: "warning"
+				});
+				$('#performance').addClass('is-invalid');
+				$('#detailProcess').collapse('show');
+				return false;
+			}
+			if (prepared_by !== undefined && (prepared_by == '' || prepared_by == null)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty User Prepared, please input User Prepared first.',
+					icon: "warning"
+				});
+				$('#prepared_by').addClass('is-invalid');
+				$('#approvalDocs').collapse('show');
+				return false;
+			}
+			if ((reviewer_id == '' && reviewer_id != undefined) || (reviewer_id == null && reviewer_id != undefined)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty reviewer, please input reviewer first.',
+					icon: "warning"
+				});
+				$('#reviewer_id').addClass('is-invalid');
+				$('#approvalDocs').collapse('show');
+				return false;
+			}
+			if ((approval_id == '' && approval_id != undefined) || (approval_id == null && approval_id != undefined)) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty approval, please input approval first!',
+					icon: "warning"
+				});
+				$('#approval_id').addClass('is-invalid');
+				$('#approvalDocs').collapse('show');
+				return false;
+			}
 
 
 			var validate = true
@@ -1528,6 +1628,41 @@
 			e.preventDefault();
 			let formdata = new FormData($(this)[0])
 			let btn = $('.save')
+
+			let number = $('#number').val()
+			let pic = $('#pic').val()
+			let description = $('#description').summernote('isEmpty') ? '' : $('#description').val().trim()
+			let cleanDescription = description.replace(/<[^>]*>/g, '').trim()
+
+			$('#number').removeClass('is-invalid')
+			$('#pic').removeClass('is-invalid')
+
+			if (number == '' || number == null) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Nomor, please input Nomor first.',
+					icon: "warning"
+				});
+				$('#number').addClass('is-invalid');
+				return false;
+			}
+			if (pic == '' || pic == null) {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty PIC, please input PIC first.',
+					icon: "warning"
+				});
+				$('#pic').addClass('is-invalid');
+				return false;
+			}
+			if (cleanDescription == '') {
+				Swal.fire({
+					title: "Warning!",
+					text: 'Empty Deskripsi, please input Deskripsi first.',
+					icon: "warning"
+				});
+				return false;
+			}
 
 			$.ajax({
 				url: siteurl + active_controller + 'saveFlowDetail',
