@@ -72,8 +72,10 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_draft_<?= $draft->id; ?>">
-															<a href="<?= base_url('procedures/printfile/' . $draft->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
-															<div class="dropdown-divider my-0"></div>
+															<?php if (isset($allow_download) && $allow_download) : ?>
+																<a href="<?= base_url('procedures/printfile/' . $draft->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+																<div class="dropdown-divider my-0"></div>
+															<?php endif; ?>
 															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item" data-id="<?= $draft->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
 															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $draft->id; ?>" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
@@ -121,8 +123,10 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_review_<?= $dt->id; ?>">
-															<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
-															<div class="dropdown-divider my-0"></div>
+															<?php if (isset($allow_download) && $allow_download) : ?>
+																<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+																<div class="dropdown-divider my-0"></div>
+															<?php endif; ?>
 															<a href="javascript:void(0)" class="dropdown-item cancle-review" data-id="<?= $dt->id; ?>" title="Cancel Review"><i class="fa fa-undo mr-2 text-danger"></i>Cancel Review</a>
 														</div>
 													</div>
@@ -162,8 +166,10 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_cor_<?= $dt->id; ?>">
-															<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
-															<div class="dropdown-divider my-0"></div>
+															<?php if (isset($allow_download) && $allow_download) : ?>
+																<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+																<div class="dropdown-divider my-0"></div>
+															<?php endif; ?>
 															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $dt->id); ?>" class="dropdown-item" data-id="<?= $dt->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
 															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $dt->id; ?>" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
@@ -207,7 +213,9 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_apv_<?= $dt->id; ?>">
-															<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php if (isset($allow_download) && $allow_download) : ?>
+																<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php endif; ?>
 														</div>
 													</div>
 												</td>
@@ -252,8 +260,10 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_rev_<?= $dt->id; ?>">
-															<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
-															<div class="dropdown-divider my-0"></div>
+															<?php if (isset($allow_download) && $allow_download) : ?>
+																<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+																<div class="dropdown-divider my-0"></div>
+															<?php endif; ?>
 															<a href="<?= base_url($this->uri->segment(1) . '/revision/' . $dt->id); ?>" class="dropdown-item" data-id="<?= $dt->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
 															<a href="javascript:void(0)" class="dropdown-item review" data-id="<?= $dt->id; ?>" title="Process to Review"><i class="fa fa-sync mr-2 text-primary"></i>Process to Review</a>
@@ -299,7 +309,9 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_pub_<?= $dt->id; ?>">
-															<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php if (isset($allow_download) && $allow_download) : ?>
+																<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php endif; ?>
 														</div>
 													</div>
 												</td>
@@ -343,8 +355,10 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_del_<?= $dt->id; ?>">
-															<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
-															<div class="dropdown-divider my-0"></div>
+															<?php if (isset($allow_download) && $allow_download) : ?>
+																<a href="<?= base_url('procedures/printfile/' . $dt->id . '?download=1'); ?>" class="dropdown-item" title="Download Prosedur"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+																<div class="dropdown-divider my-0"></div>
+															<?php endif; ?>
 															<a href="javascript:void(0)" class="dropdown-item delete" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" title="Delete Data"><i class="fa fa-trash mr-2 text-danger"></i>Delete</a>
 														</div>
 													</div>

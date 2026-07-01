@@ -545,13 +545,15 @@
 													<th width="100">Action</th>
 												</tr>
 											</thead>
-											<tbody>
+											<tbody id="sortable-flow">
 												<?php if ($detail) :
 													$n = 0;
 													foreach ($detail as $key => $dtl) : $n++; ?>
-														<tr>
+														<tr class="sortable-row" data-id="<?= $dtl->id; ?>">
 
-															<td style="vertical-align:middle;" class="text-center"><?= $dtl->number; ?></td>
+															<td style="vertical-align:middle;" class="text-center">
+																<i class="fa fa-bars text-muted drag-handle mr-2" style="cursor: move;"></i>
+																<?= $dtl->number; ?></td>
 															<td style="vertical-align:middle;" class="text-center"><?= $dtl->pic; ?></td>
 															<td><?= $dtl->description; ?></td>
 															<td><?= $dtl->description_2; ?></td>
@@ -709,6 +711,7 @@
 	</div>
 </div>
 
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
 	$(document).ready(function() {
 		<?php if ($data->status == 'RVI'): ?>
@@ -1178,7 +1181,9 @@
 						}).then(() => {
 							// location.reload()
 							$('#modelId').modal('hide')
-							$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + result.id)
+							$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + result.id, function() {
+								initSortable();
+							})
 						})
 
 					} else {
@@ -1229,6 +1234,61 @@
 
 		/*    FORMS    */
 		/* =========== */
+
+		$(document).on('click', '.view-form', function() {
+			var id = $(this).data('id');
+			$('#modalView').modal('show')
+			$('#modalView').find('.modal-title').html('View Form')
+			$('#modalView').find('.modal-body').load(siteurl + 'forms/view/' + id)
+		})
+
+		// Make tbody sortable
+		function initSortable() {
+			if ($("#sortable-flow").length > 0) {
+				$("#sortable-flow").sortable({
+					handle: ".drag-handle",
+					update: function(event, ui) {
+						var sequenceData = [];
+						$("#sortable-flow .sortable-row").each(function(index) {
+							sequenceData.push($(this).data('id'));
+						});
+
+						$.ajax({
+							url: siteurl + active_controller + 'save_sequence',
+							type: 'POST',
+							data: { sequence: sequenceData },
+							dataType: 'json',
+							success: function(result) {
+								if (result.status == 1) {
+									// Success
+								} else {
+									Swal.fire("Error", result.msg, "error");
+								}
+							},
+							error: function() {
+								Swal.fire("Error", "Gagal menghubungi server.", "error");
+							}
+						});
+					}
+				});
+			}
+		}
+		initSortable();
+
+		function loadFlow(id) {
+			$.ajax({
+				url: siteurl + active_controller + 'loadFlow/' + id,
+				type: 'GET',
+				success: function(result) {
+					$('#flowDetail').find('tbody').html(result)
+					// Re-initialize sortable after loading new data
+					$("#sortable-flow").sortable("refresh");
+				},
+				error: function() {
+					Swal.fire("Error", "Gagal load data flow.", "error");
+				}
+			})
+		}
 
 		$(document).on('click', '.view-form', function() {
 			const id = $(this).data('id')

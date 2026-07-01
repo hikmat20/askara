@@ -66,6 +66,7 @@ class Procedures extends Admin_Controller
 			'dataDel' 	=> $dataDel,
 			'ArrReason' => $ArrReason,
 		]);
+		$this->template->set('allow_download', $this->_check_download_permission());
 		$this->template->set('status', $this->sts);
 		$this->template->render('index');
 	}
@@ -94,7 +95,7 @@ class Procedures extends Admin_Controller
 		$languange 		= ['english'];
 
 		if ($Data) {
-			$Data_detail = $this->db->order_by("CAST(number AS UNSIGNED)", "ASC", FALSE)->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$Data_detail = $this->db->order_by("sequence ASC, id ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$grProcess   = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
 			$getForms    = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
 			$getGuides   = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
@@ -152,7 +153,7 @@ class Procedures extends Admin_Controller
 		$languange 		= ['english'];
 
 		if ($Data) {
-			$Data_detail      = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$Data_detail      = $this->db->order_by("sequence ASC, id ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$grProcess        = $this->db->get_where('group_procedure', ['status' => 'ACT'])->result();
 			$getForms         = $this->db->get_where('forms', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
 			$getGuides        = $this->db->get_where('work_instructions', ['procedure_id' => $id, 'status !=' => 'DEL'])->result();
@@ -418,6 +419,38 @@ class Procedures extends Admin_Controller
 		echo json_encode($Return);
 	}
 
+	public function save_sequence()
+	{
+		$sequenceData = $this->input->post('sequence');
+		if ($sequenceData && is_array($sequenceData)) {
+			$this->db->trans_begin();
+			
+			foreach ($sequenceData as $index => $id) {
+				$this->db->update('procedure_details', ['sequence' => $index], ['id' => $id]);
+			}
+			
+			if ($this->db->trans_status() === FALSE) {
+				$this->db->trans_rollback();
+				$Return = [
+					'status' => 0,
+					'msg'    => 'Gagal menyimpan urutan.',
+				];
+			} else {
+				$this->db->trans_commit();
+				$Return = [
+					'status' => 1,
+					'msg'    => 'Urutan berhasil disimpan.',
+				];
+			}
+		} else {
+			$Return = [
+				'status' => 0,
+				'msg'    => 'Data urutan tidak valid.',
+			];
+		}
+		echo json_encode($Return);
+	}
+
 	// public function loadFlow($id){
 	// 	$data = $this->db->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 	// 	$this->load->view('load_flow', compact('data'));
@@ -570,7 +603,7 @@ class Procedures extends Admin_Controller
 
 		$language = ['english'];
 		if ($proc_id && $id) {
-			$flow       = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['id' => $id])->row();
+			$flow       = $this->db->order_by("sequence ASC, id ASC")->get_where('procedure_details', ['id' => $id])->row();
 			// $formsx  = $this->db->get_where('forms', ['procedure_id' => $proc_id, 'company_id' => $this->company, 'active' => 'Y', 'status !=' => 'DEL'])->result();
 			$cross_dept = $this->SettingModel->getSettingByName('cross_departement');
 			$forms      = $this->FormModel->find_all_by(['procedure_id' => $proc_id, 'is_active' => 'ACT', 'status !=' => 'DEL']);
@@ -595,7 +628,7 @@ class Procedures extends Admin_Controller
 	{
 		$Data_detail = '';
 		if ($id) {
-			$Data_detail 	= $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+			$Data_detail 	= $this->db->order_by("sequence ASC, id ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 			$getForms	= $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
 			$getguides	= $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
 			$ArrForms = [];
@@ -1621,6 +1654,10 @@ class Procedures extends Admin_Controller
 
 		$download = $this->input->get('download');
 		if ($download) {
+			if (!$this->_check_download_permission()) {
+				$this->session->set_flashdata('error', 'Anda tidak memiliki hak akses untuk mengunduh dokumen ini.');
+				redirect('procedures');
+			}
 			if (!empty($procedure->file_path)) {
 				$clean_path = ltrim($procedure->file_path, './');
 				$full_path = FCPATH . $clean_path;
@@ -1632,7 +1669,7 @@ class Procedures extends Admin_Controller
 			}
 		}
 
-		$flowDetail          = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+		$flowDetail          = $this->db->order_by("sequence ASC, id ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 		$getForms            = $this->db->get_where('forms', ['status !=' => 'DEL'])->result();
 		$getGuides           = $this->db->get_where('work_instructions', ['status !=' => 'DEL'])->result();
 		$users               = $this->db->get_where('view_users', ['company_id' => $this->company])->result();
@@ -1786,6 +1823,24 @@ class Procedures extends Admin_Controller
 				</td>
 				</tr>
 			</table></div>';
+	}
+
+	private function _check_download_permission()
+	{
+		if ($this->auth->is_admin()) {
+			return true;
+		}
+
+		$permission = $this->db->select('group_menus.*')
+			->from('group_menus')
+			->join('menus', 'group_menus.menu_id = menus.id')
+			->where('group_menus.group_id', $this->group_id)
+			->where('group_menus.company_id', $this->company)
+			->where('menus.link', 'procedures')
+			->get()
+			->row();
+
+		return ($permission && $permission->download == '1');
 	}
 
 	public function generateQrCode($id)

@@ -142,7 +142,7 @@ class Documents_list extends Admin_Controller
 	{
 
 		$docs          = $this->db->get_where('view_procedures', ['id' => $id])->row();
-		$detail        = $this->db->order_by("CAST(number AS UNSIGNED) ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
+		$detail        = $this->db->order_by("id ASC")->get_where('procedure_details', ['procedure_id' => $id, 'status' => '1'])->result();
 		$forms         = $this->db->get_where('forms', ['procedure_id' => $id])->result();
 		$guides        = $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
 		$users         = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
