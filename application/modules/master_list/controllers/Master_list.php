@@ -313,7 +313,7 @@ class Master_list extends Admin_Controller
                 $row++;
             }
         } else {
-            $headers = ['No', 'Department', 'Document Number', 'Prosedur Induk', 'Document Name', 'Effective Date Rev. 0', 'Latest Revision', 'Effective Date Latest Rev.', 'Status'];
+            $headers = ['No', 'Department', 'Prosedur Induk', 'Document Number', 'Document Name', 'Effective Date Rev. 0', 'Latest Revision', 'Effective Date Latest Rev.', 'Status'];
             $col = 'A';
             foreach ($headers as $h) { $sheet->setCellValue($col . '1', $h); $col++; }
 
@@ -321,8 +321,8 @@ class Master_list extends Admin_Controller
             foreach ($data as $k => $v) {
                 $sheet->setCellValue('A' . $row, $k + 1);
                 $sheet->setCellValue('B' . $row, isset($v->departement_name) ? $v->departement_name : '-');
-                $sheet->setCellValue('C' . $row, isset($v->procedure_nomor) ? $v->procedure_nomor : '-');
-                $sheet->setCellValue('D' . $row, isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-');
+                $sheet->setCellValue('C' . $row, isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-');
+                $sheet->setCellValue('D' . $row, isset($v->number) ? $v->number : '-');
                 $sheet->setCellValue('E' . $row, strip_tags($v->name));
                 $sheet->setCellValue('F' . $row, isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-');
                 $sheet->setCellValue('G' . $row, isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-');
