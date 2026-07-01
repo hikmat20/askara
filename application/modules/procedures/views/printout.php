@@ -220,11 +220,14 @@
 
   <pagebreak></pagebreak>
 
+  <?php $sectionNumber = 0; ?>
   <table class="table-data" cellpadding="10">
     <tr>
+    <?php if (!empty($procedure->object) || !empty(isset($procedure_bilingual->object) ? $procedure_bilingual->object : '')): ?>
+    <?php $sectionNumber++; ?>
     <tr>
       <td width="50%" style="position: relative;">
-        <h4 style="margin-bottom: 56px;"><strong>1. TUJUAN</strong></h4>
+        <h4 style="margin-bottom: 56px;"><strong><?= $sectionNumber; ?>. TUJUAN</strong></h4>
         <br>
         <div class="" style="position: relative;">
           <?php if (isset($markers['object']) && $markers['object']): ?>
@@ -236,16 +239,19 @@
         </div>
       </td>
       <td style="color: #0088ff;font-style: italic; ">
-        <h4 style="margin-bottom: 20px;"><strong>1. OBJECT</strong></h4>
+        <h4 style="margin-bottom: 20px;"><strong><?= $sectionNumber; ?>. OBJECT</strong></h4>
         <br>
         <div class="mpdf-highlight">
           <?= (isset($procedure_bilingual->object) ? $procedure_bilingual->object : ''); ?>
         </div>
       </td>
     </tr>
+    <?php endif; ?>
+    <?php if (!empty($procedure->scope) || !empty(isset($procedure_bilingual->scope) ? $procedure_bilingual->scope : '')): ?>
+    <?php $sectionNumber++; ?>
     <tr>
       <td>
-        <h4><strong>2. RUANG LINGKUP</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. RUANG LINGKUP</strong></h4>
         <br>
         <div class="" style="position: relative;">
           <?php if (isset($markers['scope']) && $markers['scope']): ?>
@@ -257,16 +263,19 @@
         </div>
       </td>
       <td style="color: #0088ff;font-style: italic; ">
-        <h4><strong>2. SCOPE</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. SCOPE</strong></h4>
         <br>
         <div class="mpdf-highlight">
           <?= (isset($procedure_bilingual->scope) ? $procedure_bilingual->scope : ''); ?>
         </div>
       </td>
     </tr>
+    <?php endif; ?>
+    <?php if (!empty($procedure->responsibility) || !empty(isset($procedure_bilingual->responsibility) ? $procedure_bilingual->responsibility : '')): ?>
+    <?php $sectionNumber++; ?>
     <tr>
       <td>
-        <h4><strong>3. TANGGUNG JAWAB</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. TANGGUNG JAWAB</strong></h4>
         <br>
         <div class="" style="position: relative;">
           <?php if (isset($markers['responsibility']) && $markers['responsibility']): ?>
@@ -278,16 +287,19 @@
         </div>
       </td>
       <td style="color: #0088ff;font-style: italic; ">
-        <h4><strong>3. RESPONSIBILITY</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. RESPONSIBILITY</strong></h4>
         <br>
         <div class="mpdf-highlight">
           <?= (isset($procedure_bilingual->responsibility) ? $procedure_bilingual->responsibility : ''); ?>
         </div>
       </td>
     </tr>
+    <?php endif; ?>
+    <?php if (!empty($procedure->define) || !empty(isset($procedure_bilingual->define) ? $procedure_bilingual->define : '')): ?>
+    <?php $sectionNumber++; ?>
     <tr>
       <td>
-        <h4><strong>4. DEFINISI</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. DEFINISI</strong></h4>
         <br>
         <div class="" style="position: relative;">
           <?php if (isset($markers['define']) && $markers['define']): ?>
@@ -299,16 +311,19 @@
         </div>
       </td>
       <td style="color: #0088ff;font-style: italic; ">
-        <h4><strong>4. DEFINE</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. DEFINE</strong></h4>
         <br>
         <div class="mpdf-highlight">
           <?= (isset($procedure_bilingual->define) ? $procedure_bilingual->define : ''); ?>
         </div>
       </td>
     </tr>
+    <?php endif; ?>
+    <?php if (!empty($procedure->performance) || !empty(isset($procedure_bilingual->performance) ? $procedure_bilingual->performance : '')): ?>
+    <?php $sectionNumber++; ?>
     <tr>
       <td style="position: relative;">
-        <h4><strong>5. PERFORMA INDIKATOR</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. PERFORMA INDIKATOR</strong></h4>
         <br>
         <div class="" style="position: relative;">
           <?php if (isset($markers['performance']) && $markers['performance']): ?>
@@ -320,16 +335,19 @@
         </div>
       </td>
       <td style="color: #0088ff;font-style: italic; ">
-        <h4><strong>5. INDICATOR PERFORMANCE</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. INDICATOR PERFORMANCE</strong></h4>
         <br>
         <div class="mpdf-highlight">
           <?= (isset($procedure_bilingual->performance) ? $procedure_bilingual->performance : ''); ?>
         </div>
       </td>
     </tr>
+    <?php endif; ?>
+    <?php if (!empty($procedure->general_requirement) || !empty(isset($procedure_bilingual->general_requirement) ? $procedure_bilingual->general_requirement : '')): ?>
+    <?php $sectionNumber++; ?>
     <tr>
       <td>
-        <h4><strong>6. KETENTUAN UMUM</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. KETENTUAN UMUM</strong></h4>
         <br>
         <div class="" style="position: relative;">
           <?php if (isset($markers['general_requirement']) && $markers['general_requirement']): ?>
@@ -341,22 +359,41 @@
         </div>
       </td>
       <td style="color: #0088ff;font-style: italic; ">
-        <h4><strong>6. GENERAL REQUIREMENT</strong></h4>
+        <h4><strong><?= $sectionNumber; ?>. GENERAL REQUIREMENT</strong></h4>
         <br>
         <div class="mpdf-highlight">
           <?= (isset($procedure_bilingual->general_requirement) ? $procedure_bilingual->general_requirement : ''); ?>
         </div>
       </td>
     </tr>
+    <?php endif; ?>
+    <?php if (!empty($ArrStd)): ?>
+    <?php $sectionNumber++; ?>
     <tr>
       <td>
-        <h4>7. REFERENSI</h4>
+        <h4><?= $sectionNumber; ?>. REFERENSI</h4>
         <br>
-        <?php if ($ArrStd) : ?>
+        <?php foreach ($ArrStd as $std) : ?>
+          <h4><?= $std->name; ?></h4>
+          <ul>
+            <?php if (isset($ArrData['standards'][$std->requirement_id]) && $ArrData['standards'][$std->requirement_id]) : ?>
+              <?php $n = 0;
+              foreach ($ArrData['standards'][$std->requirement_id] as $dtStd) : $n++; ?>
+                <li><?= $dtStd->chapter; ?></li>
+            <?php endforeach;
+            endif; ?>
+          </ul>
+          <br>
+        <?php endforeach; ?>
+      </td>
+      <td style="color: #0088ff;font-style: italic; ">
+        <h4><?= $sectionNumber; ?>. REFERENCE</h4>
+        <br>
+        <div class="mpdf-highlight">
           <?php foreach ($ArrStd as $std) : ?>
             <h4><?= $std->name; ?></h4>
             <ul>
-              <?php if ($ArrData['standards'][$std->requirement_id]) : ?>
+              <?php if (isset($ArrData['standards'][$std->requirement_id]) && $ArrData['standards'][$std->requirement_id]) : ?>
                 <?php $n = 0;
                 foreach ($ArrData['standards'][$std->requirement_id] as $dtStd) : $n++; ?>
                   <li><?= $dtStd->chapter; ?></li>
@@ -365,32 +402,13 @@
             </ul>
             <br>
           <?php endforeach; ?>
-        <?php endif; ?>
-      </td>
-      <td style="color: #0088ff;font-style: italic; ">
-        <h4>7. REFERENCE</h4>
-        <br>
-        <div class="mpdf-highlight">
-          <?php if ($ArrStd) : ?>
-            <?php foreach ($ArrStd as $std) : ?>
-              <h4><?= $std->name; ?></h4>
-              <ul>
-                <?php if ($ArrData['standards'][$std->requirement_id]) : ?>
-                  <?php $n = 0;
-                  foreach ($ArrData['standards'][$std->requirement_id] as $dtStd) : $n++; ?>
-                    <li><?= $dtStd->chapter; ?></li>
-                <?php endforeach;
-                endif; ?>
-              </ul>
-              <br>
-            <?php endforeach; ?>
-          <?php endif; ?>
         </div>
       </td>
     </tr>
+    <?php endif; ?>
   </table>
 
-  <?php if ($procedure->supplier): ?>
+  <?php if (!empty($procedure->supplier)): ?>
     <div>
       <h4><strong>SIPOCOR</strong></h4>
       <table width="100%" class="">
@@ -431,7 +449,8 @@
   <pagebreak></pagebreak>
   <!-- Deskripsi Procedure -->
   <div>
-    <h4>8. DESKRIPSI PROSEDUR</h4>
+    <?php $sectionNumber++; ?>
+    <h4><?= $sectionNumber; ?>. DESKRIPSI PROSEDUR</h4>
     <table class="table-data" width="100%" cellpadding="5" cellspacing="0">
       <thead>
         <tr class="table-secondary">
@@ -485,7 +504,8 @@
   </div>
 
   <div>
-    <h4>9. DISTRIBUSI</h4>
+    <?php $sectionNumber++; ?>
+    <h4><?= $sectionNumber; ?>. DISTRIBUSI</h4>
     <?php $lsDept = explode(',', $procedure->distribute_id);
     if (count($lsDept) > 0) : ?>
       <ol>
@@ -506,7 +526,8 @@
   <?php if ($procedure->image_flow_1 || $procedure->image_flow_2 || $procedure->image_flow_3) : ?>
     <pagebreak></pagebreak>
     <div style="border: 0px solid;height:100%;">
-      <h4>10. FLOW PROCEDURE</h4>
+      <?php $sectionNumber++; ?>
+      <h4><?= $sectionNumber; ?>. FLOW PROCEDURE</h4>
       <?php if ($procedure->image_flow_1) : ?>
         <img width="100%" src="<?= base_url("directory/FLOW_IMG/$procedure->company_id/$procedure->image_flow_1"); ?>"
           alt="image_flow_1" class="img-fluid">
