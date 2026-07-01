@@ -4,12 +4,30 @@ $file_ext = strtolower(pathinfo($file_name, PATHINFO_EXTENSION));
 $is_pdf = ($file_ext === 'pdf');
 
 // Gunakan file_path dari view jika ada, atau fallback ke default path
-$clean_path = isset($file_path) ? ltrim($file_path, './') : 'directory/WI/' . $company_id . '/' . $file_name;
+$clean_path = !empty($file_path) ? ltrim($file_path, './') : 'directory/WI/' . $company_id . '/' . $file_name;
 $path_check = FCPATH . $clean_path;
 
 if (!file_exists($path_check)) {
-  echo "File not found: " . $file_name;
-  return;
+  // Try case-insensitive search (Linux)
+  $dir = dirname($path_check);
+  $basename = basename($path_check);
+  $found = false;
+  if (is_dir($dir)) {
+      $files = scandir($dir);
+      foreach ($files as $f) {
+          if (strtolower($f) === strtolower($basename)) {
+              $path_check = $dir . '/' . $f;
+              $clean_path = dirname($clean_path) . '/' . $f;
+              $found = true;
+              break;
+          }
+      }
+  }
+  
+  if (!$found) {
+      echo "<div class='alert alert-danger m-3'>File not found: " . htmlspecialchars($file_name) . "</div>";
+      return;
+  }
 }
 $web_file_path = base_url($clean_path);
 ?>
