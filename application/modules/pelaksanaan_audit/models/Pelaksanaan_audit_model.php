@@ -49,13 +49,13 @@ class Pelaksanaan_audit_model extends BF_Model
                 audit_program_schedule.process_name_free,
                 procedures.name as process_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name
+                COALESCE(departements.name, audit_program_schedule.auditee_name_free) as department_name
             ')
             ->from('audit_program_schedule')
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
+            ->join('departements', 'departements.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.program_id', $program_id)
             ->where('audit_program_schedule.status', '1')
             ->order_by('audit_program_schedule.audit_date', 'ASC')
@@ -81,7 +81,7 @@ class Pelaksanaan_audit_model extends BF_Model
                 audit_program_schedule.process_name_free,
                 procedures.name as process_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
+                COALESCE(departements.name, audit_program_schedule.auditee_name_free) as department_name,
                 audit_program.company,
                 audit_program.id as program_code
             ')
@@ -90,7 +90,7 @@ class Pelaksanaan_audit_model extends BF_Model
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
+            ->join('departements', 'departements.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.status', '1')
             ->where('audit_program.status', '1')
             ->order_by('audit_program_schedule.audit_date', 'DESC')
@@ -111,7 +111,7 @@ class Pelaksanaan_audit_model extends BF_Model
                 audit_program_schedule.process_name_free,
                 procedures.name as process_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
+                COALESCE(departements.name, audit_program_schedule.auditee_name_free) as department_name,
                 audit_program.company,
                 audit_program.id as program_code
             ')
@@ -120,7 +120,7 @@ class Pelaksanaan_audit_model extends BF_Model
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
+            ->join('departements', 'departements.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.id', $schedule_id)
             ->where('audit_program_schedule.status', '1')
             ->get()

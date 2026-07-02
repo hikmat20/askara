@@ -26,7 +26,7 @@
 									<?php if ($data) foreach ($data as $k => $v) : $k++; ?>
 										<tr>
 											<td class="text-center"><?= $k; ?></td>
-											<td><?= $v->department_name; ?></td>
+											<td><?= $v->name; ?></td>
 											<td class="text-center">
 												<?php if ($v->status == '1') : ?>
 													<span class="label label-success label-inline">Active</span>

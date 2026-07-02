@@ -311,6 +311,9 @@ $(document).ready(function() {
 		});
 	}
 
+	// Initialize select2 on page load
+	initSelect2();
+
 	// ISO CHANGE -> LOAD PASAL
 	$(document).on('change', '.iso-select', function() {
 		var row = $(this).data('row'), iso_id = $(this).val();
