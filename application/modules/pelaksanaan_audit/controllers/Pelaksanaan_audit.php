@@ -97,6 +97,12 @@ class Pelaksanaan_audit extends Admin_Controller
         // Get ISO standards (requirements)
         $standards = $this->model->getRequirements();
 
+        // Get requirement details (pasal) for Audit Persyaratan type
+        $requirement_details = [];
+        if (!empty($schedule->requirement_id)) {
+            $requirement_details = $this->model->getPasalByRequirement($schedule->requirement_id);
+        }
+
         // Get existing audit data if editing
         $audit_data = $this->model->getAuditByScheduleId($schedule_id);
         $audit_ns_details = [];
@@ -104,6 +110,7 @@ class Pelaksanaan_audit extends Admin_Controller
         $audit_free_checklist = [];
         $audit_conformity = [];
         $audit_temuan = [];
+        $audit_requirement_details = [];
 
         if ($audit_data) {
             $audit_ns_details = $this->model->getAuditNsDetails($audit_data->id);
@@ -111,6 +118,7 @@ class Pelaksanaan_audit extends Admin_Controller
             $audit_free_checklist = $this->model->getAuditFreeChecklist($audit_data->id);
             $audit_conformity = $this->model->getAuditConformity($audit_data->id);
             $audit_temuan = $this->model->getAuditTemuan($audit_data->id);
+            $audit_requirement_details = $this->model->getAuditRequirementDetails($audit_data->id);
         }
 
         $this->template->set([
@@ -119,12 +127,14 @@ class Pelaksanaan_audit extends Admin_Controller
             'ns_checklist'          => $ns_checklist,
             'std_checklist'         => $std_checklist,
             'standards'             => $standards,
+            'requirement_details'   => $requirement_details,
             'audit_data'            => $audit_data,
             'audit_ns_details'      => $audit_ns_details,
             'audit_std_details'     => $audit_std_details,
             'audit_free_checklist'  => $audit_free_checklist,
             'audit_conformity'      => $audit_conformity,
             'audit_temuan'          => $audit_temuan,
+            'audit_requirement_details' => $audit_requirement_details,
         ]);
         $this->template->render('audit');
     }
@@ -361,12 +371,19 @@ class Pelaksanaan_audit extends Admin_Controller
         $std_checklist = $this->model->getStandardChecklist($schedule->process_id, $this->company);
         $standards = $this->model->getRequirements();
 
+        // Get requirement details (pasal) for Audit Persyaratan type
+        $requirement_details = [];
+        if (!empty($schedule->requirement_id)) {
+            $requirement_details = $this->model->getPasalByRequirement($schedule->requirement_id);
+        }
+
         $audit_data = $this->model->getAuditByScheduleId($schedule_id);
         $audit_ns_details = [];
         $audit_std_details = [];
         $audit_free_checklist = [];
         $audit_conformity = [];
         $audit_temuan = [];
+        $audit_requirement_details = [];
 
         if ($audit_data) {
             $audit_ns_details = $this->model->getAuditNsDetails($audit_data->id);
@@ -374,6 +391,7 @@ class Pelaksanaan_audit extends Admin_Controller
             $audit_free_checklist = $this->model->getAuditFreeChecklist($audit_data->id);
             $audit_conformity = $this->model->getAuditConformity($audit_data->id);
             $audit_temuan = $this->model->getAuditTemuan($audit_data->id);
+            $audit_requirement_details = $this->model->getAuditRequirementDetails($audit_data->id);
         }
 
         $this->template->set([
@@ -382,12 +400,14 @@ class Pelaksanaan_audit extends Admin_Controller
             'ns_checklist'          => $ns_checklist,
             'std_checklist'         => $std_checklist,
             'standards'             => $standards,
+            'requirement_details'   => $requirement_details,
             'audit_data'            => $audit_data,
             'audit_ns_details'      => $audit_ns_details,
             'audit_std_details'     => $audit_std_details,
             'audit_free_checklist'  => $audit_free_checklist,
             'audit_conformity'      => $audit_conformity,
             'audit_temuan'          => $audit_temuan,
+            'audit_requirement_details' => $audit_requirement_details,
         ]);
         $this->template->render('view');
     }
@@ -415,12 +435,19 @@ class Pelaksanaan_audit extends Admin_Controller
         $std_checklist = $this->model->getStandardChecklist($schedule->process_id, $this->company);
         $standards = $this->model->getRequirements();
 
+        // Get requirement details (pasal) for Audit Persyaratan type
+        $requirement_details = [];
+        if (!empty($schedule->requirement_id)) {
+            $requirement_details = $this->model->getPasalByRequirement($schedule->requirement_id);
+        }
+
         $audit_data = $this->model->getAuditByScheduleId($schedule_id);
         $audit_ns_details = [];
         $audit_std_details = [];
         $audit_free_checklist = [];
         $audit_conformity = [];
         $audit_temuan = [];
+        $audit_requirement_details = [];
 
         if ($audit_data) {
             $audit_ns_details = $this->model->getAuditNsDetails($audit_data->id);
@@ -428,6 +455,7 @@ class Pelaksanaan_audit extends Admin_Controller
             $audit_free_checklist = $this->model->getAuditFreeChecklist($audit_data->id);
             $audit_conformity = $this->model->getAuditConformity($audit_data->id);
             $audit_temuan = $this->model->getAuditTemuan($audit_data->id);
+            $audit_requirement_details = $this->model->getAuditRequirementDetails($audit_data->id);
         }
 
         $data = [
@@ -436,28 +464,23 @@ class Pelaksanaan_audit extends Admin_Controller
             'ns_checklist'          => $ns_checklist,
             'std_checklist'         => $std_checklist,
             'standards'             => $standards,
+            'requirement_details'   => $requirement_details,
             'audit_data'            => $audit_data,
             'audit_ns_details'      => $audit_ns_details,
             'audit_std_details'     => $audit_std_details,
             'audit_free_checklist'  => $audit_free_checklist,
             'audit_conformity'      => $audit_conformity,
             'audit_temuan'          => $audit_temuan,
+            'audit_requirement_details' => $audit_requirement_details,
         ];
 
         $html = $this->load->view('pelaksanaan_audit/pdf', $data, true);
 
-        $mpdf = new \Mpdf\Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_left' => 15,
-            'margin_right' => 15,
-            'margin_top' => 15,
-            'margin_bottom' => 15,
-            'tempDir' => APPPATH . 'cache/mpdf'
-        ]);
+        // Load mPDF directly from MPDF_ folder
+        require_once(APPPATH . 'libraries/MPDF_/mpdf.php');
+        $mpdf = new mPDF('utf-8', 'A4', 0, '', 15, 15, 15, 15, 0, 0);
         $mpdf->SetTitle('Pelaksanaan Audit - ' . $schedule->schedule_id);
         $mpdf->WriteHTML($html);
-        if (ob_get_contents()) ob_clean();
         $mpdf->Output('Pelaksanaan_Audit_' . $schedule->schedule_id . '.pdf', 'I');
     }
 }

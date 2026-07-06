@@ -1,3 +1,4 @@
+
 <div class="content d-flex flex-column flex-column-fluid" id="kt_content">
 	<div class="d-flex flex-column-fluid">
 		<div class="container">
@@ -12,7 +13,7 @@
 					<div class="mb-4">
 						<h5 class="font-weight-bold border-bottom pb-2"><i class="fa fa-calendar-alt text-primary mr-2"></i><span class="text-primary">Header</span></h5>
 						<table class="table table-bordered table-sm">
-							<tr><th width="200">Prosedur</th><td><?= !empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free); ?></td></tr>
+							<tr><th width="200">Prosedur</th><td><?= !empty($schedule->requirement_name) ? htmlspecialchars($schedule->requirement_name) : (!empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free)); ?></td></tr>
 							<tr><th>Date</th><td><?= date('d/m/Y', strtotime($schedule->audit_date)); ?></td></tr>
 							<tr><th>Department - Company</th><td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td></tr>
 							<tr><th>Auditor</th><td><?= isset($schedule->auditor_name) ? $schedule->auditor_name : '-'; ?></td></tr>
@@ -37,6 +38,59 @@
 						<?php endif; ?>
 					</div>
 
+					<!-- CHECKLIST BERDASARKAN PERSYARATAN - khusus Audit Persyaratan, sebelum Kesimpulan Audit -->
+					<?php if (!empty($schedule->requirement_id) && !empty($requirement_details)) :
+						$req_detail_map = [];
+						if (!empty($audit_requirement_details)) {
+							foreach ($audit_requirement_details as $d) {
+								$req_detail_map[$d->requirement_detail_id] = $d;
+							}
+						}
+						// Filter: hanya tampilkan baris yang setidaknya salah satu (aktual/temuan/rekomendasi) terisi
+						$has_filled_rows = false;
+						foreach ($requirement_details as $rd) {
+							$existing = isset($req_detail_map[$rd->id]) ? $req_detail_map[$rd->id] : null;
+							if ($existing && (trim($existing->aktual) !== '' || trim($existing->temuan) !== '' || trim($existing->rekomendasi) !== '')) {
+								$has_filled_rows = true;
+								break;
+							}
+						}
+					?>
+					<?php if ($has_filled_rows) : ?>
+					<div class="mb-4">
+						<h5 class="font-weight-bold border-bottom pb-2"><i class="fa fa-clipboard-check text-info mr-2"></i><span class="text-info">Checklist Berdasarkan Persyaratan</span></h5>
+						<div class="table-responsive">
+							<table class="table table-bordered table-sm">
+								<thead class="text-center table-light">
+									<tr>
+										<th width="180">Pasal</th>
+										<th>Requirement (Des. Inggris)</th>
+										<th width="180">Aktual</th>
+										<th width="180">Temuan</th>
+										<th width="180">Rekomendasi</th>
+									</tr>
+								</thead>
+								<tbody>
+									<?php foreach ($requirement_details as $rd) :
+										$existing = isset($req_detail_map[$rd->id]) ? $req_detail_map[$rd->id] : null;
+										// Skip baris jika ketiga kolom kosong
+										if (!$existing || (trim($existing->aktual) === '' && trim($existing->temuan) === '' && trim($existing->rekomendasi) === '')) continue;
+									?>
+										<tr>
+											<td><?= htmlspecialchars($rd->chapter); ?></td>
+											<td><?= $rd->desc_eng; ?></td>
+											<td><?= trim($existing->aktual) !== '' ? nl2br(htmlspecialchars($existing->aktual)) : '-'; ?></td>
+											<td><?= trim($existing->temuan) !== '' ? nl2br(htmlspecialchars($existing->temuan)) : '-'; ?></td>
+											<td><?= trim($existing->rekomendasi) !== '' ? nl2br(htmlspecialchars($existing->rekomendasi)) : '-'; ?></td>
+										</tr>
+									<?php endforeach; ?>
+								</tbody>
+							</table>
+						</div>
+					</div>
+					<?php endif; ?>
+					<?php endif; ?>
+
 					<!-- KESIMPULAN AUDIT -->
 					<div class="mb-4">
 						<h5 class="font-weight-bold border-bottom pb-2"><i class="fa fa-star text-success mr-2"></i><span class="text-success">Kesimpulan Audit</span></h5>
@@ -56,7 +110,8 @@
 							<p class="text-muted"><em>Tidak ada data conformity.</em></p>
 						<?php endif; ?>
 
-						<!-- Temuan (full: Kategori, ISO, Pasal, Evidence) -->
+						<!-- Temuan - HIDE untuk Audit Persyaratan -->
+						<?php if (empty($schedule->requirement_id)) : ?>
 						<h6 class="font-weight-bold mt-3 mb-2">Temuan</h6>
 						<?php if (!empty($audit_temuan)) : ?>
 							<table class="table table-bordered table-sm">
@@ -93,6 +148,7 @@
 							</table>
 						<?php else : ?>
 							<p class="text-muted"><em>Tidak ada data temuan.</em></p>
+						<?php endif; ?>
 						<?php endif; ?>
 					</div>
 				</div>

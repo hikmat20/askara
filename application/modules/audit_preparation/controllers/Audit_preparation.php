@@ -39,6 +39,7 @@ class Audit_preparation extends Admin_Controller
         $data['procedures'] = $this->audit_program_model->getActiveProcedures($this->company);
         $data['temuan'] = $this->audit_program_model->getActiveTemuan();
         $data['departments'] = $this->audit_program_model->getDepartments($this->company);
+        $data['requirements'] = $this->audit_program_model->getPublishedRequirements();
         $data['program'] = null;
         $data['evaluations'] = [];
         $data['critical_issues'] = [];
@@ -70,6 +71,7 @@ class Audit_preparation extends Admin_Controller
         $data['procedures'] = $this->audit_program_model->getActiveProcedures($this->company);
         $data['temuan'] = $this->audit_program_model->getActiveTemuan();
         $data['departments'] = $this->audit_program_model->getDepartments($this->company);
+        $data['requirements'] = $this->audit_program_model->getPublishedRequirements();
 
         // Load existing program and child records
         $data['program'] = $program;
@@ -256,6 +258,7 @@ class Audit_preparation extends Admin_Controller
         $schedRecordIds = isset($data['schedule_record_id']) ? $data['schedule_record_id'] : [];
         $schedProcessIds = isset($data['schedule_process_id']) ? $data['schedule_process_id'] : [];
         $schedProcessFree = isset($data['schedule_process_name_free']) ? $data['schedule_process_name_free'] : [];
+        $schedRequirementIds = isset($data['schedule_requirement_id']) ? $data['schedule_requirement_id'] : [];
         $schedAuditorIds = isset($data['schedule_auditor_id']) ? $data['schedule_auditor_id'] : [];
         $schedAuditeeIds = isset($data['schedule_auditee_id']) ? $data['schedule_auditee_id'] : [];
         $schedAuditeeFree = isset($data['schedule_auditee_name_free']) ? $data['schedule_auditee_name_free'] : [];
@@ -290,8 +293,9 @@ class Audit_preparation extends Admin_Controller
         if (!empty($schedProcessIds)) {
             foreach ($schedProcessIds as $k => $processId) {
                 $freeText = isset($schedProcessFree[$k]) ? trim($schedProcessFree[$k]) : '';
-                // Skip row if both process_id and free text are empty
-                if (empty($processId) && empty($freeText)) continue;
+                $requirementId = isset($schedRequirementIds[$k]) ? trim($schedRequirementIds[$k]) : '';
+                // Skip row if process_id, free text, and requirement_id are all empty
+                if (empty($processId) && empty($freeText) && empty($requirementId)) continue;
 
                 $recordId = isset($schedRecordIds[$k]) ? $schedRecordIds[$k] : '';
                 $auditeeFreeText = isset($schedAuditeeFree[$k]) ? trim($schedAuditeeFree[$k]) : '';
@@ -299,6 +303,7 @@ class Audit_preparation extends Admin_Controller
                     'program_id'        => $program_id,
                     'process_id'        => !empty($processId) ? $processId : null,
                     'process_name_free' => $freeText,
+                    'requirement_id'    => !empty($requirementId) ? $requirementId : null,
                     'auditor_id'        => isset($schedAuditorIds[$k]) ? $schedAuditorIds[$k] : null,
                     'audit_date'        => isset($schedDates[$k]) ? $schedDates[$k] : null,
                     'start_time'        => isset($schedStartTimes[$k]) ? $schedStartTimes[$k] : null,
@@ -479,7 +484,7 @@ class Audit_preparation extends Admin_Controller
         $html .= '</tr></thead><tbody>';
 
         foreach ($schedules as $k => $sched) {
-            $process = !empty($sched->process_name) ? strip_tags($sched->process_name) : htmlspecialchars($sched->process_name_free);
+            $process = !empty($sched->requirement_name) ? htmlspecialchars($sched->requirement_name) : (!empty($sched->process_name) ? strip_tags($sched->process_name) : htmlspecialchars($sched->process_name_free));
             $auditor = htmlspecialchars($sched->auditor_name);
 
             // Department
@@ -793,13 +798,15 @@ class Audit_preparation extends Admin_Controller
         if (isset($data['schedule_process_id']) && is_array($data['schedule_process_id'])) {
             $today = date('Y-m-d');
             $schedProcessFree = isset($data['schedule_process_name_free']) ? $data['schedule_process_name_free'] : [];
+            $schedRequirementIds = isset($data['schedule_requirement_id']) ? $data['schedule_requirement_id'] : [];
 
             foreach ($data['schedule_process_id'] as $index => $processId) {
                 $row_num = $index + 1;
                 $freeText = isset($schedProcessFree[$index]) ? trim($schedProcessFree[$index]) : '';
+                $requirementId = isset($schedRequirementIds[$index]) ? trim($schedRequirementIds[$index]) : '';
 
-                // Process: either select or free text must be filled
-                if (empty($processId) && empty($freeText)) {
+                // Process: either select, free text, or requirement must be filled
+                if (empty($processId) && empty($freeText) && empty($requirementId)) {
                     $errors[] = "Schedule row {$row_num}: Process must be selected or filled.";
                 }
                 if (empty($data['schedule_auditor_id'][$index])) {

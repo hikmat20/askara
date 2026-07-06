@@ -27,7 +27,7 @@
 						<div class="mb-4">
 							<h5 class="font-weight-bold border-bottom pb-2"><i class="fa fa-calendar-alt text-primary mr-2"></i><span class="text-primary">Header</span></h5>
 							<table class="table table-bordered table-sm">
-								<tr><th width="200">Prosedur</th><td><?= !empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free); ?></td></tr>
+								<tr><th width="200">Prosedur</th><td><?= !empty($schedule->requirement_name) ? htmlspecialchars($schedule->requirement_name) : (!empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free)); ?></td></tr>
 								<tr><th>Date</th><td><?= date('d/m/Y', strtotime($schedule->audit_date)); ?></td></tr>
 								<tr><th>Department - Company</th><td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td></tr>
 								<tr><th>Auditor</th><td><?= isset($schedule->auditor_name) ? $schedule->auditor_name : '-'; ?></td></tr>
@@ -125,7 +125,8 @@
 							<?php endif; ?>
 						</div>
 
-						<!-- ================ LIST NON CHECKLIST (free text, tidak wajib) ================ -->
+						<!-- ================ LIST NON CHECKLIST (free text, tidak wajib) - HIDE untuk Audit Persyaratan ================ -->
+						<?php if (empty($schedule->requirement_id)) : ?>
 						<div class="mb-4">
 							<h5 class="font-weight-bold border-bottom pb-2"><i class="fa fa-list-alt text-purple mr-2"></i><span style="color:#6f42c1;">List Non Checklist</span> <small class="text-muted">(tidak wajib diisi semua)</small></h5>
 							<div class="table-responsive">
@@ -157,6 +158,52 @@
 							</div>
 							<button type="button" class="btn btn-sm btn-outline-primary mb-2" id="btn-add-free-checklist"><i class="fa fa-plus mr-1"></i> Add Item</button>
 						</div>
+						<?php endif; ?>
+
+						<!-- ================ CHECKLIST BERDASARKAN PERSYARATAN (khusus Audit Persyaratan) ================ -->
+						<?php if (!empty($schedule->requirement_id) && !empty($requirement_details)) : ?>
+						<div class="mb-4">
+							<h5 class="font-weight-bold border-bottom pb-2"><i class="fa fa-clipboard-check text-info mr-2"></i><span class="text-info">Checklist Berdasarkan Persyaratan</span> <small class="text-muted">(tidak wajib diisi semua)</small></h5>
+							<?php
+							$req_detail_map = [];
+							if (!empty($audit_requirement_details)) {
+								foreach ($audit_requirement_details as $d) {
+									$req_detail_map[$d->requirement_detail_id] = $d;
+								}
+							}
+							?>
+							<div class="table-responsive">
+								<table class="table table-bordered table-sm table-hover" id="tblReqChecklist">
+									<thead class="table-light text-center">
+										<tr>
+											<th width="180">Pasal</th>
+											<th>Requirement (Des. Inggris)</th>
+											<th width="180">Aktual</th>
+											<th width="180">Temuan</th>
+											<th width="180">Rekomendasi</th>
+										</tr>
+									</thead>
+									<tbody>
+										<?php foreach ($requirement_details as $k => $rd) :
+											$existing = isset($req_detail_map[$rd->id]) ? $req_detail_map[$rd->id] : null;
+										?>
+											<tr class="req-checklist-row">
+												<td style="vertical-align:top;">
+													<input type="hidden" name="req_detail[<?= $k; ?>][requirement_detail_id]" value="<?= $rd->id; ?>">
+													<?php if ($existing) : ?><input type="hidden" name="req_detail[<?= $k; ?>][id]" value="<?= $existing->id; ?>"><?php endif; ?>
+													<?= htmlspecialchars($rd->chapter); ?>
+												</td>
+												<td style="vertical-align:top;" class="req-desc-cell"><?= $rd->desc_eng; ?></td>
+												<td style="vertical-align:top;"><textarea name="req_detail[<?= $k; ?>][aktual]" class="form-control form-control-sm req-textarea" rows="2" placeholder="Input free text"><?= $existing ? htmlspecialchars($existing->aktual) : ''; ?></textarea></td>
+												<td style="vertical-align:top;"><textarea name="req_detail[<?= $k; ?>][temuan]" class="form-control form-control-sm req-textarea" rows="2" placeholder="Input free text"><?= $existing ? htmlspecialchars($existing->temuan) : ''; ?></textarea></td>
+												<td style="vertical-align:top;"><textarea name="req_detail[<?= $k; ?>][rekomendasi]" class="form-control form-control-sm req-textarea" rows="2" placeholder="Input free text"><?= $existing ? htmlspecialchars($existing->rekomendasi) : ''; ?></textarea></td>
+											</tr>
+										<?php endforeach; ?>
+									</tbody>
+								</table>
+							</div>
+						</div>
+						<?php endif; ?>
 
 						<!-- ================ KESIMPULAN AUDIT ================ -->
 						<div class="mb-4">
@@ -191,7 +238,8 @@
 							</div>
 							<button type="button" class="btn btn-sm btn-outline-success mb-4" id="btn-add-conformity"><i class="fa fa-plus mr-1"></i> Add Item</button>
 
-							<!-- Temuan (full: Kategori, ISO, Pasal, Evidence, Action) -->
+							<!-- Temuan (full: Kategori, ISO, Pasal, Evidence, Action) - HIDE untuk Audit Persyaratan -->
+							<?php if (empty($schedule->requirement_id)) : ?>
 							<div class="d-flex justify-content-between align-items-center mb-2">
 								<h6 class="font-weight-bold mt-3 mb-0">Temuan</h6>
 								<small class="text-muted"><em>Format: PDF, JPG, JPEG, PNG, DOC, DOCX, XLS, XLSX (Max: 10MB)</em></small>
@@ -290,6 +338,7 @@
 								</table>
 							</div>
 							<button type="button" class="btn btn-sm btn-outline-danger mb-4" id="btn-add-temuan"><i class="fa fa-plus mr-1"></i> Add Item</button>
+							<?php endif; ?>
 						</div>
 
 						<!-- ================ SAVE BUTTON ================ -->
@@ -310,9 +359,6 @@ $(document).ready(function() {
 			$(this).select2({ placeholder: $(this).data('placeholder') || 'Choose an options', allowClear: true, width: '100%' });
 		});
 	}
-
-	// Initialize select2 on page load
-	initSelect2();
 
 	// ISO CHANGE -> LOAD PASAL
 	$(document).on('change', '.iso-select', function() {
@@ -437,16 +483,45 @@ $(document).ready(function() {
 	function renumberConformity() { var n = 0; $('#tblConformity tbody tr.conformity-row').each(function() { n++; $(this).find('.row-num').text(n); }); }
 	function renumberTemuan() { var n = 0; $('#tblTemuan tbody tr.temuan-row').each(function() { n++; $(this).find('.row-num').text(n); }); }
 
-	// Auto-resize textareas
+	// Auto-resize textareas (exclude requirement checklist textareas)
 	function autoResizeTextarea(el) {
 		el.style.height = 'auto';
 		el.style.height = el.scrollHeight + 'px';
 	}
 
-	// Apply on page load to all existing textareas
-	$('#formAudit textarea').each(function() { autoResizeTextarea(this); });
+	// Apply on page load to all existing textareas (except req-textarea)
+	$('#formAudit textarea').not('.req-textarea').each(function() { autoResizeTextarea(this); });
 
-	// Apply on input
-	$(document).on('input', '#formAudit textarea', function() { autoResizeTextarea(this); });
+	// Apply on input (except req-textarea)
+	$(document).on('input', '#formAudit textarea:not(.req-textarea)', function() { autoResizeTextarea(this); });
+
+	// Resize requirement checklist textareas: min-height = desc_eng cell height, grows with content
+	function resizeReqTextareas() {
+		$('#tblReqChecklist tbody tr.req-checklist-row').each(function() {
+			var $row = $(this);
+			var descHeight = $row.find('.req-desc-cell').outerHeight();
+			var minH = (descHeight && descHeight > 50) ? (descHeight - 16) : 50;
+			$row.find('.req-textarea').each(function() {
+				$(this).css('min-height', minH + 'px');
+				// Set height based on content, but not less than minH
+				this.style.height = 'auto';
+				var contentH = this.scrollHeight;
+				this.style.height = Math.max(contentH, minH) + 'px';
+			});
+		});
+	}
+
+	// On input for req-textarea: grow with content but respect min-height
+	$(document).on('input', '.req-textarea', function() {
+		var $row = $(this).closest('tr.req-checklist-row');
+		var descHeight = $row.find('.req-desc-cell').outerHeight();
+		var minH = (descHeight && descHeight > 50) ? (descHeight - 16) : 50;
+		this.style.height = 'auto';
+		var contentH = this.scrollHeight;
+		this.style.height = Math.max(contentH, minH) + 'px';
+	});
+
+	resizeReqTextareas();
+	$(window).on('resize', resizeReqTextareas);
 });
 </script>

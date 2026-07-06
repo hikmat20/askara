@@ -14,7 +14,7 @@
 						<table class="table table-bordered table-sm">
 							<tr>
 								<th width="200">Proses</th>
-								<td><?= !empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free); ?></td>
+								<td><?= !empty($schedule->requirement_name) ? htmlspecialchars($schedule->requirement_name) : (!empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free)); ?></td>
 							</tr>
 							<tr>
 								<th>Department - Company</th>

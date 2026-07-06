@@ -170,7 +170,7 @@
 									<?php foreach ($schedules as $k => $sched) : ?>
 										<tr>
 											<td class="text-center"><?= $k + 1; ?></td>
-											<td><?= !empty($sched->process_name) ? strip_tags($sched->process_name) : htmlspecialchars($sched->process_name_free); ?></td>
+											<td><?= !empty($sched->requirement_name) ? htmlspecialchars($sched->requirement_name) : (!empty($sched->process_name) ? strip_tags($sched->process_name) : htmlspecialchars($sched->process_name_free)); ?></td>
 											<td><?= $sched->auditor_name; ?></td>
 											<td>
 												<?php if (!empty($sched->auditees)) : ?>

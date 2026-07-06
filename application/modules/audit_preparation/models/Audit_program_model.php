@@ -193,10 +193,10 @@ class Audit_program_model extends BF_Model
      */
     public function getDepartments($company_id = null)
     {
-        return $this->db->select('id, name')
+        return $this->db->select('id, department_name as name')
             ->where('status', '1')
-            ->order_by('name', 'ASC')
-            ->get('departements')
+            ->order_by('department_name', 'ASC')
+            ->get('audit_department')
             ->result();
     }
 
@@ -260,13 +260,29 @@ class Audit_program_model extends BF_Model
      */
     public function getSchedules($program_id)
     {
-        return $this->db->select('audit_program_schedule.*, procedures.name as process_name, audit_auditor_consultant.name as auditor_name')
+        return $this->db->select('audit_program_schedule.*, procedures.name as process_name, audit_auditor_consultant.name as auditor_name, requirements.name as requirement_name')
             ->from('audit_program_schedule')
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
+            ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->where('audit_program_schedule.program_id', $program_id)
             ->where('audit_program_schedule.status', '1')
             ->get()
+            ->result();
+    }
+
+    /**
+     * Get published requirements (Index of Standard) for audit persyaratan
+     *
+     * @return array
+     */
+    public function getPublishedRequirements()
+    {
+        return $this->db->select('id, name as nama')
+            ->where('status', '1')
+            ->where('deleted_at', null)
+            ->order_by('name', 'ASC')
+            ->get('requirements')
             ->result();
     }
 
@@ -278,9 +294,9 @@ class Audit_program_model extends BF_Model
      */
     public function getScheduleAuditees($schedule_id)
     {
-        return $this->db->select('audit_program_schedule_auditee.*, departements.name as department_name')
+        return $this->db->select('audit_program_schedule_auditee.*, audit_department.department_name as department_name')
             ->from('audit_program_schedule_auditee')
-            ->join('departements', 'departements.id = audit_program_schedule_auditee.department_id', 'left')
+            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule_auditee.schedule_id', $schedule_id)
             ->get()
             ->result();

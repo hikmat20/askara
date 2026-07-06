@@ -6,6 +6,7 @@
 					<h2 class="mt-5"><i class="<?= $icon; ?> text-primary mr-2"></i><?= $title; ?></h2>
 				</div>
 				<div class="card-body">
+					<div class="table-responsive">
 					<table id="dtTable" class="table table-bordered table-sm table-condensed table-hover">
 						<thead class="text-center table-light">
 							<tr>
@@ -36,6 +37,7 @@
 							<?php endforeach; ?>
 						</tbody>
 					</table>
+					</div>
 				</div>
 			</div>
 		</div>

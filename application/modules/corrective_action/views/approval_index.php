@@ -8,6 +8,7 @@
 				<div class="card-body">
 					<div class="tab-content mt-3">
 						<div class="tab-pane fade active show" role="tabpanel">
+							<div class="table-responsive">
 							<table id="table-data" class="table table-bordered table-striped table-sm table-hover">
 								<thead class="text-center table-light">
 									<tr>
@@ -60,6 +61,7 @@
 									endif; ?>
 								</tbody>
 							</table>
+							</div>
 						</div>
 					</div>
 				</div>

@@ -10,13 +10,15 @@
     .text-center { text-align: center; }
     .text-muted { color: #999; font-style: italic; }
     .section-title { background-color: #e8f5e9; padding: 6px 10px; margin: 15px 0 8px 0; font-weight: bold; font-size: 12px; }
+    td p { margin: 0 0 6px 0; }
+    td p:last-child { margin-bottom: 0; }
 </style>
 
 <h2 style="text-align:center;">Laporan Pelaksanaan Audit</h2>
 
 <!-- HEADER -->
 <table class="no-border" style="width:50%;">
-    <tr><th style="width:150px; text-align:left;">Prosedur</th><td><?= !empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free); ?></td></tr>
+    <tr><th style="width:150px; text-align:left;">Prosedur</th><td><?= !empty($schedule->requirement_name) ? htmlspecialchars($schedule->requirement_name) : (!empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free)); ?></td></tr>
     <tr><th style="text-align:left;">Date</th><td><?= date('d/m/Y', strtotime($schedule->audit_date)); ?></td></tr>
     <tr><th style="text-align:left;">Department - Company</th><td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td></tr>
     <tr><th style="text-align:left;">Auditor</th><td><?= isset($schedule->auditor_name) ? $schedule->auditor_name : '-'; ?></td></tr>
@@ -36,6 +38,53 @@
 </table>
 <?php else : ?>
 <p class="text-muted">Tidak ada isu proses.</p>
+<?php endif; ?>
+
+<!-- CHECKLIST BERDASARKAN PERSYARATAN - khusus Audit Persyaratan, sebelum Kesimpulan Audit -->
+<?php if (!empty($schedule->requirement_id) && !empty($requirement_details)) :
+    $req_detail_map = [];
+    if (!empty($audit_requirement_details)) {
+        foreach ($audit_requirement_details as $d) {
+            $req_detail_map[$d->requirement_detail_id] = $d;
+        }
+    }
+    $has_filled_rows = false;
+    foreach ($requirement_details as $rd) {
+        $existing = isset($req_detail_map[$rd->id]) ? $req_detail_map[$rd->id] : null;
+        if ($existing && (trim($existing->aktual) !== '' || trim($existing->temuan) !== '' || trim($existing->rekomendasi) !== '')) {
+            $has_filled_rows = true;
+            break;
+        }
+    }
+?>
+<?php if ($has_filled_rows) : ?>
+<div class="section-title">Checklist Berdasarkan Persyaratan</div>
+<table>
+    <thead>
+        <tr>
+            <th width="13%">Pasal</th>
+            <th width="37%">Requirement (Des. Inggris)</th>
+            <th width="17%">Aktual</th>
+            <th width="17%">Temuan</th>
+            <th width="16%">Rekomendasi</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($requirement_details as $rd) :
+            $existing = isset($req_detail_map[$rd->id]) ? $req_detail_map[$rd->id] : null;
+            if (!$existing || (trim($existing->aktual) === '' && trim($existing->temuan) === '' && trim($existing->rekomendasi) === '')) continue;
+        ?>
+            <tr>
+                <td><?= htmlspecialchars($rd->chapter); ?></td>
+                <td><?= $rd->desc_eng; ?></td>
+                <td><?= trim($existing->aktual) !== '' ? nl2br(htmlspecialchars($existing->aktual)) : '-'; ?></td>
+                <td><?= trim($existing->temuan) !== '' ? nl2br(htmlspecialchars($existing->temuan)) : '-'; ?></td>
+                <td><?= trim($existing->rekomendasi) !== '' ? nl2br(htmlspecialchars($existing->rekomendasi)) : '-'; ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+<?php endif; ?>
 <?php endif; ?>
 
 <!-- KESIMPULAN AUDIT -->
@@ -59,7 +108,8 @@
 <p class="text-muted">Tidak ada data conformity.</p>
 <?php endif; ?>
 
-<!-- Temuan -->
+<!-- Temuan - HIDE untuk Audit Persyaratan -->
+<?php if (empty($schedule->requirement_id)) : ?>
 <h4>Temuan</h4>
 <?php if (!empty($audit_temuan)) : ?>
 <table>
@@ -96,4 +146,5 @@
 </table>
 <?php else : ?>
 <p class="text-muted">Tidak ada temuan.</p>
+<?php endif; ?>
 <?php endif; ?>
