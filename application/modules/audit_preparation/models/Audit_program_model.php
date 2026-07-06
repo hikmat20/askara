@@ -193,10 +193,13 @@ class Audit_program_model extends BF_Model
      */
     public function getDepartments($company_id = null)
     {
-        return $this->db->select('id, department_name as name')
+        if ($company_id) {
+            $this->db->where('company_id', $company_id);
+        }
+        return $this->db->select('id, name')
             ->where('status', '1')
-            ->order_by('department_name', 'ASC')
-            ->get('audit_department')
+            ->order_by('name', 'ASC')
+            ->get('departements')
             ->result();
     }
 
@@ -294,9 +297,9 @@ class Audit_program_model extends BF_Model
      */
     public function getScheduleAuditees($schedule_id)
     {
-        return $this->db->select('audit_program_schedule_auditee.*, audit_department.department_name as department_name')
+        return $this->db->select('audit_program_schedule_auditee.*, departements.name as department_name')
             ->from('audit_program_schedule_auditee')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
+            ->join('departements', 'departements.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule_auditee.schedule_id', $schedule_id)
             ->get()
             ->result();
