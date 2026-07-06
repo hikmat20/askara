@@ -29,8 +29,8 @@
 							<table class="table table-bordered table-sm">
 								<tr><th width="200">Prosedur</th><td><?= !empty($schedule->requirement_name) ? htmlspecialchars($schedule->requirement_name) : (!empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free)); ?></td></tr>
 								<tr><th>Date</th><td><?= date('d/m/Y', strtotime($schedule->audit_date)); ?></td></tr>
-								<tr><th>Department - Company</th><td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td></tr>
-								<tr><th>Auditor</th><td><?= isset($schedule->auditor_name) ? $schedule->auditor_name : '-'; ?></td></tr>
+								<tr><th>Department - Company</th><td><?= isset($schedule->department_name) ? htmlspecialchars($schedule->department_name) : '-'; ?></td></tr>
+								<tr><th>Auditor</th><td><?= isset($schedule->auditor_name) ? htmlspecialchars($schedule->auditor_name) : '-'; ?></td></tr>
 								<tr>
 									<th>Auditee</th>
 									<td><textarea name="auditee_text" class="form-control form-control-sm" rows="3" placeholder="Input Auditee..."><?= isset($audit_data->auditee_text) ? htmlspecialchars($audit_data->auditee_text) : ''; ?></textarea></td>
@@ -359,6 +359,7 @@ $(document).ready(function() {
 			$(this).select2({ placeholder: $(this).data('placeholder') || 'Choose an options', allowClear: true, width: '100%' });
 		});
 	}
+	initSelect2();
 
 	// ISO CHANGE -> LOAD PASAL
 	$(document).on('change', '.iso-select', function() {

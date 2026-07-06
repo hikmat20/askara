@@ -1,4 +1,4 @@
-﻿<style>
+<style>
     body { font-family: sans-serif; font-size: 11px; }
     h2 { font-size: 16px; margin-bottom: 10px; }
     h3 { font-size: 13px; margin: 15px 0 8px 0; color: #333; }
@@ -20,8 +20,8 @@
 <table class="no-border" style="width:50%;">
     <tr><th style="width:150px; text-align:left;">Prosedur</th><td><?= !empty($schedule->requirement_name) ? htmlspecialchars($schedule->requirement_name) : (!empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free)); ?></td></tr>
     <tr><th style="text-align:left;">Date</th><td><?= date('d/m/Y', strtotime($schedule->audit_date)); ?></td></tr>
-    <tr><th style="text-align:left;">Department - Company</th><td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td></tr>
-    <tr><th style="text-align:left;">Auditor</th><td><?= isset($schedule->auditor_name) ? $schedule->auditor_name : '-'; ?></td></tr>
+    <tr><th style="text-align:left;">Department - Company</th><td><?= isset($schedule->department_name) ? htmlspecialchars($schedule->department_name) : '-'; ?></td></tr>
+    <tr><th style="text-align:left;">Auditor</th><td><?= isset($schedule->auditor_name) ? htmlspecialchars($schedule->auditor_name) : '-'; ?></td></tr>
     <tr><th style="text-align:left;">Auditee</th><td><?= isset($audit_data->auditee_text) && $audit_data->auditee_text ? nl2br(htmlspecialchars($audit_data->auditee_text)) : '-'; ?></td></tr>
 </table>
 
