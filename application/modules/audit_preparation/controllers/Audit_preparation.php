@@ -435,25 +435,13 @@ class Audit_preparation extends Admin_Controller
         // Build email body HTML
         $body = $this->_buildEmailBody($program, $schedules);
 
-        // Load CI email library and send
-        $this->load->library('email');
+        // Load CI email library and send via queue
+        $this->load->library('email_runner');
+        
+        $action_url = base_url('audit_preparation/index');
+        $this->email_runner->queue($emails, 'Jadwal Audit', $body, null, $action_url);
 
-        $config = get_smtp_config();
-        $smtp_user = $config['smtp_user'];
-
-        $this->email->initialize($config);
-        $this->email->from($smtp_user, 'Sentral Sistem - Audit');
-        $this->email->to($emails);
-        $this->email->subject('Jadwal Audit');
-        $this->email->message($body);
-
-        if ($this->email->send()) {
-            echo json_encode(['status' => 1, 'msg' => 'Email berhasil dikirim ke ' . count($emails) . ' auditor.']);
-        } else {
-            $error = $this->email->print_debugger(['headers']);
-            log_message('error', 'Email send failed: ' . $error);
-            echo json_encode(['status' => 0, 'msg' => 'Gagal mengirim email. Silakan cek konfigurasi email.']);
-        }
+        echo json_encode(['status' => 1, 'msg' => 'Email berhasil dimasukkan ke antrean untuk ' . count($emails) . ' auditor.']);
     }
 
     /**

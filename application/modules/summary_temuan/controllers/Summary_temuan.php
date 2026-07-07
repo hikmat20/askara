@@ -191,8 +191,16 @@ class Summary_temuan extends Admin_Controller
 
         $html = $this->load->view('summary_temuan/pdf', $data, true);
 
-        require_once(APPPATH . 'libraries/MPDF_/mpdf.php');
-        $mpdf = new mPDF('utf-8', 'A4', 0, '', 15, 15, 15, 15, 0, 0);
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 15,
+            'margin_bottom' => 15,
+            'margin_header' => 0,
+            'margin_footer' => 0,
+        ]);
         $mpdf->SetTitle('Summary Temuan Audit - ' . $program->id);
         $mpdf->WriteHTML($html);
         $mpdf->Output('Summary_Temuan_' . $program->id . '.pdf', 'I');
