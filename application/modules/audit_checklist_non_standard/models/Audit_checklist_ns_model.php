@@ -39,7 +39,13 @@ class Audit_checklist_ns_model extends BF_Model
                 procedures.name as process_name,
                 requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
+                COALESCE(
+                    (SELECT GROUP_CONCAT(d.name SEPARATOR \', \') 
+                     FROM audit_program_schedule_auditee apsa 
+                     JOIN departements d ON d.id = apsa.department_id 
+                     WHERE apsa.schedule_id = audit_program_schedule.id), 
+                    audit_program_schedule.auditee_name_free
+                ) as department_name,
                 audit_program.company,
                 audit_program.id as program_code
             ')
@@ -48,8 +54,6 @@ class Audit_checklist_ns_model extends BF_Model
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
             ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
-            ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.status', '1')
             ->where('audit_program.status', '1')
             ->order_by('audit_program_schedule.audit_date', 'DESC')
@@ -78,7 +82,13 @@ class Audit_checklist_ns_model extends BF_Model
                 procedures.name as process_name,
                 requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
+                COALESCE(
+                    (SELECT GROUP_CONCAT(d.name SEPARATOR \', \') 
+                     FROM audit_program_schedule_auditee apsa 
+                     JOIN departements d ON d.id = apsa.department_id 
+                     WHERE apsa.schedule_id = audit_program_schedule.id), 
+                    audit_program_schedule.auditee_name_free
+                ) as department_name,
                 audit_program.company,
                 audit_program.id as program_code
             ')
@@ -87,8 +97,6 @@ class Audit_checklist_ns_model extends BF_Model
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
             ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
-            ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.id', $schedule_id)
             ->where('audit_program_schedule.status', '1')
             ->get()

@@ -18,7 +18,14 @@
 							</tr>
 							<tr>
 								<th>Department - Company</th>
-								<td><?= isset($schedule->department_name) ? $schedule->department_name : '-'; ?></td>
+								<td><?php 
+									$dept = !empty($schedule->department_name) ? $schedule->department_name : '';
+									$comp = !empty($schedule->company) ? $schedule->company : '';
+									if ($dept && $comp) echo $dept . ' - ' . $comp;
+									elseif ($dept) echo $dept;
+									elseif ($comp) echo $comp;
+									else echo '-';
+								?></td>
 							</tr>
 							<tr>
 								<th>Auditor</th>
