@@ -43,16 +43,19 @@ class Pelaksanaan_audit_model extends BF_Model
                 audit_program_schedule.id as schedule_id,
                 audit_program_schedule.program_id,
                 audit_program_schedule.process_id,
+                audit_program_schedule.requirement_id,
                 audit_program_schedule.audit_date,
                 audit_program_schedule.start_time,
                 audit_program_schedule.end_time,
                 audit_program_schedule.process_name_free,
                 procedures.name as process_name,
+                requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
                 COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name
             ')
             ->from('audit_program_schedule')
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
+            ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
             ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
@@ -75,11 +78,13 @@ class Pelaksanaan_audit_model extends BF_Model
                 audit_program_schedule.id as schedule_id,
                 audit_program_schedule.program_id,
                 audit_program_schedule.process_id,
+                audit_program_schedule.requirement_id,
                 audit_program_schedule.audit_date,
                 audit_program_schedule.start_time,
                 audit_program_schedule.end_time,
                 audit_program_schedule.process_name_free,
                 procedures.name as process_name,
+                requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
                 COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
                 audit_program.company,
@@ -88,6 +93,7 @@ class Pelaksanaan_audit_model extends BF_Model
             ->from('audit_program_schedule')
             ->join('audit_program', 'audit_program.id = audit_program_schedule.program_id', 'left')
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
+            ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
             ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
@@ -105,11 +111,13 @@ class Pelaksanaan_audit_model extends BF_Model
                 audit_program_schedule.id as schedule_id,
                 audit_program_schedule.program_id,
                 audit_program_schedule.process_id,
+                audit_program_schedule.requirement_id,
                 audit_program_schedule.audit_date,
                 audit_program_schedule.start_time,
                 audit_program_schedule.end_time,
                 audit_program_schedule.process_name_free,
                 procedures.name as process_name,
+                requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
                 COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
                 audit_program.company,
@@ -118,6 +126,7 @@ class Pelaksanaan_audit_model extends BF_Model
             ->from('audit_program_schedule')
             ->join('audit_program', 'audit_program.id = audit_program_schedule.program_id', 'left')
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
+            ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
             ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
@@ -258,6 +267,17 @@ class Pelaksanaan_audit_model extends BF_Model
         ])->result();
     }
 
+    /**
+     * Get saved requirement checklist details for an audit
+     */
+    public function getAuditRequirementDetails($audit_id)
+    {
+        return $this->db->get_where('pelaksanaan_audit_requirement_details', [
+            'audit_id' => $audit_id,
+            'status'   => '1'
+        ])->result();
+    }
+
     // =========================================================================
     // SAVE AUDIT
     // =========================================================================
@@ -310,6 +330,10 @@ class Pelaksanaan_audit_model extends BF_Model
 
         // Save Temuan
         $this->saveTemuan($audit_id, $temuan, $userId, $now);
+
+        // Save Requirement Details (Checklist Berdasarkan Persyaratan)
+        $requirement_checklist = isset($data['req_detail']) ? $data['req_detail'] : [];
+        $this->saveRequirementDetails($audit_id, $requirement_checklist, $userId, $now);
 
         if ($this->db->trans_status() === FALSE) {
             $this->db->trans_rollback();
@@ -528,6 +552,37 @@ class Pelaksanaan_audit_model extends BF_Model
     // =========================================================================
     // EVIDENCE & DELETE
     // =========================================================================
+
+    private function saveRequirementDetails($audit_id, $items, $userId, $now)
+    {
+        // Soft delete existing
+        $this->db->update('pelaksanaan_audit_requirement_details', ['status' => '0'], ['audit_id' => $audit_id]);
+
+        if (!empty($items)) {
+            foreach ($items as $item) {
+                $requirement_detail_id = isset($item['requirement_detail_id']) ? $item['requirement_detail_id'] : '';
+                if (empty($requirement_detail_id)) continue;
+
+                $insertData = [
+                    'audit_id'              => $audit_id,
+                    'requirement_detail_id' => $requirement_detail_id,
+                    'aktual'                => isset($item['aktual']) ? $item['aktual'] : '',
+                    'temuan'                => isset($item['temuan']) ? $item['temuan'] : '',
+                    'rekomendasi'           => isset($item['rekomendasi']) ? $item['rekomendasi'] : '',
+                    'status'                => '1',
+                    'created_at'            => $now,
+                    'created_by'            => $userId,
+                ];
+
+                if (isset($item['id']) && $item['id']) {
+                    $insertData['id'] = $item['id'];
+                    $this->db->update('pelaksanaan_audit_requirement_details', $insertData, ['id' => $item['id']]);
+                } else {
+                    $this->db->insert('pelaksanaan_audit_requirement_details', $insertData);
+                }
+            }
+        }
+    }
 
     public function updateEvidence($type, $detail_id, $fileInfo)
     {

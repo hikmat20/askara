@@ -604,7 +604,7 @@
 										<div id="flowImages" class="collapse in" role="tabpanel"
 											aria-labelledby="sectionFlowImages">
 											<div class="card-body">
-												<h5 class="mb-4">Flow Images</h5>
+												<h5 class="mb-4">Flow Images <small class="text-muted">(Format: gif, jpg, jpeg, png | Ukuran Maks: 5MB)</small></h5>
 												<div class="mb-4">
 													<div class="preview-zone hidden">
 														<div class="box box-solid">
@@ -712,7 +712,7 @@
 													</div>
 												</div>
 
-												<h5 class="mb-4">Upload File</h5>
+												<h5 class="mb-4">Upload File <small class="text-muted">(Format: pdf | Ukuran Maks: 5MB)</small></h5>
 												<div class="mb-4">
 													<div class="preview-zone hidden">
 														<div class="box box-solid">
@@ -818,14 +818,15 @@
 															<th width="100">Action</th>
 														</tr>
 													</thead>
-													<tbody>
+													<tbody id="sortable-flow">
 														<?php if ($detail):
 															$n = 0;
 															foreach ($detail as $key => $dtl):
 																$n++; ?>
-																<tr>
+																<tr class="sortable-row" data-id="<?= $dtl->id; ?>">
 
 																	<td style="vertical-align:middle;" class="text-center">
+																		<i class="fa fa-bars text-muted drag-handle mr-2" style="cursor: move;"></i>
 																		<?= $dtl->number; ?></td>
 																	<td style="vertical-align:middle;" class="text-center">
 																		<?= $dtl->pic; ?></td>
@@ -1246,6 +1247,7 @@
 	</div>
 </div>
 
+<script src="https://code.jquery.com/ui/1.13.2/jquery-ui.min.js"></script>
 <script>
 	$(document).ready(function () {
 		<?php if ($data->status == 'RVI'): ?>
@@ -1259,6 +1261,36 @@
 
 
 		<?php endif; ?>
+
+		function initSortable() {
+			if ($("#sortable-flow").length > 0) {
+				$("#sortable-flow").sortable({
+					handle: ".drag-handle",
+					update: function(event, ui) {
+						var sequenceData = [];
+						$("#sortable-flow .sortable-row").each(function(index) {
+							sequenceData.push($(this).data("id"));
+						});
+
+						$.ajax({
+							url: siteurl + active_controller + 'save_sequence',
+							type: 'POST',
+							data: { sequence: sequenceData },
+							dataType: 'JSON',
+							success: function(response) {
+								if(response.status != 1) {
+									Swal.fire("Warning", "Gagal menyimpan urutan.", "warning");
+								}
+							},
+							error: function() {
+								Swal.fire("Error", "Terjadi kesalahan server.", "error");
+							}
+						});
+					}
+				});
+			}
+		}
+		initSortable();
 
 		$(document).on('change', '.ckRevision', function () {
 			let id = $(this).data('id')
@@ -1601,7 +1633,9 @@
 						}).then(() => {
 							location.reload()
 							$('#modelId').modal('hide')
-							$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + result.id)
+							$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + result.id, function() {
+								initSortable();
+							})
 						})
 					} else {
 						Swal.fire({
@@ -1691,7 +1725,9 @@
 						}).then(() => {
 							// location.reload()
 							$('#modelId').modal('hide')
-							$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + result.id)
+							$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + result.id, function() {
+								initSortable();
+							})
 						})
 
 					} else {
@@ -2594,7 +2630,9 @@
 
 
 	function loadDetailProcedure(id) {
-		$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + id)
+		$('#flowDetail table tbody').load(siteurl + active_controller + 'loadFlow/' + id, function() {
+			initSortable();
+		})
 	}
 
 

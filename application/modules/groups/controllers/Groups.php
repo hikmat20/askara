@@ -96,6 +96,7 @@ class Groups extends Admin_Controller
                 $menus['create']        = isset($menus['create']) ? '1' : '0';
                 $menus['update']        = isset($menus['update']) ? '1' : '0';
                 $menus['delete']        = isset($menus['delete']) ? '1' : '0';
+                $menus['download']      = isset($menus['download']) ? '1' : '0';
 
                 if ($check > 0) {
                     $this->db->update('group_menus', $menus, ['menu_id' =>  $menu_id, 'company_id' => $company_id, 'group_id' => $group_id]);
@@ -116,6 +117,7 @@ class Groups extends Admin_Controller
                 $submenus['create'] = isset($submenus['create']) ? '1' : '0';
                 $submenus['update'] = isset($submenus['update']) ? '1' : '0';
                 $submenus['delete'] = isset($submenus['delete']) ? '1' : '0';
+                $submenus['download'] = isset($submenus['download']) ? '1' : '0';
                 if ($check > 0) {
                     $this->db->update('group_menus', $submenus, ['menu_id' => $submenus_id, 'company_id' => $company_id, 'group_id' => $group_id]);
                 } else {

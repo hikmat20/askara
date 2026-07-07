@@ -52,7 +52,7 @@ class Summary_temuan extends Admin_Controller
         // Get all schedules for this program
         $schedules = $this->model->getSchedulesByProgram($program_id);
 
-        // For each schedule, get audit data (temuan, conformity)
+        // For each schedule, get audit data (temuan, conformity, requirement details)
         $schedule_data = [];
         foreach ($schedules as $sched) {
             $audit = $this->model->getAuditByScheduleId($sched->schedule_id);
@@ -62,6 +62,8 @@ class Summary_temuan extends Admin_Controller
             $item->temuan = [];
             $item->conformity = [];
             $item->counts = ['Major' => 0, 'Minor' => 0, 'OFI' => 0];
+            $item->requirement_details = [];
+            $item->audit_requirement_details = [];
 
             if ($audit) {
                 $temuan = $this->model->getAuditTemuan($audit->id);
@@ -73,6 +75,12 @@ class Summary_temuan extends Admin_Controller
                     if (isset($item->counts[$tm->kategori])) {
                         $item->counts[$tm->kategori]++;
                     }
+                }
+
+                // Load requirement details for Audit Persyaratan
+                if (!empty($sched->requirement_id)) {
+                    $item->requirement_details = $this->model->getPasalByRequirement($sched->requirement_id);
+                    $item->audit_requirement_details = $this->model->getAuditRequirementDetails($audit->id);
                 }
             }
 
@@ -137,6 +145,8 @@ class Summary_temuan extends Admin_Controller
             $item->temuan = [];
             $item->conformity = [];
             $item->counts = ['Major' => 0, 'Minor' => 0, 'OFI' => 0];
+            $item->requirement_details = [];
+            $item->audit_requirement_details = [];
 
             if ($audit) {
                 $temuan = $this->model->getAuditTemuan($audit->id);
@@ -147,6 +157,12 @@ class Summary_temuan extends Admin_Controller
                     if (isset($item->counts[$tm->kategori])) {
                         $item->counts[$tm->kategori]++;
                     }
+                }
+
+                // Load requirement details for Audit Persyaratan
+                if (!empty($sched->requirement_id)) {
+                    $item->requirement_details = $this->model->getPasalByRequirement($sched->requirement_id);
+                    $item->audit_requirement_details = $this->model->getAuditRequirementDetails($audit->id);
                 }
             }
 
@@ -175,18 +191,10 @@ class Summary_temuan extends Admin_Controller
 
         $html = $this->load->view('summary_temuan/pdf', $data, true);
 
-        $mpdf = new \Mpdf\Mpdf([
-            'mode' => 'utf-8',
-            'format' => 'A4',
-            'margin_left' => 15,
-            'margin_right' => 15,
-            'margin_top' => 15,
-            'margin_bottom' => 15,
-            'tempDir' => APPPATH . 'cache/mpdf'
-        ]);
+        require_once(APPPATH . 'libraries/MPDF_/mpdf.php');
+        $mpdf = new mPDF('utf-8', 'A4', 0, '', 15, 15, 15, 15, 0, 0);
         $mpdf->SetTitle('Summary Temuan Audit - ' . $program->id);
         $mpdf->WriteHTML($html);
-        if (ob_get_contents()) ob_clean();
         $mpdf->Output('Summary_Temuan_' . $program->id . '.pdf', 'I');
     }
 }

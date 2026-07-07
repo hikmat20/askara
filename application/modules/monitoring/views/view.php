@@ -77,6 +77,7 @@
         <div class="card rounded-10 mb-3">
             <div class="card-body p-3">
                 <table class="table table-borderless rounded-lg mb-6">
+                    <?php if (!empty($data->object) || !empty(isset($bilingual->object) ? $bilingual->object : '')): ?>
                     <tr>
                         <td class="py-6 w-50">
                             <h3 class="fw-extra-bold"><strong>TUJUAN</strong></h3>
@@ -91,6 +92,8 @@
                             </div>
                         </td>
                     </tr>
+                    <?php endif; ?>
+                    <?php if (!empty($data->scope) || !empty(isset($bilingual->scope) ? $bilingual->scope : '')): ?>
                     <tr>
                         <td class="py-6">
                             <h3 class="fw-extra-bold"><strong>RUANG LINGKUP</strong></h3>
@@ -105,6 +108,8 @@
                             </div>
                         </td>
                     </tr>
+                    <?php endif; ?>
+                    <?php if (!empty($data->responsibility) || !empty(isset($bilingual->responsibility) ? $bilingual->responsibility : '')): ?>
                     <tr>
                         <td class="py-6">
                             <h3 class="fw-extra-bold"><strong>TANGGUNG JAWAB</strong></h3>
@@ -119,6 +124,8 @@
                             </div>
                         </td>
                     </tr>
+                    <?php endif; ?>
+                    <?php if (!empty($data->define) || !empty(isset($bilingual->define) ? $bilingual->define : '')): ?>
                     <tr>
                         <td class="py-6">
                             <h3 class="fw-extra-bold"><strong>DEFINISI</strong></h3>
@@ -133,6 +140,8 @@
                             </div>
                         </td>
                     </tr>
+                    <?php endif; ?>
+                    <?php if (!empty($data->performance) || !empty(isset($bilingual->performance) ? $bilingual->performance : '')): ?>
                     <tr>
                         <td class="py-6">
                             <h3 class="fw-extra-bold"><strong>PERFORMA INDIKATOR</strong></h3>
@@ -147,6 +156,8 @@
                             </div>
                         </td>
                     </tr>
+                    <?php endif; ?>
+                    <?php if (!empty($data->general_requirement) || !empty(isset($bilingual->general_requirement) ? $bilingual->general_requirement : '')): ?>
                     <tr>
                         <td class="py-6">
                             <h3 class="fw-extra-bold"><strong>KETENTUAN UMUM</strong></h3>
@@ -161,6 +172,7 @@
                             </div>
                         </td>
                     </tr>
+                    <?php endif; ?>
                 </table>
                 <!-- SIPOCOR -->
                 <?php if ($data->supplier): ?>

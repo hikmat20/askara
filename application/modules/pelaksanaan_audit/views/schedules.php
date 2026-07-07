@@ -19,6 +19,7 @@
 
 					<!-- Schedule List -->
 					<h5 class="font-weight-bold border-bottom pb-2 mt-4"><i class="fa fa-calendar-alt text-primary mr-2"></i>Pilih Proses Audit</h5>
+					<div class="table-responsive">
 					<table id="dtSchedules" class="table table-bordered table-sm table-hover">
 						<thead class="text-center table-light">
 							<tr>
@@ -35,9 +36,9 @@
 							<?php if (!empty($schedules)) foreach ($schedules as $k => $v) : $k++; ?>
 								<tr>
 									<td class="text-center"><?= $k; ?></td>
-									<td><?= !empty($v->process_name) ? strip_tags($v->process_name) : htmlspecialchars($v->process_name_free); ?></td>
-									<td><?= isset($v->department_name) ? $v->department_name : '-'; ?></td>
-									<td><?= isset($v->auditor_name) ? $v->auditor_name : '-'; ?></td>
+									<td><?= !empty($v->requirement_name) ? htmlspecialchars($v->requirement_name) : (!empty($v->process_name) ? strip_tags($v->process_name) : htmlspecialchars($v->process_name_free)); ?></td>
+									<td><?= isset($v->department_name) ? htmlspecialchars($v->department_name) : '-'; ?></td>
+									<td><?= isset($v->auditor_name) ? htmlspecialchars($v->auditor_name) : '-'; ?></td>
 									<td class="text-center"><?= date('d/m/Y', strtotime($v->audit_date)); ?></td>
 									<td class="text-center"><?= substr($v->start_time, 0, 5); ?> - <?= substr($v->end_time, 0, 5); ?></td>
 									<td class="text-center">
@@ -61,6 +62,7 @@
 							<?php endforeach; ?>
 						</tbody>
 					</table>
+					</div>
 				</div>
 			</div>
 		</div>
@@ -69,11 +71,24 @@
 
 <script>
 $(document).ready(function() {
-	$('#dtSchedules').DataTable({
+	var table = $('#dtSchedules').DataTable({
 		fixedHeader: true,
 		processing: true,
 		destroy: true,
-		order: [[4, 'desc']]
+		order: [[4, 'desc']],
+		columnDefs: [{
+			targets: 0,
+			searchable: false,
+			orderable: false
+		}]
 	});
+
+	// Auto-number the "No" column after every draw (sort, page, search)
+	table.on('order.dt search.dt draw.dt', function() {
+		var i = 1;
+		table.cells(null, 0, { search: 'applied', order: 'applied' }).every(function() {
+			this.data(i++);
+		});
+	}).draw();
 });
 </script>

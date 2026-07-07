@@ -319,7 +319,7 @@
 										</div>
 										<div id="flowImages" class="collapse in" role="tabpanel" aria-labelledby="sectionFlowImages">
 											<div class="card-body">
-												<h5 class="mb-4">Upload Images</h5>
+												<h5 class="mb-4">Upload Images <small class="text-muted">(Format: gif, jpg, jpeg, png | Ukuran Maks: 5MB)</small></h5>
 												<div class="mb-4">
 													<div class="preview-zone hidden">
 														<div class="box box-solid">
@@ -350,7 +350,7 @@
 														</div>
 													</div>
 												</div>
-												<h5 class="mb-4">Upload File</h5>
+												<h5 class="mb-4">Upload File <small class="text-muted">(Format: pdf | Ukuran Maks: 5MB)</small></h5>
 												<div class="mb-4">
 													<div class="preview-zone hidden">
 														<div class="box box-solid">

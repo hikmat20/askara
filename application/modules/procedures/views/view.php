@@ -81,6 +81,7 @@
     <div class="card rounded-10">
       <div class="card-body p-3">
         <table class="table table-borderless rounded-lg mb-6">
+          <?php if (!empty($procedure->object) || !empty(isset($bilingual->object) ? $bilingual->object : '')): ?>
           <tr>
             <td class="w-50">
               <h3 class="fw-extra-bold"><strong>TUJUAN</strong></h3>
@@ -95,6 +96,8 @@
               </div>
             </td>
           </tr>
+          <?php endif; ?>
+          <?php if (!empty($procedure->scope) || !empty(isset($bilingual->scope) ? $bilingual->scope : '')): ?>
           <tr>
             <td class="">
               <h3 class="fw-extra-bold"><strong>RUANG LINGKUP</strong></h3>
@@ -109,6 +112,8 @@
               </div>
             </td>
           </tr>
+          <?php endif; ?>
+          <?php if (!empty($procedure->responsibility) || !empty(isset($bilingual->responsibility) ? $bilingual->responsibility : '')): ?>
           <tr>
             <td class="">
               <h3 class="fw-extra-bold"><strong>TANGGUNG JAWAB</strong></h3>
@@ -123,6 +128,8 @@
               </div>
             </td>
           </tr>
+          <?php endif; ?>
+          <?php if (!empty($procedure->define) || !empty(isset($bilingual->define) ? $bilingual->define : '')): ?>
           <tr>
             <td class="">
               <h3 class="fw-extra-bold"><strong>DEFINISI</strong></h3>
@@ -137,6 +144,8 @@
               </div>
             </td>
           </tr>
+          <?php endif; ?>
+          <?php if (!empty($procedure->performance) || !empty(isset($bilingual->performance) ? $bilingual->performance : '')): ?>
           <tr>
             <td class="">
               <h3 class="fw-extra-bold"><strong>PERFORMA INDIKATOR</strong></h3>
@@ -151,6 +160,8 @@
               </div>
             </td>
           </tr>
+          <?php endif; ?>
+          <?php if (!empty($procedure->general_requirement) || !empty(isset($bilingual->general_requirement) ? $bilingual->general_requirement : '')): ?>
           <tr>
             <td class="">
               <h3 class="fw-extra-bold"><strong>KETENTUAN UMUM</strong></h3>
@@ -165,6 +176,7 @@
               </div>
             </td>
           </tr>
+          <?php endif; ?>
         </table>
         <!-- SIPOCOR -->
         <?php if ($procedure->supplier): ?>

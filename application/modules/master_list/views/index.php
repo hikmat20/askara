@@ -184,8 +184,8 @@
 								<tr>
 									<th width="30">No</th>
 									<th>Department</th>
-									<th>Document Number</th>
 									<th>Prosedur Induk</th>
+									<th>Document Number</th>
 									<th>Document Name</th>
 									<th width="110">Effective Date Rev. 0</th>
 									<th width="80">Latest Revision</th>
@@ -198,8 +198,8 @@
 									<tr>
 										<td class="text-center"><?= $k; ?></td>
 										<td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
-										<td><?= isset($v->procedure_nomor) ? $v->procedure_nomor : '-'; ?></td>
 										<td><?= isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-'; ?></td>
+										<td><?= isset($v->number) ? $v->number : '-'; ?></td>
 										<td><?= $v->name; ?></td>
 										<td class="text-center"><?= isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
 										<td class="text-center"><?= isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-'; ?></td>
@@ -221,8 +221,8 @@
 								<tr>
 									<th width="30">No</th>
 									<th>Department</th>
-									<th>Document Number</th>
 									<th>Prosedur Induk</th>
+									<th>Document Number</th>
 									<th>Document Name</th>
 									<th width="110">Effective Date Rev. 0</th>
 									<th width="80">Latest Revision</th>
@@ -235,8 +235,8 @@
 									<tr>
 										<td class="text-center"><?= $k; ?></td>
 										<td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
-										<td><?= isset($v->procedure_nomor) ? $v->procedure_nomor : '-'; ?></td>
 										<td><?= isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-'; ?></td>
+										<td><?= isset($v->number) ? $v->number : '-'; ?></td>
 										<td><?= $v->name; ?></td>
 										<td class="text-center"><?= isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
 										<td class="text-center"><?= isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-'; ?></td>

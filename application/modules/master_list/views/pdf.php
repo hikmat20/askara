@@ -52,8 +52,8 @@ $sts_labels = ['DFT'=>'Draft','REV'=>'Review','APV'=>'Approval','PUB'=>'Publishe
         <tr>
             <th width="20">No</th>
             <th>Department</th>
-            <th>Document Number</th>
             <th>Prosedur Induk</th>
+            <th>Document Number</th>
             <th>Document Name</th>
             <th width="70">Effective Date Rev. 0</th>
             <th width="50">Latest Revision</th>
@@ -66,8 +66,8 @@ $sts_labels = ['DFT'=>'Draft','REV'=>'Review','APV'=>'Approval','PUB'=>'Publishe
             <tr>
                 <td class="text-center"><?= $k + 1; ?></td>
                 <td><?= isset($v->departement_name) ? $v->departement_name : '-'; ?></td>
-                <td><?= isset($v->procedure_nomor) ? $v->procedure_nomor : '-'; ?></td>
                 <td><?= isset($v->procedure_name) ? strip_tags($v->procedure_name) : '-'; ?></td>
+                <td><?= isset($v->number) ? $v->number : '-'; ?></td>
                 <td><?= $v->name; ?></td>
                 <td class="text-center"><?= isset($v->issue_date) && $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
                 <td class="text-center"><?= isset($v->revision_number) && $v->revision_number !== null ? 'Rev. ' . $v->revision_number : '-'; ?></td>

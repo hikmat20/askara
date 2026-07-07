@@ -126,7 +126,24 @@ class Work_instructions extends Admin_Controller
 			$wi->showing_old_version = true;
 		} else {
 			$wi->display_file_name = isset($wi->file_name) ? $wi->file_name : null;
-			$wi->display_file_path = isset($wi->file_path) ? $wi->file_path : null;
+			$wi->display_file_path = !empty($wi->file_path) ? $wi->file_path : (isset($wi->file_name) ? 'directory/WI/' . (isset($wi->company_id) ? $wi->company_id : '1') . '/' . $wi->file_name : null);
+			
+			// Resolve case sensitivity on Linux
+			if ($wi->display_file_path && !file_exists(FCPATH . ltrim($wi->display_file_path, './'))) {
+				$path_check = FCPATH . ltrim($wi->display_file_path, './');
+				$dir = dirname($path_check);
+				$basename = basename($path_check);
+				if (is_dir($dir)) {
+					$files = scandir($dir);
+					foreach ($files as $f) {
+						if (strtolower($f) === strtolower($basename)) {
+							$wi->display_file_path = dirname(ltrim($wi->display_file_path, './')) . '/' . $f;
+							break;
+						}
+					}
+				}
+			}
+
 			$wi->display_ext = isset($wi->ext) ? $wi->ext : null;
 			$wi->display_size = isset($wi->size) ? $wi->size : null;
 			$wi->showing_old_version = false;

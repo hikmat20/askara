@@ -13,6 +13,7 @@
 				<div class="card-body">
 					<div class="tab-content mt-3">
 						<div class="tab-pane fade active show" id="Published" role="tabpanel" aria-labelledby="Published-tab">
+							<div class="table-responsive">
 							<table id="table-programs" class="table table-bordered table-sm table-condensed table-hover">
 								<thead class="text-center table-light">
 									<tr class="text-center">
@@ -44,6 +45,7 @@
 									<?php endforeach; ?>
 								</tbody>
 							</table>
+							</div>
 						</div>
 					</div>
 				</div>

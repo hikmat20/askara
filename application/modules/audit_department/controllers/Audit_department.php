@@ -20,20 +20,9 @@ class audit_department extends Admin_Controller
         date_default_timezone_set("Asia/Bangkok");
     }
 
-    private function _getId()
-    {
-        $count    = 1;
-        $result   = $this->db->select('MAX(RIGHT(id,3)) as id')->from('audit_department')->where(['SUBSTR(id,3,4)' => date('ym')])->get()->row();
-
-        if ($result->id > 0) {
-            $count = $result->id + 1;
-        }
-        return "AD" . date('ym-') . sprintf("%03d", $count);
-    }
-
     public function index()
     {
-        $data = $this->db->get_where('audit_department', ['status !=' => '0'])->result();
+        $data = $this->db->get_where('departements', ['company_id' => $this->company, 'status !=' => '0'])->result();
         $this->template->set('data', $data);
         $this->template->render('index');
     }
@@ -45,7 +34,7 @@ class audit_department extends Admin_Controller
 
     public function edit($id)
     {
-        $data = $this->db->get_where('audit_department', ['id' => $id])->row();
+        $data = $this->db->get_where('departements', ['id' => $id])->row();
         $this->template->set([
             'data' => $data,
         ]);
@@ -54,20 +43,22 @@ class audit_department extends Admin_Controller
 
     public function save()
     {
-        $data = $this->input->post();
+        $post = $this->input->post();
 
         $this->db->trans_begin();
-        if ($data) {
-            if (isset($data['id']) && $data['id']) {
-                $data['modified_at'] = date('Y-m-d H:i:s');
-                $data['modified_by'] = $this->auth->user_id();
-                $this->db->update('audit_department', $data, ['id' => $data['id']]);
+        if ($post) {
+            $data = [
+                'name'       => $post['name'],
+                'status'     => $post['status'],
+                'company_id' => $this->company,
+            ];
+
+            if (isset($post['id']) && $post['id']) {
+                $this->db->update('departements', $data, ['id' => $post['id']]);
             } else {
-                $data['id']         = $this->_getId();
-                $data['created_at'] = date('Y-m-d H:i:s');
-                $data['created_by'] = $this->auth->user_id();
-                $this->db->insert('audit_department', $data);
+                $this->db->insert('departements', $data);
             }
+
             if ($this->db->trans_status() === FALSE) {
                 $this->db->trans_rollback();
                 $return = array(
@@ -96,7 +87,7 @@ class audit_department extends Admin_Controller
         $id = $this->input->post('id');
         if ($id) {
             $this->db->trans_begin();
-            $this->db->update('audit_department', ['status' => '0'], ['id' => $id]);
+            $this->db->update('departements', ['status' => '0'], ['id' => $id]);
             if ($this->db->trans_status() === FALSE) {
                 $this->db->trans_rollback();
                 $Return = [

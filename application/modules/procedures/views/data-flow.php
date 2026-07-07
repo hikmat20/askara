@@ -1,9 +1,11 @@
 <?php if ($detail) :
 	$n = 0;
 	foreach ($detail as $key => $dtl) : $n++; ?>
-		<tr>
-
-			<td style="vertical-align:middle;" class="text-center"><?= $dtl->number; ?></td>
+		<tr class="sortable-row" data-id="<?= $dtl->id; ?>">
+			<td style="vertical-align:middle;" class="text-center">
+				<i class="fa fa-bars text-muted drag-handle mr-2" style="cursor: move;"></i>
+				<?= $dtl->number; ?>
+			</td>
 			<td style="vertical-align:middle;" class="text-center"><?= $dtl->pic; ?></td>
 			<td><?= $dtl->description; ?></td>
 			<td><?= $dtl->description_2; ?></td>

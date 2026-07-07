@@ -30,6 +30,7 @@
                                     <th class="text-center" width="120px">Create</th>
                                     <th class="text-center" width="120px">Update</th>
                                     <th class="text-center" width="120px">Delete</th>
+                                    <th class="text-center" width="120px">Download</th>
                                 </tr>
                             </thead>
                             <?= $this->menu_generator->group_menus(); ?>
