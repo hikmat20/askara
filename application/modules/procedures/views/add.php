@@ -478,7 +478,7 @@
 																<select name="reviewer_id" id="reviewer_id" class="form-control select2">;
 																	<option value=""></option>
 																	<?php foreach ($jabatan as $jbt) : ?>
-																		<option value="<?= $jbt->id; ?>"><?= $jbt->name; ?></option>
+																		<option value="<?= $jbt->id; ?>" <?= (isset($default_reviewer) && $default_reviewer == $jbt->id) ? 'selected' : ''; ?>><?= $jbt->name; ?></option>
 																	<?php endforeach; ?>
 																</select>
 																<span class="form-text text-danger invalid-feedback"><span class="text-danger">*</span> Review By harus di isi</span>

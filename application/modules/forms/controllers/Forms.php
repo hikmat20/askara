@@ -39,6 +39,7 @@ class Forms extends Admin_Controller
 			'PUB' => '<span class="badge badge-primary">Published</span>',
 		];
 
+		$this->template->set('allow_download', $this->_check_download_permission('forms'));
 		$this->template->render('index', compact(
 			'dataDraft',
 			'dataReview',
@@ -130,6 +131,7 @@ class Forms extends Admin_Controller
 			'DEL' => '<span class="badge badge-secondary">Deleted</span>',
 		];
 
+		$this->template->set('allow_download', $this->_check_download_permission('forms'));
 		$this->template->render('view', compact(
 			'dataForm',
 			'display_form',
@@ -410,6 +412,15 @@ class Forms extends Admin_Controller
 			return;
 		}
 
+		if (!$this->_check_download_permission('forms')) {
+			$this->output->set_status_header(403);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'Access Denied: You do not have permission to download this document.'
+			]);
+			return;
+		}
+
 		if (!$this->_checkCompanyIsolation($id)) {
 			$this->output->set_status_header(403);
 			echo json_encode([
@@ -459,6 +470,12 @@ class Forms extends Admin_Controller
 	{
 		if ($id === null) {
 			show_404();
+			return;
+		}
+
+		if (!$this->_check_download_permission('forms')) {
+			$this->output->set_status_header(403);
+			show_error('Access Denied: You do not have permission to download this document.', 403);
 			return;
 		}
 

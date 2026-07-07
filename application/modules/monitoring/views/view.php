@@ -453,7 +453,7 @@
     </div>
 
     <div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
-        <?php if ($this->auth->is_admin()) : ?>
+        <?php if ($allow_download_procedure) : ?>
             <div class="mb-3 text-right">
                 <a href="<?= base_url('procedures/printfile/' . $data->id . '?download=1'); ?>" 
                    target="_blank" class="btn btn-sm btn-primary">

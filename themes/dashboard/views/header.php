@@ -263,7 +263,7 @@
         <div class="btn btn-icon btn-hover-transparent-white w-auto d-flex align-items-center btn-lg px-2" id="kt_quick_user_toggle">
           <div class="symbol symbol-circle symbol-30 bg-white overflow-hidden">
             <div class="symbol-label">
-              <img alt="avatar" src="<?= (isset($userData->photo) && file_exists('/assets/img/avatar/' . $userData->photo)) ? base_url('/assets/img/avatar/' . $userData->photo) : base_url('/assets/img/avatar/no-user.jpg'); ?>" class="h-75 align-self-end" />
+              <img alt="avatar" src="<?= (isset($userData->photo) && file_exists(FCPATH . 'assets/img/avatar/' . $userData->photo)) ? base_url('/assets/img/avatar/' . $userData->photo) : base_url('/assets/img/avatar/no-user.jpg'); ?>" class="h-75 align-self-end" />
             </div>
           </div>
         </div>

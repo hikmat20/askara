@@ -20,6 +20,10 @@ class Monitoring extends Admin_Controller
 		$this->template->set_theme('dashboard');
 		$this->template->page_icon('fa fa-dashboard');
 
+		$this->template->set('allow_download_procedure', $this->_check_download_permission('procedures'));
+		$this->template->set('allow_download_form', $this->_check_download_permission('forms'));
+		$this->template->set('allow_download_wi', $this->_check_download_permission('work_instructions'));
+
 		$this->sts = [
 			'DFT' => '<span class="label label-light-secondary label-pill label-inline mr-2 text-dark-50">Draft</span>',
 			'OPN' => '<span class="label label-light-primary label-pill label-inline mr-2">New</span>',

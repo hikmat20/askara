@@ -11,7 +11,7 @@
                         </span>
                     <?php endif; ?>
                 </h3>
-                <?php if (!empty($wi->display_file_name) && $this->auth->is_admin()) : ?>
+                <?php if (!empty($wi->display_file_name) && $allow_download) : ?>
                     <div class="card-toolbar">
                         <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-sm btn-light-primary">
                             <i class="fa fa-download"></i> Download
@@ -32,7 +32,7 @@
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF. 
-                                <?php if ($this->auth->is_admin()) : ?>
+                                <?php if ($allow_download) : ?>
                                     <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank">Klik di sini untuk download</a>
                                 <?php endif; ?>
                             </p>
@@ -44,7 +44,7 @@
                             <h4>Excel Document</h4>
                             <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                             <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download) : ?>
                                 <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-success">
                                     <i class="fa fa-download"></i> Download Excel File
                                 </a>
@@ -59,7 +59,7 @@
                             <h4>Word Document</h4>
                             <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                             <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download) : ?>
                                 <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-primary">
                                     <i class="fa fa-download"></i> Download Word File
                                 </a>
@@ -74,7 +74,7 @@
                             <h4>Document File</h4>
                             <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                             <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download) : ?>
                                 <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-secondary">
                                     <i class="fa fa-download"></i> Download File
                                 </a>
@@ -299,7 +299,7 @@
                                         data-version="<?= $version->version_number; ?>">
                                     <i class="fa fa-eye"></i> View
                                 </button>
-                                <?php if ($this->auth->is_admin()) : ?>
+                                <?php if ($allow_download) : ?>
                                     <a href="<?= base_url('work_instructions/download_version/' . $wi->id . '/' . $version->version_number); ?>" 
                                        class="btn btn-sm btn-primary">
                                         <i class="fa fa-download"></i> Download

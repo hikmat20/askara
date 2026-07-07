@@ -78,5 +78,22 @@ class Admin_Controller extends Base_Controller
 
         $this->form_validation->set_error_delimiters('', '');
     }
+    protected function _check_download_permission($menu_link)
+    {
+        if ($this->auth->is_admin()) {
+            return true;
+        }
+
+        $permission = $this->db->select('group_menus.*')
+            ->from('group_menus')
+            ->join('menus', 'group_menus.menu_id = menus.id')
+            ->where('group_menus.group_id', $this->group_id)
+            ->where('group_menus.company_id', $this->company)
+            ->where('menus.link', $menu_link)
+            ->get()
+            ->row();
+
+        return ($permission && $permission->download == '1');
+    }
 }
 /* End of file Admin_Controller.php */

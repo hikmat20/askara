@@ -66,7 +66,7 @@ class Procedures extends Admin_Controller
 			'dataDel' 	=> $dataDel,
 			'ArrReason' => $ArrReason,
 		]);
-		$this->template->set('allow_download', $this->_check_download_permission());
+		$this->template->set('allow_download', $this->_check_procedures_download_permission());
 		$this->template->set('status', $this->sts);
 		$this->template->render('index');
 	}
@@ -77,12 +77,16 @@ class Procedures extends Admin_Controller
 		$users     = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 		$jabatan   = $this->db->get_where('positions', ['company_id' => $this->company])->result();
 		$depts     = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		
+		$setting = $this->db->get_where('company_settings', ['company_id' => $this->company, 'setting_name' => 'default_reviewer_procedure'])->row();
+		$default_reviewer = $setting ? $setting->setting_value : '';
 
 		$this->template->set([
 			'grProcess' 	=> $grProcess,
 			'users' 		=> $users,
 			'jabatan' 		=> $jabatan,
 			'depts' 		=> $depts,
+			'default_reviewer' => $default_reviewer,
 		]);
 
 		$this->template->set('title', 'Add Procedures');
@@ -1654,7 +1658,7 @@ class Procedures extends Admin_Controller
 
 		$download = $this->input->get('download');
 		if ($download) {
-			if (!$this->_check_download_permission()) {
+			if (!$this->_check_procedures_download_permission()) {
 				$this->session->set_flashdata('error', 'Anda tidak memiliki hak akses untuk mengunduh dokumen ini.');
 				redirect('procedures');
 			}
@@ -1825,22 +1829,9 @@ class Procedures extends Admin_Controller
 			</table></div>';
 	}
 
-	private function _check_download_permission()
+	protected function _check_procedures_download_permission()
 	{
-		if ($this->auth->is_admin()) {
-			return true;
-		}
-
-		$permission = $this->db->select('group_menus.*')
-			->from('group_menus')
-			->join('menus', 'group_menus.menu_id = menus.id')
-			->where('group_menus.group_id', $this->group_id)
-			->where('group_menus.company_id', $this->company)
-			->where('menus.link', 'procedures')
-			->get()
-			->row();
-
-		return ($permission && $permission->download == '1');
+		return parent::_check_download_permission('procedures');
 	}
 
 	public function generateQrCode($id)

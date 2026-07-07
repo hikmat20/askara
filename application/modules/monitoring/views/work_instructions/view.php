@@ -25,9 +25,11 @@
                         </h3>
                         <?php if (!empty($wi->display_file_name)) : ?>
                             <div class="card-toolbar">
+                                <?php if ($allow_download_wi) : ?>
                                 <a href="<?= base_url($wi->display_file_path); ?>" target="_blank" class="btn btn-sm btn-light-primary">
                                     <i class="fa fa-download"></i> Download
                                 </a>
+                                <?php endif; ?>
                             </div>
                         <?php endif; ?>
                     </div>
@@ -44,7 +46,9 @@
                                         style="width: 100%; height: 800px; border: none;" 
                                         frameborder="0">
                                     <p>Browser Anda tidak mendukung preview PDF. 
+                                        <?php if ($allow_download_wi) : ?>
                                         <a href="<?= $file_path; ?>" target="_blank">Klik di sini untuk download</a>
+                                        <?php endif; ?>
                                     </p>
                                 </iframe>
                             <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
@@ -54,9 +58,13 @@
                                     <h4>Excel Document</h4>
                                     <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                                     <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
+                                    <?php if ($allow_download_wi) : ?>
                                     <a href="<?= $file_path; ?>" target="_blank" class="btn btn-success">
                                         <i class="fa fa-download"></i> Download Excel File
                                     </a>
+                                    <?php else: ?>
+                                        <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                                    <?php endif; ?>
                                 </div>
                             <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                                 <!-- Word Preview -->
@@ -65,9 +73,13 @@
                                     <h4>Word Document</h4>
                                     <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                                     <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
+                                    <?php if ($allow_download_wi) : ?>
                                     <a href="<?= $file_path; ?>" target="_blank" class="btn btn-primary">
                                         <i class="fa fa-download"></i> Download Word File
                                     </a>
+                                    <?php else: ?>
+                                        <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                                    <?php endif; ?>
                                 </div>
                             <?php else : ?>
                                 <!-- Unknown file type -->
@@ -76,9 +88,13 @@
                                     <h4>Document File</h4>
                                     <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                                     <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
+                                    <?php if ($allow_download_wi) : ?>
                                     <a href="<?= $file_path; ?>" target="_blank" class="btn btn-secondary">
                                         <i class="fa fa-download"></i> Download File
                                     </a>
+                                    <?php else: ?>
+                                        <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                                    <?php endif; ?>
                                 </div>
                             <?php endif; ?>
                         <?php else : ?>
@@ -297,10 +313,12 @@
                                                 data-version="<?= $version->version_number; ?>">
                                             <i class="fa fa-eye"></i> View
                                         </button>
+                                        <?php if ($allow_download_wi) : ?>
                                         <a href="<?= base_url('work_instructions/download_version/' . $wi->id . '/' . $version->version_number); ?>" 
                                            class="btn btn-sm btn-primary">
                                             <i class="fa fa-download"></i> Download
                                         </a>
+                                        <?php endif; ?>
                                     </div>
                                 </div>
                             </div>

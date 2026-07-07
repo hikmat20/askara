@@ -62,7 +62,9 @@ if ($disp->form_type == 'upload_file') {
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF. 
+                                <?php if ($allow_download) : ?>
                                 <a href="<?= base_url('forms/download/' . $df->id); ?>" target="_blank">Klik di sini untuk download</a>
+                                <?php endif; ?>
                             </p>
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
@@ -72,9 +74,13 @@ if ($disp->form_type == 'upload_file') {
                             <h4>Excel Document</h4>
                             <p class=""><?= htmlspecialchars($disp->file_name); ?></p>
                             <p class="">Size: <?= isset($disp->size) ? number_format($disp->size) . ' KB' : '-'; ?></p>
+                            <?php if ($allow_download) : ?>
                             <a href="<?= base_url('forms/download/' . $df->id); ?>" target="_blank" class="btn btn-success">
                                 <i class="fa fa-download"></i> Download Excel File
                             </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                            <?php endif; ?>
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
@@ -83,9 +89,13 @@ if ($disp->form_type == 'upload_file') {
                             <h4>Word Document</h4>
                             <p class=""><?= htmlspecialchars($disp->file_name); ?></p>
                             <p class="">Size: <?= isset($disp->size) ? number_format($disp->size) . ' KB' : '-'; ?></p>
+                            <?php if ($allow_download) : ?>
                             <a href="<?= base_url('forms/download/' . $df->id); ?>" target="_blank" class="btn btn-primary">
                                 <i class="fa fa-download"></i> Download Word File
                             </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                            <?php endif; ?>
                         </div>
                     <?php else : ?>
                         <!-- Unknown file type -->
@@ -94,9 +104,13 @@ if ($disp->form_type == 'upload_file') {
                             <h4>Document File</h4>
                             <p class=""><?= htmlspecialchars($disp->file_name); ?></p>
                             <p class="">Size: <?= isset($disp->size) ? number_format($disp->size) . ' KB' : '-'; ?></p>
+                            <?php if ($allow_download) : ?>
                             <a href="<?= base_url('forms/download/' . $df->id); ?>" target="_blank" class="btn btn-secondary">
                                 <i class="fa fa-download"></i> Download File
                             </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 <?php else : ?>
@@ -311,10 +325,12 @@ if ($disp->form_type == 'upload_file') {
                                         data-version="<?= $v_node->version_number; ?>">
                                     <i class="fa fa-eye"></i> View
                                 </button>
+                                <?php if ($allow_download): ?>
                                 <a href="<?= base_url('forms/download_version/' . $df->id . '/' . $v_node->version_number); ?>" 
                                    class="btn btn-sm btn-primary">
                                     <i class="fa fa-download"></i> Download
                                 </a>
+                                <?php endif; ?>
                             </div>
                         </div>
                     </div>

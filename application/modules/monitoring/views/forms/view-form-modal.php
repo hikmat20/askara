@@ -11,7 +11,7 @@
                         </span>
                     <?php endif; ?>
                 </h5>
-                <?php if (!empty($form->file_name) && $this->auth->is_admin()) : ?>
+                <?php if (!empty($form->file_name) && $allow_download_form) : ?>
                     <div class="card-toolbar">
                         <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-sm btn-light-primary">
                             <i class="fa fa-download"></i> Download
@@ -30,7 +30,7 @@
                         <!-- PDF Preview -->
                         <iframe src="<?= $file_path; ?>#toolbar=0" style="width: 100%; height: 600px; border: none;" frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF.
-                                <?php if ($this->auth->is_admin()) : ?>
+                                <?php if ($allow_download_form) : ?>
                                     <a href="<?= base_url('forms/download/' . $form->id); ?>" target="_blank">Klik di sini untuk download</a>
                                 <?php endif; ?>
                             </p>
@@ -42,7 +42,7 @@
                             <h4>Excel Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download_form) : ?>
                                 <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-success">
                                     <i class="fa fa-download"></i> Download Excel File
                                 </a>
@@ -57,7 +57,7 @@
                             <h4>Word Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download_form) : ?>
                                 <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-primary">
                                     <i class="fa fa-download"></i> Download Word File
                                 </a>
@@ -72,7 +72,7 @@
                             <h4>Document File</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download_form) : ?>
                                 <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-secondary">
                                     <i class="fa fa-download"></i> Download File
                                 </a>
@@ -277,7 +277,7 @@
                             <?php endif; ?>
                             
                             <div class="mt-3">
-                                <?php if ($this->auth->is_admin()) : ?>
+                                <?php if ($allow_download_form) : ?>
                                     <a href="<?= base_url('forms/download_version/' . $form->id . '/' . $version->version_number); ?>" 
                                        class="btn btn-sm btn-primary">
                                         <i class="fa fa-download"></i> Download
