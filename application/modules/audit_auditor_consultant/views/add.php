@@ -1,7 +1,7 @@
 <form id="form">
   <div class="form-group">
     <label for="" class="h6 font-weight-bold mb-5">Name <span class="text-danger">*</span></label>
-    <input type="name" name="name" placeholder="Process Name" class="form-control form-control-lg required" aria-describedby="helpId">
+    <input type="name" name="name" placeholder="Auditor / Consultant Name" class="form-control form-control-lg required" aria-describedby="helpId">
   </div>
   <div class="form-group">
     <label for="" class="h6 font-weight-bold mb-5">Position <span class="text-danger">*</span></label>

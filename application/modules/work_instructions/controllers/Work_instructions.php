@@ -58,8 +58,15 @@ class Work_instructions extends Admin_Controller
 		$positions    = $this->PositionModel->find_all();
 		$procedures   = $this->ProcedureModel->as_array()->find_all_by('status !=', 'DEL');
 
+		$user_id = $this->auth->user_id();
+		$user_positions = $this->db->get_where('user_positions', ['user_id' => $user_id])->result();
+		$default_prepared_id = '';
+		if (count($user_positions) == 1) {
+			$default_prepared_id = $user_positions[0]->position_id;
+		}
+
 		$this->template->title('Add New Work Instruction');
-		$this->template->render('add', compact('procedures', 'departements', 'user', 'positions'));
+		$this->template->render('add', compact('procedures', 'departements', 'user', 'positions', 'default_prepared_id'));
 	}
 
 	public function edit($id = '')

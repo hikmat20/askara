@@ -24,3 +24,5 @@ document-version-control
 assets/images/dashboard/
 *sql/
 AGENTS.md
+email_cron.sh
+themes/dashboard/views/header_.php

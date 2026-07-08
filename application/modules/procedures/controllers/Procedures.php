@@ -81,12 +81,20 @@ class Procedures extends Admin_Controller
 		$setting = $this->db->get_where('settings', ['setting_name' => 'default_reviewer_procedure'])->row();
 		$default_reviewer = $setting ? $setting->value : '';
 
+		$user_id = $this->auth->user_id();
+		$user_positions = $this->db->get_where('user_positions', ['user_id' => $user_id])->result();
+		$default_prepared_id = '';
+		if (count($user_positions) == 1) {
+			$default_prepared_id = $user_positions[0]->position_id;
+		}
+
 		$this->template->set([
 			'grProcess' 	=> $grProcess,
 			'users' 		=> $users,
 			'jabatan' 		=> $jabatan,
 			'depts' 		=> $depts,
 			'default_reviewer' => $default_reviewer,
+			'default_prepared_id' => $default_prepared_id,
 		]);
 
 		$this->template->set('title', 'Add Procedures');
