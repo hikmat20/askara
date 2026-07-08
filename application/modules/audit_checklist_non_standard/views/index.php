@@ -12,7 +12,7 @@
 							<tr class="text-center">
 								<th width="40">No</th>
 								<th>Process</th>
-								<th>Department - Company</th>
+								<th>Department</th>
 								<th>Auditor</th>
 								<th width="120">Tanggal</th>
 								<th width="120">Jam</th>
@@ -24,14 +24,7 @@
 								<tr>
 									<td class="text-center"><?= $k; ?></td>
 									<td><?= !empty($v->requirement_name) ? htmlspecialchars($v->requirement_name) : (!empty($v->process_name) ? strip_tags($v->process_name) : htmlspecialchars($v->process_name_free)); ?></td>
-									<td><?php 
-										$dept = !empty($v->department_name) ? $v->department_name : '';
-										$comp = !empty($v->company) ? $v->company : '';
-										if ($dept && $comp) echo $dept . ' - ' . $comp;
-										elseif ($dept) echo $dept;
-										elseif ($comp) echo $comp;
-										else echo '-';
-									?></td>
+									<td><?= !empty($v->department_name) ? $v->department_name : '-'; ?></td>
 									<td><?= isset($v->auditor_name) ? $v->auditor_name : '-'; ?></td>
 									<td class="text-center"><?= date('d/m/Y', strtotime($v->audit_date)); ?></td>
 									<td class="text-center"><?= substr($v->start_time, 0, 5); ?> - <?= substr($v->end_time, 0, 5); ?></td>
