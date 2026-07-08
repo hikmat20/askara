@@ -78,8 +78,8 @@ class Procedures extends Admin_Controller
 		$jabatan   = $this->db->get_where('positions', ['company_id' => $this->company])->result();
 		$depts     = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
 		
-		$setting = $this->db->get_where('company_settings', ['company_id' => $this->company, 'setting_name' => 'default_reviewer_procedure'])->row();
-		$default_reviewer = $setting ? $setting->setting_value : '';
+		$setting = $this->db->get_where('settings', ['setting_name' => 'default_reviewer_procedure'])->row();
+		$default_reviewer = $setting ? $setting->value : '';
 
 		$this->template->set([
 			'grProcess' 	=> $grProcess,
