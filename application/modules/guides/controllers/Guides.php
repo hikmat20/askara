@@ -59,6 +59,10 @@ class Guides extends Admin_Controller
 			$ArrRef[$ref->id] = $ref->alias;
 		}
 
+		// Check if current user has same position as prepare_by users (for edit/delete/process permissions)
+		$current_user_position = $this->db->get_where('positions', ['assign_user' => $this->auth->user_id()])->row();
+		$current_position_id = $current_user_position ? $current_user_position->id : null;
+
 		$this->template->set([
 			'data' 				=> $dirs,
 			'details' 			=> $details,
@@ -68,6 +72,8 @@ class Guides extends Admin_Controller
 			'sub'  				=> $sub,
 			'methode'  			=> $methode,
 			'ArrRef'  			=> $ArrRef,
+			'current_user_id'	=> $this->auth->user_id(),
+			'current_position_id' => $current_position_id,
 		]);
 
 		$this->template->render('index');
@@ -305,11 +311,14 @@ class Guides extends Admin_Controller
 			$group_tools 	 = $this->db->get_where('tool_scopes')->result();
 			$references 	 = $this->db->get_where('view_standards', ['status' => 'PUB'])->result();
 			$detail 		 = $this->db->get_where('guide_details', ['id' => $guide_detail_id])->row();
+			$users 			 = $this->db->get_where('users', ['status' => 'ACT'])->result();
 			$this->template->set([
 				'guide_detail_id' 	=> $guide_detail_id,
 				'group_tools' 		=> $group_tools,
 				'references' 		=> $references,
-				'detail' 			=> $detail
+				'detail' 			=> $detail,
+				'users' 			=> $users,
+				'current_user_id'	=> $this->auth->user_id()
 			]);
 
 			$this->template->render('form');
@@ -335,29 +344,29 @@ class Guides extends Admin_Controller
 
 	public function upload_document()
 	{
-		$data 					= $this->input->post();
-		$data['company_id']		= $this->company;
+		$post 					= $this->input->post();
 
-		if ($data) {
+		if ($post) {
 			try {
-				$data['publish_date'] = (isset($data['publish_date']) && $data['publish_date']) ? date_format(date_create(str_replace("/", "-", $data['publish_date'])), 'Y-m-d') : null;
-				$data['revision_date'] = (isset($data['revision_date']) && $data['revision_date']) ? date_format(date_create(str_replace("/", "-", $data['revision_date'])), 'Y-m-d') : null;
+				// Only take valid fields for guide_detail_data table
+				$data = [
+					'guide_detail_id'		=> isset($post['guide_detail_id']) ? $post['guide_detail_id'] : null,
+					'doc_number'			=> isset($post['doc_number']) ? $post['doc_number'] : null,
+					'doc_name'				=> isset($post['doc_name']) ? $post['doc_name'] : null,
+					'issue_date'			=> (isset($post['issue_date']) && $post['issue_date']) ? date_format(date_create(str_replace("/", "-", $post['issue_date'])), 'Y-m-d') : null,
+					'effective_date'		=> (isset($post['effective_date']) && $post['effective_date']) ? date_format(date_create(str_replace("/", "-", $post['effective_date'])), 'Y-m-d') : null,
+					'doc_revision_number'	=> isset($post['doc_revision_number']) ? $post['doc_revision_number'] : null,
+					'prepare_by'			=> isset($post['prepare_by']) ? $post['prepare_by'] : null,
+					'pic_reviewer'			=> isset($post['pic_reviewer']) ? $post['pic_reviewer'] : null,
+					'pic_approval'			=> isset($post['pic_approval']) ? $post['pic_approval'] : null,
+					'company_id'			=> $this->company,
+				];
 
-				$id = isset($data['id']) ? $data['id'] : '';
-				// if (!$data['number']) {
-				// 	$data['number'] = $this->getNumber($data['group_id']);
-				// }
-				
+				$id = isset($post['id']) ? $post['id'] : '';
+
 				$this->db->trans_begin();
 				$check = $this->db->get_where('guide_detail_data', ['id' => $id])->num_rows();
-				
-				$data['sub_tools']		= json_encode($data['sub_tools']);
-				$data['range_measure']	= json_encode($data['range_measure']);
-				$data['uncertainty']	= json_encode($data['uncertainty']);
-				$data['methode']		= json_encode($data['methode']);
-				$data['reference']		= json_encode($data['reference']);
 
-				unset($data['documents']);
 				if (intval($check) == '0') {
 					$data['created_by']		= $this->auth->user_id();
 					$data['created_at']		= date('Y-m-d H:i:s');
@@ -377,7 +386,67 @@ class Guides extends Admin_Controller
 						'msg'	 => 'Failed upload document file. Please try again later.!'
 					];
 				} else {
-					$upload = $this->_uploadFiles($newid);
+					// Upload document file
+					if (isset($_FILES['doc_file']['name']) && $_FILES['doc_file']['name']) {
+						$DIR_COMP = $this->company;
+						$DIR = 'IK';
+
+						if (!is_dir("./directory/MASTER_GUIDES/$DIR_COMP/$DIR")) {
+							mkdir("./directory/MASTER_GUIDES/$DIR_COMP/$DIR", 0755, TRUE);
+						}
+
+						$config['upload_path'] 		= "./directory/MASTER_GUIDES/$DIR_COMP/$DIR";
+						$config['allowed_types'] 	= 'pdf|jpg|jpeg|png|doc|docx|xls|xlsx';
+						$config['encrypt_name'] 	= true;
+						$config['max_size'] 		= 10240; // 10MB
+						$this->load->library('upload', $config);
+						$this->upload->initialize($config);
+
+						if ($this->upload->do_upload('doc_file')) {
+							$file = $this->upload->data();
+
+							// Check if existing document exists (update mode)
+							$existing_doc = $this->db->get_where('guide_documents', [
+								'guide_detail_data_id' => $newid,
+								'file_type' => 1,
+								'status' => '1'
+							])->row();
+
+							if ($existing_doc) {
+								// Delete old file
+								$old_file_path = "./directory/MASTER_GUIDES/$DIR_COMP/$DIR/" . $existing_doc->file;
+								if (file_exists($old_file_path)) {
+									unlink($old_file_path);
+								}
+								// Update existing record
+								$this->db->update('guide_documents', [
+									'name'			=> $data['doc_name'],
+									'ext'			=> $file['file_ext'],
+									'file'			=> $file['file_name'],
+									'modified_by'	=> $this->auth->user_id(),
+									'modified_at'	=> date('Y-m-d H:i:s')
+								], ['id' => $existing_doc->id]);
+							} else {
+								// Insert new record
+								$doc_data = [
+									'id'					=> $this->_getIDDoc($this->company, 1),
+									'guide_detail_data_id'	=> $newid,
+									'name'					=> $data['doc_name'],
+									'ext'					=> $file['file_ext'],
+									'file_type'				=> 1,
+									'file'					=> $file['file_name'],
+									'created_by'			=> $this->auth->user_id(),
+									'created_at'			=> date('Y-m-d H:i:s')
+								];
+								$this->db->insert('guide_documents', $doc_data);
+							}
+						} else {
+							$this->db->trans_rollback();
+							echo json_encode(['status' => 0, 'msg' => $this->upload->display_errors('', '')]);
+							return;
+						}
+					}
+
 					$this->db->trans_commit();
 					$Return = [
 						'status' => 1,
@@ -497,44 +566,16 @@ class Guides extends Admin_Controller
 		$data = [];
 		if ($id) {
 			$data 			= $this->db->get_where('guide_detail_data', ['id' => $id])->row();
-			$group_tools 	= $this->db->get_where('tool_scopes')->result();
-			$references 	= $this->db->get_where('view_standards', ['status' => 'PUB'])->result();
 			$detail 		= $this->db->get_where('guide_details', ['id' => $data->guide_detail_id])->row();
-
+			$users 			= $this->db->get_where('users', ['status' => 'ACT'])->result();
 			$DocIK 			= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '1', 'status' => '1'])->result();
-			$DocCMC 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '2', 'status' => '1'])->result();
-			$DocTEMP 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '3', 'status' => '1'])->result();
-			$DocUBLK 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '4', 'status' => '1'])->result();
-			$DocSERT 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '5', 'status' => '1'])->result();
-			$DocDRIFT 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '6', 'status' => '1'])->result();
-			$DocSERTCAL 	= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '7', 'status' => '1'])->result();
-			$DocCEK 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '8', 'status' => '1'])->result();
-			$DocVID 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '9', 'status' => '1'])->result();
-			$ArrRange = [];
-			$ArrUncert = [];
-			$ArrUncert = [];
-
-			$ArrSubTools = (json_decode($data->sub_tools));
-			$ArrRange = (json_decode($data->range_measure));
-			$ArrUncert = (json_decode($data->uncertainty));
 
 			$this->template->set([
 				'data' 				=> $data,
-				'group_tools' 		=> $group_tools,
-				'references' 		=> $references,
 				'detail' 			=> $detail,
+				'users' 			=> $users,
 				'DocIK' 			=> $DocIK,
-				'DocCMC' 			=> $DocCMC,
-				'DocTEMP' 			=> $DocTEMP,
-				'DocUBLK' 			=> $DocUBLK,
-				'DocSERT' 			=> $DocSERT,
-				'DocDRIFT' 			=> $DocDRIFT,
-				'DocSERTCAL' 		=> $DocSERTCAL,
-				'DocCEK' 			=> $DocCEK,
-				'DocVID' 			=> $DocVID,
-				'ArrRange' 			=> $ArrRange,
-				'ArrUncert' 		=> $ArrUncert,
-				'ArrSubTools' 		=> $ArrSubTools,
+				'current_user_id'	=> $this->auth->user_id()
 			]);
 
 			$this->template->render('edit');
@@ -573,10 +614,10 @@ class Guides extends Admin_Controller
 		foreach ($standards as $std) {
 			$ArrStd[$std->id] = $std->alias;
 		}
-		$ArrRange = (json_decode($data->range_measure));
-		$ArrUncert = (json_decode($data->uncertainty));
-		$ArrCombine = array_combine($ArrRange, $ArrUncert);
-		$ArrSubTools = (json_decode($data->sub_tools));
+		$ArrRange = $data->range_measure ? json_decode($data->range_measure) : [];
+		$ArrUncert = $data->uncertainty ? json_decode($data->uncertainty) : [];
+		$ArrCombine = ($ArrRange && $ArrUncert) ? array_combine($ArrRange, $ArrUncert) : [];
+		$ArrSubTools = $data->sub_tools ? json_decode($data->sub_tools) : [];
 
 		$DocIK 			= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '1', 'status' => '1'])->result();
 			$DocCMC 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '2', 'status' => '1'])->result();
@@ -589,26 +630,69 @@ class Guides extends Admin_Controller
 			$DocVID 		= $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '9', 'status' => '1'])->result();
 			
 
-		// $file 			= $this->db->get_where('guide_detail_data', ['id' => $id])->row();
+		// Get user names for display
+		$prepare_by_name = '-';
+		$reviewer_name = '-';
+		$approval_name = '-';
+		if ($data->prepare_by) {
+			$prep_user = $this->db->get_where('users', ['id_user' => $data->prepare_by])->row();
+			if ($prep_user) $prepare_by_name = $prep_user->full_name;
+		}
+		if ($data->pic_reviewer) {
+			$rev_user = $this->db->get_where('users', ['id_user' => $data->pic_reviewer])->row();
+			if ($rev_user) $reviewer_name = $rev_user->full_name;
+		}
+		if ($data->pic_approval) {
+			$apv_user = $this->db->get_where('users', ['id_user' => $data->pic_approval])->row();
+			if ($apv_user) $approval_name = $apv_user->full_name;
+		}
+
 		$this->template->set([
 			'data' 				=> $data,
-			'file'				=> $file,
-			'ArrStd'			=> $ArrStd,
-			'methode'			=> $methode,
-			'ArrCombine' 		=> $ArrCombine,
-			'ArrSubTools' 		=> $ArrSubTools,
 			'DocIK' 			=> $DocIK,
-			'DocCMC' 			=> $DocCMC,
-			'DocTEMP' 			=> $DocTEMP,
-			'DocUBLK' 			=> $DocUBLK,
-			'DocSERT' 			=> $DocSERT,
-			'DocDRIFT' 			=> $DocDRIFT,
-			'DocSERTCAL' 		=> $DocSERTCAL,
-			'DocCEK' 			=> $DocCEK,
-			'DocVID' 			=> $DocVID,
+			'prepare_by_name'	=> $prepare_by_name,
+			'reviewer_name'		=> $reviewer_name,
+			'approval_name'		=> $approval_name,
 		]);
 
 		$this->template->render('view-file');
+	}
+
+	public function view_file_page($id)
+	{
+		$data = $this->db->get_where('view_guides_detail_data', ['id' => $id])->row();
+		if (!$data) {
+			echo "Data not found";
+			return;
+		}
+
+		$DocIK = $this->db->get_where('guide_documents', ['guide_detail_data_id' => $id, 'file_type' => '1', 'status' => '1'])->result();
+
+		$prepare_by_name = '-';
+		$reviewer_name = '-';
+		$approval_name = '-';
+		if ($data->prepare_by) {
+			$prep_user = $this->db->get_where('users', ['id_user' => $data->prepare_by])->row();
+			if ($prep_user) $prepare_by_name = $prep_user->full_name;
+		}
+		if ($data->pic_reviewer) {
+			$rev_user = $this->db->get_where('users', ['id_user' => $data->pic_reviewer])->row();
+			if ($rev_user) $reviewer_name = $rev_user->full_name;
+		}
+		if ($data->pic_approval) {
+			$apv_user = $this->db->get_where('users', ['id_user' => $data->pic_approval])->row();
+			if ($apv_user) $approval_name = $apv_user->full_name;
+		}
+
+		$this->template->set([
+			'data' 				=> $data,
+			'DocIK' 			=> $DocIK,
+			'prepare_by_name'	=> $prepare_by_name,
+			'reviewer_name'		=> $reviewer_name,
+			'approval_name'		=> $approval_name,
+		]);
+
+		$this->template->render('view-file-page');
 	}
 
 	public function view_video($id)
@@ -657,6 +741,173 @@ class Guides extends Admin_Controller
 				'msg'			=> "Data not valid"
 			);
 			echo json_encode($Return);
+		}
+	}
+
+	public function process_to_review()
+	{
+		$id = $this->input->post('id');
+		if ($id) {
+			$data = $this->db->get_where('guide_detail_data', ['id' => $id])->row();
+			if (!$data) {
+				echo json_encode(['status' => 0, 'msg' => 'Data not found.']);
+				return;
+			}
+			if (!in_array($data->doc_status, ['DFT', 'RVI', 'COR'])) {
+				echo json_encode(['status' => 0, 'msg' => 'Document cannot be processed to Review from current status.']);
+				return;
+			}
+			$this->db->update('guide_detail_data', [
+				'doc_status'  => 'REV',
+				'modified_by' => $this->auth->user_id(),
+				'modified_at' => date('Y-m-d H:i:s')
+			], ['id' => $id]);
+
+			if ($this->db->affected_rows() > 0) {
+				echo json_encode(['status' => 1, 'msg' => 'Document berhasil diproses ke Review.']);
+			} else {
+				echo json_encode(['status' => 0, 'msg' => 'Failed to process document.']);
+			}
+		} else {
+			echo json_encode(['status' => 0, 'msg' => 'Data not valid.']);
+		}
+	}
+
+	public function submit_review()
+	{
+		$id = $this->input->post('id');
+		$action = $this->input->post('action');
+		$reason = $this->input->post('reason');
+
+		if (!$id || !$action) {
+			echo json_encode(['status' => 0, 'msg' => 'Data not valid.']);
+			return;
+		}
+
+		$data = $this->db->get_where('guide_detail_data', ['id' => $id])->row();
+		if (!$data) {
+			echo json_encode(['status' => 0, 'msg' => 'Data not found.']);
+			return;
+		}
+
+		if ($data->doc_status != 'REV') {
+			echo json_encode(['status' => 0, 'msg' => 'Document is not in Review status.']);
+			return;
+		}
+
+		if ($action == 'approve') {
+			$new_status = 'APV';
+			$msg = 'Document berhasil diproses ke Approval.';
+		} elseif ($action == 'correction') {
+			$new_status = 'COR';
+			$msg = 'Document dikembalikan untuk Correction.';
+		} else {
+			echo json_encode(['status' => 0, 'msg' => 'Invalid action.']);
+			return;
+		}
+
+		$update_data = [
+			'doc_status'  => $new_status,
+			'modified_by' => $this->auth->user_id(),
+			'modified_at' => date('Y-m-d H:i:s')
+		];
+
+		$this->db->update('guide_detail_data', $update_data, ['id' => $id]);
+
+		if ($this->db->affected_rows() > 0) {
+			echo json_encode(['status' => 1, 'msg' => $msg]);
+		} else {
+			echo json_encode(['status' => 0, 'msg' => 'Failed to process.']);
+		}
+	}
+
+	public function request_revision()
+	{
+		$id = $this->input->post('id');
+		$reason = $this->input->post('reason');
+
+		if (!$id || !$reason) {
+			echo json_encode(['status' => 0, 'msg' => 'Data not valid.']);
+			return;
+		}
+
+		$data = $this->db->get_where('guide_detail_data', ['id' => $id])->row();
+		if (!$data) {
+			echo json_encode(['status' => 0, 'msg' => 'Data not found.']);
+			return;
+		}
+
+		if ($data->doc_status != 'PUB') {
+			echo json_encode(['status' => 0, 'msg' => 'Document is not in Published status.']);
+			return;
+		}
+
+		$this->db->update('guide_detail_data', [
+			'doc_status'  => 'RVI',
+			'modified_by' => $this->auth->user_id(),
+			'modified_at' => date('Y-m-d H:i:s')
+		], ['id' => $id]);
+
+		if ($this->db->affected_rows() > 0) {
+			echo json_encode(['status' => 1, 'msg' => 'Document berhasil di-request untuk Revision.']);
+		} else {
+			echo json_encode(['status' => 0, 'msg' => 'Failed to process.']);
+		}
+	}
+
+	public function submit_approval()
+	{
+		$id = $this->input->post('id');
+		$action = $this->input->post('action');
+		$note = $this->input->post('note');
+		$published_date = $this->input->post('published_date');
+
+		if (!$id || !$action) {
+			echo json_encode(['status' => 0, 'msg' => 'Data not valid.']);
+			return;
+		}
+
+		$data = $this->db->get_where('guide_detail_data', ['id' => $id])->row();
+		if (!$data) {
+			echo json_encode(['status' => 0, 'msg' => 'Data not found.']);
+			return;
+		}
+
+		if ($data->doc_status != 'APV') {
+			echo json_encode(['status' => 0, 'msg' => 'Document is not in Approval status.']);
+			return;
+		}
+
+		if ($action == 'publish') {
+			$new_status = 'PUB';
+			$msg = 'Document berhasil dipublikasikan.';
+			$update_data = [
+				'doc_status'  => $new_status,
+				'modified_by' => $this->auth->user_id(),
+				'modified_at' => date('Y-m-d H:i:s')
+			];
+			if ($published_date) {
+				$update_data['effective_date'] = date_format(date_create(str_replace("/", "-", $published_date)), 'Y-m-d');
+			}
+		} elseif ($action == 'correction') {
+			$new_status = 'COR';
+			$msg = 'Document dikembalikan untuk Correction.';
+			$update_data = [
+				'doc_status'  => $new_status,
+				'modified_by' => $this->auth->user_id(),
+				'modified_at' => date('Y-m-d H:i:s')
+			];
+		} else {
+			echo json_encode(['status' => 0, 'msg' => 'Invalid action.']);
+			return;
+		}
+
+		$this->db->update('guide_detail_data', $update_data, ['id' => $id]);
+
+		if ($this->db->affected_rows() > 0) {
+			echo json_encode(['status' => 1, 'msg' => $msg]);
+		} else {
+			echo json_encode(['status' => 0, 'msg' => 'Failed to process.']);
 		}
 	}
 

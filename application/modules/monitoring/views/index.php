@@ -249,6 +249,78 @@
             </div>
         </div>
 
+        <!-- MASTER IK / IK Non Process -->
+        <div class="pt-3">
+            <h3 class="text-white pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Master IK / IK Non Process</h3>
+            <div class="d-flex justify-content-start align-items-center">
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-success" style="font-size: 48px;"><?= isset($dtIkNpRev) ? $dtIkNpRev : 0; ?></h5>
+                            <span class="text-muted font-size-sm">Documents</span>
+                            <h6 class="card-title text-center px-4">
+                                <a href="<?= base_url('monitoring/ik_np_review'); ?>" class="text-hover-primary">
+                                    <span class="card-label text-dark text-center font-weight-bolder">REVIEW<br>IK NON PROCESS</span>
+                                </a>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-warning" style="font-size: 48px;"><?= isset($dtIkNpCor) ? $dtIkNpCor : 0; ?></h5>
+                            <span class="text-muted font-size-sm">Documents</span>
+                            <h6 class="card-title text-center px-4">
+                                <a href="<?= base_url('monitoring/ik_np_correction'); ?>" class="text-hover-primary">
+                                    <span class="card-label text-dark text-center font-weight-bolder">CORRECTION<br>IK NON PROCESS</span>
+                                </a>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-info" style="font-size: 48px;"><?= isset($dtIkNpApv) ? $dtIkNpApv : 0; ?></h5>
+                            <span class="text-muted font-size-sm">Documents</span>
+                            <h6 class="card-title text-center px-4">
+                                <a href="<?= base_url('monitoring/ik_np_approval'); ?>" class="text-hover-primary">
+                                    <span class="card-label text-dark text-center font-weight-bolder">APPROVAL<br>IK NON PROCESS</span>
+                                </a>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-danger" style="font-size: 48px;"><?= isset($dtIkNpRvi) ? $dtIkNpRvi : 0; ?></h5>
+                            <span class="text-muted font-size-sm">Documents</span>
+                            <h6 class="card-title text-center px-4">
+                                <a href="<?= base_url('monitoring/ik_np_revision'); ?>" class="text-hover-primary">
+                                    <span class="card-label text-dark text-center font-weight-bolder">REVISION<br>IK NON PROCESS</span>
+                                </a>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+                <div class="w-250px mr-5 mb-lg-5">
+                    <div class="card border-0 shadow-lg rounded-lg" style="background-color: rgba(255, 255, 255,100);">
+                        <div class="card-body p-2 text-center">
+                            <h5 class="font-weight-bolder text-primary" style="font-size: 48px;"><?= isset($dtIkNpPub) ? $dtIkNpPub : 0; ?></h5>
+                            <span class="text-muted font-size-sm">Documents</span>
+                            <h6 class="card-title text-center px-4">
+                                <a href="<?= base_url('monitoring/ik_np_published'); ?>" class="text-hover-primary">
+                                    <span class="card-label text-dark text-center font-weight-bolder">PUBLISHED<br>IK NON PROCESS</span>
+                                </a>
+                            </h6>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+
         <div class="pt-3 d-none">
             <h3 class="text-white mt-0 pt-0 font-weight-bolder bg-white-o-0 rounded-lg px-0 py-1">Other Document</h3>
             <div class="d-flex justify-content-start align-items-center">

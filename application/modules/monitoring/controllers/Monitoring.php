@@ -164,6 +164,12 @@ class Monitoring extends Admin_Controller
 				'dtWiPub'			=> $dtWiPub,
 				'dtWiDelREV'		=> $dtWiDelREV,
 				'dtWiDelAPV'		=> $dtWiDelAPV,
+				'count_ik_non_process' => $this->db->where('company_id', $this->company)->where('status', '1')->count_all_results('guide_detail_data'),
+				'dtIkNpRev'	=> $this->db->where(['company_id' => $this->company, 'status' => '1', 'doc_status' => 'REV'])->count_all_results('guide_detail_data'),
+				'dtIkNpCor'	=> $this->db->where(['company_id' => $this->company, 'status' => '1', 'doc_status' => 'COR'])->count_all_results('guide_detail_data'),
+				'dtIkNpApv'	=> $this->db->where(['company_id' => $this->company, 'status' => '1', 'doc_status' => 'APV'])->count_all_results('guide_detail_data'),
+				'dtIkNpRvi'	=> $this->db->where(['company_id' => $this->company, 'status' => '1', 'doc_status' => 'RVI'])->count_all_results('guide_detail_data'),
+				'dtIkNpPub'	=> $this->db->where(['company_id' => $this->company, 'status' => '1', 'doc_status' => 'PUB'])->count_all_results('guide_detail_data'),
 			]
 		);
 
@@ -1936,5 +1942,79 @@ class Monitoring extends Admin_Controller
 
 		$Return = $this->WiModel->saveWiApvDeletion($data);
 		echo json_encode($Return);
+	}
+
+	/* ============================================================
+	 * MASTER IK / IK NON PROCESS MONITORING
+	 * ============================================================ */
+
+	public function ik_np_review()
+	{
+		$this->_ik_np_list('REV', 'REVIEW IK NON PROCESS');
+	}
+
+	public function ik_np_correction()
+	{
+		$this->_ik_np_list('COR', 'CORRECTION IK NON PROCESS');
+	}
+
+	public function ik_np_approval()
+	{
+		$this->_ik_np_list('APV', 'APPROVAL IK NON PROCESS');
+	}
+
+	public function ik_np_revision()
+	{
+		$this->_ik_np_list('RVI', 'REVISION IK NON PROCESS');
+	}
+
+	public function ik_np_published()
+	{
+		$this->_ik_np_list('PUB', 'PUBLISHED IK NON PROCESS');
+	}
+
+	private function _ik_np_list($doc_status, $title)
+	{
+		$data = $this->db->get_where('guide_detail_data', [
+			'company_id' => $this->company,
+			'status' => '1',
+			'doc_status' => $doc_status
+		])->result();
+
+		$users = $this->db->get_where('users')->result();
+		$ArrUsers = [];
+		foreach ($users as $user) {
+			$ArrUsers[$user->id_user] = $user;
+		}
+
+		// Check if current user can request revision (same position as prepare_by user)
+		$can_request_revision = false;
+		if ($doc_status == 'PUB') {
+			// Get position of current user
+			$current_position = $this->db->get_where('positions', ['assign_user' => $this->auth->user_id()])->row();
+			if ($current_position) {
+				// Check if any prepare_by user has same position_id
+				foreach ($data as $d) {
+					if (isset($d->prepare_by)) {
+						$prep_position = $this->db->get_where('positions', ['assign_user' => $d->prepare_by])->row();
+						if ($prep_position && $prep_position->id == $current_position->id) {
+							$can_request_revision = true;
+							break;
+						}
+					}
+				}
+			}
+		}
+
+		$this->template->set([
+			'title'		=> $title,
+			'data'		=> $data,
+			'ArrUsers'	=> $ArrUsers,
+			'doc_status'=> $doc_status,
+			'current_user_id' => $this->auth->user_id(),
+			'can_request_revision' => $can_request_revision,
+		]);
+
+		$this->template->render('ik_np_list');
 	}
 }

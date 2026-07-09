@@ -15,7 +15,7 @@
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-copy text-muted mb-1"></i>
-								<div class="font-size-h2 font-weight-bold"><?= $count_sop['all'] + $count_ik['all'] + $count_form['all']; ?></div>
+								<div class="font-size-h2 font-weight-bold"><?= $count_sop['all'] + $count_ik['all'] + $count_form['all'] + $count_ik_non_process; ?></div>
 								<div class="text-muted">Semua Dokumen</div>
 							</div>
 						</div>
@@ -42,6 +42,13 @@
 						</div>
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
+								<i class="fa fa-file text-muted mb-1"></i>
+								<div class="font-size-h2 font-weight-bold"><?= $count_ik_non_process; ?></div>
+								<div class="text-muted">IK Non Process</div>
+							</div>
+						</div>
+						<div class="col">
+							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-check-circle text-success mb-1"></i>
 								<div class="font-size-h2 font-weight-bold text-success"><?= $count_sop['publish'] + $count_ik['publish'] + $count_form['publish']; ?></div>
 								<div class="text-muted">Publish</div>
@@ -57,7 +64,7 @@
 						<div class="col">
 							<div class="border rounded p-3" style="min-height:80px;">
 								<i class="fa fa-pencil-alt text-secondary mb-1"></i>
-								<div class="font-size-h2 font-weight-bold text-secondary"><?= $count_sop['draft'] + $count_ik['draft'] + $count_form['draft']; ?></div>
+								<div class="font-size-h2 font-weight-bold text-secondary"><?= $count_sop['draft'] + $count_ik['draft'] + $count_form['draft'] + $count_ik_non_process; ?></div>
 								<div class="text-muted">Draft</div>
 							</div>
 						</div>
@@ -74,9 +81,10 @@
 								<option value="sop" <?= $filter == 'sop' ? 'selected' : ''; ?>>Master List SOP</option>
 								<option value="ik" <?= $filter == 'ik' ? 'selected' : ''; ?>>Master List IK</option>
 								<option value="form" <?= $filter == 'form' ? 'selected' : ''; ?>>Master List Form</option>
+								<option value="ik_non_process" <?= $filter == 'ik_non_process' ? 'selected' : ''; ?>>Master List IK Non Process</option>
 							</select>
 						</div>
-						<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
+						<?php if ($filter && in_array($filter, ['sop', 'ik', 'form', 'ik_non_process'])) : ?>
 						<div>
 							<a href="<?= site_url('master_list/export_excel?filter=' . $filter . '&status=' . $status . '&departement_id=' . $departement_id . '&effective_date=' . $effective_date . '&last_version=' . $last_version . '&doc_status=' . $doc_status); ?>" class="btn btn-sm btn-outline-success mr-1"><i class="fa fa-file-excel mr-1"></i> Export Excel</a>
 							<a href="<?= site_url('master_list/print_pdf?filter=' . $filter . '&status=' . $status . '&departement_id=' . $departement_id . '&effective_date=' . $effective_date . '&last_version=' . $last_version . '&doc_status=' . $doc_status); ?>" class="btn btn-sm btn-outline-danger" target="_blank"><i class="fa fa-file-pdf mr-1"></i> Print PDF</a>
@@ -85,7 +93,7 @@
 					</div>
 
 					<!-- Advanced Filters -->
-					<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
+					<?php if ($filter && in_array($filter, ['sop', 'ik', 'form', 'ik_non_process'])) : ?>
 					<div class="card bg-light mb-4">
 						<div class="card-body p-3">
 							<form id="filterForm" class="row align-items-end">
@@ -138,7 +146,7 @@
 					<?php endif; ?>
 
 					<!-- Status Filter & Table (only show when filter selected) -->
-					<?php if ($filter && in_array($filter, ['sop', 'ik', 'form'])) : ?>
+					<?php if ($filter && in_array($filter, ['sop', 'ik', 'form', 'ik_non_process'])) : ?>
 
 					<!-- Data Table -->
 					<?php if ($filter == 'sop') : ?>
@@ -208,6 +216,46 @@
 											$sts = isset($v->status) ? $v->status : '';
 											$sts_map = ['DFT'=>'<span class="label label-secondary label-inline">Draft</span>','OPN'=>'<span class="label label-primary label-inline">New</span>','REV'=>'<span class="label label-warning label-inline">Review</span>','COR'=>'<span class="label label-danger label-inline">Correction</span>','APV'=>'<span class="label label-info label-inline">Approval</span>','PUB'=>'<span class="label label-success label-inline">Published</span>','RVI'=>'<span class="label label-primary label-inline">Revision</span>'];
 											echo isset($sts_map[$sts]) ? $sts_map[$sts] : $sts;
+										?></td>
+									</tr>
+								<?php endforeach; ?>
+							</tbody>
+						</table>
+
+					<?php elseif ($filter == 'ik_non_process') : ?>
+						<h6 class="font-weight-bold">DAFTAR INDUK IK NON PROCESS - DOCUMENT MASTER LIST</h6>
+						<table id="dtTable" class="table table-bordered table-sm table-hover">
+							<thead class="table-light text-center">
+								<tr>
+									<th width="30">No</th>
+									<th>Document Number</th>
+									<th>Document Name</th>
+									<th width="110">Issue Date Rev-0</th>
+									<th width="80">Revision</th>
+									<th width="110">Effective Date</th>
+									<th width="130">Status</th>
+								</tr>
+							</thead>
+							<tbody>
+								<?php if ($data) foreach ($data as $k => $v) : $k++; ?>
+									<tr>
+										<td class="text-center"><?= $k; ?></td>
+										<td><?= $v->doc_number; ?></td>
+										<td><?= $v->doc_name; ?></td>
+										<td class="text-center"><?= $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
+										<td class="text-center"><?= $v->doc_revision_number ?: '-'; ?></td>
+										<td class="text-center"><?= $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-'; ?></td>
+										<td class="text-center" style="white-space:nowrap;"><?php
+											$doc_sts = isset($v->doc_status) ? $v->doc_status : 'DFT';
+											$sts_map = [
+												'DFT'=>'<span class="label label-secondary label-inline font-size-xs">Draft</span>',
+												'REV'=>'<span class="label label-primary label-inline font-size-xs">Waiting Review</span>',
+												'COR'=>'<span class="label label-danger label-inline font-size-xs">Need Correction</span>',
+												'APV'=>'<span class="label label-info label-inline font-size-xs">Waiting Approval</span>',
+												'RVI'=>'<span class="label label-warning label-inline font-size-xs">Revision</span>',
+												'PUB'=>'<span class="label label-success label-inline font-size-xs">Published</span>',
+											];
+											echo isset($sts_map[$doc_sts]) ? $sts_map[$doc_sts] : $doc_sts;
 										?></td>
 									</tr>
 								<?php endforeach; ?>
