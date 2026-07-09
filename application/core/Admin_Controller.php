@@ -33,9 +33,22 @@ class Admin_Controller extends Base_Controller
         
         $this->form_validation->set_error_delimiters('', '');
         $positions = $this->db->get_where('positions', ['assign_user' => $this->auth->user_id(), 'company_id' => $this->company])->result();
+        
+        $user_positions = $this->db->select('position_id as id')
+            ->from('user_positions')
+            ->join('positions', 'positions.id = user_positions.position_id')
+            ->where('user_positions.user_id', $this->auth->user_id())
+            ->where('positions.company_id', $this->company)
+            ->get()->result();
+
         $ArrPos = [];
         foreach ($positions as $pos) {
             $ArrPos[] = $pos->id;
+        }
+        foreach ($user_positions as $pos) {
+            if (!in_array($pos->id, $ArrPos)) {
+                $ArrPos[] = $pos->id;
+            }
         }
 
         $this->ArrPosts         = $ArrPos;
