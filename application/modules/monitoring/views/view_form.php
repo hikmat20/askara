@@ -5,9 +5,11 @@ $download_url = base_url('forms/download/' . $form->id);
 ?>
 <div class="mb-3 d-flex justify-content-between align-items-center">
     <span class="text-muted">Document: <strong><?= htmlspecialchars($form->name); ?></strong></span>
+    <?php if ($allow_download_form): ?>
     <a href="<?= $download_url; ?>" class="btn btn-sm btn-primary">
         <i class="fa fa-download"></i> Download Form
     </a>
+    <?php endif; ?>
 </div>
 <?php if ($form->form_type !== 'upload_file') : ?>
     <iframe class="w-100" style="height: 70vh;" src="<?= $form->link_form; ?>" frameborder="0"></iframe>
@@ -18,8 +20,12 @@ $download_url = base_url('forms/download/' . $form->id);
         <i class="fa fa-file-excel fa-4x text-success mb-3"></i>
         <h5>Excel/Word Document</h5>
         <p class="text-muted">Dokumen ini tidak mendukung preview langsung di browser.</p>
+        <?php if ($allow_download_form): ?>
         <a href="<?= $download_url; ?>" class="btn btn-success">
             <i class="fa fa-download"></i> Download File
         </a>
+        <?php else: ?>
+            <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+        <?php endif; ?>
     </div>
 <?php endif; ?>

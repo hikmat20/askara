@@ -91,10 +91,14 @@ class Positions extends Admin_Controller
     {
         $pos    = $this->db->get_where('positions', ['id' => $id])->row();
         $users  = $this->db->get_where('view_user_groups', ['company_id' => $this->company, 'active' => 'Y'])->result();
+        
+        $assigned_users = $this->db->get_where('user_positions', ['position_id' => $id])->result_array();
+        $assigned_user_ids = array_column($assigned_users, 'user_id');
 
         $this->template->set([
             'pos' => $pos,
-            'users' => $users
+            'users' => $users,
+            'assigned_user_ids' => $assigned_user_ids
         ]);
         $this->template->render('assign');
     }
@@ -104,8 +108,12 @@ class Positions extends Admin_Controller
         $id = $this->input->post('position');
         $user_id = $this->input->post('user_id');
         $this->db->trans_begin();
-        if ($id != '') {
-            $this->db->update('positions', ['assign_user' => $user_id], ['id' => $id]);
+        if ($id != '' && $user_id != '') {
+            $check = $this->db->get_where('user_positions', ['position_id' => $id, 'user_id' => $user_id])->num_rows();
+            if ($check == 0) {
+                $this->db->insert('user_positions', ['position_id' => $id, 'user_id' => $user_id]);
+                $this->db->update('positions', ['assign_user' => $user_id], ['id' => $id]);
+            }
         } else {
             $this->db->trans_rollback();
             $Return = [
@@ -137,8 +145,12 @@ class Positions extends Admin_Controller
         $user_id    = $this->input->post('user_id');
 
         $this->db->trans_begin();
-        if ($id != '') {
-            $this->db->update('positions', ['assign_user' => null], ['id' => $id]);
+        if ($id != '' && $user_id != '') {
+            $this->db->delete('user_positions', ['position_id' => $id, 'user_id' => $user_id]);
+            $pos = $this->db->get_where('positions', ['id' => $id])->row();
+            if ($pos && $pos->assign_user == $user_id) {
+                $this->db->update('positions', ['assign_user' => null], ['id' => $id]);
+            }
         } else {
             $this->db->trans_rollback();
             $Return = [

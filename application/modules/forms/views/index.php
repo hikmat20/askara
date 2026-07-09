@@ -70,7 +70,9 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_draft_<?= $draft->id; ?>">
+															<?php if ($allow_download): ?>
 															<a href="<?= base_url('forms/download/' . $draft->id); ?>" class="dropdown-item" title="Download Form"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php endif; ?>
 															<div class="dropdown-divider my-0"></div>
 															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $draft->id); ?>" class="dropdown-item edit" data-id="<?= $draft->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
@@ -119,7 +121,9 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_review_<?= $review->id; ?>">
+															<?php if ($allow_download): ?>
 															<a href="<?= base_url('forms/download/' . $review->id); ?>" class="dropdown-item" title="Download Form"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php endif; ?>
 															<div class="dropdown-divider my-0"></div>
 															<a href="javascript:void(0)" class="dropdown-item cancelReview" data-id="<?= $review->id; ?>" title="Cancel Review"><i class="fa fa-undo mr-2 text-danger"></i>Cancel Review</a>
 														</div>
@@ -164,7 +168,9 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_cor_<?= $cor->id; ?>">
+															<?php if ($allow_download): ?>
 															<a href="<?= base_url('forms/download/' . $cor->id); ?>" class="dropdown-item" title="Download Form"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php endif; ?>
 															<div class="dropdown-divider my-0"></div>
 															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $cor->id); ?>" class="dropdown-item edit" data-id="<?= $cor->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
@@ -211,7 +217,9 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_apv_<?= $apv->id; ?>">
+															<?php if ($allow_download): ?>
 															<a href="<?= base_url('forms/download/' . $apv->id); ?>" class="dropdown-item" title="Download Form"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php endif; ?>
 														</div>
 													</div>
 												</td>
@@ -254,7 +262,9 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_rev_<?= $rev->id; ?>">
+															<?php if ($allow_download): ?>
 															<a href="<?= base_url('forms/download/' . $rev->id); ?>" class="dropdown-item" title="Download Form"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php endif; ?>
 															<div class="dropdown-divider my-0"></div>
 															<a href="<?= base_url($this->uri->segment(1) . '/edit/' . $rev->id); ?>" class="dropdown-item edit" data-id="<?= $rev->id; ?>" title="Edit Data"><i class="fa fa-edit mr-2 text-warning"></i>Edit</a>
 															<div class="dropdown-divider my-0"></div>
@@ -308,7 +318,9 @@
 															<i class="fa fa-cog"></i>
 														</button>
 														<div class="dropdown-menu" aria-labelledby="triggerId_pub_<?= $pub->id; ?>">
+															<?php if ($allow_download): ?>
 															<a href="<?= base_url('forms/download/' . $pub->id); ?>" class="dropdown-item" title="Download Form"><i class="fa fa-download mr-2 text-success"></i>Download</a>
+															<?php endif; ?>
 														</div>
 													</div>
 												</td>

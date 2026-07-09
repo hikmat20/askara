@@ -100,28 +100,7 @@
                         <?php if (!empty($history)) : ?>
                             <div class="timeline timeline-5">
                                 <div class="timeline-items">
-                                    <?php foreach ($history as $log) : ?>
-                                        <div class="timeline-item">
-                                            <div class="timeline-media <?= ($log->new_status === 'APV' || $log->new_status === 'PUB') ? 'bg-light-success' : 'bg-light-danger'; ?>">
-                                                <span class="<?= ($log->new_status === 'APV' || $log->new_status === 'PUB') ? 'fa fa-check text-success' : 'fa fa-circle text-danger'; ?>"></span>
-                                            </div>
-                                            <div class="timeline-desc timeline-desc-light-primary mb-5">
-                                                <span class="font-weight-bolder text-primary"><?= htmlspecialchars($log->action_at); ?></span>
-                                                <p class="mb-1">
-                                                    Status:
-                                                    <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars(isset($log->old_status) ? $log->old_status : '-'); ?>
-                                                    <i class="fa fa-arrow-right mx-1"></i>
-                                                    <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars(isset($log->new_status) ? $log->new_status : '-'); ?>
-                                                </p>
-                                                <p class="mb-1">
-                                                    Oleh: <strong><?= isset($ArrUsers[$log->action_by]) ? htmlspecialchars(isset($ArrUsers[$log->action_by]->full_name) ? $ArrUsers[$log->action_by]->full_name : $ArrUsers[$log->action_by]->username) : 'User #' . $log->action_by; ?></strong>
-                                                </p>
-                                                <?php if (!empty($log->note)) : ?>
-                                                    <p class="mb-0 text-muted">Catatan: <?= htmlspecialchars($log->note); ?></p>
-                                                <?php endif; ?>
-                                            </div>
-                                        </div>
-                                    <?php endforeach; ?>
+                                    <?php $this->load->view('partials/activity_log_ui', ['history' => $history, 'sts' => isset($sts) ? $sts : []]); ?>
                                 </div>
                             </div>
                         <?php else : ?>

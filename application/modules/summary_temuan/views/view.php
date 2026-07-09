@@ -5,7 +5,9 @@
 				<div class="card-header justify-content-between d-flex align-items-center">
 					<h2 class="m-0"><i class="<?= $icon; ?> text-primary mr-2"></i><?= $title; ?>: <?= $program->id; ?></h2>
 					<div>
+						<?php if (isset($allow_download) && $allow_download) : ?>
 						<a href="<?= site_url('summary_temuan/print_pdf/' . $program->id); ?>" class="btn btn-warning mr-2" target="_blank"><i class="fa fa-file-pdf"></i> Print PDF</a>
+						<?php endif; ?>
 						<a href="<?= site_url('summary_temuan'); ?>" class="btn btn-danger"><i class="fa fa-reply"></i> Kembali</a>
 					</div>
 				</div>
@@ -55,7 +57,7 @@
 									<div class="col-auto pr-2"><strong><?= $no; ?></strong></div>
 									<div class="col-md-5">
 										<table class="table table-sm table-borderless mb-0">
-											<tr><th width="120">Proses</th><td><?= !empty($sched->process_name) ? strip_tags($sched->process_name) : htmlspecialchars($sched->process_name_free); ?></td></tr>
+											<tr><th width="120">Proses</th><td><?= !empty($sched->requirement_name) ? htmlspecialchars($sched->requirement_name) : (!empty($sched->process_name) ? strip_tags($sched->process_name) : htmlspecialchars($sched->process_name_free)); ?></td></tr>
 											<tr><th>Tanggal Audit</th><td><?= date('d-m-Y', strtotime($sched->audit_date)); ?></td></tr>
 										</table>
 									</div>
@@ -67,7 +69,8 @@
 									</div>
 								</div>
 
-								<!-- Kategori Count Per Proses -->
+								<?php if (empty($sched->requirement_id)) : ?>
+								<!-- Kategori Count Per Proses - HIDE untuk Audit Persyaratan -->
 								<table class="table table-bordered table-sm mb-3" style="max-width:500px;">
 									<tr class="text-center">
 										<td>Major</td>
@@ -78,6 +81,7 @@
 										<td class="bg-info text-white font-weight-bold"><?= $item->counts['OFI']; ?></td>
 									</tr>
 								</table>
+								<?php endif; ?>
 
 								<!-- Strong Point -->
 								<div class="mb-3">
@@ -93,10 +97,12 @@
 									</div>
 								</div>
 
-								<!-- Temuan Table -->
+								<?php if (empty($sched->requirement_id)) : ?>
+								<!-- Temuan Table - HIDE untuk Audit Persyaratan -->
 								<div class="mb-2">
 									<strong>Temuan</strong>
 									<?php if (!empty($item->temuan)) : ?>
+										<div class="table-responsive">
 										<table class="table table-bordered table-sm mt-1">
 											<thead class="table-light text-center">
 												<tr>
@@ -128,10 +134,63 @@
 												<?php endforeach; ?>
 											</tbody>
 										</table>
+										</div>
 									<?php else : ?>
 										<p class="text-muted mt-1"><em>Tidak ada temuan.</em></p>
 									<?php endif; ?>
 								</div>
+								<?php else : ?>
+								<!-- Checklist Berdasarkan Persyaratan - khusus Audit Persyaratan -->
+								<?php
+								$req_detail_map = [];
+								if (!empty($item->audit_requirement_details)) {
+									foreach ($item->audit_requirement_details as $d) {
+										$req_detail_map[$d->requirement_detail_id] = $d;
+									}
+								}
+								$has_filled = false;
+								if (!empty($item->requirement_details)) {
+									foreach ($item->requirement_details as $rd) {
+										$ex = isset($req_detail_map[$rd->id]) ? $req_detail_map[$rd->id] : null;
+										if ($ex && (trim($ex->aktual) !== '' || trim($ex->temuan) !== '' || trim($ex->rekomendasi) !== '')) {
+											$has_filled = true; break;
+										}
+									}
+								}
+								?>
+								<?php if ($has_filled) : ?>
+								<div class="mb-2">
+									<strong><i class="fa fa-clipboard-check text-info mr-1"></i> Checklist Berdasarkan Persyaratan</strong>
+									<div class="table-responsive">
+									<table class="table table-bordered table-sm mt-1">
+										<thead class="table-light text-center">
+											<tr>
+												<th width="150">Pasal</th>
+												<th>Requirement (Des. Inggris)</th>
+												<th width="150">Aktual</th>
+												<th width="150">Temuan</th>
+												<th width="150">Rekomendasi</th>
+											</tr>
+										</thead>
+										<tbody>
+											<?php foreach ($item->requirement_details as $rd) :
+												$ex = isset($req_detail_map[$rd->id]) ? $req_detail_map[$rd->id] : null;
+												if (!$ex || (trim($ex->aktual) === '' && trim($ex->temuan) === '' && trim($ex->rekomendasi) === '')) continue;
+											?>
+												<tr>
+													<td><?= htmlspecialchars($rd->chapter); ?></td>
+													<td><?= $rd->desc_eng; ?></td>
+													<td><?= trim($ex->aktual) !== '' ? nl2br(htmlspecialchars($ex->aktual)) : '-'; ?></td>
+													<td><?= trim($ex->temuan) !== '' ? nl2br(htmlspecialchars($ex->temuan)) : '-'; ?></td>
+													<td><?= trim($ex->rekomendasi) !== '' ? nl2br(htmlspecialchars($ex->rekomendasi)) : '-'; ?></td>
+												</tr>
+											<?php endforeach; ?>
+										</tbody>
+									</table>
+									</div>
+								</div>
+								<?php endif; ?>
+								<?php endif; ?>
 							</div>
 						<?php endforeach; ?>
 

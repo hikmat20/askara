@@ -11,7 +11,7 @@
                         </span>
                     <?php endif; ?>
                 </h5>
-                <?php if (!empty($form->file_name) && $this->auth->is_admin()) : ?>
+                <?php if (!empty($form->file_name) && $allow_download_form) : ?>
                     <div class="card-toolbar">
                         <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-sm btn-light-primary">
                             <i class="fa fa-download"></i> Download
@@ -30,7 +30,7 @@
                         <!-- PDF Preview -->
                         <iframe src="<?= $file_path; ?>#toolbar=0" style="width: 100%; height: 600px; border: none;" frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF.
-                                <?php if ($this->auth->is_admin()) : ?>
+                                <?php if ($allow_download_form) : ?>
                                     <a href="<?= base_url('forms/download/' . $form->id); ?>" target="_blank">Klik di sini untuk download</a>
                                 <?php endif; ?>
                             </p>
@@ -42,7 +42,7 @@
                             <h4>Excel Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download_form) : ?>
                                 <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-success">
                                     <i class="fa fa-download"></i> Download Excel File
                                 </a>
@@ -57,7 +57,7 @@
                             <h4>Word Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download_form) : ?>
                                 <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-primary">
                                     <i class="fa fa-download"></i> Download Word File
                                 </a>
@@ -72,7 +72,7 @@
                             <h4>Document File</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download_form) : ?>
                                 <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-secondary">
                                     <i class="fa fa-download"></i> Download File
                                 </a>
@@ -237,58 +237,7 @@
                 </h5>
             </div>
             <div class="card-body">
-                <?php foreach ($version_history as $version) : ?>
-                    <div class="card mb-3 <?= $version->is_current ? 'border-success' : 'border-secondary'; ?>">
-                        <div class="card-body p-3">
-                            <div class="d-flex justify-content-between align-items-start mb-2">
-                                <div>
-                                    <h5 class="mb-1">
-                                        <span class="font-weight-bold">v<?= $version->version_number; ?></span>
-                                        <?php if ($version->is_current) : ?>
-                                            <span class="badge badge-success ml-2">Current</span>
-                                        <?php else : ?>
-                                            <span class="badge badge-secondary ml-2">Superseded</span>
-                                        <?php endif; ?>
-                                    </h5>
-                                </div>
-                            </div>
-                            
-                            <div class="mb-2">
-                                <small class="text-muted">
-                                    <i class="fa fa-calendar mr-1"></i>
-                                    <strong>Published:</strong> <?= date('d M Y', strtotime($version->published_date)); ?>
-                                </small>
-                            </div>
-                            
-                            <div class="mb-2">
-                                <small class="text-muted">
-                                    <i class="fa fa-user mr-1"></i>
-                                    <strong>Published by:</strong> <?= htmlspecialchars($version->publisher_name ? $version->publisher_name : '-'); ?>
-                                </small>
-                            </div>
-                            
-                            <?php if (!empty($version->description)) : ?>
-                                <div class="mb-2">
-                                    <small class="text-muted">
-                                        <i class="fa fa-info-circle mr-1"></i>
-                                        <strong>Description:</strong> <?= htmlspecialchars($version->description); ?>
-                                    </small>
-                                </div>
-                            <?php endif; ?>
-                            
-                            <div class="mt-3">
-                                <?php if ($this->auth->is_admin()) : ?>
-                                    <a href="<?= base_url('forms/download_version/' . $form->id . '/' . $version->version_number); ?>" 
-                                       class="btn btn-sm btn-primary">
-                                        <i class="fa fa-download"></i> Download
-                                    </a>
-                                <?php else : ?>
-                                    <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
-                                <?php endif; ?>
-                            </div>
-                        </div>
-                    </div>
-                <?php endforeach; ?>
+                <?php $this->load->view('partials/activity_log_ui', ['history' => $version_history, 'sts' => isset($sts) ? $sts : []]); ?>
             </div>
         </div>
         <?php endif; ?>

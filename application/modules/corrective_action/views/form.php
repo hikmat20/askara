@@ -242,6 +242,8 @@ $(document).ready(function() {
 							icon: 'success',
 							text: result.msg,
 							timer: 2000
+						}).then(function() {
+							window.location.href = '<?= site_url("corrective_action"); ?>';
 						});
 					}
 				} else {

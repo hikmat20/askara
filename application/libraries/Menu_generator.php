@@ -328,7 +328,7 @@ class Menu_generator
 
 
 		$ArrMenu	= array();
-		if ($groupID == '1') {
+		if ($this->is_admin) {
 			$Query	= "SELECT * FROM menus WHERE flag_active='1' ORDER BY parent_id,weight,id ASC";
 		} else {
 			$Query	= "SELECT menus.* FROM menus INNER JOIN group_menus ON menus.id=group_menus.menu_id WHERE menus.flag_active='1' AND group_menus.group_id='$groupID' AND group_menus.company_id='$company' ORDER BY menus.parent_id,menus.weight,menus.id ASC";
@@ -391,12 +391,11 @@ class Menu_generator
 		$group 		= $this->ci->session->group;
 		$company    = $this->ci->session->company->id_perusahaan;
 		$ArrMenu	= array();
-		// if ($group->role == '1') {
-		// 	// $Query	= "SELECT * FROM menus WHERE `status`='1' ORDER BY parent_id,id ASC";
-		// } else {
-		// 	$Query    = "SELECT * FROM view_group_menus WHERE `status`='1' AND `read`='1' ORDER BY parent_id,id ASC";
-		$Query	= "SELECT menus.* FROM menus LEFT JOIN group_menus ON menus.id=group_menus.menu_id WHERE menus.status='1' AND group_menus.group_id='$group->id_group' AND group_menus.company_id='$company' AND group_menus.read='1' ORDER BY menus.parent_id,menus.id ASC";
-		// }
+		if ($this->is_admin) {
+			$Query = "SELECT menus.* FROM menus WHERE menus.status='1' ORDER BY menus.parent_id,menus.id ASC";
+		} else {
+			$Query = "SELECT menus.* FROM menus JOIN group_menus ON menus.id=group_menus.menu_id WHERE menus.status='1' AND group_menus.group_id='$group->id_group' AND group_menus.company_id='$company' AND group_menus.read='1' ORDER BY menus.parent_id,menus.id ASC";
+		}
 
 		$count		= $this->ci->db->query($Query)->num_rows();
 
@@ -593,6 +592,14 @@ class Menu_generator
 							<span></span>
 						</label>
 					</div>
+				</td>
+				<td class='text-center'>
+					<div class='checkbox-inline d-flex justify-content-center m-auto'>
+						<label class='checkbox checkbox-light-primary d-flex justify-content-center d-inline-block w-100px'>
+							<input " . (($disabled) ? 'disabled' : '') . " class='form-check-input parent parent-download parent-download-" . $value['id'] . "' " . (($in_array && ($in_array['download'] == '1')) ? 'checked' : '') . " type='checkbox' name='menus[" . $value['parent_id']  . $key . "][download]' data-action='download' data-id='" . $value['id'] . "' value=''>
+							<span></span>
+						</label>
+					</div>
 				</td>";
 			// $this->render_menus($value['child'], $dept + 1, $disabled);
 			echo ('</tr>');
@@ -631,6 +638,14 @@ class Menu_generator
 						<div class='checkbox-inline d-flex justify-content-center m-auto'>
 							<label class='checkbox checkbox-outline d-flex justify-content-center d-inline-block w-100px'>
 								<input " . (($disabled) ? 'disabled' : '') . " class='form-check-input child child-delete child-delete-" . $child['parent_id'] . "' " . (($in_array_child && ($in_array_child['delete'] == '1')) ? 'checked' : '') . " type='checkbox' name='submenus[" . $child['parent_id']  . $key . "][delete]' data-parent='" . $child['parent_id'] . "' data-id='" . $child['id'] . "' data-action='delete' value=''>
+								<span></span>
+							</label>
+						</div>
+					</td>
+					<td class='text-center'>
+						<div class='checkbox-inline d-flex justify-content-center m-auto'>
+							<label class='checkbox checkbox-outline d-flex justify-content-center d-inline-block w-100px'>
+								<input " . (($disabled) ? 'disabled' : '') . " class='form-check-input child child-download child-download-" . $child['parent_id'] . "' " . (($in_array_child && ($in_array_child['download'] == '1')) ? 'checked' : '') . " type='checkbox' name='submenus[" . $child['parent_id']  . $key . "][download]' data-parent='" . $child['parent_id'] . "' data-id='" . $child['id'] . "' data-action='download' value=''>
 								<span></span>
 							</label>
 						</div>

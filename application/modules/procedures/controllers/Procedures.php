@@ -48,7 +48,7 @@ class Procedures extends Admin_Controller
 		$dataPub		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'PUB'])->result();
 		$dataDel		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'DEL'])->result();
 		$dataRvi		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'RVI'])->result();
-		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('directory_log', ['doc_type' => 'Procedure', 'new_status' => 'RVI'])->result();
+		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('procedure_activity_logs', ['new_status' => 'RVI'])->result();
 
 		$ArrReason = [];
 		foreach (array_reverse($noteRevision) as $rvi) {
@@ -66,7 +66,7 @@ class Procedures extends Admin_Controller
 			'dataDel' 	=> $dataDel,
 			'ArrReason' => $ArrReason,
 		]);
-		$this->template->set('allow_download', $this->_check_download_permission());
+		$this->template->set('allow_download', $this->_check_procedures_download_permission());
 		$this->template->set('status', $this->sts);
 		$this->template->render('index');
 	}
@@ -77,12 +77,24 @@ class Procedures extends Admin_Controller
 		$users     = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 		$jabatan   = $this->db->get_where('positions', ['company_id' => $this->company])->result();
 		$depts     = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		
+		$setting = $this->db->get_where('settings', ['setting_name' => 'default_reviewer_procedure'])->row();
+		$default_reviewer = $setting ? $setting->value : '';
+
+		$user_id = $this->auth->user_id();
+		$user_positions = $this->db->get_where('user_positions', ['user_id' => $user_id])->result();
+		$default_prepared_id = '';
+		if (count($user_positions) == 1) {
+			$default_prepared_id = $user_positions[0]->position_id;
+		}
 
 		$this->template->set([
 			'grProcess' 	=> $grProcess,
 			'users' 		=> $users,
 			'jabatan' 		=> $jabatan,
 			'depts' 		=> $depts,
+			'default_reviewer' => $default_reviewer,
+			'default_prepared_id' => $default_prepared_id,
 		]);
 
 		$this->template->set('title', 'Add Procedures');
@@ -777,7 +789,7 @@ class Procedures extends Admin_Controller
 	{
 		$data['updated_by']    = $this->auth->user_id();
 		$data['updated_at']    = date('Y-m-d H:i:s');
-		$this->db->insert('directory_log', $data);
+		$this->db->insert('procedure_activity_logs', $data);
 	}
 
 	function delete_procedure($id)
@@ -1654,7 +1666,7 @@ class Procedures extends Admin_Controller
 
 		$download = $this->input->get('download');
 		if ($download) {
-			if (!$this->_check_download_permission()) {
+			if (!$this->_check_procedures_download_permission()) {
 				$this->session->set_flashdata('error', 'Anda tidak memiliki hak akses untuk mengunduh dokumen ini.');
 				redirect('procedures');
 			}
@@ -1825,22 +1837,9 @@ class Procedures extends Admin_Controller
 			</table></div>';
 	}
 
-	private function _check_download_permission()
+	protected function _check_procedures_download_permission()
 	{
-		if ($this->auth->is_admin()) {
-			return true;
-		}
-
-		$permission = $this->db->select('group_menus.*')
-			->from('group_menus')
-			->join('menus', 'group_menus.menu_id = menus.id')
-			->where('group_menus.group_id', $this->group_id)
-			->where('group_menus.company_id', $this->company)
-			->where('menus.link', 'procedures')
-			->get()
-			->row();
-
-		return ($permission && $permission->download == '1');
+		return parent::_check_download_permission('procedures');
 	}
 
 	public function generateQrCode($id)

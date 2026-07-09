@@ -193,6 +193,9 @@ class Audit_program_model extends BF_Model
      */
     public function getDepartments($company_id = null)
     {
+        if ($company_id) {
+            $this->db->where('company_id', $company_id);
+        }
         return $this->db->select('id, name')
             ->where('status', '1')
             ->order_by('name', 'ASC')
@@ -260,13 +263,29 @@ class Audit_program_model extends BF_Model
      */
     public function getSchedules($program_id)
     {
-        return $this->db->select('audit_program_schedule.*, procedures.name as process_name, audit_auditor_consultant.name as auditor_name')
+        return $this->db->select('audit_program_schedule.*, procedures.name as process_name, audit_auditor_consultant.name as auditor_name, requirements.name as requirement_name')
             ->from('audit_program_schedule')
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
+            ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->where('audit_program_schedule.program_id', $program_id)
             ->where('audit_program_schedule.status', '1')
             ->get()
+            ->result();
+    }
+
+    /**
+     * Get published requirements (Index of Standard) for audit persyaratan
+     *
+     * @return array
+     */
+    public function getPublishedRequirements()
+    {
+        return $this->db->select('id, name as nama')
+            ->where('status', '1')
+            ->where('deleted_at', null)
+            ->order_by('name', 'ASC')
+            ->get('requirements')
             ->result();
     }
 

@@ -33,9 +33,22 @@ class Admin_Controller extends Base_Controller
         
         $this->form_validation->set_error_delimiters('', '');
         $positions = $this->db->get_where('positions', ['assign_user' => $this->auth->user_id(), 'company_id' => $this->company])->result();
+        
+        $user_positions = $this->db->select('position_id as id')
+            ->from('user_positions')
+            ->join('positions', 'positions.id = user_positions.position_id')
+            ->where('user_positions.user_id', $this->auth->user_id())
+            ->where('positions.company_id', $this->company)
+            ->get()->result();
+
         $ArrPos = [];
         foreach ($positions as $pos) {
             $ArrPos[] = $pos->id;
+        }
+        foreach ($user_positions as $pos) {
+            if (!in_array($pos->id, $ArrPos)) {
+                $ArrPos[] = $pos->id;
+            }
         }
 
         $this->ArrPosts         = $ArrPos;
@@ -77,6 +90,23 @@ class Admin_Controller extends Base_Controller
         }
 
         $this->form_validation->set_error_delimiters('', '');
+    }
+    protected function _check_download_permission($menu_link)
+    {
+        if ($this->auth->is_admin()) {
+            return true;
+        }
+
+        $permission = $this->db->select('group_menus.*')
+            ->from('group_menus')
+            ->join('menus', 'group_menus.menu_id = menus.id')
+            ->where('group_menus.group_id', $this->group_id)
+            ->where('group_menus.company_id', $this->company)
+            ->where('menus.link', $menu_link)
+            ->get()
+            ->row();
+
+        return ($permission && $permission->download == '1');
     }
 }
 /* End of file Admin_Controller.php */

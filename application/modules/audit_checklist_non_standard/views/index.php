@@ -6,12 +6,13 @@
 					<h2 class="mt-5"><i class="<?= $icon; ?> text-primary mr-2"></i><?= $title; ?></h2>
 				</div>
 				<div class="card-body">
+					<div class="table-responsive">
 					<table id="dtTable" class="table table-bordered table-sm table-condensed table-hover">
 						<thead class="text-center table-light">
 							<tr class="text-center">
 								<th width="40">No</th>
 								<th>Process</th>
-								<th>Department - Company</th>
+								<th>Department</th>
 								<th>Auditor</th>
 								<th width="120">Tanggal</th>
 								<th width="120">Jam</th>
@@ -22,8 +23,8 @@
 							<?php if (!empty($schedules)) foreach ($schedules as $k => $v) : $k++; ?>
 								<tr>
 									<td class="text-center"><?= $k; ?></td>
-									<td><?= !empty($v->process_name) ? strip_tags($v->process_name) : htmlspecialchars($v->process_name_free); ?></td>
-									<td><?= isset($v->department_name) ? $v->department_name : '-'; ?></td>
+									<td><?= !empty($v->requirement_name) ? htmlspecialchars($v->requirement_name) : (!empty($v->process_name) ? strip_tags($v->process_name) : htmlspecialchars($v->process_name_free)); ?></td>
+									<td><?= !empty($v->department_name) ? $v->department_name : '-'; ?></td>
 									<td><?= isset($v->auditor_name) ? $v->auditor_name : '-'; ?></td>
 									<td class="text-center"><?= date('d/m/Y', strtotime($v->audit_date)); ?></td>
 									<td class="text-center"><?= substr($v->start_time, 0, 5); ?> - <?= substr($v->end_time, 0, 5); ?></td>
@@ -45,6 +46,7 @@
 							<?php endforeach; ?>
 						</tbody>
 					</table>
+					</div>
 				</div>
 			</div>
 		</div>

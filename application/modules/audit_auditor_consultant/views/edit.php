@@ -2,7 +2,7 @@
   <input type="hidden" name="id" value="<?= $data->id; ?>">
   <div class="form-group">
     <label class="h6 font-weight-bold mb-5">Name <span class="text-danger">*</span></label>
-    <input type="name" name="name" value="<?= $data->name; ?>" placeholder="Process Name" class="form-control form-control-lg required" aria-describedby="helpId">
+    <input type="name" name="name" value="<?= $data->name; ?>" placeholder="Auditor Name" class="form-control form-control-lg required" aria-describedby="helpId">
   </div>
   <div class="form-group">
     <label class="h6 font-weight-bold mb-5">Position <span class="text-danger">*</span></label>

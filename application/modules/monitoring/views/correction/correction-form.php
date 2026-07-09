@@ -36,9 +36,7 @@
                         <input type="hidden" name="status" id="status" class="form-control" value="REV">
                         <select hidden name="distribute_id[]" multiple id="distribute_id" data-placeholder="Choose an options" class="">;
                             <option value=""></option>
-                            <?php foreach ($jabatan as $jbt) : ?>
-                                <option value="<?= $jbt->id; ?>" <?= isset($file) ? ((in_array($jbt->id, explode(',', $file->distribute_id))) ? 'selected' : '') : ''; ?>><?= $jbt->nm_jabatan; ?></option>
-                            <?php endforeach; ?>
+                            <?php $this->load->view('partials/activity_log_ui', ['history' => $jabatan, 'sts' => isset($sts) ? $sts : []]); ?>
                         </select>
                     </div>
                     <div class="form-group row">
@@ -75,28 +73,7 @@
                                 </p>
                             </div>
                         </div> -->
-                        <?php if (isset($history)) :
-
-
-                            foreach ($history as $his) : ?>
-                                <div class="timeline-item">
-                                    <div class="timeline-media <?= ($his->new_status == 'OPN') ? 'bg-light-success' : 'bg-light-danger'; ?>">
-                                        <span class="<?= ($his->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-danger'; ?>"></span>
-                                    </div>
-
-                                    <div class="timeline-desc timeline-desc-light-danger">
-                                        <span class="font-weight-bolder text-danger"> <?= $his->updated_at; ?></span>
-                                        <?= $sts[$his->new_status]; ?>
-                                        <p class="font-weight-normal text-dark-50 pt-1">
-                                            <strong for="">Processed by <?= $his->updated_by; ?></strong>
-                                        </p>
-                                        <p>
-                                            <?= $his->note; ?>
-                                        </p>
-                                    </div>
-                                </div>
-                        <?php endforeach;
-                        endif; ?>
+                        <?php $this->load->view('partials/activity_log_ui', ['history' => $history, 'sts' => isset($sts) ? $sts : []]); ?>
                     </div>
                 </div>
             </div>

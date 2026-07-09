@@ -21,11 +21,22 @@
                             <td class="text-center row-number"><?= $k + 1; ?></td>
                             <td>
                                 <input type="hidden" name="schedule_record_id[]" value="<?= $schedule->id; ?>">
-                                <?php if (!empty($schedule->process_name_free)) : ?>
+                                <?php if (!empty($schedule->requirement_id)) : ?>
                                     <input type="hidden" name="schedule_process_id[]" value="">
+                                    <input type="hidden" name="schedule_process_name_free[]" value="">
+                                    <select name="schedule_requirement_id[]" class="form-control select2-schedule-requirement required" data-placeholder="Select Standard">
+                                        <option value=""></option>
+                                        <?php if (!empty($requirements)) foreach ($requirements as $r) : ?>
+                                            <option value="<?= $r->id; ?>" <?= ($r->id == $schedule->requirement_id) ? 'selected' : ''; ?>><?= htmlspecialchars($r->nama); ?></option>
+                                        <?php endforeach; ?>
+                                    </select>
+                                <?php elseif (!empty($schedule->process_name_free)) : ?>
+                                    <input type="hidden" name="schedule_process_id[]" value="">
+                                    <input type="hidden" name="schedule_requirement_id[]" value="">
                                     <input type="text" name="schedule_process_name_free[]" class="form-control required" value="<?= htmlspecialchars($schedule->process_name_free); ?>">
                                 <?php else : ?>
                                     <input type="hidden" name="schedule_process_name_free[]" value="">
+                                    <input type="hidden" name="schedule_requirement_id[]" value="">
                                     <select name="schedule_process_id[]" class="form-control select2-schedule-process required" data-placeholder="Select Process">
                                         <option value=""></option>
                                         <?php if (!empty($procedures)) foreach ($procedures as $p) : ?>
@@ -81,8 +92,9 @@
         </table>
     </div>
     <div class="mt-2">
-        <button type="button" class="btn btn-sm btn-primary" id="btn-add-schedule"><i class="fa fa-plus mr-1"></i>Add Row</button>
-        <button type="button" class="btn btn-sm btn-success" id="btn-add-schedule-free"><i class="fa fa-plus mr-1"></i>Add Row (Free Text)</button>
+        <button type="button" class="btn btn-sm btn-primary" id="btn-add-schedule"><i class="fa fa-plus mr-1"></i>Audit Proses</button>
+        <button type="button" class="btn btn-sm btn-success" id="btn-add-schedule-free"><i class="fa fa-plus mr-1"></i>Audit Free</button>
+        <button type="button" class="btn btn-sm btn-warning" id="btn-add-schedule-requirement"><i class="fa fa-plus mr-1"></i>Audit Persyaratan</button>
         <span class="text-muted ml-2 schedule-count-info">
             <?php $count = !empty($schedules) ? count($schedules) : 0; ?>
             (<span id="schedule-row-count"><?= $count; ?></span> / 50 rows)
@@ -97,16 +109,22 @@ $(document).ready(function() {
         initScheduleSelect2();
     }
 
-    // Add Row button (Process = Select)
+    // Audit Proses button (Process = Select from procedures)
     $(document).on('click', '#btn-add-schedule', function() {
         if (!checkScheduleMax()) return false;
-        addScheduleRow(false);
+        addScheduleRow('process');
     });
 
-    // Add Row (Free Text) button (Process = text input)
+    // Audit Free button (Process = text input)
     $(document).on('click', '#btn-add-schedule-free', function() {
         if (!checkScheduleMax()) return false;
-        addScheduleRow(true);
+        addScheduleRow('free');
+    });
+
+    // Audit Persyaratan button (Process = Select from requirements/standards)
+    $(document).on('click', '#btn-add-schedule-requirement', function() {
+        if (!checkScheduleMax()) return false;
+        addScheduleRow('requirement');
     });
 
     // Delete row with SweetAlert confirmation
@@ -128,6 +146,9 @@ $(document).ready(function() {
                     if ($(this).hasClass('select2-hidden-accessible')) $(this).select2('destroy');
                 });
                 $row.find('.select2-schedule-auditee').each(function() {
+                    if ($(this).hasClass('select2-hidden-accessible')) $(this).select2('destroy');
+                });
+                $row.find('.select2-schedule-requirement').each(function() {
                     if ($(this).hasClass('select2-hidden-accessible')) $(this).select2('destroy');
                 });
                 $row.remove();
@@ -152,14 +173,27 @@ function checkScheduleMax() {
     return true;
 }
 
-function addScheduleRow(isFreeText) {
+function addScheduleRow(type) {
     var rowCount = $('#table-schedule tbody tr.schedule-row').length;
     var rowNum = rowCount + 1;
+    var isFreeText = (type === 'free');
+    var isRequirement = (type === 'requirement');
 
     var processCell = '';
     if (isFreeText) {
         processCell = '<input type="hidden" name="schedule_process_id[]" value="">' +
+            '<input type="hidden" name="schedule_requirement_id[]" value="">' +
             '<input type="text" name="schedule_process_name_free[]" class="form-control required" placeholder="Input Process">';
+    } else if (isRequirement) {
+        var requirementOptions = '<option value=""></option>';
+        <?php if (!empty($requirements)) : ?>
+            <?php foreach ($requirements as $r) : ?>
+                requirementOptions += '<option value="<?= $r->id; ?>"><?= addslashes($r->nama); ?></option>';
+            <?php endforeach; ?>
+        <?php endif; ?>
+        processCell = '<input type="hidden" name="schedule_process_id[]" value="">' +
+            '<input type="hidden" name="schedule_process_name_free[]" value="">' +
+            '<select name="schedule_requirement_id[]" class="form-control select2-schedule-requirement required" data-placeholder="Select Standard">' + requirementOptions + '</select>';
     } else {
         var processOptions = '<option value=""></option>';
         <?php if (!empty($procedures)) : ?>
@@ -168,6 +202,7 @@ function addScheduleRow(isFreeText) {
             <?php endforeach; ?>
         <?php endif; ?>
         processCell = '<input type="hidden" name="schedule_process_name_free[]" value="">' +
+            '<input type="hidden" name="schedule_requirement_id[]" value="">' +
             '<select name="schedule_process_id[]" class="form-control select2-schedule-process required" data-placeholder="Select Process">' + processOptions + '</select>';
     }
 
@@ -179,7 +214,7 @@ function addScheduleRow(isFreeText) {
     <?php endif; ?>
 
     var auditeeCell = '';
-    if (isFreeText) {
+    if (isFreeText || isRequirement) {
         auditeeCell = '<input type="hidden" name="schedule_auditee_id[]" value="">' +
             '<input type="text" name="schedule_auditee_name_free[]" class="form-control required" placeholder="Input Department - Company">';
     } else {
@@ -208,7 +243,13 @@ function addScheduleRow(isFreeText) {
 
     // Initialize Select2 on the new row
     var $newRow = $('#table-schedule tbody tr.schedule-row:last');
-    if (!isFreeText) {
+    if (isRequirement) {
+        $newRow.find('.select2-schedule-requirement').select2({
+            placeholder: "Select Standard",
+            allowClear: true,
+            width: "100%"
+        });
+    } else if (!isFreeText) {
         $newRow.find('.select2-schedule-process').select2({
             placeholder: "Select Process",
             allowClear: true,
@@ -245,6 +286,11 @@ function initScheduleSelect2() {
         allowClear: true,
         width: "100%"
     });
+    $('.select2-schedule-requirement').select2({
+        placeholder: "Select Standard",
+        allowClear: true,
+        width: "100%"
+    });
 }
 
 function renumberScheduleRows() {
@@ -261,9 +307,11 @@ function updateScheduleRowCount() {
     if (count >= 50) {
         $('#btn-add-schedule').prop('disabled', true);
         $('#btn-add-schedule-free').prop('disabled', true);
+        $('#btn-add-schedule-requirement').prop('disabled', true);
     } else {
         $('#btn-add-schedule').prop('disabled', false);
         $('#btn-add-schedule-free').prop('disabled', false);
+        $('#btn-add-schedule-requirement').prop('disabled', false);
     }
 }
 </script>

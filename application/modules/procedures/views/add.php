@@ -461,9 +461,12 @@
 																<select name="prepared_id" id="prepared_id" class="form-control select2">;
 																	<option value=""></option>
 																	<?php foreach ($jabatan as $jbt) : ?>
-																		<option value="<?= $jbt->id; ?>"><?= $jbt->name; ?></option>
+																		<option value="<?= $jbt->id; ?>" <?= (isset($default_prepared_id) && $default_prepared_id == $jbt->id) ? 'selected' : ''; ?>><?= $jbt->name; ?></option>
 																	<?php endforeach; ?>
 																</select>
+																<?php if (isset($default_prepared_id) && $default_prepared_id == '') : ?>
+																	<small class="text-warning"><i class="fa fa-info-circle"></i> Anda tidak memiliki posisi aktif, atau memiliki lebih dari 1 posisi. Silakan pilih secara manual.</small>
+																<?php endif; ?>
 																<span class="form-text text-danger invalid-feedback">Prepared By harus di isi</span>
 															</div>
 														</div>
@@ -478,7 +481,7 @@
 																<select name="reviewer_id" id="reviewer_id" class="form-control select2">;
 																	<option value=""></option>
 																	<?php foreach ($jabatan as $jbt) : ?>
-																		<option value="<?= $jbt->id; ?>"><?= $jbt->name; ?></option>
+																		<option value="<?= $jbt->id; ?>" <?= (isset($default_reviewer) && $default_reviewer == $jbt->id) ? 'selected' : ''; ?>><?= $jbt->name; ?></option>
 																	<?php endforeach; ?>
 																</select>
 																<span class="form-text text-danger invalid-feedback"><span class="text-danger">*</span> Review By harus di isi</span>

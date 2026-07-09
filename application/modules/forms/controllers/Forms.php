@@ -39,6 +39,7 @@ class Forms extends Admin_Controller
 			'PUB' => '<span class="badge badge-primary">Published</span>',
 		];
 
+		$this->template->set('allow_download', $this->_check_download_permission('forms'));
 		$this->template->render('index', compact(
 			'dataDraft',
 			'dataReview',
@@ -57,8 +58,15 @@ class Forms extends Admin_Controller
 		$positions    = $this->PositionModel->find_all();
 		$procedures   = $this->ProcedureModel->as_array()->find_all_by('status !=', 'DEL');
 
+		$user_id = $this->auth->user_id();
+		$user_positions = $this->db->get_where('user_positions', ['user_id' => $user_id])->result();
+		$default_prepared_id = '';
+		if (count($user_positions) == 1) {
+			$default_prepared_id = $user_positions[0]->position_id;
+		}
+
 		$this->template->title('Add New Form');
-		$this->template->render('add', compact('departements', 'users', 'positions', 'procedures'));
+		$this->template->render('add', compact('departements', 'users', 'positions', 'procedures', 'default_prepared_id'));
 	}
 
 	public function edit($id = '')
@@ -130,6 +138,7 @@ class Forms extends Admin_Controller
 			'DEL' => '<span class="badge badge-secondary">Deleted</span>',
 		];
 
+		$this->template->set('allow_download', $this->_check_download_permission('forms'));
 		$this->template->render('view', compact(
 			'dataForm',
 			'display_form',
@@ -410,6 +419,15 @@ class Forms extends Admin_Controller
 			return;
 		}
 
+		if (!$this->_check_download_permission('forms')) {
+			$this->output->set_status_header(403);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'Access Denied: You do not have permission to download this document.'
+			]);
+			return;
+		}
+
 		if (!$this->_checkCompanyIsolation($id)) {
 			$this->output->set_status_header(403);
 			echo json_encode([
@@ -459,6 +477,12 @@ class Forms extends Admin_Controller
 	{
 		if ($id === null) {
 			show_404();
+			return;
+		}
+
+		if (!$this->_check_download_permission('forms')) {
+			$this->output->set_status_header(403);
+			show_error('Access Denied: You do not have permission to download this document.', 403);
 			return;
 		}
 

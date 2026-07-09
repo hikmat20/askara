@@ -52,7 +52,7 @@ class Summary_temuan extends Admin_Controller
         // Get all schedules for this program
         $schedules = $this->model->getSchedulesByProgram($program_id);
 
-        // For each schedule, get audit data (temuan, conformity)
+        // For each schedule, get audit data (temuan, conformity, requirement details)
         $schedule_data = [];
         foreach ($schedules as $sched) {
             $audit = $this->model->getAuditByScheduleId($sched->schedule_id);
@@ -62,6 +62,8 @@ class Summary_temuan extends Admin_Controller
             $item->temuan = [];
             $item->conformity = [];
             $item->counts = ['Major' => 0, 'Minor' => 0, 'OFI' => 0];
+            $item->requirement_details = [];
+            $item->audit_requirement_details = [];
 
             if ($audit) {
                 $temuan = $this->model->getAuditTemuan($audit->id);
@@ -73,6 +75,12 @@ class Summary_temuan extends Admin_Controller
                     if (isset($item->counts[$tm->kategori])) {
                         $item->counts[$tm->kategori]++;
                     }
+                }
+
+                // Load requirement details for Audit Persyaratan
+                if (!empty($sched->requirement_id)) {
+                    $item->requirement_details = $this->model->getPasalByRequirement($sched->requirement_id);
+                    $item->audit_requirement_details = $this->model->getAuditRequirementDetails($audit->id);
                 }
             }
 
@@ -99,6 +107,7 @@ class Summary_temuan extends Admin_Controller
             'schedule_data' => $schedule_data,
             'total_counts'  => $total_counts,
             'std_map'       => $std_map,
+            'allow_download'=> $this->_check_download_permission('summary_temuan'),
         ]);
         $this->template->render('view');
     }
@@ -110,6 +119,11 @@ class Summary_temuan extends Admin_Controller
      */
     public function print_pdf($program_id = null)
     {
+        if (!$this->_check_download_permission('summary_temuan')) {
+            show_error('Access Denied: You do not have permission to download this document.', 403);
+            return;
+        }
+
         if (!$program_id) {
             show_404();
             return;
@@ -137,6 +151,8 @@ class Summary_temuan extends Admin_Controller
             $item->temuan = [];
             $item->conformity = [];
             $item->counts = ['Major' => 0, 'Minor' => 0, 'OFI' => 0];
+            $item->requirement_details = [];
+            $item->audit_requirement_details = [];
 
             if ($audit) {
                 $temuan = $this->model->getAuditTemuan($audit->id);
@@ -147,6 +163,12 @@ class Summary_temuan extends Admin_Controller
                     if (isset($item->counts[$tm->kategori])) {
                         $item->counts[$tm->kategori]++;
                     }
+                }
+
+                // Load requirement details for Audit Persyaratan
+                if (!empty($sched->requirement_id)) {
+                    $item->requirement_details = $this->model->getPasalByRequirement($sched->requirement_id);
+                    $item->audit_requirement_details = $this->model->getAuditRequirementDetails($audit->id);
                 }
             }
 
@@ -182,11 +204,11 @@ class Summary_temuan extends Admin_Controller
             'margin_right' => 15,
             'margin_top' => 15,
             'margin_bottom' => 15,
-            'tempDir' => APPPATH . 'cache/mpdf'
+            'margin_header' => 0,
+            'margin_footer' => 0,
         ]);
         $mpdf->SetTitle('Summary Temuan Audit - ' . $program->id);
         $mpdf->WriteHTML($html);
-        if (ob_get_contents()) ob_clean();
         $mpdf->Output('Summary_Temuan_' . $program->id . '.pdf', 'I');
     }
 }

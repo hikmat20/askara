@@ -1,4 +1,4 @@
-﻿<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
+<?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
 /**
  * Corrective Action Model
@@ -117,7 +117,7 @@ class Corrective_action_model extends BF_Model
             ->join('pelaksanaan_audit_temuan pat', 'pat.audit_id = pa.id AND pat.status = "1"', 'inner')
             ->join('corrective_action ca', 'ca.pelaksanaan_id = pa.id AND ca.deleted = "0"', 'left')
             ->where('pa.status', '1')
-            ->group_by('pa.id')
+            ->group_by('pa.id, aps.audit_date, p.name, aps.process_name_free, ad.name, aps.auditee_name_free, aac.name, ca.id, ca.status_ca')
             ->order_by('aps.audit_date', 'DESC')
             ->get()
             ->result();
@@ -150,7 +150,7 @@ class Corrective_action_model extends BF_Model
             ->join('pelaksanaan_audit_temuan pat', 'pat.audit_id = pa.id AND pat.status = "1"', 'left')
             ->where_in('ca.status_ca', ['waiting_approval', 'approved'])
             ->where('ca.deleted', '0')
-            ->group_by('ca.id')
+            ->group_by('ca.id, aps.audit_date, p.name, aps.process_name_free, ad.name, aps.auditee_name_free, aac.name, ca.status_ca')
             ->order_by('aps.audit_date', 'DESC')
             ->get()
             ->result();
@@ -183,7 +183,7 @@ class Corrective_action_model extends BF_Model
             ->join('pelaksanaan_audit_temuan pat', 'pat.audit_id = pa.id AND pat.status = "1"', 'left')
             ->where('ca.status_ca', 'approved')
             ->where('ca.deleted', '0')
-            ->group_by('ca.id')
+            ->group_by('ca.id, aps.audit_date, p.name, aps.process_name_free, ad.name, aps.auditee_name_free, aac.name, ca.status_ca')
             ->order_by('aps.audit_date', 'DESC')
             ->get()
             ->result();

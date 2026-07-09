@@ -20,6 +20,10 @@ class Monitoring extends Admin_Controller
 		$this->template->set_theme('dashboard');
 		$this->template->page_icon('fa fa-dashboard');
 
+		$this->template->set('allow_download_procedure', $this->_check_download_permission('procedures'));
+		$this->template->set('allow_download_form', $this->_check_download_permission('forms'));
+		$this->template->set('allow_download_wi', $this->_check_download_permission('work_instructions'));
+
 		$this->sts = [
 			'DFT' => '<span class="label label-light-secondary label-pill label-inline mr-2 text-dark-50">Draft</span>',
 			'OPN' => '<span class="label label-light-primary label-pill label-inline mr-2">New</span>',
@@ -179,7 +183,7 @@ class Monitoring extends Admin_Controller
 	public function view($id = null, $type = null)
 	{
 		$file          = $this->db->get_where('procedures', ['id' => $id])->row();
-		$history       = $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+		$history       = $this->db->order_by('updated_at', 'ASC')->get_where('view_procedure_activity_logs', ['procedure_id' => $id])->result();
 		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users         = $this->db->get_where('view_users')->result();
@@ -245,13 +249,13 @@ class Monitoring extends Admin_Controller
 	public function view_data($id = null, $type = null)
 	{
 		$file 		= $this->db->get_where('view_procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_procedure_activity_logs', ['procedure_id' => $id])->result();
 
 		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users         = $this->db->get_where('view_users')->result();
-		$getForms      = $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
-		$getGuides     = $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
+		$getForms      = $this->db->get_where('forms', ['procedure_id' => $id])->result();
+		$getGuides     = $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
 		$jabatan       = $this->db->get('positions')->result();
 		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
 		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
@@ -335,13 +339,13 @@ class Monitoring extends Admin_Controller
 	public function load_form_review($id, $type = null)
 	{
 		$file 		= $this->db->get_where('view_procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_procedure_activity_logs', ['procedure_id' => $id])->result();
 
 		$Data          = $this->db->get_where('view_procedures', ['id' => $id, 'company_id' => $this->company])->row();
 		$bilingual     = $this->db->get_where('procedure_bilingual', ['procedure_id' => $id])->row();
 		$users         = $this->db->get_where('view_users')->result();
-		$getForms      = $this->db->get_where('dir_forms', ['procedure_id' => $id])->result();
-		$getGuides     = $this->db->get_where('dir_guides', ['procedure_id' => $id])->result();
+		$getForms      = $this->db->get_where('forms', ['procedure_id' => $id])->result();
+		$getGuides     = $this->db->get_where('work_instructions', ['procedure_id' => $id])->result();
 		$jabatan       = $this->db->get('positions')->result();
 		$ArrUsr        = $ArrJab = $ArrDept =  $ArrForms = $ArrGuides = [];
 		$depts         = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
@@ -430,7 +434,7 @@ class Monitoring extends Admin_Controller
 	public function load_form_correction($id = null, $type = null)
 	{
 		$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_procedure_activity_logs', ['procedure_id' => $id])->result();
 		$this->template->set('sts', $this->sts);
 		$this->template->set('file', $file);
 		$this->template->set('type', $type);
@@ -510,9 +514,10 @@ class Monitoring extends Admin_Controller
 	{
 		if ($type && $type == 'procedures') {
 			$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
+			$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_procedure_activity_logs', ['procedure_id' => $id])->result();
+		} else {
+			$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
 		}
-
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_directory_log', ['directory_id' => $id])->result();
 		$jabatan 	= $this->db->get('positions')->result();
 
 		$this->template->set('jabatan', $jabatan);
@@ -668,7 +673,7 @@ class Monitoring extends Admin_Controller
 	public function load_form_revision($id, $type = null)
 	{
 		$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_procedure_activity_logs', ['procedure_id' => $id])->result();
 		$this->template->set('sts', $this->sts);
 		$this->template->set('file', $file);
 		$this->template->set('type', $type);
@@ -688,7 +693,7 @@ class Monitoring extends Admin_Controller
 	public function load_form_deletion($id, $type = null)
 	{
 		$file 		= $this->db->get_where('procedures', ['id' => $id])->row();
-		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('directory_log', ['directory_id' => $id])->result();
+		$history	= $this->db->order_by('updated_at', 'ASC')->get_where('view_procedure_activity_logs', ['procedure_id' => $id])->result();
 		$this->template->set('sts', $this->sts);
 		$this->template->set('file', $file);
 		$this->template->set('type', $type);

@@ -22,13 +22,11 @@
           <td><?= $n; ?></td>
           <td><?= $usr->full_name; ?></td>
           <td class="text-center">
-            <?php if (!$pos->assign_user) : ?>
+            <?php if (!in_array($usr->user_id, $assigned_user_ids)) : ?>
               <button type="button" data-id="<?= $usr->user_id; ?>" data-position="<?= $pos->id; ?>" class="btn btn-xs btn-light-primary btn-icon choose-user"><i class="fa fa"></i></button>
-            <?php elseif ($pos->assign_user == $usr->user_id) : ?>
+            <?php else : ?>
               <button type="button" data-id="<?= $usr->user_id; ?>" data-position="<?= $pos->id; ?>" class="btn btn-xs btn-light-primary btn-icon"><i class="fa fa-check"></i></button>
               <button type="button" data-id="<?= $usr->user_id; ?>" data-position="<?= $pos->id; ?>" class="btn btn-xs btn-light-danger btn-icon remove-user"><i class="fa fa-times"></i></button>
-            <?php else : ?>
-              <button type="button" data-id="<?= $usr->user_id; ?>" data-position="<?= $pos->id; ?>" class="btn btn-xs btn-light-primary btn-icon choose-user"><i class="fa fa"></i></button>
             <?php endif; ?>
           </td>
         </tr>
