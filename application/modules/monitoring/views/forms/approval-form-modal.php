@@ -80,6 +80,34 @@
                 <?php endif; ?>
             </div>
         </div>
+
+        <!-- Status History Card -->
+        <div class="card card-custom shadow-sm mb-3 mt-3">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                <h5 class="card-title font-weight-bolder mb-0">
+                    <i class="fa fa-history text-info mr-2"></i>Status History
+                </h5>
+                <div class="card-toolbar">
+                    <a href="<?= base_url('forms/export_history_excel/' . $form->id); ?>" class="btn btn-sm btn-success mr-2">
+                        <i class="fa fa-file-excel"></i> Export Excel
+                    </a>
+                    <a href="<?= base_url('forms/export_history_pdf/' . $form->id); ?>" target="_blank" class="btn btn-sm btn-danger">
+                        <i class="fa fa-file-pdf"></i> Export PDF
+                    </a>
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <?php if (!empty($history)) : ?>
+                    <div class="timeline timeline-5">
+                        <div class="timeline-items">
+                            <?php $this->load->view('partials/activity_log_ui', ['history' => $history, 'sts' => isset($sts) ? $sts : []]); ?>
+                        </div>
+                    </div>
+                <?php else : ?>
+                    <p class="text-muted text-center py-3">Belum ada riwayat perubahan status.</p>
+                <?php endif; ?>
+            </div>
+        </div>
     </div>
 
     <!-- RIGHT SIDE: Document Information & Approval Form (40%) -->
@@ -179,25 +207,7 @@
             </div>
         </div>
 
-        <!-- Status History Card -->
-        <div class="card card-custom shadow-sm">
-            <div class="card-header py-2">
-                <h5 class="card-title font-weight-bolder mb-0">
-                    <i class="fa fa-history text-info mr-2"></i>Status History
-                </h5>
-            </div>
-            <div class="card-body py-2">
-                <?php if (!empty($history)) : ?>
-                    <div class="timeline timeline-5">
-                        <div class="timeline-items">
-                            <?php $this->load->view('partials/activity_log_ui', ['history' => $history, 'sts' => isset($sts) ? $sts : []]); ?>
-                        </div>
-                    </div>
-                <?php else : ?>
-                    <p class="text-muted text-center py-3">Belum ada riwayat perubahan status.</p>
-                <?php endif; ?>
-            </div>
-        </div>
+
     </div>
 </div>
 

@@ -105,9 +105,61 @@
                             </div>
                         <?php endif; ?>
                     </div>
+                    </div>
                 </div>
-            </div>
 
+                <!-- Status History Card -->
+                <?php if (!empty($status_logs)) : ?>
+                <div class="card card-custom shadow-sm mb-3 mt-3">
+                    <div class="card-header">
+                        <h3 class="card-title font-weight-bolder">
+                            <i class="fa fa-history text-warning mr-2"></i>Status History
+                        </h3>
+                        <div class="card-toolbar">
+                            <a href="<?= base_url('work_instructions/export_history_excel/' . $wi->id); ?>" class="btn btn-sm btn-success mr-2">
+                                <i class="fa fa-file-excel"></i> Export Excel
+                            </a>
+                            <a href="<?= base_url('work_instructions/export_history_pdf/' . $wi->id); ?>" target="_blank" class="btn btn-sm btn-danger">
+                                <i class="fa fa-file-pdf"></i> Export PDF
+                            </a>
+                        </div>
+                    </div>
+                    <div class="card-body p-0">
+                        <div class="table-responsive">
+                            <table class="table table-sm table-hover mb-0">
+                                <thead class="table-light">
+                                    <tr>
+                                        <th width="30" class="p-2">No</th>
+                                        <th class="p-2">Status Change</th>
+                                        <th class="p-2">By</th>
+                                        <th class="p-2">Date</th>
+                                    </tr>
+                                </thead>
+                                <tbody>
+                                    <?php $n = 0; foreach ($status_logs as $log) : $n++; ?>
+                                        <tr>
+                                            <td class="p-2 text-center"><?= $n; ?></td>
+                                            <td class="p-2">
+                                                <small>
+                                                    <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars($log->old_status); ?>
+                                                    <i class="fa fa-arrow-right mx-1"></i>
+                                                    <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars($log->new_status); ?>
+                                                </small>
+                                                <?php if (!empty($log->note)) : ?>
+                                                    <br><small class="text-muted"><i class="fa fa-comment"></i> <?= htmlspecialchars($log->note); ?></small>
+                                                <?php endif; ?>
+                                            </td>
+                                            <td class="p-2"><small><?= htmlspecialchars($log->action_by_name ?? $log->action_by); ?></small></td>
+                                            <td class="p-2"><small><?= date('d M Y H:i', strtotime($log->action_at)); ?></small></td>
+                                        </tr>
+                                    <?php endforeach; ?>
+                                </tbody>
+                            </table>
+                        </div>
+                    </div>
+                </div>
+                <?php endif; ?>
+            </div>
             <!-- RIGHT SIDE: Document Information (40%) -->
             <div class="col-lg-5">
                 <!-- Document Information Card -->
@@ -214,49 +266,7 @@
                     </div>
                 </div>
 
-                <!-- Status History Card -->
-                <?php if (!empty($status_logs)) : ?>
-                <div class="card card-custom shadow-sm mb-3">
-                    <div class="card-header">
-                        <h3 class="card-title font-weight-bolder">
-                            <i class="fa fa-history text-warning mr-2"></i>Status History
-                        </h3>
-                    </div>
-                    <div class="card-body p-0">
-                        <div class="table-responsive">
-                            <table class="table table-sm table-hover mb-0">
-                                <thead class="table-light">
-                                    <tr>
-                                        <th width="30" class="p-2">No</th>
-                                        <th class="p-2">Status Change</th>
-                                        <th class="p-2">By</th>
-                                        <th class="p-2">Date</th>
-                                    </tr>
-                                </thead>
-                                <tbody>
-                                    <?php $n = 0; foreach ($status_logs as $log) : $n++; ?>
-                                        <tr>
-                                            <td class="p-2 text-center"><?= $n; ?></td>
-                                            <td class="p-2">
-                                                <small>
-                                                    <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars($log->old_status); ?>
-                                                    <i class="fa fa-arrow-right mx-1"></i>
-                                                    <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars($log->new_status); ?>
-                                                </small>
-                                                <?php if (!empty($log->note)) : ?>
-                                                    <br><small class="text-muted"><i class="fa fa-comment"></i> <?= htmlspecialchars($log->note); ?></small>
-                                                <?php endif; ?>
-                                            </td>
-                                            <td class="p-2"><small><?= htmlspecialchars($log->action_by_name ?? $log->action_by); ?></small></td>
-                                            <td class="p-2"><small><?= date('d M Y H:i', strtotime($log->action_at)); ?></small></td>
-                                        </tr>
-                                    <?php endforeach; ?>
-                                </tbody>
-                            </table>
-                        </div>
-                    </div>
-                </div>
-                <?php endif; ?>
+
 
                 <!-- Version History Card -->
                 <?php if (!empty($version_history)) : ?>
@@ -267,7 +277,41 @@
                         </h3>
                     </div>
                     <div class="card-body">
-                        <?php $this->load->view('partials/activity_log_ui', ['history' => $version_history, 'sts' => isset($sts) ? $sts : []]); ?>
+                        <div class="row">
+                        <?php foreach ($version_history as $version) : $v_node = (object)$version; ?>
+                            <div class="col-12 mb-3">
+                                <div class="border rounded p-3 <?= $v_node->is_current ? 'border-success bg-light-success' : 'border-secondary'; ?>">
+                                    <div class="d-flex justify-content-between align-items-start mb-2">
+                                        <div>
+                                            <h6 class="mb-1 font-weight-bold">
+                                                v<?= $v_node->version_number; ?>
+                                                <?php if ($v_node->is_current) : ?>
+                                                    <span class="badge badge-success ml-2">Current</span>
+                                                <?php else : ?>
+                                                    <span class="badge badge-secondary ml-2">Superseded</span>
+                                                <?php endif; ?>
+                                            </h6>
+                                        </div>
+                                    </div>
+                                    <div class="mb-2">
+                                        <small class="text-muted"><i class="fa fa-calendar mr-1"></i> Published: <?= date('d M Y', strtotime($v_node->published_date)); ?></small><br>
+                                        <small class="text-muted"><i class="fa fa-user mr-1"></i> By: <?= htmlspecialchars($v_node->publisher_name ? $v_node->publisher_name : '-'); ?></small>
+                                        <?php if (!empty($v_node->description)) : ?>
+                                            <br><small class="text-muted"><i class="fa fa-info-circle mr-1"></i> Note: <?= htmlspecialchars($v_node->description); ?></small>
+                                        <?php endif; ?>
+                                    </div>
+                                    <div>
+                                        <?php if (isset($allow_download_wi) && $allow_download_wi): ?>
+                                        <a href="<?= base_url('work_instructions/download_version/' . $wi->id . '/' . $v_node->version_number); ?>" 
+                                           class="btn btn-sm btn-primary py-1 px-2">
+                                            <i class="fa fa-download"></i> Download
+                                        </a>
+                                        <?php endif; ?>
+                                    </div>
+                                </div>
+                            </div>
+                        <?php endforeach; ?>
+                        </div>
                     </div>
                 </div>
                 <?php endif; ?>

@@ -122,6 +122,58 @@ if ($disp->form_type == 'upload_file') {
                 <?php endif; ?>
             </div>
         </div>
+
+        <!-- Status History Card -->
+        <?php if (!empty($s_logs)) : ?>
+        <div class="card card-custom shadow-sm mb-3 mt-3">
+            <div class="card-header">
+                <h3 class="card-title font-weight-bolder">
+                    <i class="fa fa-history text-warning mr-2"></i>Status History
+                </h3>
+                <div class="card-toolbar">
+                    <a href="<?= base_url('forms/export_history_excel/' . $df->id); ?>" class="btn btn-sm btn-success mr-2">
+                        <i class="fa fa-file-excel"></i> Export Excel
+                    </a>
+                    <a href="<?= base_url('forms/export_history_pdf/' . $df->id); ?>" target="_blank" class="btn btn-sm btn-danger">
+                        <i class="fa fa-file-pdf"></i> Export PDF
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="30" class="p-2">No</th>
+                                <th class="p-2">Status Change</th>
+                                <th class="p-2">By</th>
+                                <th class="p-2">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $n = 0; foreach ($s_logs as $log) : $n++; $lg = (object)$log; ?>
+                                <tr>
+                                    <td class="p-2 text-center"><?= $n; ?></td>
+                                    <td class="p-2">
+                                        <small>
+                                            <?= isset($sts[$lg->old_status]) ? $sts[$lg->old_status] : htmlspecialchars($lg->old_status); ?>
+                                            <i class="fa fa-arrow-right mx-1"></i>
+                                            <?= isset($sts[$lg->new_status]) ? $sts[$lg->new_status] : htmlspecialchars($lg->new_status); ?>
+                                        </small>
+                                        <?php if (!empty($lg->note)) : ?>
+                                            <br><small class=""><i class="fa fa-comment"></i> <?= htmlspecialchars($lg->note); ?></small>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="p-2"><small><?= htmlspecialchars($lg->action_by_name ? $lg->action_by_name : $lg->action_by); ?></small></td>
+                                    <td class="p-2"><small><?= date('d M Y H:i', strtotime($lg->action_at)); ?></small></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 
     <!-- RIGHT SIDE: Document Information (40%) -->
@@ -226,49 +278,7 @@ if ($disp->form_type == 'upload_file') {
             </div>
         </div>
 
-        <!-- Status History Card -->
-        <?php if (!empty($s_logs)) : ?>
-        <div class="card card-custom shadow-sm mb-3">
-            <div class="card-header">
-                <h3 class="card-title font-weight-bolder">
-                    <i class="fa fa-history text-warning mr-2"></i>Status History
-                </h3>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th width="30" class="p-2">No</th>
-                                <th class="p-2">Status Change</th>
-                                <th class="p-2">By</th>
-                                <th class="p-2">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $n = 0; foreach ($s_logs as $log) : $n++; $lg = (object)$log; ?>
-                                <tr>
-                                    <td class="p-2 text-center"><?= $n; ?></td>
-                                    <td class="p-2">
-                                        <small>
-                                            <?= isset($sts[$lg->old_status]) ? $sts[$lg->old_status] : htmlspecialchars($lg->old_status); ?>
-                                            <i class="fa fa-arrow-right mx-1"></i>
-                                            <?= isset($sts[$lg->new_status]) ? $sts[$lg->new_status] : htmlspecialchars($lg->new_status); ?>
-                                        </small>
-                                        <?php if (!empty($lg->note)) : ?>
-                                            <br><small class=""><i class="fa fa-comment"></i> <?= htmlspecialchars($lg->note); ?></small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="p-2"><small><?= htmlspecialchars($lg->action_by_name ? $lg->action_by_name : $lg->action_by); ?></small></td>
-                                    <td class="p-2"><small><?= date('d M Y H:i', strtotime($lg->action_at)); ?></small></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
+
 
         <!-- Version History Card -->
         <?php if (!empty($v_hist)) : ?>
