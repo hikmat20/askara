@@ -48,12 +48,18 @@ class Procedures extends Admin_Controller
 		$dataPub		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'PUB'])->result();
 		$dataDel		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'DEL'])->result();
 		$dataRvi		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'RVI'])->result();
+		
 		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('procedure_activity_logs', ['new_status' => 'RVI'])->result();
-
 		$ArrReason = [];
 		foreach (array_reverse($noteRevision) as $rvi) {
-			$ArrReason[$rvi->directory_id] = $rvi;
-		};
+			$ArrReason[$rvi->procedure_id] = $rvi;
+		}
+
+		$noteCorrection = $this->db->order_by('id', 'DESC')->select('*')->get_where('procedure_activity_logs', ['new_status' => 'COR'])->result();
+		$ArrNoteCorrection = [];
+		foreach (array_reverse($noteCorrection) as $cor) {
+			$ArrNoteCorrection[$cor->procedure_id] = $cor;
+		}
 
 		$this->template->set('title', 'List of Procedures');
 		$this->template->set([
@@ -65,6 +71,7 @@ class Procedures extends Admin_Controller
 			'dataRvi' 	=> $dataRvi,
 			'dataDel' 	=> $dataDel,
 			'ArrReason' => $ArrReason,
+			'ArrNoteCorrection' => $ArrNoteCorrection,
 		]);
 		$this->template->set('allow_download', $this->_check_procedures_download_permission());
 		$this->template->set('status', $this->sts);
@@ -131,6 +138,8 @@ class Procedures extends Admin_Controller
 				$ArrGuides[$gui->id] = $gui;
 			}
 
+			$last_correction = $this->db->order_by('id', 'DESC')->get_where('procedure_activity_logs', ['procedure_id' => $id, 'new_status' => 'COR'])->row();
+
 			$this->template->set([
 				'title'      => 'Edit Procedures',
 				'data'       => $Data,
@@ -147,6 +156,7 @@ class Procedures extends Admin_Controller
 				'languange'  => $languange,
 				'bilingualArr'  => $bilingualArr,
 				'sts'        => $this->sts,
+				'last_correction' => $last_correction,
 			]);
 
 			$this->template->render('edit');

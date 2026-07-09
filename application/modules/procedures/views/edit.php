@@ -81,6 +81,12 @@
 					</div>
 
 					<div class="card-body">
+						<?php if (isset($last_correction) && $last_correction): ?>
+							<div class="alert alert-warning mb-4">
+								<strong>Note Review Terakhir:</strong><br>
+								<?= nl2br($last_correction->note); ?>
+							</div>
+						<?php endif; ?>
 						<!-- Nav tabs -->
 						<ul class="nav nav-tabs nav-pills border-0 mb-5" id="myTab" role="tablist">
 							<!-- <li class="nav-item" role="presentation">

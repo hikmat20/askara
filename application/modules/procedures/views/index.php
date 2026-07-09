@@ -146,6 +146,7 @@
 										<th class="p-2" width="40">No.</th>
 										<th class="p-2 text-left">Nama</th>
 										<th class="p-2" width="130">Status</th>
+										<th class="p-2">Note Review</th>
 										<th class="p-2" width="70">Action</th>
 									</tr>
 								</thead>
@@ -159,6 +160,7 @@
 													<h6 class="my-0"><?= $dt->name; ?></h6>
 												</td>
 												<td class="p-2"><?= $status[$dt->status]; ?></td>
+												<td class="p-2 text-left"><?= isset($ArrNoteCorrection[$dt->id]) ? $ArrNoteCorrection[$dt->id]->note : '~'; ?></td>
 												<td class="p-2">
 													<button type="button" class="btn btn-xs btn-icon btn-info view" data-status="<?= $dt->status; ?>" data-id="<?= $dt->id; ?>" data-toggle="tooltip" title="View Data"><i class="fa fa-eye"></i></button>
 													<div class="dropdown open d-inline">
