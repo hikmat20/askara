@@ -48,7 +48,7 @@ class Procedures extends Admin_Controller
 		$dataPub		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'PUB'])->result();
 		$dataDel		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'DEL'])->result();
 		$dataRvi		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'RVI'])->result();
-		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('directory_log', ['doc_type' => 'Procedure', 'new_status' => 'RVI'])->result();
+		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('procedure_activity_logs', ['new_status' => 'RVI'])->result();
 
 		$ArrReason = [];
 		foreach (array_reverse($noteRevision) as $rvi) {
@@ -789,7 +789,7 @@ class Procedures extends Admin_Controller
 	{
 		$data['updated_by']    = $this->auth->user_id();
 		$data['updated_at']    = date('Y-m-d H:i:s');
-		$this->db->insert('directory_log', $data);
+		$this->db->insert('procedure_activity_logs', $data);
 	}
 
 	function delete_procedure($id)

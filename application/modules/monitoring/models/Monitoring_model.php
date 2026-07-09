@@ -62,15 +62,14 @@ class Monitoring_model extends BF_Model
     private function _update_history($data, $note = null)
     {
         $thisData = $this->db->get_where('procedures', ['id' => $data['id']])->row();
-        $logData['directory_id'] = $data['id'];
+        $logData['procedure_id'] = $data['id'];
         $logData['new_status']   = $data['status'];
         $logData['old_status']   = $thisData->status;
-        $logData['doc_type']     = 'Procedure';
         $logData['note']         = ($note) ?: '~';
         $logData['updated_by']   = $this->auth->user_id();
         $logData['updated_at']   = date('Y-m-d H:i:s');
 
-        $this->db->insert('directory_log', $logData);
+        $this->db->insert('procedure_activity_logs', $logData);
 
         if ($this->db->affected_rows() === 0) {
             throw new Exception('Failed update Logs activity.');
@@ -120,7 +119,7 @@ class Monitoring_model extends BF_Model
                 );
 
                 $this->_signature($data, 'review');
-                $this->_update_history($data);
+                $this->_update_history($data, isset($data['note']) ? $data['note'] : null);
                 if ($this->db->trans_status() === FALSE) {
                     $this->db->trans_rollback();
                     throw new Exception('Failed process review document. Please try again later.');
@@ -171,7 +170,7 @@ class Monitoring_model extends BF_Model
                     $this->generatePdfFile($data['id']);
                 }
 
-                $this->_update_history($data);
+                $this->_update_history($data, isset($data['note']) ? $data['note'] : null);
                 $this->_logsProcedure($data);
 
                 if ($this->db->trans_status() === FALSE) {

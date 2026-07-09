@@ -37,7 +37,7 @@
   </li>
   <li class="nav-item">
     <a href="#tab5Id" data-toggle="tab" data-target="#tab5Id" class="nav-link"><i class="far fa-file-alt mr-2"></i>
-      Logs</a>
+      Activity Logs</a>
   </li>
 </ul>
 
@@ -470,47 +470,7 @@
   <div class="tab-pane fade" id="tab5Id" role="tabpanel">
     <br>
     <div class="row overflow-auto">
-      <div class="col-md-1"></div>
-      <div class="col-md-8">
-        <!-- <label for="">Tracking File</label> -->
-        <div class="timeline timeline-5">
-          <div class="timeline-items">
-            <div class="timeline-item">
-              <!-- <div class="timeline-media bg-light-primary">
-                <i class="fa fa-upload text-success"></i>
-              </div>
-              <div class="timeline-desc timeline-desc-light-primary">
-                <span class="font-weight-bolder text-primary"> <?= date('Y-m-d'); ?> 09:30 AM</span>
-                <span class="label label-pill label-inline label-light-danger">Upload File</span>
-                <p class="font-weight-normal text-dark-50 pb-2">
-                  To start a blog, think of a topic about and first brainstorm ways to write details
-                </p>
-              </div> -->
-            </div>
-            <?php if (isset($logs)):
-              foreach ($logs as $log): ?>
-                <div class="timeline-item">
-                  <div class="timeline-media <?= ($log->new_status == 'OPN') ? 'bg-light-success' : 'bg-light-primary'; ?>">
-                    <span
-                      class="<?= ($log->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-primary'; ?>"></span>
-                  </div>
-
-                  <div class="timeline-desc timeline-desc-light-primary">
-                    <p class="font-weight-bolder text-primary mb-0"> <?= $log->note; ?></p>
-                    <!-- <div class="card card-stretch d-inline-block border-left border-y-0 border-right-0 my-1 bg-light border-primary border-3">
-                      <div class="card-body p-2"></div>
-                    </div> -->
-                    <p class="font-weight-normal text-dark-50 pt-1">
-                      <span class=" text-muted">Updated at <strong><?= $log->updated_at; ?></strong> by
-                        <strong><?= $log->full_name; ?></strong></span>
-                    </p>
-                  </div>
-                </div>
-              <?php endforeach;
-            endif; ?>
-          </div>
-        </div>
-      </div>
+      <?php $this->load->view('partials/activity_log_ui', ['history' => $logs, 'sts' => isset($sts) ? $sts : []]); ?>
     </div>
   </div>
 </div>

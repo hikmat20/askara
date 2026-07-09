@@ -65,27 +65,7 @@
                                     </p>
                                 </div>
                             </div> -->
-                            <?php if (isset($history)) :
-                                foreach ($history as $his) : ?>
-                                    <div class="timeline-item">
-                                        <div class="timeline-media <?= ($his->new_status == 'OPN') ? 'bg-light-success' : 'bg-light-danger'; ?>">
-                                            <span class="<?= ($his->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-danger'; ?>"></span>
-                                        </div>
-
-                                        <div class="timeline-desc timeline-desc-light-danger">
-                                            <span class="font-weight-bolder text-danger"> <?= $his->updated_at; ?></span>
-                                            <?php //$sts[$his->status]; 
-                                            ?>
-                                            <p>
-                                                <?= $his->note; ?>
-                                            </p>
-                                            <p class="font-weight-normal text-dark-50 pt-1">
-                                                <span class="badge badge-danger">by <?= $his->full_name; ?></span>
-                                            </p>
-                                        </div>
-                                    </div>
-                            <?php endforeach;
-                            endif; ?>
+                            <?php $this->load->view('partials/activity_log_ui', ['history' => $history, 'sts' => isset($sts) ? $sts : []]); ?>
                         </div>
                     </div>
                 </div>
