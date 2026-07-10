@@ -1916,6 +1916,7 @@ class Procedures extends Admin_Controller
 				'document_type' => 'procedure',
 				'position_id'   => $user_pos->position_id,
 				'token'         => $token,
+				'qr_path'       => 'directory/SIGNATURE/' . $token . '.png',
 				'sign_type'     => $sign_type,
 				'sign_by'       => $this->auth->user_id(),
 				'sign_at'       => date('Y-m-d H:i:s'),
@@ -1953,6 +1954,10 @@ class Procedures extends Admin_Controller
 			
 			$count++;
 		}
+		
+		// Fix missing qr_path for older synced data
+		$this->db->query("UPDATE signature_documents SET qr_path = CONCAT('directory/SIGNATURE/', token, '.png') WHERE qr_path IS NULL OR qr_path = ''");
+
 		echo "Berhasil memproses sinkronisasi $count dokumen.";
 	}
 
@@ -1972,8 +1977,9 @@ class Procedures extends Admin_Controller
 					'document_id'   => $document_id,
 					'document_type' => 'procedure',
 					'position_id'   => $user_pos->position_id,
-					'token'         => $token,
 					'sign_type'     => $sign_type,
+					'token'         => $token,
+					'qr_path'       => 'directory/SIGNATURE/' . $token . '.png',
 					'sign_by'       => $user_id,
 					'sign_at'       => date('Y-m-d H:i:s'),
 					'created_by'    => $user_id,
