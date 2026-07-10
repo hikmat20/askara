@@ -1971,23 +1971,22 @@ class Procedures extends Admin_Controller
 
 		if (!$check) {
 			$user_pos = $this->db->get_where('user_positions', ['user_id' => $user_id])->row();
-			if ($user_pos) {
-				$token = generate_qr_token();
-				$signData = [
-					'document_id'   => $document_id,
-					'document_type' => 'procedure',
-					'position_id'   => $user_pos->position_id,
-					'sign_type'     => $sign_type,
-					'token'         => $token,
-					'qr_path'       => 'directory/SIGNATURE/' . $token . '.png',
-					'sign_by'       => $user_id,
-					'sign_at'       => date('Y-m-d H:i:s'),
-					'created_by'    => $user_id,
-					'created_at'    => date('Y-m-d H:i:s')
-				];
-				$this->db->insert('signature_documents', $signData);
-				$this->_generate_qr_signature_png($token);
-			}
+			
+			$token = generate_qr_token();
+			$signData = [
+				'document_id'   => $document_id,
+				'document_type' => 'procedure',
+				'position_id'   => $user_pos ? $user_pos->position_id : null,
+				'sign_type'     => $sign_type,
+				'token'         => $token,
+				'qr_path'       => 'directory/SIGNATURE/' . $token . '.png',
+				'sign_by'       => $user_id,
+				'sign_at'       => date('Y-m-d H:i:s'),
+				'created_by'    => $user_id,
+				'created_at'    => date('Y-m-d H:i:s')
+			];
+			$this->db->insert('signature_documents', $signData);
+			$this->_generate_qr_signature_png($token);
 		} else {
 			// Jika sudah ada tapi file PNG belum ada
 			if (!$check->qr_path || !file_exists(FCPATH . $check->qr_path)) {
