@@ -443,17 +443,29 @@
           <td class="text-center"><?= ($procedure->reviewer_name) ?: '~'; ?></td>
           <td class="text-center"><?= ($procedure->approval_name) ?: '~'; ?></td>
         </tr>
-        <!-- <tr>
+        <tr>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if(isset($signatures['prepare']) && $signatures['prepare']->qr_path): ?>
+              <img src="<?= base_url($signatures['prepare']->qr_path); ?>" width="80" alt="QR Prepare">
+            <?php else: ?>
+              ~
+            <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if(isset($signatures['review']) && $signatures['review']->qr_path): ?>
+              <img src="<?= base_url($signatures['review']->qr_path); ?>" width="80" alt="QR Review">
+            <?php else: ?>
+              ~
+            <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if(isset($signatures['approve']) && $signatures['approve']->qr_path): ?>
+              <img src="<?= base_url($signatures['approve']->qr_path); ?>" width="80" alt="QR Approve">
+            <?php else: ?>
+              ~
+            <?php endif; ?>
           </td>
-        </tr> -->
+        </tr>
         <tr class="text-center bg-secondary">
           <th class="text-center" style="vertical-align: middle;"><?= ($procedure->user_prepared_name) ?: '~'; ?></th>
           <th class="text-center" style="vertical-align: middle;"><?= ($procedure->user_reviewed_name) ?: '~'; ?></th>

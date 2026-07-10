@@ -143,8 +143,24 @@ class Procedure_model extends BF_Model
     $data['work_instructions'] = $this->getArrayWorkInstruction($id);
     $data['company']           = $this->session->userdata['company'];
     $data['logs']              = $this->getLogsProcedure($id);
+    $data['signatures']        = $this->getSignaturesProcedure($id);
 
     return $data;
+  }
+
+  public function getSignaturesProcedure($id)
+  {
+    $results = $this->db->get_where('signature_documents', [
+      'document_id' => $id,
+      'document_type' => 'procedure',
+      'status' => 'VALID'
+    ])->result();
+    
+    $signatures = [];
+    foreach ($results as $row) {
+        $signatures[$row->sign_type] = $row;
+    }
+    return $signatures;
   }
 
   private function _update_history($data, $procedure)

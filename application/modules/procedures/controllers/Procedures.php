@@ -337,6 +337,10 @@ class Procedures extends Admin_Controller
 				$Data['prepared_by'] = $this->auth->user_id();
 				$this->db->insert('procedures', $Data);
 				$pro_id = $this->db->order_by('id', 'DESC')->get_where('procedures')->row()->id;
+				
+				// Generate Signature untuk Prepared By
+				$this->_signature($pro_id, 'prepare');
+
 				$thisData = $this->db->get_where('procedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
 				$dataLog = [
 					'directory_id' 	=> $thisData->id,
@@ -393,6 +397,10 @@ class Procedures extends Admin_Controller
 			);
 		} else {
 			$this->db->trans_commit();
+
+			// Generate QR Code di background (tanpa load view)
+			$this->generateQrCode($pro_id, false);
+
 			$Return		= array(
 				'status'		=> 1,
 				'msg'			=> 'Data Procedure successfully saved..',
@@ -797,6 +805,15 @@ class Procedures extends Admin_Controller
 
 	private function _update_history($data)
 	{
+		if (isset($data['directory_id'])) {
+			$data['procedure_id'] = $data['directory_id'];
+			unset($data['directory_id']);
+		}
+		if (isset($data['doc_type'])) {
+			$data['note'] = isset($data['note']) ? '[' . $data['doc_type'] . '] ' . $data['note'] : '[' . $data['doc_type'] . ']';
+			unset($data['doc_type']);
+		}
+
 		$data['updated_by']    = $this->auth->user_id();
 		$data['updated_at']    = date('Y-m-d H:i:s');
 		$this->db->insert('procedure_activity_logs', $data);
@@ -1762,6 +1779,12 @@ class Procedures extends Admin_Controller
 		}
 		$mpdf->SetWatermarkText($watermark);
 
+		$signatures_raw = $this->db->get_where('signature_documents', ['document_id' => $id, 'document_type' => 'procedure'])->result();
+		$signatures = [];
+		foreach ($signatures_raw as $sig) {
+			$signatures[$sig->sign_type] = $sig;
+		}
+
 		$getData = [
 			'procedure'           => $procedure,
 			'company'             => $company,
@@ -1777,7 +1800,8 @@ class Procedures extends Admin_Controller
 			'procedure_bilingual' => $procedure_bilingual,
 			'revision_logs'       => $revision_logs,
 			'markers'             => $markers,
-			'watermark'             => $watermark,
+			'watermark'           => $watermark,
+			'signatures'          => $signatures,
 		];
 
 
@@ -1852,8 +1876,13 @@ class Procedures extends Admin_Controller
 		return parent::_check_download_permission('procedures');
 	}
 
-	public function generateQrCode($id)
+	public function generateQrCode($id, $return_view = true)
 	{
+		$qr_dir = FCPATH . 'directory/QR_CODE/';
+		if (!is_dir($qr_dir)) {
+			mkdir($qr_dir, 0777, true);
+		}
+
 		$this->load->library('ciqrcode');
 		$config['cacheable']    = true; //boolean, the default is true
 		$config['cachedir']     = './directory/QR_CODE/'; //string, the default is application/cache/
@@ -1862,9 +1891,128 @@ class Procedures extends Admin_Controller
 		$params['data'] = site_url($this->uri->segment(1) . '/printfile/' . $id);
 		$params['level'] = 'H';
 		$params['size'] = 100;
-		$params['savename'] = FCPATH . 'directory/QR_CODE/' . $id . '.png';
+		$params['savename'] = $qr_dir . $id . '.png';
 		$this->ciqrcode->generate($params);
 		// header("Content-Type: image/png");
-		$this->load->view('qrcode', ['id' => $id]);
+		
+		if ($return_view) {
+			$this->load->view('qrcode', ['id' => $id]);
+		}
+	}
+
+	private function _signature($document_id, $sign_type)
+	{
+		$this->load->helper('signature/signature');
+		$user_pos = $this->db
+			->where('user_id', $this->auth->user_id())
+			->get('user_positions')
+			->row();
+
+		if ($user_pos) {
+			$token = generate_qr_token();
+
+			$signData = [
+				'document_id'   => $document_id,
+				'document_type' => 'procedure',
+				'position_id'   => $user_pos->position_id,
+				'token'         => $token,
+				'sign_type'     => $sign_type,
+				'sign_by'       => $this->auth->user_id(),
+				'sign_at'       => date('Y-m-d H:i:s'),
+				'created_by'    => $this->auth->user_id(),
+				'created_at'    => date('Y-m-d H:i:s')
+			];
+
+			$this->db->insert('signature_documents', $signData);
+			$this->_generate_qr_signature_png($token);
+		}
+	}
+
+	public function sync_existing_data()
+	{
+		$this->load->helper('signature/signature');
+		$procedures = $this->db->get('procedures')->result();
+		$count = 0;
+
+		foreach ($procedures as $proc) {
+			// 1. Generate Document QR Code (Jika belum ada)
+			if (!file_exists(FCPATH . 'directory/QR_CODE/' . $proc->id . '.png')) {
+				$this->generateQrCode($proc->id, false);
+			}
+
+			// 2. Generate Missing Signatures
+			if ($proc->prepared_by) {
+				$this->_sync_signature($proc->id, 'prepare', $proc->prepared_by);
+			}
+			if ($proc->reviewed_by) {
+				$this->_sync_signature($proc->id, 'review', $proc->reviewed_by);
+			}
+			if ($proc->approved_by) {
+				$this->_sync_signature($proc->id, 'approve', $proc->approved_by);
+			}
+			
+			$count++;
+		}
+		echo "Berhasil memproses sinkronisasi $count dokumen.";
+	}
+
+	private function _sync_signature($document_id, $sign_type, $user_id)
+	{
+		$check = $this->db->get_where('signature_documents', [
+			'document_id'   => $document_id,
+			'document_type' => 'procedure',
+			'sign_type'     => $sign_type
+		])->row();
+
+		if (!$check) {
+			$user_pos = $this->db->get_where('user_positions', ['user_id' => $user_id])->row();
+			if ($user_pos) {
+				$token = generate_qr_token();
+				$signData = [
+					'document_id'   => $document_id,
+					'document_type' => 'procedure',
+					'position_id'   => $user_pos->position_id,
+					'token'         => $token,
+					'sign_type'     => $sign_type,
+					'sign_by'       => $user_id,
+					'sign_at'       => date('Y-m-d H:i:s'),
+					'created_by'    => $user_id,
+					'created_at'    => date('Y-m-d H:i:s')
+				];
+				$this->db->insert('signature_documents', $signData);
+				$this->_generate_qr_signature_png($token);
+			}
+		} else {
+			// Jika sudah ada tapi file PNG belum ada
+			if (!$check->qr_path || !file_exists(FCPATH . $check->qr_path)) {
+				$this->_generate_qr_signature_png($check->token);
+			}
+		}
+	}
+
+	private function _generate_qr_signature_png($token)
+	{
+		$this->load->library('ciqrcode');
+		$dir = FCPATH . 'directory/SIGNATURE/';
+		if (!is_dir($dir)) {
+			mkdir($dir, 0755, true);
+		}
+
+		$qrPath = $dir . $token . '.png';
+		$params = [
+			'data'     => site_url('signature/verify?token=' . $token),
+			'level'    => 'H',
+			'size'     => 10,
+			'savename' => $qrPath
+		];
+
+		if ($this->ciqrcode->generate($params)) {
+			if (file_exists($qrPath)) {
+				$this->db->where('token', $token)->update(
+					'signature_documents',
+					['qr_path' => 'directory/SIGNATURE/' . $token . '.png']
+				);
+			}
+		}
 	}
 }

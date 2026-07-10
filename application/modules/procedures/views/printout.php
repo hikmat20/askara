@@ -171,13 +171,25 @@
         </tr>
         <tr>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if(isset($signatures['prepare']) && $signatures['prepare']->qr_path && file_exists(FCPATH . $signatures['prepare']->qr_path)): ?>
+              <img src="<?= base_url($signatures['prepare']->qr_path) ?>" width="70">
+            <?php else: ?>
+              <br><br><br>
+            <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if(isset($signatures['review']) && $signatures['review']->qr_path && file_exists(FCPATH . $signatures['review']->qr_path)): ?>
+              <img src="<?= base_url($signatures['review']->qr_path) ?>" width="70">
+            <?php else: ?>
+              <br><br><br>
+            <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php if(isset($signatures['approve']) && $signatures['approve']->qr_path && file_exists(FCPATH . $signatures['approve']->qr_path)): ?>
+              <img src="<?= base_url($signatures['approve']->qr_path) ?>" width="70">
+            <?php else: ?>
+              <br><br><br>
+            <?php endif; ?>
           </td>
         </tr>
         <tr style="background-color: #e6e6e6;">
