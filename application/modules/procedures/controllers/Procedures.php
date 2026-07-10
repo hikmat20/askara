@@ -1988,6 +1988,14 @@ class Procedures extends Admin_Controller
 			$this->db->insert('signature_documents', $signData);
 			$this->_generate_qr_signature_png($token);
 		} else {
+			// Update position_id if it's missing but user has one
+			if (empty($check->position_id)) {
+				$user_pos = $this->db->get_where('user_positions', ['user_id' => $user_id])->row();
+				if ($user_pos) {
+					$this->db->update('signature_documents', ['position_id' => $user_pos->position_id], ['id' => $check->id]);
+				}
+			}
+
 			// Jika sudah ada tapi file PNG belum ada
 			if (!$check->qr_path || !file_exists(FCPATH . $check->qr_path)) {
 				$this->_generate_qr_signature_png($check->token);
