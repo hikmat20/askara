@@ -171,22 +171,31 @@
         </tr>
         <tr>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            <?php if(isset($signatures['prepare']) && $signatures['prepare']->qr_path && file_exists(FCPATH . $signatures['prepare']->qr_path)): ?>
-              <img src="<?= base_url($signatures['prepare']->qr_path) ?>" width="70">
+            <?php 
+            $prep_path = isset($signatures['prepare']) ? ($signatures['prepare']->qr_path ?: 'directory/SIGNATURE/' . $signatures['prepare']->token . '.png') : '';
+            if(isset($signatures['prepare']) && $prep_path && file_exists(FCPATH . $prep_path)): 
+            ?>
+              <img src="<?= base_url($prep_path) ?>" width="70">
             <?php else: ?>
               <br><br><br>
             <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            <?php if(isset($signatures['review']) && $signatures['review']->qr_path && file_exists(FCPATH . $signatures['review']->qr_path)): ?>
-              <img src="<?= base_url($signatures['review']->qr_path) ?>" width="70">
+            <?php 
+            $rev_path = isset($signatures['review']) ? ($signatures['review']->qr_path ?: 'directory/SIGNATURE/' . $signatures['review']->token . '.png') : '';
+            if(isset($signatures['review']) && $rev_path && file_exists(FCPATH . $rev_path)): 
+            ?>
+              <img src="<?= base_url($rev_path) ?>" width="70">
             <?php else: ?>
               <br><br><br>
             <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            <?php if(isset($signatures['approve']) && $signatures['approve']->qr_path && file_exists(FCPATH . $signatures['approve']->qr_path)): ?>
-              <img src="<?= base_url($signatures['approve']->qr_path) ?>" width="70">
+            <?php 
+            $appv_path = isset($signatures['approve']) ? ($signatures['approve']->qr_path ?: 'directory/SIGNATURE/' . $signatures['approve']->token . '.png') : '';
+            if(isset($signatures['approve']) && $appv_path && file_exists(FCPATH . $appv_path)): 
+            ?>
+              <img src="<?= base_url($appv_path) ?>" width="70">
             <?php else: ?>
               <br><br><br>
             <?php endif; ?>
