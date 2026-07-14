@@ -48,12 +48,18 @@ class Procedures extends Admin_Controller
 		$dataPub		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'PUB'])->result();
 		$dataDel		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'DEL'])->result();
 		$dataRvi		= $this->db->get_where('view_procedures', ['company_id' => $this->company, 'deleted_at' => null, 'status' => 'RVI'])->result();
-		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('directory_log', ['doc_type' => 'Procedure', 'new_status' => 'RVI'])->result();
-
+		
+		$noteRevision	= $this->db->order_by('id', 'DESC')->select('*')->get_where('procedure_activity_logs', ['new_status' => 'RVI'])->result();
 		$ArrReason = [];
 		foreach (array_reverse($noteRevision) as $rvi) {
-			$ArrReason[$rvi->directory_id] = $rvi;
-		};
+			$ArrReason[$rvi->procedure_id] = $rvi;
+		}
+
+		$noteCorrection = $this->db->order_by('id', 'DESC')->select('*')->get_where('procedure_activity_logs', ['new_status' => 'COR'])->result();
+		$ArrNoteCorrection = [];
+		foreach (array_reverse($noteCorrection) as $cor) {
+			$ArrNoteCorrection[$cor->procedure_id] = $cor;
+		}
 
 		$this->template->set('title', 'List of Procedures');
 		$this->template->set([
@@ -65,8 +71,9 @@ class Procedures extends Admin_Controller
 			'dataRvi' 	=> $dataRvi,
 			'dataDel' 	=> $dataDel,
 			'ArrReason' => $ArrReason,
+			'ArrNoteCorrection' => $ArrNoteCorrection,
 		]);
-		$this->template->set('allow_download', $this->_check_download_permission());
+		$this->template->set('allow_download', $this->_check_procedures_download_permission());
 		$this->template->set('status', $this->sts);
 		$this->template->render('index');
 	}
@@ -77,12 +84,24 @@ class Procedures extends Admin_Controller
 		$users     = $this->db->get_where('view_users', ['status' => 'ACT', 'id_user !=' => '1', 'company_id' => $this->company])->result();
 		$jabatan   = $this->db->get_where('positions', ['company_id' => $this->company])->result();
 		$depts     = $this->db->get_where('departements', ['company_id' => $this->company, 'status' => '1'])->result();
+		
+		$setting = $this->db->get_where('settings', ['setting_name' => 'default_reviewer_procedure'])->row();
+		$default_reviewer = $setting ? $setting->value : '';
+
+		$user_id = $this->auth->user_id();
+		$user_positions = $this->db->get_where('user_positions', ['user_id' => $user_id])->result();
+		$default_prepared_id = '';
+		if (count($user_positions) == 1) {
+			$default_prepared_id = $user_positions[0]->position_id;
+		}
 
 		$this->template->set([
 			'grProcess' 	=> $grProcess,
 			'users' 		=> $users,
 			'jabatan' 		=> $jabatan,
 			'depts' 		=> $depts,
+			'default_reviewer' => $default_reviewer,
+			'default_prepared_id' => $default_prepared_id,
 		]);
 
 		$this->template->set('title', 'Add Procedures');
@@ -119,6 +138,8 @@ class Procedures extends Admin_Controller
 				$ArrGuides[$gui->id] = $gui;
 			}
 
+			$last_correction = $this->db->order_by('id', 'DESC')->get_where('procedure_activity_logs', ['procedure_id' => $id, 'new_status' => 'COR'])->row();
+
 			$this->template->set([
 				'title'      => 'Edit Procedures',
 				'data'       => $Data,
@@ -135,6 +156,7 @@ class Procedures extends Admin_Controller
 				'languange'  => $languange,
 				'bilingualArr'  => $bilingualArr,
 				'sts'        => $this->sts,
+				'last_correction' => $last_correction,
 			]);
 
 			$this->template->render('edit');
@@ -315,6 +337,10 @@ class Procedures extends Admin_Controller
 				$Data['prepared_by'] = $this->auth->user_id();
 				$this->db->insert('procedures', $Data);
 				$pro_id = $this->db->order_by('id', 'DESC')->get_where('procedures')->row()->id;
+				
+				// Generate Signature untuk Prepared By
+				$this->_signature($pro_id, 'prepare');
+
 				$thisData = $this->db->get_where('procedures', ['company_id' => $this->company, 'name' => $Data['name']])->row();
 				$dataLog = [
 					'directory_id' 	=> $thisData->id,
@@ -371,6 +397,10 @@ class Procedures extends Admin_Controller
 			);
 		} else {
 			$this->db->trans_commit();
+
+			// Generate QR Code di background (tanpa load view)
+			$this->generateQrCode($pro_id, false);
+
 			$Return		= array(
 				'status'		=> 1,
 				'msg'			=> 'Data Procedure successfully saved..',
@@ -775,9 +805,18 @@ class Procedures extends Admin_Controller
 
 	private function _update_history($data)
 	{
+		if (isset($data['directory_id'])) {
+			$data['procedure_id'] = $data['directory_id'];
+			unset($data['directory_id']);
+		}
+		if (isset($data['doc_type'])) {
+			$data['note'] = isset($data['note']) ? '[' . $data['doc_type'] . '] ' . $data['note'] : '[' . $data['doc_type'] . ']';
+			unset($data['doc_type']);
+		}
+
 		$data['updated_by']    = $this->auth->user_id();
 		$data['updated_at']    = date('Y-m-d H:i:s');
-		$this->db->insert('directory_log', $data);
+		$this->db->insert('procedure_activity_logs', $data);
 	}
 
 	function delete_procedure($id)
@@ -1654,7 +1693,7 @@ class Procedures extends Admin_Controller
 
 		$download = $this->input->get('download');
 		if ($download) {
-			if (!$this->_check_download_permission()) {
+			if (!$this->_check_procedures_download_permission()) {
 				$this->session->set_flashdata('error', 'Anda tidak memiliki hak akses untuk mengunduh dokumen ini.');
 				redirect('procedures');
 			}
@@ -1740,6 +1779,12 @@ class Procedures extends Admin_Controller
 		}
 		$mpdf->SetWatermarkText($watermark);
 
+		$signatures_raw = $this->db->get_where('signature_documents', ['document_id' => $id, 'document_type' => 'procedure'])->result();
+		$signatures = [];
+		foreach ($signatures_raw as $sig) {
+			$signatures[$sig->sign_type] = $sig;
+		}
+
 		$getData = [
 			'procedure'           => $procedure,
 			'company'             => $company,
@@ -1755,7 +1800,8 @@ class Procedures extends Admin_Controller
 			'procedure_bilingual' => $procedure_bilingual,
 			'revision_logs'       => $revision_logs,
 			'markers'             => $markers,
-			'watermark'             => $watermark,
+			'watermark'           => $watermark,
+			'signatures'          => $signatures,
 		];
 
 
@@ -1825,26 +1871,18 @@ class Procedures extends Admin_Controller
 			</table></div>';
 	}
 
-	private function _check_download_permission()
+	protected function _check_procedures_download_permission()
 	{
-		if ($this->auth->is_admin()) {
-			return true;
-		}
-
-		$permission = $this->db->select('group_menus.*')
-			->from('group_menus')
-			->join('menus', 'group_menus.menu_id = menus.id')
-			->where('group_menus.group_id', $this->group_id)
-			->where('group_menus.company_id', $this->company)
-			->where('menus.link', 'procedures')
-			->get()
-			->row();
-
-		return ($permission && $permission->download == '1');
+		return parent::_check_download_permission('procedures');
 	}
 
-	public function generateQrCode($id)
+	public function generateQrCode($id, $return_view = true)
 	{
+		$qr_dir = FCPATH . 'directory/QR_CODE/';
+		if (!is_dir($qr_dir)) {
+			mkdir($qr_dir, 0777, true);
+		}
+
 		$this->load->library('ciqrcode');
 		$config['cacheable']    = true; //boolean, the default is true
 		$config['cachedir']     = './directory/QR_CODE/'; //string, the default is application/cache/
@@ -1853,9 +1891,141 @@ class Procedures extends Admin_Controller
 		$params['data'] = site_url($this->uri->segment(1) . '/printfile/' . $id);
 		$params['level'] = 'H';
 		$params['size'] = 100;
-		$params['savename'] = FCPATH . 'directory/QR_CODE/' . $id . '.png';
+		$params['savename'] = $qr_dir . $id . '.png';
 		$this->ciqrcode->generate($params);
 		// header("Content-Type: image/png");
-		$this->load->view('qrcode', ['id' => $id]);
+		
+		if ($return_view) {
+			$this->load->view('qrcode', ['id' => $id]);
+		}
+	}
+
+	private function _signature($document_id, $sign_type)
+	{
+		$this->load->helper('signature/signature');
+		$user_pos = $this->db
+			->where('user_id', $this->auth->user_id())
+			->get('user_positions')
+			->row();
+
+		if ($user_pos) {
+			$token = generate_qr_token();
+
+			$signData = [
+				'document_id'   => $document_id,
+				'document_type' => 'procedure',
+				'position_id'   => $user_pos->position_id,
+				'token'         => $token,
+				'qr_path'       => 'directory/SIGNATURE/' . $token . '.png',
+				'sign_type'     => $sign_type,
+				'sign_by'       => $this->auth->user_id(),
+				'sign_at'       => date('Y-m-d H:i:s'),
+				'created_by'    => $this->auth->user_id(),
+				'created_at'    => date('Y-m-d H:i:s')
+			];
+
+			$this->db->insert('signature_documents', $signData);
+			$this->_generate_qr_signature_png($token);
+		}
+	}
+
+	public function sync_existing_data()
+	{
+		$this->load->helper('signature/signature');
+		$procedures = $this->db->get('procedures')->result();
+		$count = 0;
+
+		foreach ($procedures as $proc) {
+			// 1. Generate Document QR Code (Jika belum ada)
+			if (!file_exists(FCPATH . 'directory/QR_CODE/' . $proc->id . '.png')) {
+				$this->generateQrCode($proc->id, false);
+			}
+
+			// 2. Generate Missing Signatures
+			if ($proc->prepared_by) {
+				$this->_sync_signature($proc->id, 'prepare', $proc->prepared_by);
+			}
+			if ($proc->reviewed_by) {
+				$this->_sync_signature($proc->id, 'review', $proc->reviewed_by);
+			}
+			if ($proc->approved_by) {
+				$this->_sync_signature($proc->id, 'approve', $proc->approved_by);
+			}
+			
+			$count++;
+		}
+		
+		// Fix missing qr_path for older synced data
+		$this->db->query("UPDATE signature_documents SET qr_path = CONCAT('directory/SIGNATURE/', token, '.png') WHERE qr_path IS NULL OR qr_path = ''");
+
+		echo "Berhasil memproses sinkronisasi $count dokumen.";
+	}
+
+	private function _sync_signature($document_id, $sign_type, $user_id)
+	{
+		$check = $this->db->get_where('signature_documents', [
+			'document_id'   => $document_id,
+			'document_type' => 'procedure',
+			'sign_type'     => $sign_type
+		])->row();
+
+		if (!$check) {
+			$user_pos = $this->db->get_where('user_positions', ['user_id' => $user_id])->row();
+			
+			$token = generate_qr_token();
+			$signData = [
+				'document_id'   => $document_id,
+				'document_type' => 'procedure',
+				'position_id'   => $user_pos ? $user_pos->position_id : null,
+				'sign_type'     => $sign_type,
+				'token'         => $token,
+				'qr_path'       => 'directory/SIGNATURE/' . $token . '.png',
+				'sign_by'       => $user_id,
+				'sign_at'       => date('Y-m-d H:i:s'),
+				'created_by'    => $user_id,
+				'created_at'    => date('Y-m-d H:i:s')
+			];
+			$this->db->insert('signature_documents', $signData);
+			$this->_generate_qr_signature_png($token);
+		} else {
+			// Update position_id if it's missing but user has one
+			if (empty($check->position_id)) {
+				$user_pos = $this->db->get_where('user_positions', ['user_id' => $user_id])->row();
+				if ($user_pos) {
+					$this->db->update('signature_documents', ['position_id' => $user_pos->position_id], ['id' => $check->id]);
+				}
+			}
+
+			// Jika sudah ada tapi file PNG belum ada
+			if (!$check->qr_path || !file_exists(FCPATH . $check->qr_path)) {
+				$this->_generate_qr_signature_png($check->token);
+			}
+		}
+	}
+
+	private function _generate_qr_signature_png($token)
+	{
+		$this->load->library('ciqrcode');
+		$dir = FCPATH . 'directory/SIGNATURE/';
+		if (!is_dir($dir)) {
+			mkdir($dir, 0755, true);
+		}
+
+		$qrPath = $dir . $token . '.png';
+		$params = [
+			'data'     => site_url('signature/verify?token=' . $token),
+			'level'    => 'H',
+			'size'     => 10,
+			'savename' => $qrPath
+		];
+
+		if ($this->ciqrcode->generate($params)) {
+			if (file_exists($qrPath)) {
+				$this->db->where('token', $token)->update(
+					'signature_documents',
+					['qr_path' => 'directory/SIGNATURE/' . $token . '.png']
+				);
+			}
+		}
 	}
 }

@@ -107,6 +107,7 @@ class Summary_temuan extends Admin_Controller
             'schedule_data' => $schedule_data,
             'total_counts'  => $total_counts,
             'std_map'       => $std_map,
+            'allow_download'=> $this->_check_download_permission('summary_temuan'),
         ]);
         $this->template->render('view');
     }
@@ -118,6 +119,11 @@ class Summary_temuan extends Admin_Controller
      */
     public function print_pdf($program_id = null)
     {
+        if (!$this->_check_download_permission('summary_temuan')) {
+            show_error('Access Denied: You do not have permission to download this document.', 403);
+            return;
+        }
+
         if (!$program_id) {
             show_404();
             return;

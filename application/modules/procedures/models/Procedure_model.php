@@ -126,7 +126,7 @@ class Procedure_model extends BF_Model
   // getLogsProcedure
   public function getLogsProcedure($id)
   {
-    return $this->db->get_where('view_directory_log', ['directory_id' => $id])->result();
+    return $this->db->get_where('view_procedure_activity_logs', ['procedure_id' => $id])->result();
   }
 
   public function viewDataProcedure($id)
@@ -143,17 +143,32 @@ class Procedure_model extends BF_Model
     $data['work_instructions'] = $this->getArrayWorkInstruction($id);
     $data['company']           = $this->session->userdata['company'];
     $data['logs']              = $this->getLogsProcedure($id);
+    $data['signatures']        = $this->getSignaturesProcedure($id);
 
     return $data;
+  }
+
+  public function getSignaturesProcedure($id)
+  {
+    $results = $this->db->get_where('signature_documents', [
+      'document_id' => $id,
+      'document_type' => 'procedure',
+      'status' => 'VALID'
+    ])->result();
+    
+    $signatures = [];
+    foreach ($results as $row) {
+        $signatures[$row->sign_type] = $row;
+    }
+    return $signatures;
   }
 
   private function _update_history($data, $procedure)
   {
     $dataLog = [
-      'directory_id' => $procedure->id,
+      'procedure_id' => $procedure->id,
       'old_status'   => $procedure->status,
       'new_status'   => $data['status'],
-      'doc_type'     => 'Procedure',
       'updated_by'     => $this->auth->user_id(),
       'updated_at'     => date('Y-m-d H:i:s'),
     ];
@@ -162,7 +177,7 @@ class Procedure_model extends BF_Model
       $dataLog['note'] = 'Procesed to review procedure';
     }
 
-    $this->db->insert('directory_log', $dataLog);
+    $this->db->insert('procedure_activity_logs', $dataLog);
   }
 
   public function processReview($id)

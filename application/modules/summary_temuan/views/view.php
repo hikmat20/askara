@@ -5,7 +5,9 @@
 				<div class="card-header justify-content-between d-flex align-items-center">
 					<h2 class="m-0"><i class="<?= $icon; ?> text-primary mr-2"></i><?= $title; ?>: <?= $program->id; ?></h2>
 					<div>
+						<?php if (isset($allow_download) && $allow_download) : ?>
 						<a href="<?= site_url('summary_temuan/print_pdf/' . $program->id); ?>" class="btn btn-warning mr-2" target="_blank"><i class="fa fa-file-pdf"></i> Print PDF</a>
+						<?php endif; ?>
 						<a href="<?= site_url('summary_temuan'); ?>" class="btn btn-danger"><i class="fa fa-reply"></i> Kembali</a>
 					</div>
 				</div>

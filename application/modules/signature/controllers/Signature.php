@@ -83,4 +83,47 @@ class Signature extends MX_Controller
 
         $this->load->view('verify_result', $data);
     }
+
+    public function view_document()
+    {
+        $this->load->library('users/auth');
+        if (!$this->auth->is_login()) {
+            $this->session->set_flashdata('warning', 'Silakan login terlebih dahulu untuk melihat file asli.');
+            redirect('login');
+        }
+
+        $token = $this->input->get('token');
+        if (!$token) {
+            show_404();
+        }
+
+        $result = $this->Signature->getByToken($token);
+        if (!$result || $result->status === 'REVOKE') {
+            show_404();
+        }
+
+        $document = $this->Signature->getDocument($result->document_id, $result->document_type);
+        if (!$document || empty($document->file_path)) {
+            show_404();
+        }
+
+        $clean_path = ltrim($document->file_path, './');
+        $full_path = FCPATH . $clean_path;
+
+        if (!file_exists($full_path)) {
+            show_404();
+        }
+
+        $mime = mime_content_type($full_path);
+        if (!$mime) {
+            $mime = 'application/pdf';
+        }
+
+        header('Content-Type: ' . $mime);
+        header('Content-Disposition: inline; filename="' . basename($full_path) . '"');
+        header('Content-Transfer-Encoding: binary');
+        header('Accept-Ranges: bytes');
+        readfile($full_path);
+        exit;
+    }
 }

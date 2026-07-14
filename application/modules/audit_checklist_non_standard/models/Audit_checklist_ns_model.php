@@ -39,12 +39,12 @@ class Audit_checklist_ns_model extends BF_Model
                 procedures.name as process_name,
                 requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(
+                CONCAT_WS(\', \',
                     (SELECT GROUP_CONCAT(d.name SEPARATOR \', \') 
                      FROM audit_program_schedule_auditee apsa 
                      JOIN departements d ON d.id = apsa.department_id 
                      WHERE apsa.schedule_id = audit_program_schedule.id), 
-                    audit_program_schedule.auditee_name_free
+                    NULLIF(audit_program_schedule.auditee_name_free, \'\')
                 ) as department_name,
                 audit_program.company,
                 audit_program.id as program_code
@@ -82,12 +82,12 @@ class Audit_checklist_ns_model extends BF_Model
                 procedures.name as process_name,
                 requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(
+                CONCAT_WS(\', \',
                     (SELECT GROUP_CONCAT(d.name SEPARATOR \', \') 
                      FROM audit_program_schedule_auditee apsa 
                      JOIN departements d ON d.id = apsa.department_id 
                      WHERE apsa.schedule_id = audit_program_schedule.id), 
-                    audit_program_schedule.auditee_name_free
+                    NULLIF(audit_program_schedule.auditee_name_free, \'\')
                 ) as department_name,
                 audit_program.company,
                 audit_program.id as program_code

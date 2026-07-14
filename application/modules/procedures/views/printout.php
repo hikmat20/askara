@@ -171,13 +171,34 @@
         </tr>
         <tr>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php 
+            $prep_path = isset($signatures['prepare']) ? ($signatures['prepare']->qr_path ?: 'directory/SIGNATURE/' . $signatures['prepare']->token . '.png') : '';
+            if(isset($signatures['prepare']) && $prep_path && file_exists(FCPATH . $prep_path)): 
+            ?>
+              <img src="<?= base_url($prep_path) ?>" width="70">
+            <?php else: ?>
+              <br><br><br>
+            <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php 
+            $rev_path = isset($signatures['review']) ? ($signatures['review']->qr_path ?: 'directory/SIGNATURE/' . $signatures['review']->token . '.png') : '';
+            if(isset($signatures['review']) && $rev_path && file_exists(FCPATH . $rev_path)): 
+            ?>
+              <img src="<?= base_url($rev_path) ?>" width="70">
+            <?php else: ?>
+              <br><br><br>
+            <?php endif; ?>
           </td>
           <td class="text-center" style="vertical-align: middle;padding:10px">
-            QR
+            <?php 
+            $appv_path = isset($signatures['approve']) ? ($signatures['approve']->qr_path ?: 'directory/SIGNATURE/' . $signatures['approve']->token . '.png') : '';
+            if(isset($signatures['approve']) && $appv_path && file_exists(FCPATH . $appv_path)): 
+            ?>
+              <img src="<?= base_url($appv_path) ?>" width="70">
+            <?php else: ?>
+              <br><br><br>
+            <?php endif; ?>
           </td>
         </tr>
         <tr style="background-color: #e6e6e6;">

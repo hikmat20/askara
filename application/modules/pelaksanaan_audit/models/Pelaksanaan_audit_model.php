@@ -51,14 +51,15 @@ class Pelaksanaan_audit_model extends BF_Model
                 procedures.name as process_name,
                 requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name
+                COALESCE(departements.name, audit_program_schedule.auditee_name_free) as department_name,
+                audit_program_schedule_auditee.department_id
             ')
             ->from('audit_program_schedule')
             ->join('procedures', 'procedures.id = audit_program_schedule.process_id', 'left')
             ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
+            ->join('departements', 'departements.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.program_id', $program_id)
             ->where('audit_program_schedule.status', '1')
             ->order_by('audit_program_schedule.audit_date', 'ASC')
@@ -86,7 +87,8 @@ class Pelaksanaan_audit_model extends BF_Model
                 procedures.name as process_name,
                 requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
+                COALESCE(departements.name, audit_program_schedule.auditee_name_free) as department_name,
+                audit_program_schedule_auditee.department_id,
                 audit_program.company,
                 audit_program.id as program_code
             ')
@@ -96,7 +98,7 @@ class Pelaksanaan_audit_model extends BF_Model
             ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
+            ->join('departements', 'departements.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.status', '1')
             ->where('audit_program.status', '1')
             ->order_by('audit_program_schedule.audit_date', 'DESC')
@@ -119,7 +121,8 @@ class Pelaksanaan_audit_model extends BF_Model
                 procedures.name as process_name,
                 requirements.name as requirement_name,
                 audit_auditor_consultant.name as auditor_name,
-                COALESCE(audit_department.department_name, audit_program_schedule.auditee_name_free) as department_name,
+                COALESCE(departements.name, audit_program_schedule.auditee_name_free) as department_name,
+                audit_program_schedule_auditee.department_id,
                 audit_program.company,
                 audit_program.id as program_code
             ')
@@ -129,7 +132,7 @@ class Pelaksanaan_audit_model extends BF_Model
             ->join('requirements', 'requirements.id = audit_program_schedule.requirement_id', 'left')
             ->join('audit_auditor_consultant', 'audit_auditor_consultant.id = audit_program_schedule.auditor_id', 'left')
             ->join('audit_program_schedule_auditee', 'audit_program_schedule_auditee.schedule_id = audit_program_schedule.id', 'left')
-            ->join('audit_department', 'audit_department.id = audit_program_schedule_auditee.department_id', 'left')
+            ->join('departements', 'departements.id = audit_program_schedule_auditee.department_id', 'left')
             ->where('audit_program_schedule.id', $schedule_id)
             ->where('audit_program_schedule.status', '1')
             ->get()
@@ -173,14 +176,21 @@ class Pelaksanaan_audit_model extends BF_Model
      * Get standard checklist items from audit_checklist module
      * Based on procedure_id matching
      */
-    public function getStandardChecklist($process_id, $company_id)
+    public function getStandardChecklist($process_id, $department_id = null)
     {
-        if (empty($process_id)) return [];
+        if (empty($process_id) && empty($department_id)) return [];
 
-        $checklist = $this->db->get_where('audit_checklist', [
-            'procedure_id' => $process_id,
-            'status'       => '1'
-        ])->row();
+        $this->db->where('status', '1');
+        $this->db->group_start();
+        if (!empty($process_id)) {
+            $this->db->or_where('procedure_id', $process_id);
+        }
+        if (!empty($department_id)) {
+            $this->db->or_where('departement_id', $department_id);
+        }
+        $this->db->group_end();
+
+        $checklist = $this->db->get('audit_checklist')->row();
 
         if (!$checklist) return [];
 

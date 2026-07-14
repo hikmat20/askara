@@ -205,54 +205,53 @@
 									<table class="table py-0 table-sm nowrap table-hover datatable">
 										<thead>
 											<tr>
-												<th class="py-2" width="100">Kelompok</th>
-												<th class="py-2">Jenis Alat</th>
-												<th class="py-2">Sub Alat</th>
-												<th class="py-2">Rentang Ukur</th>
-												<th class="py-2">Ketidakpastian</th>
-												<th class="py-2" width="150">Dokumen Standar</th>
-												<th class="py-2 text-center" width="100">Opsi</th>
+												<th class="py-2">Document Number</th>
+												<th class="py-2">Document Name</th>
+												<th class="py-2">Effective Date</th>
+												<th class="py-2">Revision</th>
+												<th class="py-2 text-center">Status</th>
+												<th class="py-2 text-center" width="140">Opsi</th>
 											</tr>
 										</thead>
 										<tbody>
 											<?php if (isset($details_data)) : foreach ($details_data as $dtDtl) : ?>
+													<?php
+														$doc_sts = isset($dtDtl->doc_status) ? $dtDtl->doc_status : 'DFT';
+														$sts_labels = [
+															'DFT' => '<span class="label label-secondary label-inline">Draft</span>',
+															'REV' => '<span class="label label-primary label-inline">Waiting Review</span>',
+															'COR' => '<span class="label label-danger label-inline">Need Correction</span>',
+															'APV' => '<span class="label label-info label-inline">Waiting Approval</span>',
+															'RVI' => '<span class="label label-warning label-inline">Revision</span>',
+															'PUB' => '<span class="label label-success label-inline">Published</span>',
+														];
+														// Check if current user has same position as prepare_by
+														$can_manage = false;
+														if (isset($current_position_id) && $current_position_id && isset($dtDtl->prepare_by)) {
+															$prep_position = $CI =& get_instance();
+															$prep_pos = $CI->db->get_where('positions', ['assign_user' => $dtDtl->prepare_by])->row();
+															if ($prep_pos && $prep_pos->id == $current_position_id) {
+																$can_manage = true;
+															}
+														}
+													?>
 													<tr>
-														<td style="vertical-align: top;"><?= $dtDtl->group_name; ?></td>
-														<td style="vertical-align: top;"><?= $dtDtl->guide_detail_data_name; ?></td>
-														<td style="vertical-align: top;">
-															<?php if ($dtDtl->sub_tools) : ?>
-																<ul style="list-style-type: none ;" class="px-0">
-																	<?php foreach (json_decode($dtDtl->sub_tools) as $st) : ?>
-																		<li class="px-0"><?= ($st) ?: '&nbsp;'; ?></li>
-																	<?php endforeach; ?>
-																</ul>
-															<?php endif; ?>
-														</td>
-														<td style="vertical-align: top;">
-															<ul style="list-style-type:none  ;" class="px-0">
-																<?php foreach (json_decode($dtDtl->range_measure) as $range) : ?>
-																	<li class="px-0"><?= $range; ?></li>
-																<?php endforeach; ?>
-															</ul>
-														</td>
-														<td style="vertical-align: top;">
-															<ul style="list-style-type:none ;" class="px-0">
-																<?php if (isset($dtDtl->uncertainty)) foreach (json_decode($dtDtl->uncertainty) as $uc) : ?>
-																	<li class="px-0"><?= $uc; ?></li>
-																<?php endforeach; ?>
-															</ul>
-														</td>
-														<td style="vertical-align: top;">
-															<ul style="list-style-type: none;" class="px-0">
-																<?php foreach (json_decode($dtDtl->reference) as $ref) : ?>
-																	<li class="px-0"><?= $ArrRef[$ref]; ?></li>
-																<?php endforeach; ?>
-															</ul>
-														</td>
+														<td style="vertical-align: top;"><?= $dtDtl->doc_number; ?></td>
+														<td style="vertical-align: top;"><?= $dtDtl->doc_name; ?></td>
+														<td style="vertical-align: top;"><?= $dtDtl->effective_date ? date('d/m/Y', strtotime($dtDtl->effective_date)) : '-'; ?></td>
+														<td style="vertical-align: top;"><?= $dtDtl->doc_revision_number; ?></td>
+														<td class="text-center" style="vertical-align: top;"><?= isset($sts_labels[$doc_sts]) ? $sts_labels[$doc_sts] : $doc_sts; ?></td>
 														<td class="text-center">
-															<button type="button" class="btn btn-xs btn-icon btn-info view-file" data-guide_detail_id="<?= $sub; ?>" data-id="<?= $dtDtl->id; ?>"><i class="fa fa-eye"></i></button>
-															<a href="<?= base_url($this->uri->segment(1) . '/?d=' . $selected . '&sub=' . $sub . '&edit=' . $dtDtl->id); ?>" class="btn btn-xs btn-icon btn-warning" data-guide_detail_id="<?= $sub; ?>" data-id="<?= $dtDtl->id; ?>"><i class="fa fa-edit"></i></a>
-															<button type="button" class="btn btn-xs btn-icon btn-danger delete-file" data-guide_detail_id="<?= $sub; ?>" data-id="<?= $dtDtl->id; ?>"><i class="fa fa-trash-alt"></i></button>
+															<button type="button" class="btn btn-xs btn-icon btn-info view-file" data-guide_detail_id="<?= $sub; ?>" data-id="<?= $dtDtl->id; ?>" title="View"><i class="fa fa-eye"></i></button>
+															<?php if (in_array($doc_sts, ['DFT', 'RVI', 'COR']) && $can_manage) : ?>
+															<a href="<?= base_url($this->uri->segment(1) . '/?d=' . $selected . '&sub=' . $sub . '&edit=' . $dtDtl->id); ?>" class="btn btn-xs btn-icon btn-warning" title="Edit"><i class="fa fa-edit"></i></a>
+															<?php endif; ?>
+															<?php if (in_array($doc_sts, ['DFT', 'RVI', 'COR']) && $can_manage) : ?>
+															<button type="button" class="btn btn-xs btn-icon btn-success process-review" data-id="<?= $dtDtl->id; ?>" title="Process to Review"><i class="fa fa-paper-plane"></i></button>
+															<?php endif; ?>
+															<?php if (in_array($doc_sts, ['DFT', 'RVI', 'COR']) && $can_manage) : ?>
+															<button type="button" class="btn btn-xs btn-icon btn-danger delete-file" data-guide_detail_id="<?= $sub; ?>" data-id="<?= $dtDtl->id; ?>" title="Delete"><i class="fa fa-trash-alt"></i></button>
+															<?php endif; ?>
 														</td>
 													</tr>
 											<?php endforeach;
@@ -803,6 +802,39 @@
 		$('#modalView').modal('show')
 		$('#modalView .modal-dialog')
 		$('#modalView .modal-body').load(siteurl + active_controller + 'view_file/' + id)
+	})
+
+	$(document).on('click', '.process-review', function() {
+		const id = $(this).data('id')
+		Swal.fire({
+			title: 'Process to Review?',
+			text: 'Dokumen akan diproses ke status Review. Lanjutkan?',
+			icon: 'question',
+			showCancelButton: true,
+			confirmButtonText: 'Ya, Proses',
+			cancelButtonText: 'Batal'
+		}).then((value) => {
+			if (value.isConfirmed) {
+				$.ajax({
+					url: siteurl + active_controller + 'process_to_review',
+					dataType: 'JSON',
+					type: 'POST',
+					data: { id },
+					success: function(result) {
+						if (result.status == 1) {
+							Swal.fire("Success!", result.msg, "success", 3000).then(function() {
+								location.reload()
+							})
+						} else {
+							Swal.fire("Warning!", result.msg, "warning", 3000)
+						}
+					},
+					error: function(result) {
+						Swal.fire("Error!", "Server time out.", "error", 3000)
+					}
+				})
+			}
+		})
 	})
 
 	/* MUlTI */

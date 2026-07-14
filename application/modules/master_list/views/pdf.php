@@ -8,7 +8,7 @@
 </style>
 
 <?php
-$titles = ['sop' => 'DAFTAR INDUK SOP', 'ik' => 'DAFTAR INDUK IK', 'form' => 'DAFTAR INDUK FORM'];
+$titles = ['sop' => 'DAFTAR INDUK SOP', 'ik' => 'DAFTAR INDUK IK', 'form' => 'DAFTAR INDUK FORM', 'ik_non_process' => 'DAFTAR INDUK IK NON PROCESS'];
 $sts_labels = ['DFT'=>'Draft','REV'=>'Review','APV'=>'Approval','PUB'=>'Published','RVI'=>'Revision','COR'=>'Correction','OPN'=>'Draft'];
 ?>
 
@@ -41,6 +41,34 @@ $sts_labels = ['DFT'=>'Draft','REV'=>'Review','APV'=>'Approval','PUB'=>'Publishe
                 <td class="text-center"><?= $v->revision_date ? date('d-m-Y', strtotime($v->revision_date)) : '-'; ?></td>
                 <td class="text-center"><?= isset($sts_labels[$v->status]) ? $sts_labels[$v->status] : $v->status; ?></td>
                 <td><?= str_replace('<br>', "\n", $v->cross_reference); ?></td>
+            </tr>
+        <?php endforeach; ?>
+    </tbody>
+</table>
+
+<?php elseif ($filter == 'ik_non_process') : ?>
+<table>
+    <thead>
+        <tr>
+            <th width="20">No</th>
+            <th>Document Number</th>
+            <th>Document Name</th>
+            <th width="80">Issue Date Rev-0</th>
+            <th width="50">Revision</th>
+            <th width="80">Effective Date</th>
+            <th width="50">Status</th>
+        </tr>
+    </thead>
+    <tbody>
+        <?php foreach ($data as $k => $v) : ?>
+            <tr>
+                <td class="text-center"><?= $k + 1; ?></td>
+                <td><?= $v->doc_number ?: '-'; ?></td>
+                <td><?= $v->doc_name ?: '-'; ?></td>
+                <td class="text-center"><?= $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-'; ?></td>
+                <td class="text-center"><?= $v->doc_revision_number ?: '-'; ?></td>
+                <td class="text-center"><?= $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-'; ?></td>
+                <td class="text-center">Draft</td>
             </tr>
         <?php endforeach; ?>
     </tbody>

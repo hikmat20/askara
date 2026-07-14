@@ -50,12 +50,15 @@ class Master_list extends Admin_Controller
             $data = $this->_getIK($status, $filters);
         } elseif ($filter == 'form') {
             $data = $this->_getForm($status, $filters);
+        } elseif ($filter == 'ik_non_process') {
+            $data = $this->_getIKNonProcess($status, $filters);
         }
 
         // Count per status for badges
         $count_sop = $this->_countByStatus('procedures');
         $count_ik = $this->_countByStatus('dir_guides');
         $count_form = $this->_countByStatus('dir_forms');
+        $count_ik_non_process = $this->db->where('company_id', $this->company)->where('status', '1')->count_all_results('guide_detail_data');
 
         $this->template->set([
             'filter'         => $filter,
@@ -65,6 +68,7 @@ class Master_list extends Admin_Controller
             'count_sop'      => $count_sop,
             'count_ik'       => $count_ik,
             'count_form'     => $count_form,
+            'count_ik_non_process' => $count_ik_non_process,
             'departments'    => $departments,
             'departement_id' => $departement_id,
             'effective_date' => $effective_date,
@@ -212,6 +216,28 @@ class Master_list extends Admin_Controller
     }
 
     /**
+     * Get IK Non Process (guide_detail_data from Master IK) data
+     */
+    private function _getIKNonProcess($status, $filters = [])
+    {
+        $this->db->select('guide_detail_data.*, guide_details.name as guide_detail_name, guides.name as guide_name')
+            ->from('guide_detail_data')
+            ->join('guide_details', 'guide_details.id = guide_detail_data.guide_detail_id', 'left')
+            ->join('guides', 'guides.id = guide_details.guide_id', 'left')
+            ->where('guide_detail_data.company_id', $this->company)
+            ->where('guide_detail_data.status', '1');
+
+        if (!empty($filters['effective_date'])) {
+            $this->db->where('guide_detail_data.effective_date', $filters['effective_date']);
+        }
+        if (isset($filters['last_version']) && $filters['last_version'] !== '') {
+            $this->db->where('guide_detail_data.doc_revision_number', $filters['last_version']);
+        }
+
+        return $this->db->order_by('guide_detail_data.created_at', 'DESC')->get()->result();
+    }
+
+    /**
      * Count documents by status for a table
      */
     private function _countByStatus($table)
@@ -278,6 +304,7 @@ class Master_list extends Admin_Controller
         if ($filter == 'sop') { $data = $this->_getSOP($status, $filters); }
         elseif ($filter == 'ik') { $data = $this->_getIK($status, $filters); }
         elseif ($filter == 'form') { $data = $this->_getForm($status, $filters); }
+        elseif ($filter == 'ik_non_process') { $data = $this->_getIKNonProcess($status, $filters); }
 
         require_once(APPPATH . 'libraries/PHPExcel.php');
         $objPHPExcel = new PHPExcel();
@@ -288,6 +315,7 @@ class Master_list extends Admin_Controller
             'sop'  => 'DAFTAR INDUK SOP',
             'ik'   => 'DAFTAR INDUK IK',
             'form' => 'DAFTAR INDUK FORM',
+            'ik_non_process' => 'DAFTAR INDUK IK NON PROCESS',
         ];
         $sheet->setTitle(isset($titles[$filter]) ? $titles[$filter] : 'Master List');
 
@@ -310,6 +338,22 @@ class Master_list extends Admin_Controller
                 $sheet->setCellValue('G' . $row, $v->revision_date ? date('d-m-Y', strtotime($v->revision_date)) : '-');
                 $sheet->setCellValue('H' . $row, isset($sts_labels[$v->status]) ? $sts_labels[$v->status] : $v->status);
                 $sheet->setCellValue('I' . $row, $cross_ref);
+                $row++;
+            }
+        } elseif ($filter == 'ik_non_process') {
+            $headers = ['No', 'Document Number', 'Document Name', 'Issue Date Rev-0', 'Revision', 'Effective Date', 'Status'];
+            $col = 'A';
+            foreach ($headers as $h) { $sheet->setCellValue($col . '1', $h); $col++; }
+
+            $row = 2;
+            foreach ($data as $k => $v) {
+                $sheet->setCellValue('A' . $row, $k + 1);
+                $sheet->setCellValue('B' . $row, $v->doc_number ?: '-');
+                $sheet->setCellValue('C' . $row, $v->doc_name ?: '-');
+                $sheet->setCellValue('D' . $row, $v->issue_date ? date('d-m-Y', strtotime($v->issue_date)) : '-');
+                $sheet->setCellValue('E' . $row, $v->doc_revision_number ?: '-');
+                $sheet->setCellValue('F' . $row, $v->effective_date ? date('d-m-Y', strtotime($v->effective_date)) : '-');
+                $sheet->setCellValue('G' . $row, 'Draft');
                 $row++;
             }
         } else {
@@ -367,6 +411,7 @@ class Master_list extends Admin_Controller
         if ($filter == 'sop') { $data = $this->_getSOP($status, $filters); }
         elseif ($filter == 'ik') { $data = $this->_getIK($status, $filters); }
         elseif ($filter == 'form') { $data = $this->_getForm($status, $filters); }
+        elseif ($filter == 'ik_non_process') { $data = $this->_getIKNonProcess($status, $filters); }
 
         $html_data = [
             'filter' => $filter,

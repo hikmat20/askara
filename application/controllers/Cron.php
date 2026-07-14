@@ -27,7 +27,7 @@ class Cron extends CI_Controller
         $queues = $this->db->get_where('email_queues', ['status' => 'PND'], 5)->result();
 
         if (empty($queues)) {
-            echo "No pending queues.";
+            echo "[" . date('Y-m-d H:i:s') . "] No pending queues.\n";
             return;
         }
 
@@ -145,16 +145,29 @@ class Cron extends CI_Controller
             } else {
                 // Failed
                 $error_msg = $this->email->print_debugger(['headers']);
+                $clean_error = strip_tags($error_msg);
+                
+                // Ekstrak pesan error asli dari output debugger CI3
+                if (strpos($clean_error, 'The following SMTP error was encountered:') !== false) {
+                    $parts = explode('The following SMTP error was encountered:', $clean_error);
+                    $clean_error = 'SMTP Error: ' . trim(end($parts));
+                }
+                
+                // Jika masih terlalu panjang, potong
+                if (strlen($clean_error) > 1000) {
+                    $clean_error = substr($clean_error, 0, 1000);
+                }
+
                 $new_status = ($q->attempts >= 3) ? 'FAI' : 'PND'; // 3x gagal = FAI
                 
                 $this->db->update('email_queues', [
                     'status'    => $new_status,
-                    'error_msg' => substr($error_msg, 0, 1000), // Simpan limit string agar tidak pecah DB
+                    'error_msg' => $clean_error,
                     'attempts'  => $q->attempts + 1
                 ], ['id' => $q->id]);
             }
         }
         
-        echo "Batch processed.";
+        echo "[" . date('Y-m-d H:i:s') . "] Batch processed " . count($queues) . " emails.\n";
     }
 }

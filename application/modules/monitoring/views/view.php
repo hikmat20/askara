@@ -453,7 +453,7 @@
     </div>
 
     <div class="tab-pane fade" id="file" role="tabpanel" aria-labelledby="file-tab">
-        <?php if ($this->auth->is_admin()) : ?>
+        <?php if ($allow_download_procedure) : ?>
             <div class="mb-3 text-right">
                 <a href="<?= base_url('procedures/printfile/' . $data->id . '?download=1'); ?>" 
                    target="_blank" class="btn btn-sm btn-primary">
@@ -475,21 +475,7 @@
                 <label for="">Tracking File</label>
                 <div class="timeline timeline-5">
                     <div class="timeline-items">
-                        <?php if (isset($history)) :
-                            foreach ($history as $his) : ?>
-                                <div class="timeline-item">
-                                    <div class="timeline-media <?= ($his->new_status == 'OPN') ? 'bg-light-success' : 'bg-light-danger'; ?>">
-                                        <span class="<?= ($his->new_status == 'OPN') ? 'fa fa-upload text-success' : 'fa fa-circle text-danger'; ?>"></span>
-                                    </div>
-                                    <div class="timeline-desc timeline-desc-light-danger mb-5">
-                                        <span class="font-weight-bolder text-danger"> <?= $his->updated_at; ?></span>
-                                        <p>Status : <?= $sts[$his->new_status]; ?></p>
-                                        <p>Processed by : <strong class="text-dark"><?= $his->full_name; ?></strong></p>
-                                        <p>Note : <?= $his->note; ?></p>
-                                    </div>
-                                </div>
-                        <?php endforeach;
-                        endif; ?>
+                        <?php $this->load->view('partials/activity_log_ui', ['history' => $history, 'sts' => isset($sts) ? $sts : []]); ?>
                     </div>
                 </div>
             </div>

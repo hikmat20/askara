@@ -20,15 +20,8 @@
 									<td><?= !empty($schedule->requirement_name) ? htmlspecialchars($schedule->requirement_name) : (!empty($schedule->process_name) ? strip_tags($schedule->process_name) : htmlspecialchars($schedule->process_name_free)); ?></td>
 								</tr>
 								<tr>
-									<th>Department - Company</th>
-									<td><?php 
-										$dept = !empty($schedule->department_name) ? $schedule->department_name : '';
-										$comp = !empty($schedule->company) ? $schedule->company : '';
-										if ($dept && $comp) echo $dept . ' - ' . $comp;
-										elseif ($dept) echo $dept;
-										elseif ($comp) echo $comp;
-										else echo '-';
-									?></td>
+									<th>Department</th>
+									<td><?= !empty($schedule->department_name) ? $schedule->department_name : '-'; ?></td>
 								</tr>
 								<tr>
 									<th>Auditor</th>

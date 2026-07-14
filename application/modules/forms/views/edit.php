@@ -193,8 +193,14 @@
 					<div class="form-group row mb-0">
 						<label class="col-12 col-form-label"><span class="text-danger">*</span> Upload Document :</label>
 						<div class="col-12">
-							<input type="file" name="form_file" id="image" accept=".pdf,.xlsx,.xls,.docx" class="form-control" placeholder="Upload File">
-							<span class="form-text text-muted">File type : PDF,Excel,Word </span>
+							<div class="upload-drop-zone p-4 border border-primary border-dashed rounded text-center" id="drop-zone-file" style="cursor:pointer; border-style: dashed !important; border-width: 2px !important; background-color: #f8f9fa;">
+								<i class="fa fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+								<h5>Drag & Drop file di sini atau Paste (Ctrl+V)</h5>
+								<p class="text-muted mb-0">Atau klik untuk memilih file manual</p>
+								<input type="file" name="form_file" id="form_file" accept=".pdf,.xlsx,.xls,.docx" class="form-control d-none">
+								<p id="file-name" class="mt-2 text-success font-weight-bold mb-0"></p>
+							</div>
+							<span class="form-text text-muted mt-2">Format yang diizinkan: .pdf, .xlsx, .xls, .docx. Ukuran maksimal: 10MB</span>
 							<span class="form-text text-danger invalid-feedback">Upload Document By harus di isi</span>
 						</div>
 					</div>`
@@ -212,7 +218,79 @@
 					</div>`
 			}
 			$('#type-form').html(html)
+
+			if (form_type == 'upload_file') {
+				// Initialize File Upload Handler
+				const inputElement = document.getElementById('form_file');
+				const dropZone = document.getElementById('drop-zone-file');
+				const fileNameDisplay = dropZone.querySelector('#file-name');
+				
+				dropZone.addEventListener('click', () => inputElement.click());
+
+				const handleFile = (files) => {
+					if (files.length > 0) {
+						let file = files[0];
+						
+						// Validate size (10MB)
+						if (file.size > 10 * 1024 * 1024) {
+							Swal.fire('Error!', 'Ukuran file maksimal 10MB', 'error');
+							inputElement.value = '';
+							fileNameDisplay.textContent = '';
+							return;
+						}
+						
+						// Validate extension
+						const allowedExtensions = ['pdf', 'xlsx', 'xls', 'docx'];
+						const fileExt = file.name.split('.').pop().toLowerCase();
+						if (!allowedExtensions.includes(fileExt)) {
+							Swal.fire('Error!', 'Format file tidak diizinkan. Hanya .pdf, .xlsx, .xls, .docx', 'error');
+							inputElement.value = '';
+							fileNameDisplay.textContent = '';
+							return;
+						}
+
+						const dataTransfer = new DataTransfer();
+						dataTransfer.items.add(file);
+						inputElement.files = dataTransfer.files;
+						fileNameDisplay.textContent = file.name;
+					}
+				};
+
+				inputElement.addEventListener('change', function() {
+					handleFile(this.files);
+				});
+
+				dropZone.addEventListener('dragover', (e) => {
+					e.preventDefault();
+					dropZone.style.backgroundColor = '#e9ecef';
+				});
+				dropZone.addEventListener('dragleave', () => {
+					dropZone.style.backgroundColor = '#f8f9fa';
+				});
+				dropZone.addEventListener('drop', (e) => {
+					e.preventDefault();
+					dropZone.style.backgroundColor = '#f8f9fa';
+					handleFile(e.dataTransfer.files);
+				});
+
+				// We need to attach paste event to document, but make sure it only works for this input and doesn't duplicate
+				document.onpaste = function(e) {
+					if (e.clipboardData && e.clipboardData.files && e.clipboardData.files.length > 0) {
+						const currentDropZone = document.getElementById('drop-zone-file');
+						if (currentDropZone) {
+							handleFile(e.clipboardData.files);
+						}
+					}
+				};
+			} else {
+				document.onpaste = null;
+			}
 		})
+		
+		// Trigger change to set up the form correctly on load if one is checked
+		if($('input[name="form_type"]:checked').length > 0) {
+		    $('input[name="form_type"]:checked').trigger('change');
+		}
 
 		$(document).on('submit', '#form-add', function(e) {
 			e.preventDefault();

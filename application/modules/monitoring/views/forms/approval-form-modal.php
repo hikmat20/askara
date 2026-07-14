@@ -20,7 +20,9 @@
                             style="width: 100%; height: 600px; border: none;"
                             frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF.
+                                <?php if ($allow_download_form) : ?>
                                 <a href="<?= base_url('forms/download/' . $form->id); ?>" target="_blank">Klik di sini untuk download</a>
+                                <?php endif; ?>
                             </p>
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
@@ -30,9 +32,13 @@
                             <h4>Excel Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
+                            <?php if ($allow_download_form) : ?>
                             <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-success">
                                 <i class="fa fa-download"></i> Download Excel File
                             </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                            <?php endif; ?>
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
@@ -41,9 +47,13 @@
                             <h4>Word Document</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
+                            <?php if ($allow_download_form) : ?>
                             <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-primary">
                                 <i class="fa fa-download"></i> Download Word File
                             </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                            <?php endif; ?>
                         </div>
                     <?php else : ?>
                         <!-- Unknown file type -->
@@ -52,9 +62,13 @@
                             <h4>Document File</h4>
                             <p class=""><?= htmlspecialchars($form->file_name); ?></p>
                             <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
+                            <?php if ($allow_download_form) : ?>
                             <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-secondary">
                                 <i class="fa fa-download"></i> Download File
                             </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 <?php else : ?>
@@ -63,6 +77,34 @@
                         <h4>No Document File</h4>
                         <p class="">Tidak ada file dokumen yang di-upload untuk Form ini.</p>
                     </div>
+                <?php endif; ?>
+            </div>
+        </div>
+
+        <!-- Status History Card -->
+        <div class="card card-custom shadow-sm mb-3 mt-3">
+            <div class="card-header py-2 d-flex justify-content-between align-items-center">
+                <h5 class="card-title font-weight-bolder mb-0">
+                    <i class="fa fa-history text-info mr-2"></i>Status History
+                </h5>
+                <div class="card-toolbar">
+                    <a href="<?= base_url('forms/export_history_excel/' . $form->id); ?>" class="btn btn-sm btn-success mr-2">
+                        <i class="fa fa-file-excel"></i> Export Excel
+                    </a>
+                    <a href="<?= base_url('forms/export_history_pdf/' . $form->id); ?>" target="_blank" class="btn btn-sm btn-danger">
+                        <i class="fa fa-file-pdf"></i> Export PDF
+                    </a>
+                </div>
+            </div>
+            <div class="card-body py-2">
+                <?php if (!empty($history)) : ?>
+                    <div class="timeline timeline-5">
+                        <div class="timeline-items">
+                            <?php $this->load->view('partials/activity_log_ui', ['history' => $history, 'sts' => isset($sts) ? $sts : []]); ?>
+                        </div>
+                    </div>
+                <?php else : ?>
+                    <p class="text-muted text-center py-3">Belum ada riwayat perubahan status.</p>
                 <?php endif; ?>
             </div>
         </div>
@@ -165,46 +207,7 @@
             </div>
         </div>
 
-        <!-- Status History Card -->
-        <div class="card card-custom shadow-sm">
-            <div class="card-header py-2">
-                <h5 class="card-title font-weight-bolder mb-0">
-                    <i class="fa fa-history text-info mr-2"></i>Status History
-                </h5>
-            </div>
-            <div class="card-body py-2">
-                <?php if (!empty($history)) : ?>
-                    <div class="timeline timeline-5">
-                        <div class="timeline-items">
-                            <?php foreach ($history as $log) : ?>
-                                <div class="timeline-item">
-                                    <div class="timeline-media <?= ($log->new_status === 'APV' || $log->new_status === 'PUB') ? 'bg-light-success' : 'bg-light-danger'; ?>">
-                                        <span class="<?= ($log->new_status === 'APV' || $log->new_status === 'PUB') ? 'fa fa-check text-success' : 'fa fa-circle text-danger'; ?>"></span>
-                                    </div>
-                                    <div class="timeline-desc timeline-desc-light-primary mb-4">
-                                        <span class="font-weight-bolder text-primary"><?= htmlspecialchars($log->action_at); ?></span>
-                                        <p class="mb-1">
-                                            Status:
-                                            <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars($log->old_status ?? '-'); ?>
-                                            <i class="fa fa-arrow-right mx-1"></i>
-                                            <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars($log->new_status ?? '-'); ?>
-                                        </p>
-                                        <p class="mb-1">
-                                            Oleh: <strong><?= isset($ArrUsers[$log->action_by]) ? htmlspecialchars($ArrUsers[$log->action_by]->full_name ?? $ArrUsers[$log->action_by]->username) : 'User #' . $log->action_by; ?></strong>
-                                        </p>
-                                        <?php if (!empty($log->note)) : ?>
-                                            <p class="mb-0 text-muted">Catatan: <?= htmlspecialchars($log->note); ?></p>
-                                        <?php endif; ?>
-                                    </div>
-                                </div>
-                            <?php endforeach; ?>
-                        </div>
-                    </div>
-                <?php else : ?>
-                    <p class="text-muted text-center py-3">Belum ada riwayat perubahan status.</p>
-                <?php endif; ?>
-            </div>
-        </div>
+
     </div>
 </div>
 

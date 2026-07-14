@@ -1,5 +1,7 @@
 <?php if (!defined('BASEPATH')) exit('No direct script access allowed');
 
+use Mpdf\Mpdf;
+
 class Work_instructions extends Admin_Controller
 {
 	public function __construct()
@@ -39,6 +41,7 @@ class Work_instructions extends Admin_Controller
 			'PUB' => '<span class="badge badge-primary">Published</span>',
 		];
 
+		$this->template->set('allow_download', $this->_check_download_permission('work_instructions'));
 		$this->template->render('index', compact(
 			'dataDraft',
 			'dataCorrection',
@@ -57,8 +60,15 @@ class Work_instructions extends Admin_Controller
 		$positions    = $this->PositionModel->find_all();
 		$procedures   = $this->ProcedureModel->as_array()->find_all_by('status !=', 'DEL');
 
+		$user_id = $this->auth->user_id();
+		$user_positions = $this->db->get_where('user_positions', ['user_id' => $user_id])->result();
+		$default_prepared_id = '';
+		if (count($user_positions) == 1) {
+			$default_prepared_id = $user_positions[0]->position_id;
+		}
+
 		$this->template->title('Add New Work Instruction');
-		$this->template->render('add', compact('procedures', 'departements', 'user', 'positions'));
+		$this->template->render('add', compact('procedures', 'departements', 'user', 'positions', 'default_prepared_id'));
 	}
 
 	public function edit($id = '')
@@ -159,6 +169,7 @@ class Work_instructions extends Admin_Controller
 			'PUB' => '<span class="badge badge-primary">Published</span>',
 		];
 
+		$this->template->set('allow_download', $this->_check_download_permission('work_instructions'));
 		$this->template->render('view', compact('wi', 'status_logs', 'sts', 'version_history'));
 	}
 
@@ -321,6 +332,15 @@ class Work_instructions extends Admin_Controller
 			return;
 		}
 
+		if (!$this->_check_download_permission('work_instructions')) {
+			$this->output->set_status_header(403);
+			echo json_encode([
+				'status' => 0,
+				'msg' => 'Access Denied: You do not have permission to download this document.'
+			]);
+			return;
+		}
+
 		// Check company isolation - verify work instruction belongs to user's company
 		if (!$this->_checkCompanyIsolation($id)) {
 			// Return 403 Forbidden
@@ -383,6 +403,12 @@ class Work_instructions extends Admin_Controller
 	{
 		if ($id === null) {
 			show_404();
+			return;
+		}
+
+		if (!$this->_check_download_permission('work_instructions')) {
+			$this->output->set_status_header(403);
+			show_error('Access Denied: You do not have permission to download this document.', 403);
 			return;
 		}
 
@@ -927,6 +953,143 @@ class Work_instructions extends Admin_Controller
 
 		$Return = $this->WiModel->deleteData($id);
 		echo json_encode($Return);
+	}
+
+	public function export_history_excel($id)
+	{
+		$dataForm = $this->WiModel->find_data('view_work_instructions', $id, 'id');
+		if (!$dataForm || $dataForm->company_id != $this->company) {
+			show_error('Anda tidak memiliki akses ke data ini.', 403);
+			return;
+		}
+
+		$this->db->select('wsl.*, u.full_name as action_by_name');
+		$this->db->from('work_instruction_status_logs wsl');
+		$this->db->join('users u', 'wsl.action_by = u.id_user', 'left');
+		$this->db->where('wsl.work_instruction_id', $id);
+		$this->db->order_by('wsl.action_at', 'ASC');
+		$status_logs = $this->db->get()->result();
+
+		$sts = [
+			'DFT' => 'Draft',
+			'COR' => 'Correction',
+			'REV' => 'Review',
+			'APV' => 'Approval',
+			'RVI' => 'Revision',
+			'PUB' => 'Published',
+			'HLD' => 'On Hold',
+			'DEL' => 'Deleted',
+		];
+
+		require_once(APPPATH . 'libraries/PHPExcel.php');
+		$objPHPExcel = new PHPExcel();
+		$objPHPExcel->setActiveSheetIndex(0);
+		$sheet = $objPHPExcel->getActiveSheet();
+
+		$sheet->setTitle('Status History');
+
+		$sheet->setCellValue('A1', 'STATUS HISTORY WORK INSTRUCTION');
+		$sheet->mergeCells('A1:D1');
+		$sheet->getStyle('A1')->getFont()->setBold(true)->setSize(14);
+		$sheet->getStyle('A1')->getAlignment()->setHorizontal(PHPExcel_Style_Alignment::HORIZONTAL_CENTER);
+
+		$sheet->setCellValue('A3', 'Document Number');
+		$sheet->setCellValue('B3', ': ' . $dataForm->number);
+		$sheet->setCellValue('A4', 'Document Name');
+		$sheet->setCellValue('B4', ': ' . $dataForm->name);
+		
+		$headers = ['No', 'Status Change', 'By', 'Date'];
+		$col = 'A';
+		foreach ($headers as $h) {
+			$sheet->setCellValue($col . '6', $h);
+			$sheet->getStyle($col . '6')->getFont()->setBold(true);
+			$col++;
+		}
+
+		$row = 7;
+		$n = 1;
+		foreach ($status_logs as $log) {
+			$old_status = isset($sts[$log->old_status]) ? $sts[$log->old_status] : $log->old_status;
+			$new_status = isset($sts[$log->new_status]) ? $sts[$log->new_status] : $log->new_status;
+			$status_change = $old_status . ' -> ' . $new_status;
+			if (!empty($log->note)) {
+				$status_change .= "\nNote: " . $log->note;
+			}
+
+			$action_by = $log->action_by_name ? $log->action_by_name : $log->action_by;
+			$action_at = date('d M Y H:i', strtotime($log->action_at));
+
+			$sheet->setCellValue('A' . $row, $n);
+			$sheet->setCellValue('B' . $row, $status_change);
+			$sheet->setCellValue('C' . $row, $action_by);
+			$sheet->setCellValue('D' . $row, $action_at);
+			
+			$sheet->getStyle('B' . $row)->getAlignment()->setWrapText(true);
+			$row++;
+			$n++;
+		}
+
+		foreach(range('A','D') as $columnID) {
+			$sheet->getColumnDimension($columnID)->setAutoSize(true);
+		}
+
+		header('Content-Type: application/vnd.openxmlformats-officedocument.spreadsheetml.sheet');
+		header('Content-Disposition: attachment;filename="Status_History_WI_'.str_replace('/', '_', $dataForm->number).'.xlsx"');
+		header('Cache-Control: max-age=0');
+		$objWriter = PHPExcel_IOFactory::createWriter($objPHPExcel, 'Excel2007');
+		$objWriter->save('php://output');
+	}
+
+	public function export_history_pdf($id)
+	{
+		$dataForm = $this->WiModel->find_data('view_work_instructions', $id, 'id');
+		if (!$dataForm || $dataForm->company_id != $this->company) {
+			show_error('Anda tidak memiliki akses ke data ini.', 403);
+			return;
+		}
+
+		$this->db->select('wsl.*, u.full_name as action_by_name');
+		$this->db->from('work_instruction_status_logs wsl');
+		$this->db->join('users u', 'wsl.action_by = u.id_user', 'left');
+		$this->db->where('wsl.work_instruction_id', $id);
+		$this->db->order_by('wsl.action_at', 'ASC');
+		$status_logs = $this->db->get()->result();
+
+		$sts = [
+			'DFT' => 'Draft',
+			'COR' => 'Correction',
+			'REV' => 'Review',
+			'APV' => 'Approval',
+			'RVI' => 'Revision',
+			'PUB' => 'Published',
+			'HLD' => 'On Hold',
+			'DEL' => 'Deleted',
+		];
+
+		$mpdf = new Mpdf();
+		$mpdf->AddPage(
+			'P', // Portrait
+			'',
+			'',
+			'',
+			'',
+			10, // margin_left
+			10, // margin right
+			10, // margin top
+			10, // margin bottom
+			0, // margin header
+			0  // margin footer
+		);
+
+		$data = [
+			'dataForm' => $dataForm,
+			'status_logs' => $status_logs,
+			'sts' => $sts
+		];
+
+		$html = $this->load->view('export_history_pdf', $data, true);
+		$mpdf->WriteHTML($html);
+		$mpdf->Output('Status_History_WI_' . str_replace('/', '_', $dataForm->number) . '.pdf', 'I');
 	}
 }
 

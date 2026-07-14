@@ -92,7 +92,7 @@ class Pelaksanaan_audit extends Admin_Controller
         $ns_checklist = $this->model->getNonStandardChecklist($schedule_id);
 
         // Get standard checklist items (from audit_checklist module)
-        $std_checklist = $this->model->getStandardChecklist($schedule->process_id, $this->company);
+        $std_checklist = $this->model->getStandardChecklist($schedule->process_id, isset($schedule->department_id) ? $schedule->department_id : null);
 
         // Get ISO standards (requirements)
         $standards = $this->model->getRequirements();
@@ -368,7 +368,7 @@ class Pelaksanaan_audit extends Admin_Controller
 
         $issues = $this->model->getIssuesByProcess($schedule->program_id, $schedule->process_id);
         $ns_checklist = $this->model->getNonStandardChecklist($schedule_id);
-        $std_checklist = $this->model->getStandardChecklist($schedule->process_id, $this->company);
+        $std_checklist = $this->model->getStandardChecklist($schedule->process_id, isset($schedule->department_id) ? $schedule->department_id : null);
         $standards = $this->model->getRequirements();
 
         // Get requirement details (pasal) for Audit Persyaratan type
@@ -432,7 +432,7 @@ class Pelaksanaan_audit extends Admin_Controller
 
         $issues = $this->model->getIssuesByProcess($schedule->program_id, $schedule->process_id);
         $ns_checklist = $this->model->getNonStandardChecklist($schedule_id);
-        $std_checklist = $this->model->getStandardChecklist($schedule->process_id, $this->company);
+        $std_checklist = $this->model->getStandardChecklist($schedule->process_id, isset($schedule->department_id) ? $schedule->department_id : null);
         $standards = $this->model->getRequirements();
 
         // Get requirement details (pasal) for Audit Persyaratan type

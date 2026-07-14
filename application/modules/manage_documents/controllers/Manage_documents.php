@@ -33,10 +33,12 @@ class Manage_documents extends Admin_Controller
 
 	public function create()
 	{
-		$permission = $this->db->get_where('group_menus', ['group_id' => $this->group_id, 'company_id' => $this->company])->row();
-		if (!$permission) {
-			redirect('/');
-			return FALSE;
+		if (!$this->auth->is_admin()) {
+			$permission = $this->db->get_where('group_menus', ['group_id' => $this->group_id, 'company_id' => $this->company])->row();
+			if (!$permission) {
+				redirect('/');
+				return FALSE;
+			}
 		}
 		$mainFolder = $this->db->get_where('view_directories', ['flag_type' => 'FOLDER', 'active' => 'Y', 'status !=' => 'DEL', 'parent_id' => '0', 'company_id' => $this->company])->result();
 		$Data 		= $this->db->get_where('view_directories', ['flag_type' => 'FOLDER', 'active' => 'Y', 'status !=' => 'DEL'])->result();

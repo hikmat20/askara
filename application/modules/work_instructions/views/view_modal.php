@@ -11,7 +11,7 @@
                         </span>
                     <?php endif; ?>
                 </h3>
-                <?php if (!empty($wi->display_file_name) && $this->auth->is_admin()) : ?>
+                <?php if (!empty($wi->display_file_name) && $allow_download) : ?>
                     <div class="card-toolbar">
                         <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-sm btn-light-primary">
                             <i class="fa fa-download"></i> Download
@@ -32,7 +32,7 @@
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF. 
-                                <?php if ($this->auth->is_admin()) : ?>
+                                <?php if ($allow_download) : ?>
                                     <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank">Klik di sini untuk download</a>
                                 <?php endif; ?>
                             </p>
@@ -44,7 +44,7 @@
                             <h4>Excel Document</h4>
                             <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                             <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download) : ?>
                                 <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-success">
                                     <i class="fa fa-download"></i> Download Excel File
                                 </a>
@@ -59,7 +59,7 @@
                             <h4>Word Document</h4>
                             <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                             <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download) : ?>
                                 <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-primary">
                                     <i class="fa fa-download"></i> Download Word File
                                 </a>
@@ -74,7 +74,7 @@
                             <h4>Document File</h4>
                             <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                             <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($this->auth->is_admin()) : ?>
+                            <?php if ($allow_download) : ?>
                                 <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-secondary">
                                     <i class="fa fa-download"></i> Download File
                                 </a>
@@ -92,6 +92,58 @@
                 <?php endif; ?>
             </div>
         </div>
+
+        <!-- Status History Card -->
+        <?php if (!empty($status_logs)) : ?>
+        <div class="card card-custom shadow-sm mb-3 mt-3">
+            <div class="card-header">
+                <h3 class="card-title font-weight-bolder">
+                    <i class="fa fa-history text-warning mr-2"></i>Status History
+                </h3>
+                <div class="card-toolbar">
+                    <a href="<?= base_url('work_instructions/export_history_excel/' . $wi->id); ?>" class="btn btn-sm btn-success mr-2">
+                        <i class="fa fa-file-excel"></i> Export Excel
+                    </a>
+                    <a href="<?= base_url('work_instructions/export_history_pdf/' . $wi->id); ?>" target="_blank" class="btn btn-sm btn-danger">
+                        <i class="fa fa-file-pdf"></i> Export PDF
+                    </a>
+                </div>
+            </div>
+            <div class="card-body p-0">
+                <div class="table-responsive">
+                    <table class="table table-sm table-hover mb-0">
+                        <thead class="table-light">
+                            <tr>
+                                <th width="30" class="p-2">No</th>
+                                <th class="p-2">Status Change</th>
+                                <th class="p-2">By</th>
+                                <th class="p-2">Date</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            <?php $n = 0; foreach ($status_logs as $log) : $n++; ?>
+                                <tr>
+                                    <td class="p-2 text-center"><?= $n; ?></td>
+                                    <td class="p-2">
+                                        <small>
+                                            <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars($log->old_status); ?>
+                                            <i class="fa fa-arrow-right mx-1"></i>
+                                            <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars($log->new_status); ?>
+                                        </small>
+                                        <?php if (!empty($log->note)) : ?>
+                                            <br><small class=""><i class="fa fa-comment"></i> <?= htmlspecialchars($log->note); ?></small>
+                                        <?php endif; ?>
+                                    </td>
+                                    <td class="p-2"><small><?= htmlspecialchars($log->action_by_name ? $log->action_by_name : $log->action_by); ?></small></td>
+                                    <td class="p-2"><small><?= date('d M Y H:i', strtotime($log->action_at)); ?></small></td>
+                                </tr>
+                            <?php endforeach; ?>
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+        <?php endif; ?>
     </div>
 
     <!-- RIGHT SIDE: Document Information (40%) -->
@@ -200,49 +252,7 @@
             </div>
         </div>
 
-        <!-- Status History Card -->
-        <?php if (!empty($status_logs)) : ?>
-        <div class="card card-custom shadow-sm mb-3">
-            <div class="card-header">
-                <h3 class="card-title font-weight-bolder">
-                    <i class="fa fa-history text-warning mr-2"></i>Status History
-                </h3>
-            </div>
-            <div class="card-body p-0">
-                <div class="table-responsive">
-                    <table class="table table-sm table-hover mb-0">
-                        <thead class="table-light">
-                            <tr>
-                                <th width="30" class="p-2">No</th>
-                                <th class="p-2">Status Change</th>
-                                <th class="p-2">By</th>
-                                <th class="p-2">Date</th>
-                            </tr>
-                        </thead>
-                        <tbody>
-                            <?php $n = 0; foreach ($status_logs as $log) : $n++; ?>
-                                <tr>
-                                    <td class="p-2 text-center"><?= $n; ?></td>
-                                    <td class="p-2">
-                                        <small>
-                                            <?= isset($sts[$log->old_status]) ? $sts[$log->old_status] : htmlspecialchars($log->old_status); ?>
-                                            <i class="fa fa-arrow-right mx-1"></i>
-                                            <?= isset($sts[$log->new_status]) ? $sts[$log->new_status] : htmlspecialchars($log->new_status); ?>
-                                        </small>
-                                        <?php if (!empty($log->note)) : ?>
-                                            <br><small class=""><i class="fa fa-comment"></i> <?= htmlspecialchars($log->note); ?></small>
-                                        <?php endif; ?>
-                                    </td>
-                                    <td class="p-2"><small><?= htmlspecialchars($log->action_by_name ? $log->action_by_name : $log->action_by); ?></small></td>
-                                    <td class="p-2"><small><?= date('d M Y H:i', strtotime($log->action_at)); ?></small></td>
-                                </tr>
-                            <?php endforeach; ?>
-                        </tbody>
-                    </table>
-                </div>
-            </div>
-        </div>
-        <?php endif; ?>
+
 
         <!-- Version History Card -->
         <?php if (!empty($version_history)) : ?>
@@ -299,7 +309,7 @@
                                         data-version="<?= $version->version_number; ?>">
                                     <i class="fa fa-eye"></i> View
                                 </button>
-                                <?php if ($this->auth->is_admin()) : ?>
+                                <?php if ($allow_download) : ?>
                                     <a href="<?= base_url('work_instructions/download_version/' . $wi->id . '/' . $version->version_number); ?>" 
                                        class="btn btn-sm btn-primary">
                                         <i class="fa fa-download"></i> Download
