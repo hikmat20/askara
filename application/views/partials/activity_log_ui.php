@@ -30,7 +30,8 @@ if (isset($ci->auth) && method_exists($ci->auth, 'is_admin') && $ci->auth->is_ad
         $can_download = true;
     } else {
         // Direct DB fallback check for 'procedures'
-        $group_id = $ci->session->userdata('group_id') ?: ($ci->auth->user()->group_id ?? null);
+        $group = $ci->session->userdata('group');
+        $group_id = $ci->session->userdata('group_id') ?: ($group->id_group ?? ($group->group_id ?? null));
         if ($group_id) {
              $perm = $ci->db->select('group_menus.download')
                  ->from('group_menus')
