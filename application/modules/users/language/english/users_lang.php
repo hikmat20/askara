@@ -44,13 +44,13 @@ $lang['users_del_success'] 	  = 'Selected users deleted successfully';
 $lang['users_del_fail'] 	  = 'Selected user deletetion failed';
 $lang['users_del_error'] 	  = 'You have not been select the user that will be deleted';
 $lang['users_invalid_id'] 	  = 'Invalid ID';
-$lang['users_already_deleted'] = 'User has been removed,<br> for more information please call admin';
+$lang['users_already_deleted'] = 'Akun Anda telah dihapus.<br> Silakan hubungi admin untuk informasi lebih lanjut.';
 $lang['users_permission_edit_success'] = "User's permission saved successfully";
 $lang['users_permission_edit_fail'] = "User's permission saving failed";
 
-$lang['users_login_fail'] 	  = 'Login failed, username not found';
-$lang['users_not_active'] 		= 'Your username was not active anymore';
-$lang['users_wrong_password'] 	= 'You entered a wrong password';
+$lang['users_login_fail'] 	  = 'Username tidak ditemukan. Silakan periksa kembali.';
+$lang['users_not_active'] 		= 'Akun Anda sudah tidak aktif. Silakan hubungi admin.';
+$lang['users_wrong_password'] 	= 'Password yang Anda masukkan salah. Silakan coba lagi.';
 $lang['users_must_login'] 		= 'You must login to view that page';
 $lang['users_no_permission'] 	= 'You have not permission to access that page';
 $lang['users_no_records_found'] = 'Data not found';

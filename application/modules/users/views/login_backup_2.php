@@ -24,8 +24,6 @@
             box-shadow: 0 15px 35px rgba(0,0,0,0.05);
             overflow: hidden;
             background: #fff;
-            max-width: 750px;
-            margin: 0 auto;
         }
         .login-left {
             background: linear-gradient(135deg, #0a4b78 0%, #1771b1 100%);
@@ -50,7 +48,7 @@
             pointer-events: none;
         }
         .login-right {
-            padding: 35px 30px;
+            padding: 50px 40px;
             background: #ffffff;
         }
         .form-control {
@@ -107,13 +105,13 @@
             text-align: left;
         }
         .logo-img {
-            max-width: 110px;
-            margin-bottom: 15px;
+            max-width: 140px;
+            margin-bottom: 20px;
         }
         .iso-svg {
-            max-width: 85%;
+            max-width: 75%;
             height: auto;
-            margin-top: 20px;
+            margin-top: 30px;
             z-index: 1;
         }
         .tagline {
@@ -131,7 +129,7 @@
 <body>
     <div class="container">
         <div class="row justify-content-center">
-            <div class="col-xl-8 col-lg-10 col-md-11">
+            <div class="col-xl-10 col-lg-12">
                 <div class="card login-card">
                     <div class="row g-0">
                         <div class="col-lg-6 login-left d-none d-lg-flex">
@@ -181,82 +179,22 @@
                         
                         <div class="col-lg-6 login-right">
                             <div class="text-center mb-4">
-                                <?php 
-                                    if (isset($company_logo_url) && $company_logo_url != '') {
-                                        $logo_src = $company_logo_url;
-                                    } else {
-                                        $logo_inisial = (isset($company_initial) && $company_initial != '') ? strtolower($company_initial) : ''; 
-                                        if ($logo_inisial != '') {
-                                            $logo_src = base_url('assets/login/images/logo_' . $logo_inisial . '.png');
-                                        } else {
-                                            $logo_src = base_url('assets/login/images/logo-2.png');
-                                        }
-                                    }
-                                ?>
-                                <img src="<?= $logo_src; ?>" alt="Company Logo" class="logo-img">
-                                <p class="text-muted mt-3">Sign in to manage your documents</p>
+                                <img src="<?= base_url('assets/login/images/logo-2.png'); ?>" alt="Company Logo" class="logo-img">
+                                <h4 class="fw-bold text-dark mt-2">Welcome Back</h4>
+                                <p class="text-muted">Sign in to manage your documents</p>
                             </div>
                             
-                            <?php if ($this->session->userdata('tmessage')) : 
-                                $raw_msg = $this->session->userdata('tmessage');
-                                $parsed_msg = $raw_msg;
-                                if (strpos($raw_msg, '::') !== false) {
-                                    $parts = explode('::', $raw_msg);
-                                    $parsed_msg = isset($parts[1]) ? $parts[1] : $raw_msg;
-                                }
-                            ?>
-                                <div class="toast-container position-fixed top-0 end-0 p-3" style="z-index: 9999;">
-                                    <div id="loginToast" class="toast align-items-center text-white bg-danger border-0 show" role="alert" aria-live="assertive" aria-atomic="true" style="animation: bounceInRight 0.6s cubic-bezier(0.215, 0.610, 0.355, 1) forwards; border-radius: 10px; box-shadow: 0 4px 12px rgba(0,0,0,0.15);">
-                                        <div class="d-flex">
-                                            <div class="toast-body d-flex align-items-center">
-                                                <svg xmlns="http://www.w3.org/2000/svg" width="20" height="20" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16" style="flex-shrink: 0;"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>
-                                                <div>
-                                                    <strong>Peringatan!</strong><br>
-                                                    <?= $parsed_msg; ?>
-                                                </div>
-                                            </div>
-                                            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Close"></button>
-                                        </div>
-                                    </div>
+                            <?php if ($this->session->userdata('tmessage')) : ?>
+                                <div class="alert alert-danger alert-dismissible fade show" role="alert" style="border-radius: 10px;">
+                                    <strong><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-exclamation-triangle-fill me-2" viewBox="0 0 16 16"><path d="M8.982 1.566a1.13 1.13 0 0 0-1.96 0L.165 13.233c-.457.778.091 1.767.98 1.767h13.713c.889 0 1.438-.99.98-1.767L8.982 1.566zM8 5c.535 0 .954.462.9.995l-.35 3.507a.552.552 0 0 1-1.1 0L7.1 5.995A.905.905 0 0 1 8 5zm.002 6a1 1 0 1 1 0 2 1 1 0 0 1 0-2z"/></svg>Failed!</strong> <?= $this->session->userdata('tmessage'); ?>
+                                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
                                 </div>
-                                <style>
-                                    @keyframes bounceInRight {
-                                        0% { opacity: 0; transform: translateX(100%); }
-                                        60% { opacity: 1; transform: translateX(-20px); }
-                                        80% { transform: translateX(10px); }
-                                        100% { transform: translateX(0); }
-                                    }
-                                    @keyframes slideOutRight { from { transform: translateX(0); opacity: 1; } to { transform: translateX(100%); opacity: 0; } }
-                                    .toast-hide { animation: slideOutRight 0.4s ease-in forwards !important; }
-                                </style>
-                                <script>
-                                    document.addEventListener('DOMContentLoaded', function() {
-                                        var toastEl = document.getElementById('loginToast');
-                                        if (toastEl) {
-                                            var hideToast = function() {
-                                                toastEl.classList.add('toast-hide');
-                                                setTimeout(function() { toastEl.remove(); }, 400);
-                                            };
-                                            var toastTimeout = setTimeout(hideToast, 3000);
-                                            
-                                            var closeBtn = toastEl.querySelector('.btn-close');
-                                            if(closeBtn) {
-                                                closeBtn.addEventListener('click', function(e) {
-                                                    e.preventDefault();
-                                                    clearTimeout(toastTimeout);
-                                                    hideToast();
-                                                });
-                                            }
-                                        }
-                                    });
-                                </script>
                             <?php endif; ?>
 
                             <?= form_open($this->uri->uri_string(), array('id' => 'frm_login', 'name' => 'frm_login')) ?>
                                 <div class="form-group">
                                     <label class="form-label">Company Code</label>
-                                    <?php $val_inisial = (isset($company_initial) && $company_initial != '') ? $company_initial : set_value('inisial'); ?>
-                                    <input type="text" name="inisial" class="form-control" placeholder="Enter company code" value="<?= $val_inisial ?>" <?= (isset($company_initial) && $company_initial != '') ? 'readonly' : '' ?> required autofocus>
+                                    <input type="text" name="inisial" class="form-control" placeholder="Enter company code" value="<?= set_value('inisial') ?>" required autofocus>
                                 </div>
                                 <div class="form-group">
                                     <label class="form-label">Username</label>
@@ -280,16 +218,13 @@
                                 <div class="recaptcha-wrapper">
                                     <?php echo recaptcha_div('login_form'); ?>
                                 </div>
-                                <button type="submit" name="login" class="btn btn-primary w-100 mb-3">Sign In</button>
+                                <button type="submit" name="login" class="btn btn-primary w-100 mb-3">Sign In securely</button>
                             </form>
+                            <div class="text-center mt-4">
+                                <small class="text-muted fw-medium">&copy; <?= date('Y'); ?> SentralDocs Platform. All Rights Reserved.</small>
+                            </div>
                         </div>
                     </div>
-                </div>
-                
-                <!-- Footer di luar form login -->
-                <div class="text-center mt-4">
-                    <img src="<?= base_url('assets/login/images/logo-2.png'); ?>" alt="SentralDocs Logo" style="max-height: 40px; margin-bottom: 10px; opacity: 0.8;"><br>
-                    <small class="text-muted fw-medium" style="color: #6c757d;">&copy; <?= date('Y'); ?> SentralDocs Platform. All Rights Reserved.</small>
                 </div>
             </div>
         </div>
