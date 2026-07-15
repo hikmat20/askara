@@ -187,7 +187,7 @@
                                     } else {
                                         $logo_inisial = (isset($company_initial) && $company_initial != '') ? strtolower($company_initial) : ''; 
                                         if ($logo_inisial != '') {
-                                            $logo_src = base_url('assets/login/images/logo_' . $logo_inisial . '.png');
+                                            $logo_src = ('/assets/login/images/1/logo_' . $logo_inisial . '.png');
                                         } else {
                                             $logo_src = base_url('assets/login/images/logo-2.png');
                                         }
