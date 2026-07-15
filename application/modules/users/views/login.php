@@ -1,7 +1,21 @@
+<?php
+if (isset($company_logo_url) && $company_logo_url != '') {
+    $logo_src = $company_logo_url;
+} else {
+    $logo_inisial = (isset($company_initial) && $company_initial != '') ? strtolower($company_initial) : '';
+    if ($logo_inisial != '') {
+        $logo_src = ('/assets/login/images/1/logo_' . $logo_inisial . '.png');
+    } else {
+        $logo_src = base_url('assets/login/images/logo-2.png');
+    }
+}
+?>
+
 <!doctype html>
 <html lang="en">
 <head>
     <meta charset="utf-8">
+    <link rel="icon" type="image/x-icon" href="<?= $logo_src; ?>">
     <meta name="viewport" content="width=device-width, initial-scale=1, shrink-to-fit=no">
     <title>SentralDocs - ISO Management Platform</title>
     <!-- Modern Fonts -->
@@ -218,18 +232,7 @@
                         
                         <div class="col-lg-6 login-right">
                             <div class="text-center mb-4">
-                                <?php 
-                                    if (isset($company_logo_url) && $company_logo_url != '') {
-                                        $logo_src = $company_logo_url;
-                                    } else {
-                                        $logo_inisial = (isset($company_initial) && $company_initial != '') ? strtolower($company_initial) : ''; 
-                                        if ($logo_inisial != '') {
-                                            $logo_src = ('/assets/login/images/1/logo_' . $logo_inisial . '.png');
-                                        } else {
-                                            $logo_src = base_url('assets/login/images/logo-2.png');
-                                        }
-                                    }
-                                ?>
+                                
                                 <img src="<?= $logo_src; ?>" alt="Company Logo" class="logo-img">
                                 <p class="text-muted mt-3">Sign in to manage your documents</p>
                             </div>
