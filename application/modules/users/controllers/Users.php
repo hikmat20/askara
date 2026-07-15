@@ -47,7 +47,7 @@ class Users extends Front_Controller
         if ($data['company_initial'] != '') {
             $company = $this->db->get_where('companies', array('inisial' => $data['company_initial']))->row();
             if ($company && !empty($company->logo)) {
-                $path_logo = !empty($company->path_logo) ? $company->path_logo : 'assets/logo/';
+                $path_logo = !empty($company->path_logo) ? $company->path_logo : 'assets/logo/1';
                 $data['company_logo_url'] = base_url(trim($path_logo, '/') . '/' . $company->logo);
             }
         }
