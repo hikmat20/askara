@@ -37,6 +37,11 @@ class Users extends Front_Controller
         //$identitas = $this->identitas_model->find(1); => ERROR variable nama_program not define krn ga ada fieldnya di tabel identitas
         $identitas = $this->identitas_model->find_by(array('ididentitas' => 1)); // By Muhaemin => Di Form Login
 
+        // Ekstrak inisial dari URL segment (misal: /company_a/login)
+        $uri_path = parse_url($_SERVER['REQUEST_URI'], PHP_URL_PATH);
+        $uri_segments = explode('/', trim($uri_path, '/'));
+        $data['company_initial'] = (isset($uri_segments[0]) && strtolower($uri_segments[0]) != 'login') ? strtoupper($uri_segments[0]) : '';
+
         if (isset($_POST['login'])) {
             $username = $this->input->post('username');
             $password = $this->input->post('password');
@@ -49,7 +54,7 @@ class Users extends Front_Controller
         $this->template->set_layout('login');
         $this->template->title('Login');
         // $this->template->render('login_animate');
-        $this->load->view('login');
+        $this->load->view('login', $data);
     }
 
     public function logout()

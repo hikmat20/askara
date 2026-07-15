@@ -35,7 +35,8 @@
                             <i class="fa fa-user"></i>
                             <i class="fa fa-key"></i>
                             <div class="form-group first">
-                                <input type="text" name="inisial" class="form-control" placeholder="Company" value="<?= set_value('inisial') ?>" required autofocus>
+                                <?php $val_inisial = (isset($company_initial) && $company_initial != '') ? $company_initial : set_value('inisial'); ?>
+                                <input type="text" name="inisial" class="form-control" placeholder="Company" value="<?= $val_inisial ?>" <?= (isset($company_initial) && $company_initial != '') ? 'readonly' : '' ?> required autofocus>
                             </div>
                             <div class="form-group">
                                 <input type="text" name="username" class="form-control" placeholder="Username" value="<?= set_value('username') ?>" required>
