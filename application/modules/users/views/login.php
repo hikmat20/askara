@@ -126,9 +126,46 @@
             justify-content: center;
             margin-bottom: 25px;
         }
+        .floating-back-btn {
+            position: fixed;
+            top: 20px;
+            left: 20px;
+            z-index: 1000;
+            border-radius: 50px;
+            padding: 8px 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            font-weight: 500;
+            transition: all 0.3s ease;
+            background-color: white;
+            border: 1px solid #e2e8f0;
+            color: #475569;
+            display: flex;
+            align-items: center;
+            text-decoration: none;
+        }
+        .floating-back-btn:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.15);
+            background-color: #f8fafc;
+            color: #0f172a;
+        }
+        @media (max-width: 768px) {
+            .floating-back-btn {
+                top: 10px;
+                left: 10px;
+                padding: 6px 15px;
+                font-size: 14px;
+            }
+        }
     </style>
 </head>
 <body>
+    <a href="https://iso.askara-int.com" class="floating-back-btn">
+        <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" class="bi bi-arrow-left me-2" viewBox="0 0 16 16">
+            <path fill-rule="evenodd" d="M15 8a.5.5 0 0 0-.5-.5H2.707l3.147-3.146a.5.5 0 1 0-.708-.708l-4 4a.5.5 0 0 0 0 .708l4 4a.5.5 0 0 0 .708-.708L2.707 8.5H14.5A.5.5 0 0 0 15 8z"/>
+        </svg>
+        Back to Portal
+    </a>
     <div class="container">
         <div class="row justify-content-center">
             <div class="col-xl-8 col-lg-10 col-md-11">
@@ -280,7 +317,7 @@
                                 <div class="recaptcha-wrapper">
                                     <?php echo recaptcha_div('login_form'); ?>
                                 </div>
-                                <button type="submit" name="login" class="btn btn-primary w-100 mb-3">Sign In</button>
+                                <button type="submit" name="login" class="btn btn-primary w-100">Sign In</button>
                             </form>
                         </div>
                     </div>
