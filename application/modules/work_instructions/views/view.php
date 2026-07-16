@@ -38,14 +38,13 @@
                     ?>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
                         <!-- Excel Preview -->
-                        <iframe src="https://docs.google.com/gview?embedded=true&url=<?= $viewer_url ?>&rm=minimal#toolbar=0&navpanes=0" 
+                        <div class="alert alert-info mb-3">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Jika dokumen tidak muncul, pasang ekstensi <a href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj" target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda, atau unduh dokumen secara manual di bawah.
+                        </div>
+                        <iframe src="<?= $file_path; ?>" 
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
-                            <p>Browser Anda tidak mendukung preview Excel. 
-                                <?php if ($allow_download): ?>
-                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank">Klik di sini untuk download</a>
-                                <?php endif; ?>
-                            </p>
                         </iframe>
                         <div class="text-center mt-3 mb-3">
                             <?php if ($allow_download): ?>
@@ -53,19 +52,18 @@
                                 <i class="fa fa-download"></i> Download Excel File
                             </a>
                             <?php else: ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
                             <?php endif; ?>
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
-                        <iframe src="https://docs.google.com/gview?embedded=true&url=<?= $viewer_url ?>&rm=minimal#toolbar=0&navpanes=0" 
+                        <div class="alert alert-info mb-3">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Jika dokumen tidak muncul, pasang ekstensi <a href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj" target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda, atau unduh dokumen secara manual di bawah.
+                        </div>
+                        <iframe src="<?= $file_path; ?>" 
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
-                            <p>Browser Anda tidak mendukung preview Word. 
-                                <?php if ($allow_download): ?>
-                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank">Klik di sini untuk download</a>
-                                <?php endif; ?>
-                            </p>
                         </iframe>
                         <div class="text-center mt-3 mb-3">
                             <?php if ($allow_download): ?>
@@ -73,7 +71,7 @@
                                 <i class="fa fa-download"></i> Download Word File
                             </a>
                             <?php else: ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
                             <?php endif; ?>
                         </div>
                     <?php else : ?>

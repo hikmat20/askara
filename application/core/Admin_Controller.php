@@ -93,9 +93,11 @@ class Admin_Controller extends Base_Controller
     }
     protected function _check_download_permission($menu_link)
     {
-        if ($this->auth->is_admin()) {
+        if ($this->auth->is_admin() || (isset($this->group_id) && $this->group_id == 1)) {
             return true;
         }
+
+
 
         $permission = $this->db->select('group_menus.*')
             ->from('group_menus')
