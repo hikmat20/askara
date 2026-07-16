@@ -370,7 +370,7 @@ class Work_instructions extends Admin_Controller
 		$file_path = FCPATH . $version_data->file_path;
 
 		// Validate file exists on server
-		if (!file_exists($file_path)) {
+		if (!is_file($file_path)) {
 			// Return 404 Not Found
 			$this->output->set_status_header(404);
 			log_message('error', 'Version file not found: ' . $version_data->file_path . ' for work_instruction_id: ' . $id . ', version: ' . $version);
@@ -436,7 +436,7 @@ class Work_instructions extends Admin_Controller
 			$file_path = $current_version->file_path;
 		} else {
 			$file_name = $wi->file_name;
-			$file_path = $wi->file_path;
+			$file_path = !empty($wi->file_path) ? $wi->file_path : (isset($wi->file_name) ? 'directory/WI/' . (isset($wi->company_id) ? $wi->company_id : '1') . '/' . $wi->file_name : '');
 		}
 
 		if (!empty($file_name)) {
@@ -445,7 +445,7 @@ class Work_instructions extends Admin_Controller
 			$full_path = FCPATH . $clean_path;
 
 			// Validate file exists on server
-			if (file_exists($full_path)) {
+			if (is_file($full_path)) {
 				$this->load->helper('download');
 				$file_data = file_get_contents($full_path);
 				force_download($file_name, $file_data);
