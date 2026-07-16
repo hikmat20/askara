@@ -37,33 +37,49 @@
                                 <?php endif; ?>
                             </p>
                         </iframe>
+                    <?php 
+                    $path_parts = explode('/', ltrim($wi->display_file_path, './'));
+                    $encoded_path_parts = array_map('rawurlencode', $path_parts);
+                    $encoded_path = implode('/', $encoded_path_parts);
+                    $viewer_url = urlencode(base_url($encoded_path));
+                    ?>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
                         <!-- Excel Preview -->
-                        <div class="p-5 text-center">
-                            <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
-                            <h4>Excel Document</h4>
-                            <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
-                            <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download) : ?>
-                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-success">
-                                    <i class="fa fa-download"></i> Download Excel File
-                                </a>
-                            <?php else : ?>
+                        <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=<?= $viewer_url; ?>" 
+                                style="width: 100%; height: 800px; border: none;" 
+                                frameborder="0">
+                            <p>Browser Anda tidak mendukung preview Excel. 
+                                <?php if ($allow_download): ?>
+                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank">Klik di sini untuk download</a>
+                                <?php endif; ?>
+                            </p>
+                        </iframe>
+                        <div class="text-center mt-3 mb-3">
+                            <?php if ($allow_download): ?>
+                            <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-success">
+                                <i class="fa fa-download"></i> Download Excel File
+                            </a>
+                            <?php else: ?>
                                 <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
                             <?php endif; ?>
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
-                        <div class="p-5 text-center">
-                            <i class="fa fa-file-word fa-5x text-primary mb-3"></i>
-                            <h4>Word Document</h4>
-                            <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
-                            <p class="text-muted">Size: <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download) : ?>
-                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-primary">
-                                    <i class="fa fa-download"></i> Download Word File
-                                </a>
-                            <?php else : ?>
+                        <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=<?= $viewer_url; ?>" 
+                                style="width: 100%; height: 800px; border: none;" 
+                                frameborder="0">
+                            <p>Browser Anda tidak mendukung preview Word. 
+                                <?php if ($allow_download): ?>
+                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank">Klik di sini untuk download</a>
+                                <?php endif; ?>
+                            </p>
+                        </iframe>
+                        <div class="text-center mt-3 mb-3">
+                            <?php if ($allow_download): ?>
+                            <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank" class="btn btn-primary">
+                                <i class="fa fa-download"></i> Download Word File
+                            </a>
+                            <?php else: ?>
                                 <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
                             <?php endif; ?>
                         </div>
