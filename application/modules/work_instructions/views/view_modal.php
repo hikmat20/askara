@@ -45,7 +45,7 @@
                     ?>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
                         <!-- Excel Preview -->
-                        <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=<?= $viewer_url; ?>" 
+                        <iframe src="https://docs.google.com/gview?embedded=true&url=<?= $viewer_url ?>&rm=minimal#toolbar=0&navpanes=0" 
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
                             <p>Browser Anda tidak mendukung preview Excel. 
@@ -65,7 +65,7 @@
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
-                        <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=<?= $viewer_url; ?>" 
+                        <iframe src="https://docs.google.com/gview?embedded=true&url=<?= $viewer_url ?>&rm=minimal#toolbar=0&navpanes=0" 
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
                             <p>Browser Anda tidak mendukung preview Word. 
