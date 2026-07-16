@@ -59,7 +59,7 @@
                                 <i class="fa fa-download"></i> Download Excel File
                             </a>
                             <?php else: ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
+                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download</span>
                             <?php endif; ?>
                         </div>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
