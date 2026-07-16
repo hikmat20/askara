@@ -29,7 +29,7 @@
                                 <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank">Klik di sini untuk download</a>
                                 <?php endif; ?>
                             </p>
-                        </iframe>
+                        </iframe>   
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
                         <!-- Excel Preview -->
                         <iframe src="https://view.officeapps.live.com/op/embed.aspx?src=<?= urlencode(base_url($wi->display_file_path)); ?>" 
