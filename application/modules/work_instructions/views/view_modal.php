@@ -56,7 +56,7 @@
                         <iframe src="<?= $file_path; ?>" style="width: 100%; height: 800px; border: none;" frameborder="0">
                         </iframe>
                         <div class="text-center mt-3 mb-3">
-                            <?= $allow_download ?>
+                            <?= "Download : ".$allow_download ?>
                             <?php if ($allow_download): ?>
                                 <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank"
                                     class="btn btn-success">
