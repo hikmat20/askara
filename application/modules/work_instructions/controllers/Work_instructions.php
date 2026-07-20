@@ -254,7 +254,7 @@ class Work_instructions extends Admin_Controller
 
 		// Load view partial (without template wrapper)
 		$allow_download = $this->_check_download_permission('work_instructions');
-		$this->load->view('view_modal', compact('wi', 'status_logs', 'sts', 'version_history', 'ArrPosts', 'allow_download'));
+		$this->load->view('view', compact('wi', 'status_logs', 'sts', 'version_history', 'ArrPosts', 'allow_download'));
 	}
 
 	/**
