@@ -55,16 +55,7 @@
                         </div>
                         <iframe src="<?= $file_path; ?>" style="width: 100%; height: 800px; border: none;" frameborder="0">
                         </iframe>
-                        <div class="text-center mt-3 mb-3">
-                            <?php if ($allow_download): ?>
-                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank"
-                                    class="btn btn-success">
-                                    <i class="fa fa-download"></i> Download Excel File
-                                </a>
-                            <?php else: ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download</span>
-                            <?php endif; ?>
-                        </div>
+                       
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])): ?>
                         <!-- Word Preview -->
                         <div class="alert alert-info m-3">
@@ -76,16 +67,7 @@
                         </div>
                         <iframe src="<?= $file_path; ?>" style="width: 100%; height: 800px; border: none;" frameborder="0">
                         </iframe>
-                        <div class="text-center mt-3 mb-3">
-                            <?php if ($allow_download): ?>
-                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank"
-                                    class="btn btn-primary">
-                                    <i class="fa fa-download"></i> Download Word File
-                                </a>
-                            <?php else: ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
-                            <?php endif; ?>
-                        </div>
+                        
                     <?php else: ?>
                         <!-- Unknown file type -->
                         <div class="p-5 text-center">
@@ -94,14 +76,6 @@
                             <p class="text-muted"><?= htmlspecialchars($wi->display_file_name); ?></p>
                             <p class="text-muted">Size:
                                 <?= isset($wi->display_size) ? number_format($wi->display_size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download): ?>
-                                <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" target="_blank"
-                                    class="btn btn-secondary">
-                                    <i class="fa fa-download"></i> Download File
-                                </a>
-                            <?php else: ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted to Admin</span>
-                            <?php endif; ?>
                         </div>
                     <?php endif; ?>
                 <?php else: ?>
