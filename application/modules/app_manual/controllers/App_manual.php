@@ -50,6 +50,7 @@ class App_manual extends Admin_Controller
                 $file = $this->upload->data();
                 $data = [
                     'file_name' => $file['file_name'],
+                    'original_name' => $file['client_name'],
                     'description' => $this->input->post('description'),
                     'status' => 'N',
                     'created_by' => $this->auth->user_id(),

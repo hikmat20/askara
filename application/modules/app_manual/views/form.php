@@ -6,12 +6,12 @@
         <label>Upload Manual Book (PDF Only) <?= isset($manual) ? '<small class="text-danger">*Biarkan kosong jika tidak ingin mengubah file</small>' : ''; ?></label>
         
         <div id="drop-zone" class="drop-zone p-5 border-dashed text-center rounded" style="border: 2px dashed #007bff; cursor: pointer;">
-            <i class="fa fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
+            <i class="fa fa-upload fa-3x text-primary mb-3"></i>
             <h5>Drag and drop your PDF here</h5>
             <p class="text-muted mb-2">Or click to browse, or paste file</p>
             <input type="file" name="document" id="document" class="d-none" accept=".pdf">
             <div id="file-name-display" class="mt-2 text-success font-weight-bold">
-                <?= isset($manual) ? 'Current File: ' . $manual->file_name : ''; ?>
+                <?= isset($manual) ? 'Current File: ' . (!empty($manual->original_name) ? $manual->original_name : $manual->file_name) : ''; ?>
             </div>
         </div>
         <small class="form-text text-muted mb-4">Only .pdf files are allowed.</small>
@@ -23,8 +23,24 @@
     </div>
 </form>
 
+
+
 <script>
 $(document).ready(function() {
+    // Initialize EasyMDE
+    const easyMDE = new EasyMDE({ 
+        element: document.getElementById('description'),
+        autoDownloadFontAwesome: false,
+        forceSync: true,
+        hideIcons: ["guide", "fullscreen", "side-by-side"],
+        spellChecker: false,
+        status: false
+    });
+
+    // Refresh CodeMirror to fix rendering issue in hidden/animating modal
+    setTimeout(() => {
+        easyMDE.codemirror.refresh();
+    }, 300);
     const dropZone = document.getElementById('drop-zone');
     const fileInput = document.getElementById('document');
     const fileNameDisplay = document.getElementById('file-name-display');

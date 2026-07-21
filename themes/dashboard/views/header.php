@@ -433,25 +433,68 @@
         <div class="modal fade" id="modalManualBook" tabindex="-1" role="dialog" aria-labelledby="modalManualBookLabel" aria-hidden="true">
           <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
             <div class="modal-content">
-              <div class="modal-header">
-                <h5 class="modal-title" id="modalManualBookLabel">Manual Book</h5>
-                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+              <div class="modal-header pb-0 border-0">
+                <ul class="nav nav-tabs" id="manualBookTab" role="tablist">
+                  <li class="nav-item">
+                    <a class="nav-link active font-weight-bold" id="document-tab" data-toggle="tab" href="#document-view" role="tab" aria-controls="document-view" aria-selected="true">
+                      <i class="fa fa-book mr-2"></i>Manual Book
+                    </a>
+                  </li>
+                  <li class="nav-item">
+                    <a class="nav-link font-weight-bold" id="log-tab" data-toggle="tab" href="#update-log" role="tab" aria-controls="update-log" aria-selected="false">
+                      <i class="fa fa-history mr-2"></i>Update Log
+                    </a>
+                  </li>
+                </ul>
+                <button type="button" class="close mt-n5" data-dismiss="modal" aria-label="Close">
                   <i aria-hidden="true" class="ki ki-close"></i>
                 </button>
               </div>
-              <div class="modal-body p-0" style="height: 80vh;">
-                <?php if($active_manual): ?>
-                  <iframe src="<?= base_url('assets/files/'.$active_manual->file_name); ?>#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen oncontextmenu="return false;"></iframe>
-                <?php else: ?>
-                  <div class="p-5 text-center">
-                    <h4 class="text-muted">Manual Book belum tersedia.</h4>
+              <div class="modal-body p-0">
+                <div class="tab-content" id="manualBookTabContent">
+                  <div class="tab-pane fade show active" id="document-view" role="tabpanel" aria-labelledby="document-tab" style="height: 80vh;">
+                    <?php if($active_manual): ?>
+                      <iframe src="<?= base_url('assets/files/'.$active_manual->file_name); ?>#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen oncontextmenu="return false;"></iframe>
+                    <?php else: ?>
+                      <div class="p-5 text-center">
+                        <h4 class="text-muted">Manual Book belum tersedia.</h4>
+                      </div>
+                    <?php endif; ?>
                   </div>
-                <?php endif; ?>
+                  <div class="tab-pane fade p-6" id="update-log" role="tabpanel" aria-labelledby="log-tab" style="height: 80vh; overflow-y: auto;">
+                    <?php if($active_manual && !empty($active_manual->description)): ?>
+                      <textarea class="d-none" id="raw-manual-log"><?= htmlspecialchars($active_manual->description, ENT_QUOTES, 'UTF-8'); ?></textarea>
+                      <div id="parsed-manual-log" class="markdown-body"></div>
+                    <?php else: ?>
+                      <div class="text-center text-muted mt-5">
+                        <i class="fa fa-info-circle fa-3x mb-3"></i>
+                        <h5>Belum ada update log.</h5>
+                      </div>
+                    <?php endif; ?>
+                  </div>
+                </div>
               </div>
             </div>
           </div>
         </div>
         <!-- end Modal Manual Book -->
+
+        <script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
+        <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const rawLog = document.getElementById('raw-manual-log');
+            if (rawLog && typeof marked !== 'undefined') {
+                document.getElementById('parsed-manual-log').innerHTML = marked.parse(rawLog.value);
+            }
+            
+            // Re-render when modal opens just in case
+            $('#modalManualBook').on('shown.bs.modal', function () {
+                if (rawLog && typeof marked !== 'undefined') {
+                    document.getElementById('parsed-manual-log').innerHTML = marked.parse(rawLog.value);
+                }
+            });
+        });
+        </script>
         <div class="ajax_loader">
           <!-- <img src="<?php echo base_url('assets/images/ajax_loader.gif'); ?>"> -->
         </div>

@@ -29,10 +29,13 @@
                                     <td class="text-center"><?= $n++; ?></td>
                                     <td>
                                         <a href="#" class="view-pdf" data-url="<?= base_url('assets/files/'.$dt->file_name); ?>#toolbar=0&navpanes=0&scrollbar=0">
-                                            <?= $dt->file_name; ?>
+                                            <?= !empty($dt->original_name) ? $dt->original_name : $dt->file_name; ?>
                                         </a>
                                     </td>
-                                    <td><?= nl2br(htmlspecialchars($dt->description)); ?></td>
+                                    <td class="markdown-content">
+                                        <textarea class="d-none raw-markdown"><?= htmlspecialchars($dt->description, ENT_QUOTES, 'UTF-8'); ?></textarea>
+                                        <div class="parsed-markdown"></div>
+                                    </td>
                                     <td class="text-center">
                                         <?php if($dt->status == 'Y'): ?>
                                             <span class="badge badge-success">Active</span>
@@ -100,8 +103,60 @@
     </div>
 </div>
 
+<!-- Modal View Description -->
+<div class="modal fade" id="modalViewDesc" tabindex="-1" role="dialog" aria-hidden="true">
+    <div class="modal-dialog modal-lg modal-dialog-centered" role="document">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Detail Deskripsi</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                    <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+            </div>
+            <div class="modal-body">
+                <div id="fullDescViewer"></div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-dismiss="modal">Close</button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- EasyMDE Markdown Editor -->
+<link rel="stylesheet" href="https://unpkg.com/easymde/dist/easymde.min.css">
+<script src="https://unpkg.com/easymde/dist/easymde.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"></script>
 <script>
 $(document).ready(function() {
+    $('.markdown-content').each(function() {
+        const raw = $(this).find('.raw-markdown').val();
+        const parsed = marked.parse(raw);
+        
+        // Strip HTML to get plain text for preview
+        const tempDiv = document.createElement("div");
+        tempDiv.innerHTML = parsed;
+        const plainText = tempDiv.textContent || tempDiv.innerText || "";
+        
+        let previewText = plainText.length > 200 ? plainText.substring(0, 200) + '...' : plainText;
+        
+        if (plainText.length > 0) {
+            $(this).find('.parsed-markdown').html(`
+                <span class="desc-preview">${previewText}</span> 
+                <a href="#" class="view-desc text-primary font-weight-bold" data-html="${encodeURIComponent(parsed)}">(Lihat Detail)</a>
+            `);
+        } else {
+            $(this).find('.parsed-markdown').html(`<span class="text-muted italic">Tidak ada deskripsi</span>`);
+        }
+    });
+
+    $(document).on('click', '.view-desc', function(e) {
+        e.preventDefault();
+        const html = decodeURIComponent($(this).data('html'));
+        $('#fullDescViewer').html(html);
+        $('#modalViewDesc').modal('show');
+    });
+
     $('#example1').DataTable();
 
     $(document).on('click', '#add', function() {
