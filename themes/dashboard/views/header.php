@@ -380,7 +380,12 @@
               </div> -->
 
               <div class="topbar-item mr-2">
-                <a href="<?= base_url('assets/files/Manual Book Rumah ISO.pdf'); ?>" target="_blank" class="btn btn-sm btn-light-primary font-weight-bold" title="Manual Book">
+                <?php
+                  $ci =& get_instance();
+                  $active_manual = $ci->db->get_where('app_manuals', ['status' => 'Y'])->row();
+                  $manual_link = ($active_manual) ? base_url('assets/files/'.$active_manual->file_name) : '#';
+                ?>
+                <a href="#" <?= ($active_manual) ? 'data-toggle="modal" data-target="#modalManualBook"' : 'onclick="Swal.fire(\'Info\', \'Manual Book belum tersedia.\', \'info\')"'; ?> class="btn btn-sm btn-light-primary font-weight-bold" title="Manual Book">
                   <i class="fa fa-book mr-1"></i> Manual Book
                 </a>
               </div>
@@ -423,6 +428,30 @@
           <!--end::Container-->
         </div>
         <!--end::Header-->
+
+        <!-- Modal Manual Book -->
+        <div class="modal fade" id="modalManualBook" tabindex="-1" role="dialog" aria-labelledby="modalManualBookLabel" aria-hidden="true">
+          <div class="modal-dialog modal-xl modal-dialog-centered" role="document">
+            <div class="modal-content">
+              <div class="modal-header">
+                <h5 class="modal-title" id="modalManualBookLabel">Manual Book</h5>
+                <button type="button" class="close" data-dismiss="modal" aria-label="Close">
+                  <i aria-hidden="true" class="ki ki-close"></i>
+                </button>
+              </div>
+              <div class="modal-body p-0" style="height: 80vh;">
+                <?php if($active_manual): ?>
+                  <iframe src="<?= base_url('assets/files/'.$active_manual->file_name); ?>#toolbar=0&navpanes=0&scrollbar=0" width="100%" height="100%" frameborder="0" style="border:0;" allowfullscreen oncontextmenu="return false;"></iframe>
+                <?php else: ?>
+                  <div class="p-5 text-center">
+                    <h4 class="text-muted">Manual Book belum tersedia.</h4>
+                  </div>
+                <?php endif; ?>
+              </div>
+            </div>
+          </div>
+        </div>
+        <!-- end Modal Manual Book -->
         <div class="ajax_loader">
           <!-- <img src="<?php echo base_url('assets/images/ajax_loader.gif'); ?>"> -->
         </div>
