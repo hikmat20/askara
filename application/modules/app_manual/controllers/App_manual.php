@@ -19,10 +19,15 @@ class App_manual extends Admin_Controller
         $this->template->render('index');
     }
 
+    public function add()
+    {
+        $this->template->render('form');
+    }
+
     public function edit($id)
     {
-        $data = $this->db->get_where('app_manuals', ['id' => $id])->row();
-        $this->template->set('data', $data);
+        $manual = $this->db->get_where('app_manuals', ['id' => $id])->row();
+        $this->template->set('manual', $manual);
         $this->template->render('form');
     }
 
@@ -30,6 +35,8 @@ class App_manual extends Admin_Controller
     {
         $id = $this->input->post('id');
         $old_file = $this->input->post('old_file');
+        
+        file_put_contents('/tmp/post.log', "POST: " . print_r($_POST, true) . "\nFILES: " . print_r($_FILES, true));
         
         $this->db->trans_begin();
         $config['upload_path']   = './assets/files/';

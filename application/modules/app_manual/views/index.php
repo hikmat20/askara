@@ -77,7 +77,7 @@
             </div>
             <div class="modal-footer justify-content-end">
                 <button type="button" class="btn btn-primary save w-100px"><i class="fa fa-save"></i>Save</button>
-                <button type="button" class="btn btn-danger text-end" onclick="clear($('.modal-body'));setTimeout(()=>{$('.save').removeClass('d-none')},500)" data-dismiss="modal">Close</button>
+                <button type="button" class="btn btn-danger text-end" onclick="$('#modalView .modal-body').empty();setTimeout(()=>{$('.save').removeClass('d-none')},500)" data-dismiss="modal">Close</button>
             </div>
         </div>
     </div>
@@ -106,17 +106,17 @@ $(document).ready(function() {
 
     $(document).on('click', '#add', function() {
         const url = siteurl + active_controller + 'add';
-        $('.modal-title').html('Upload Manual Book')
+        $('#modalView .modal-title').html('Upload Manual Book')
         $('#modalView').modal('show')
-        $('.modal-body').load(url)
+        $('#modalView .modal-body').load(url)
     })
 
     $(document).on('click', '.edit', function() {
         const id = $(this).data('id')
         const url = siteurl + active_controller + 'edit/' + id;
-        $('.modal-title').html('Edit Manual Book')
+        $('#modalView .modal-title').html('Edit Manual Book')
         $('#modalView').modal('show')
-        $('.modal-body').load(url)
+        $('#modalView .modal-body').load(url)
     })
 
     $(document).on('click', '.view-pdf', function(e) {
@@ -127,15 +127,15 @@ $(document).ready(function() {
     })
 
     $(document).on('click', '.save', function(e) {
-        let fileInput = $('#document')[0];
-        let idInput = $('input[name="id"]').val();
+        let fileInput = $('#form-manual #document')[0];
+        let idInput = $('#form-manual input[name="id"]').val();
         
         if (!idInput && fileInput.files.length === 0) {
             Swal.fire('Warning', 'Please select a PDF file first.', 'warning');
             return;
         }
 
-        let formdata = new FormData($('#form')[0])
+        let formdata = new FormData($('#form-manual')[0])
         let btn = $(this)
         $.ajax({
             url: siteurl + active_controller + 'save',

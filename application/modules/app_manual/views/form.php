@@ -1,9 +1,9 @@
-<form id="form" enctype="multipart/form-data">
-    <input type="hidden" name="id" value="<?= isset($data) ? $data->id : ''; ?>">
-    <input type="hidden" name="old_file" value="<?= isset($data) ? $data->file_name : ''; ?>">
+<form id="form-manual" enctype="multipart/form-data">
+    <input type="hidden" name="id" value="<?= isset($manual) ? $manual->id : ''; ?>">
+    <input type="hidden" name="old_file" value="<?= isset($manual) ? $manual->file_name : ''; ?>">
 
     <div class="form-group">
-        <label>Upload Manual Book (PDF Only) <?= isset($data) ? '<small class="text-danger">*Biarkan kosong jika tidak ingin mengubah file</small>' : ''; ?></label>
+        <label>Upload Manual Book (PDF Only) <?= isset($manual) ? '<small class="text-danger">*Biarkan kosong jika tidak ingin mengubah file</small>' : ''; ?></label>
         
         <div id="drop-zone" class="drop-zone p-5 border-dashed text-center rounded" style="border: 2px dashed #007bff; cursor: pointer;">
             <i class="fa fa-cloud-upload-alt fa-3x text-primary mb-3"></i>
@@ -11,7 +11,7 @@
             <p class="text-muted mb-2">Or click to browse, or paste file</p>
             <input type="file" name="document" id="document" class="d-none" accept=".pdf">
             <div id="file-name-display" class="mt-2 text-success font-weight-bold">
-                <?= isset($data) ? 'Current File: ' . $data->file_name : ''; ?>
+                <?= isset($manual) ? 'Current File: ' . $manual->file_name : ''; ?>
             </div>
         </div>
         <small class="form-text text-muted mb-4">Only .pdf files are allowed.</small>
@@ -19,7 +19,7 @@
 
     <div class="form-group">
         <label>Deskripsi Update</label>
-        <textarea name="description" id="description" class="form-control" rows="3" placeholder="Tuliskan catatan update (misal: penambahan panduan login)"><?= isset($data) ? $data->description : ''; ?></textarea>
+        <textarea name="description" id="description" class="form-control" rows="3" placeholder="Tuliskan catatan update (misal: penambahan panduan login)"><?= isset($manual) ? $manual->description : ''; ?></textarea>
     </div>
 </form>
 
@@ -48,9 +48,9 @@ $(document).ready(function() {
         }
     });
 
-    document.addEventListener('paste', (e) => {
-        if ($('#modalView').hasClass('show') && e.clipboardData.files.length) {
-            handleFiles(e.clipboardData.files);
+    $(document).off('paste.appManual').on('paste.appManual', function(e) {
+        if ($('#modalView').hasClass('show') && e.originalEvent.clipboardData.files.length) {
+            handleFiles(e.originalEvent.clipboardData.files);
         }
     });
 
