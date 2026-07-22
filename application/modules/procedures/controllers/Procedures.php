@@ -1852,7 +1852,7 @@ class Procedures extends Admin_Controller
 				</tr>
 				<tr>
 				<td>Revisi</td>
-				<td>' . (($allData['procedure']->revision) ?: '~') . '</td>
+				<td>' . (($allData['procedure']->revision)!== null ? $allData['procedure']->revision: '~') . '</td>
 				</tr>
 				<tr>
 				<td>Tgl. Terbit</td>
