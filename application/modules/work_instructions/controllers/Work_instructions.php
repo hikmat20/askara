@@ -458,6 +458,116 @@ class Work_instructions extends Admin_Controller
 		show_error('File not found: The document file may have been deleted or moved.', 404);
 	}
 
+	/**
+	 * Stream work instruction document file inline for preview iframe
+	 * 
+	 * URL: work_instructions/view_file/{id}
+	 * 
+	 * @param int $id Work instruction ID
+	 * @return void
+	 */
+	public function view_file($id = null)
+	{
+		if (!$id) {
+			$this->_render_file_error('ID Dokumen Tidak Valid', 'Parameter ID dokumen tidak boleh kosong.');
+			return;
+		}
+
+		$wi = $this->db->get_where('view_work_instructions', ['id' => $id])->row();
+		if (!$wi) {
+			$wi = $this->db->get_where('work_instructions', ['id' => $id])->row();
+		}
+
+		if (!$wi) {
+			log_message('error', 'view_file: Work instruction not found in DB for id: ' . $id);
+			$this->_render_file_error('Dokumen Tidak Ditemukan', 'Data Work Instruction (ID: ' . htmlspecialchars($id) . ') tidak ditemukan di database.');
+			return;
+		}
+
+		// VERSION CONTROL: Get current version to display (handles under revision scenario)
+		$current_version = null;
+		if (isset($this->WiModel)) {
+			$current_version = $this->WiModel->getCurrentVersion($id);
+		}
+		
+		$file_name = '';
+		$file_path = '';
+
+		if ($current_version && isset($current_version->is_from_history) && $current_version->is_from_history) {
+			$file_name = $current_version->file_name;
+			$file_path = $current_version->file_path;
+		} else {
+			$file_name = isset($wi->file_name) ? $wi->file_name : '';
+			$file_path = !empty($wi->file_path) ? $wi->file_path : (isset($wi->file_name) ? 'directory/WI/' . (isset($wi->company_id) ? $wi->company_id : '1') . '/' . $wi->file_name : '');
+		}
+
+		if (empty($file_name) && empty($file_path)) {
+			$this->_render_file_error('File Dokumen Kosong', 'Tidak ada nama berkas dokumen yang terdaftar untuk Work Instruction ini.');
+			return;
+		}
+
+		$clean_path = ltrim($file_path, './');
+		$full_path = FCPATH . $clean_path;
+
+		// Try fallback paths on disk
+		if (!is_file($full_path) && !empty($file_name)) {
+			$possible_paths = [];
+			if (!empty($wi->company_id)) {
+				$possible_paths[] = FCPATH . 'directory/WI/' . $wi->company_id . '/' . $file_name;
+			}
+			$possible_paths[] = FCPATH . 'directory/WI/1/' . $file_name;
+			$possible_paths[] = FCPATH . 'uploads/' . $file_name;
+
+			foreach ($possible_paths as $p) {
+				if (is_file($p)) {
+					$full_path = $p;
+					break;
+				}
+			}
+		}
+
+		if (!is_file($full_path)) {
+			log_message('error', 'view_file: File not found on disk: ' . $full_path . ' for WI id: ' . $id);
+			$this->_render_file_error('File Berkas Tidak Ditemukan', 'Berkas dokumen "' . htmlspecialchars($file_name ? $file_name : basename($file_path)) . '" tidak ditemukan di server.');
+			return;
+		}
+
+		$ext = strtolower(pathinfo($file_name ? $file_name : $full_path, PATHINFO_EXTENSION));
+		$mime_types = [
+			'pdf'  => 'application/pdf',
+			'xlsx' => 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
+			'xls'  => 'application/vnd.ms-excel',
+			'docx' => 'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+			'doc'  => 'application/msword',
+			'png'  => 'image/png',
+			'jpg'  => 'image/jpeg',
+			'jpeg' => 'image/jpeg',
+		];
+
+		$content_type = isset($mime_types[$ext]) ? $mime_types[$ext] : mime_content_type($full_path);
+
+		header('Content-Type: ' . $content_type);
+		header('Content-Disposition: inline; filename="' . basename($file_name ? $file_name : $full_path) . '"');
+		header('Content-Length: ' . filesize($full_path));
+		header('Accept-Ranges: bytes');
+		readfile($full_path);
+		exit;
+	}
+
+	private function _render_file_error($title, $message)
+	{
+		echo '<!DOCTYPE html><html><head><meta charset="utf-8">';
+		echo '<style>body{font-family:-apple-system,BlinkMacSystemFont,"Segoe UI",Roboto,sans-serif;background:#f8f9fa;display:flex;align-items:center;justify-content:center;height:100vh;margin:0;color:#3f4254;}';
+		echo '.box{text-align:center;padding:40px;background:#fff;border-radius:12px;box-shadow:0 4px 12px rgba(0,0,0,0.05);max-width:480px;}';
+		echo 'h4{font-size:20px;font-weight:700;margin:16px 0 8px;color:#ffa800;}p{color:#7e8299;font-size:14px;margin:0;line-height:1.5;}</style></head>';
+		echo '<body><div class="box">';
+		echo '<svg width="64" height="64" viewBox="0 0 24 24" fill="none" stroke="#ffa800" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M10.29 3.86L1.82 18a2 2 0 0 0 1.71 3h16.94a2 2 0 0 0 1.71-3L13.71 3.86a2 2 0 0 0-3.42 0z"></path><line x1="12" y1="9" x2="12" y2="13"></line><line x1="12" y1="17" x2="12.01" y2="17"></line></svg>';
+		echo '<h4>' . htmlspecialchars($title) . '</h4>';
+		echo '<p>' . htmlspecialchars($message) . '</p>';
+		echo '</div></body></html>';
+		exit;
+	}
+
 	private function _validation()
 	{
 		$this->load->library('form_validation');

@@ -23,7 +23,7 @@
             <div class="card-body p-0">
                 <?php if (!empty($wi->display_file_name)): ?>
                     <?php
-                    $file_path = base_url($wi->display_file_path);
+                    $file_path = base_url('work_instructions/view_file/' . $wi->id);
                     $file_ext = strtolower($wi->display_ext ? $wi->display_ext : pathinfo($wi->display_file_name, PATHINFO_EXTENSION));
                     ?>
 
