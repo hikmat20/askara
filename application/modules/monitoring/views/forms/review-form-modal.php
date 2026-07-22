@@ -10,7 +10,7 @@
             <div class="card-body p-0">
                 <?php if (!empty($form->file_name)) : ?>
                     <?php
-                    $file_path = base_url('directory/FORMS/1/' . $form->file_name);
+                    $file_path = base_url('forms/view_file/' . $form->id);
                     $file_ext = strtolower($form->ext ? $form->ext : pathinfo($form->file_name, PATHINFO_EXTENSION));
                     ?>
 
