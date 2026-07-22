@@ -1774,10 +1774,29 @@ class Monitoring extends Admin_Controller
 			$wi->procedure_name = $procedure ? $procedure->name : null;
 		}
 
+		// VERSION CONTROL: Get current version to display (handles under revision scenario)
+		$current_version = $this->WiModel->getCurrentVersion($id);
+		if ($current_version && isset($current_version->is_from_history) && $current_version->is_from_history) {
+			$wi->display_file_name = $current_version->file_name;
+			$wi->display_file_path = $current_version->file_path;
+			$wi->display_ext = $current_version->ext;
+			$wi->display_size = isset($current_version->size) ? $current_version->size : null;
+			$wi->showing_old_version = true;
+		} else {
+			$wi->display_file_name = isset($wi->file_name) ? $wi->file_name : null;
+			$wi->display_file_path = isset($wi->file_path) ? $wi->file_path : null;
+			$wi->display_ext = isset($wi->ext) ? $wi->ext : null;
+			$wi->display_size = isset($wi->size) ? $wi->size : null;
+			$wi->showing_old_version = false;
+		}
+
+		$allow_download_wi = $this->_check_download_permission('work_instructions');
+
 		// Load partial view untuk modal
 		$this->load->view('work_instructions/review_modal', [
 			'wi' => $wi,
 			'sts' => $this->sts,
+			'allow_download_wi' => $allow_download_wi,
 		]);
 	}
 
@@ -1812,10 +1831,29 @@ class Monitoring extends Admin_Controller
 			$wi->procedure_name = $procedure ? $procedure->name : null;
 		}
 
+		// VERSION CONTROL: Get current version to display (handles under revision scenario)
+		$current_version = $this->WiModel->getCurrentVersion($id);
+		if ($current_version && isset($current_version->is_from_history) && $current_version->is_from_history) {
+			$wi->display_file_name = $current_version->file_name;
+			$wi->display_file_path = $current_version->file_path;
+			$wi->display_ext = $current_version->ext;
+			$wi->display_size = isset($current_version->size) ? $current_version->size : null;
+			$wi->showing_old_version = true;
+		} else {
+			$wi->display_file_name = isset($wi->file_name) ? $wi->file_name : null;
+			$wi->display_file_path = isset($wi->file_path) ? $wi->file_path : null;
+			$wi->display_ext = isset($wi->ext) ? $wi->ext : null;
+			$wi->display_size = isset($wi->size) ? $wi->size : null;
+			$wi->showing_old_version = false;
+		}
+
+		$allow_download_wi = $this->_check_download_permission('work_instructions');
+
 		// Load partial view untuk modal
 		$this->load->view('work_instructions/approval_modal', [
 			'wi' => $wi,
 			'sts' => $this->sts,
+			'allow_download_wi' => $allow_download_wi,
 		]);
 	}
 
