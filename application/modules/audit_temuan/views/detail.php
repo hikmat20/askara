@@ -6,7 +6,9 @@
           <div class="card-header">
             <h2 class="mt-5"><i class="<?= $icon; ?> text-primary mr-2"></i><?= $title; ?></h2>
             <div class="mt-4 float-right ">
-              <a href="<?= base_url($this->uri->segment(1)); ?>" class="btn btn-danger w-100px" title="Back">
+              <a href="<?= base_url($this->uri->segment(1) . "/print_pdf/" . (isset($data->id) ? $data->id : '')); ?>" target="_blank" class="btn btn-danger mr-2" title="Print PDF">
+                <i class="fa fa-file-pdf mr-1"></i>Print PDF</a>
+              <a href="<?= base_url($this->uri->segment(1)); ?>" class="btn btn-secondary w-100px" title="Back">
                 <i class="fa fa-reply mr-1"></i>Back</a>
             </div>
           </div>
