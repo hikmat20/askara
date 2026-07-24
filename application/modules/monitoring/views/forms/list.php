@@ -9,6 +9,10 @@
                 <?= $title; ?>
             </div>
         </div>
+        <div class="input-group mb-3 w-25">
+            <span class="input-group-text rounded-right-0"><i class="fa fa-search"></i></span>
+            <input type="text" name="search" id="search" class="form-control w-300" placeholder="Search">
+        </div>
         <div class="card">
             <div class="pt-1 px-3 card-body">
                 <table class="table table-hover datatable">
@@ -34,7 +38,7 @@
                                 <tr>
                                     <td class="text-center" style="vertical-align: middle;"><?= $n; ?></td>
                                     <td style="vertical-align: middle;">
-                                        <?= htmlspecialchars(isset($form->nomor) ? $form->nomor : '-'); ?></td>
+                                        <?= htmlspecialchars(isset($form->number) ? $form->number : '-'); ?></td>
                                     <td class="font-weight-bolder h6" style="vertical-align: middle;">
                                         <?= htmlspecialchars(isset($form->name) ? $form->name : '-'); ?>
                                     </td>
@@ -174,7 +178,26 @@
     </div>
 </div>
 
+<style>
+    .dataTables_filter {
+        display: none;
+    }
+</style>
+
 <script>
+    $(document).ready(function () {
+        var table = $('.datatable').DataTable({
+            lengthChange: false,
+            layout: {
+                topEnd: '',
+            }
+        });
+
+        $('#search').on('paste input', function () {
+            table.search(this.value).draw();
+        });
+    });
+
     (function () {
         var baseUrl = '<?= base_url($this->uri->segment(1)); ?>';
         var urlReview = baseUrl + '/load_form_review_form/';

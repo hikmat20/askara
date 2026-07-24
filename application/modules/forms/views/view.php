@@ -67,36 +67,19 @@ if ($disp->form_type == 'upload_file') {
                                 <?php endif; ?>
                             </p>
                         </iframe>
-                    <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
-                        <!-- Excel Preview -->
-                        <div class="p-5 text-center">
-                            <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
-                            <h4>Excel Document</h4>
-                            <p class=""><?= htmlspecialchars($disp->file_name); ?></p>
-                            <p class="">Size: <?= isset($disp->size) ? number_format($disp->size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download) : ?>
-                            <a href="<?= base_url('forms/download/' . $df->id); ?>" target="_blank" class="btn btn-success">
-                                <i class="fa fa-download"></i> Download Excel File
-                            </a>
-                            <?php else : ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
-                            <?php endif; ?>
+                    <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls', '.docx', '.doc', 'docx', 'doc'])) : ?>
+                        <!-- Office Preview -->
+                        <div class="alert alert-info m-3">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Jika dokumen tidak muncul, pasang ekstensi <a
+                                href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj"
+                                target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda,
+                            atau unduh dokumen secara manual di bawah.
                         </div>
-                    <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
-                        <!-- Word Preview -->
-                        <div class="p-5 text-center">
-                            <i class="fa fa-file-word fa-5x text-primary mb-3"></i>
-                            <h4>Word Document</h4>
-                            <p class=""><?= htmlspecialchars($disp->file_name); ?></p>
-                            <p class="">Size: <?= isset($disp->size) ? number_format($disp->size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download) : ?>
-                            <a href="<?= base_url('forms/download/' . $df->id); ?>" target="_blank" class="btn btn-primary">
-                                <i class="fa fa-download"></i> Download Word File
-                            </a>
-                            <?php else : ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
-                            <?php endif; ?>
-                        </div>
+                        <iframe src="<?= base_url('forms/view_file/' . $df->id); ?>"
+                            style="width: 100%; height: 800px; border: none;"
+                            frameborder="0">
+                        </iframe>
                     <?php else : ?>
                         <!-- Unknown file type -->
                         <div class="p-5 text-center">

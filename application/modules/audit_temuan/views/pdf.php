@@ -108,7 +108,7 @@
                                             foreach($auditors as $v) {
                                                 if($v->id == $a) {
                                                     $names[] = $v->name ? $v->name : '-';
-                                                }
+                                                }   
                                             }
                                         }
                                         echo htmlspecialchars(implode(', ', $names));
