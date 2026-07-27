@@ -518,13 +518,8 @@ class Forms extends Admin_Controller
 		$file_name = '';
 		$file_path = '';
 
-		if (isset($display_form->is_from_history) && $display_form->is_from_history) {
-			$file_name = $display_form->file_name;
-			$file_path = $display_form->file_path;
-		} else {
-			$file_name = $display_form->file_name;
-			$file_path = 'directory/FORMS/' . $form->company_id . '/' . $display_form->file_name;
-		}
+		$file_name = isset($display_form->file_name) ? $display_form->file_name : '';
+		$file_path = !empty($display_form->file_path) ? $display_form->file_path : ('directory/FORMS/' . (isset($form->company_id) ? $form->company_id : '1') . '/' . $file_name);
 
 		if (!empty($file_name)) {
 			// Get full file path on server

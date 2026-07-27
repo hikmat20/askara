@@ -16,11 +16,7 @@ $s_logs = (array)$status_logs;
 
 $file_path = '';
 if ($disp->form_type == 'upload_file') {
-  if (isset($disp->is_from_history) && $disp->is_from_history) {
-    $file_path = base_url($disp->file_path);
-  } else {
-    $file_path = base_url('directory/FORMS/' . $df->company_id . '/' . $disp->file_name);
-  }
+  $file_path = !empty($disp->file_path) ? base_url($disp->file_path) : base_url('directory/FORMS/' . (isset($df->company_id) ? $df->company_id : '1') . '/' . $disp->file_name);
 } else {
   // Validate URL
   if (filter_var($disp->link_form, FILTER_VALIDATE_URL)) {
@@ -45,9 +41,10 @@ if ($disp->form_type == 'upload_file') {
                 </h3>
             </div>
             <div class="card-body p-0">
-                <?php if (!empty($file_path)) : ?>
+                <?php if (!empty($disp->file_name) || !empty($file_path)) : ?>
                     <?php 
                     $file_ext = strtolower($disp->ext ? $disp->ext : pathinfo($disp->file_name, PATHINFO_EXTENSION));
+                    $view_file_url = base_url('forms/view_file/' . $df->id);
                     ?>
                     
                     <?php if ($disp->form_type !== 'upload_file') : ?>
@@ -56,9 +53,9 @@ if ($disp->form_type == 'upload_file') {
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
                         </iframe>
-                    <?php elseif ($file_ext === '.pdf' || $file_ext === 'pdf') : ?>
+                    <?php elseif (in_array($file_ext, ['.pdf', 'pdf'])) : ?>
                         <!-- PDF Preview -->
-                        <iframe src="<?= $file_path; ?>#toolbar=0&navpanes=0" 
+                        <iframe src="<?= $view_file_url; ?>#toolbar=0&navpanes=0" 
                                 style="width: 100%; height: 800px; border: none;" 
                                 frameborder="0">
                             <p>Browser Anda tidak mendukung preview PDF. 
@@ -68,18 +65,26 @@ if ($disp->form_type == 'upload_file') {
                             </p>
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls', '.docx', '.doc', 'docx', 'doc'])) : ?>
-                        <!-- Office Preview -->
-                        <div class="alert alert-info m-3">
-                            <i class="fa fa-info-circle mr-2"></i>
-                            Jika dokumen tidak muncul, pasang ekstensi <a
-                                href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj"
-                                target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda,
-                            atau unduh dokumen secara manual di bawah.
+                        <!-- Office Preview / Download Card -->
+                        <div class="p-5 text-center">
+                            <?php if (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
+                                <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
+                                <h4>Excel Document</h4>
+                            <?php else : ?>
+                                <i class="fa fa-file-word fa-5x text-primary mb-3"></i>
+                                <h4>Word Document</h4>
+                            <?php endif; ?>
+                            <p class="font-weight-bold mb-1"><?= htmlspecialchars($disp->file_name); ?></p>
+                            <p class="text-muted mb-4">Size: <?= isset($disp->size) ? number_format($disp->size) . ' KB' : '-'; ?></p>
+                            
+                            <?php if ($allow_download) : ?>
+                                <a href="<?= base_url('forms/download/' . $df->id); ?>" target="_blank" class="btn btn-primary font-weight-bold px-6 py-3">
+                                    <i class="fa fa-download mr-2"></i> Download / Buka Dokumen
+                                </a>
+                            <?php else : ?>
+                                <span class="badge badge-secondary p-3"><i class="fa fa-lock mr-1"></i> Download Restricted</span>
+                            <?php endif; ?>
                         </div>
-                        <iframe src="<?= base_url('forms/view_file/' . $df->id); ?>"
-                            style="width: 100%; height: 800px; border: none;"
-                            frameborder="0">
-                        </iframe>
                     <?php else : ?>
                         <!-- Unknown file type -->
                         <div class="p-5 text-center">

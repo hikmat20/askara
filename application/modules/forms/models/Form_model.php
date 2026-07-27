@@ -146,6 +146,7 @@ class Form_model extends BF_Model
     $config['upload_path']   = $path;
     $config['allowed_types'] = 'pdf|xlsx|xls|docx';
     $config['encrypt_name']  = false;
+    $config['overwrite']     = true;
     $config['max_size']      = 5120;
     $config['remove_spaces'] = true;
     $config['file_name']     = $filename_base;
