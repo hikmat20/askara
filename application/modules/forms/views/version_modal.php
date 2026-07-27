@@ -33,26 +33,18 @@ $v = (object)$version;
                             </p>
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls', '.docx', '.doc', 'docx', 'doc'])) : ?>
-                        <!-- Office Preview / Download Card -->
-                        <div class="p-5 text-center">
-                            <?php if (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
-                                <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
-                                <h4>Excel Document (v<?= $v->version_number; ?>)</h4>
-                            <?php else : ?>
-                                <i class="fa fa-file-word fa-5x text-primary mb-3"></i>
-                                <h4>Word Document (v<?= $v->version_number; ?>)</h4>
-                            <?php endif; ?>
-                            <p class="font-weight-bold mb-1"><?= htmlspecialchars($v->file_name); ?></p>
-                            <p class="text-muted mb-4">Size: <?= isset($v->size) ? number_format($v->size) . ' KB' : '-'; ?></p>
-                            
-                            <?php if ($allow_download): ?>
-                                <a href="<?= base_url('forms/download_version/' . $v->form_id . '/' . $v->version_number); ?>" target="_blank" class="btn btn-primary font-weight-bold px-6 py-3">
-                                    <i class="fa fa-download mr-2"></i> Download / Buka Dokumen Versi Ini
-                                </a>
-                            <?php else : ?>
-                                <span class="badge badge-secondary p-3"><i class="fa fa-lock mr-1"></i> Download Restricted</span>
-                            <?php endif; ?>
+                        <!-- Office Preview via iframe (Chrome Office Editing extension) -->
+                        <div class="alert alert-info m-3">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Jika dokumen tidak muncul, pasang ekstensi <a
+                                href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj"
+                                target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda,
+                            atau <a href="<?= base_url('forms/download_version/' . $v->form_id . '/' . $v->version_number); ?>" target="_blank" class="font-weight-bold text-dark">unduh dokumen versi ini secara manual di sini</a>.
                         </div>
+                        <iframe src="<?= base_url('forms/download_version/' . $v->form_id . '/' . $v->version_number); ?>"
+                            style="width: 100%; height: 600px; border: none;"
+                            frameborder="0">
+                        </iframe>
                     <?php else : ?>
                         <!-- Unknown file type -->
                         <div class="p-5 text-center">
