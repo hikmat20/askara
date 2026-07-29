@@ -79,25 +79,65 @@ class Monitoring_model extends BF_Model
     private function _logsProcedure($data, $note = null)
     {
         $procedure = $this->db->get_where('procedures', ['id' => $data['id']])->row();
+        if (!$procedure) return;
 
-        if ($procedure->revision > 0):
-            $logRevision = [
-                'company_id'      => 1,
+        $rev_num = intVal($procedure->revision);
+
+        if ($rev_num == 0) {
+            $check_log = $this->db->get_where('procedure_revision_logs', [
                 'procedure_id'    => $data['id'],
-                'revision_number' => intVal($procedure->revision) + 1,
-                'revision_date'   => date('Y-m-d'),
-                'description'     => $note,
-            ];
-        else:
-            $logRevision = [
-                'company_id'      => 1,
+                'revision_number' => 0
+            ])->row();
+
+            if (!$check_log) {
+                $logRevision = [
+                    'company_id'      => isset($procedure->company_id) ? $procedure->company_id : 1,
+                    'procedure_id'    => $data['id'],
+                    'revision_number' => 0,
+                    'revision_date'   => date('Y-m-d'),
+                    'description'     => 'Rilis Baru',
+                    'status'          => '1',
+                ];
+                $this->db->insert('procedure_revision_logs', $logRevision);
+            } else {
+                $this->db->update('procedure_revision_logs', [
+                    'revision_date' => date('Y-m-d'),
+                    'status'        => '1'
+                ], [
+                    'procedure_id'    => $data['id'],
+                    'revision_number' => 0
+                ]);
+            }
+        } else {
+            $check_log = $this->db->get_where('procedure_revision_logs', [
                 'procedure_id'    => $data['id'],
-                'revision_number' => 0,
-                'revision_date'   => date('Y-m-d'),
-                'description'     => 'Rilis Baru',
-            ];
-        endif;
-        $this->db->insert('procedure_revision_logs', $logRevision);
+                'revision_number' => $rev_num
+            ])->row();
+
+            if ($check_log) {
+                $updateData = [
+                    'revision_date' => date('Y-m-d'),
+                    'status'        => '1'
+                ];
+                if (!empty($note)) {
+                    $updateData['description'] = $note;
+                }
+                $this->db->update('procedure_revision_logs', $updateData, [
+                    'procedure_id'    => $data['id'],
+                    'revision_number' => $rev_num
+                ]);
+            } else {
+                $logRevision = [
+                    'company_id'      => isset($procedure->company_id) ? $procedure->company_id : 1,
+                    'procedure_id'    => $data['id'],
+                    'revision_number' => $rev_num,
+                    'revision_date'   => date('Y-m-d'),
+                    'description'     => !empty($note) ? $note : 'Revisi ' . $rev_num,
+                    'status'          => '1',
+                ];
+                $this->db->insert('procedure_revision_logs', $logRevision);
+            }
+        }
     }
 
     public function review($data = null)
