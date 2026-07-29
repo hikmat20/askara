@@ -217,10 +217,8 @@
             }
         })
 
-        // #column3_search is a <input type="text"> element
         $('#search').on('paste input', function () {
             table
-                .columns(1)
                 .search(this.value)
                 .draw();
         });
