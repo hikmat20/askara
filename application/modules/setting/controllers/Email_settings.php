@@ -3,7 +3,7 @@
 /*
  * @author Antigravity
  *
- * This is controller for Email Settings
+ * Controller for Email Settings & Master Email Configurations
  */
 
 class Email_settings extends Admin_Controller
@@ -11,89 +11,300 @@ class Email_settings extends Admin_Controller
     public function __construct()
     {
         parent::__construct();
+        $this->load->model('setting/Email_configuration_model', 'email_cfg');
+        $this->load->library('encryption');
         $this->template->set([
-            'title' => 'Pengaturan Email',
+            'title' => 'Pengaturan & Master Server Email',
             'icon'  => 'fa fa-envelope'
         ]);
     }
 
+    /**
+     * Halaman Master List Pengaturan Email
+     */
     public function index()
     {
-        $this->load->library('encryption');
-        // Load existing email settings from db
-        $this->db->like('setting_name', 'smtp_');
-        $data = $this->db->get('settings')->result();
-        
-        $setData = [];
-        foreach($data as $dt) {
-            if ($dt->setting_name == 'smtp_pass' && !empty($dt->value)) {
-                $decrypted = $this->encryption->decrypt($dt->value);
-                // Jika data lama belum ter-enkripsi, gunakan data asli
-                $setData[$dt->setting_name] = ($decrypted !== FALSE && $decrypted !== '') ? $decrypted : $dt->value;
-            } else {
-                $setData[$dt->setting_name] = $dt->value;
-            }
-        }
-        
-        $this->template->set('data', $setData);
+        $configs   = $this->email_cfg->get_all();
+        $providers = $this->email_cfg->get_providers();
+        $active    = $this->email_cfg->get_active();
+
+        $this->template->set([
+            'configs'   => $configs,
+            'providers' => $providers,
+            'active'    => $active
+        ]);
         $this->template->render('email_settings');
     }
 
-    public function save()
+    /**
+     * Detail Konfigurasi untuk Edit Form (AJAX)
+     */
+    public function get_config($id)
     {
-        $this->load->library('encryption');
-        $post = $this->input->post();
-        if ($post) {
-            $this->db->trans_begin();
-            
-            foreach ($post as $key => $value) {
-                // Encrypt password before saving
-                if ($key == 'smtp_pass' && !empty($value)) {
-                    $value = $this->encryption->encrypt($value);
-                }
-
-                // Check if setting exists
-                $exist = $this->db->get_where('settings', ['setting_name' => $key])->num_rows();
-                if ($exist > 0) {
-                    $this->db->update('settings', ['value' => $value], ['setting_name' => $key]);
-                } else {
-                    $this->db->insert('settings', ['setting_name' => $key, 'value' => $value]);
-                }
-            }
-
-            if ($this->db->trans_status() === FALSE) {
-                $this->db->trans_rollback();
-                $return = ['status' => 0, 'msg' => 'Gagal menyimpan pengaturan email.'];
-            } else {
-                $this->db->trans_commit();
-                $return = ['status' => 1, 'msg' => 'Pengaturan email berhasil disimpan.'];
-            }
-        } else {
-            $return = ['status' => 0, 'msg' => 'Data tidak valid.'];
-        }
-        
-        echo json_encode($return);
-    }
-
-    public function test_email()
-    {
-        $this->load->library('email_runner');
-        
-        // Ambil email dari post input UI saat ini sebagai tujuan testing
-        $target_email = $this->input->post('smtp_user'); 
-        
-        if (empty($target_email)) {
-            echo json_encode(['status' => 0, 'msg' => 'Email SMTP User harus diisi untuk pengiriman test.']);
+        $config = $this->email_cfg->get_by_id($id);
+        if (!$config) {
+            echo json_encode(['status' => 0, 'msg' => 'Konfigurasi tidak ditemukan.']);
             return;
         }
 
-        $subject = "Askara: Test Configuration " . date('H:i');
-        $message = "<h3>Berhasil!</h3><p>Jika Anda menerima email ini, berarti pengaturan SMTP (Google Mail) di aplikasi Askara sudah bekerja dengan baik lewat Queue Background.</p>";
-        
-        // Push to queue
-        $this->email_runner->queue($target_email, $subject, $message);
+        // Dekripsi password untuk keperluan form edit
+        $decrypted_pass = '';
+        if (!empty($config->smtp_pass)) {
+            $dec = $this->encryption->decrypt($config->smtp_pass);
+            $decrypted_pass = ($dec !== FALSE && $dec !== '') ? $dec : $config->smtp_pass;
+        }
 
-        echo json_encode(['status' => 1, 'msg' => 'Test email berhasil dimasukkan ke antrean! Mohon cek kotak masuk email Anda ('.$target_email.') dalam 1 menit ke depan.']);
+        $response = [
+            'status' => 1,
+            'data'   => [
+                'id'             => $config->id,
+                'title'          => $config->title,
+                'provider'       => $config->provider,
+                'smtp_host'      => $config->smtp_host,
+                'smtp_port'      => $config->smtp_port,
+                'smtp_user'      => $config->smtp_user,
+                'smtp_pass'      => $decrypted_pass,
+                'smtp_crypto'    => $config->smtp_crypto,
+                'sender_name'    => $config->sender_name,
+                'sender_email'   => $config->sender_email,
+                'reply_to_name'  => $config->reply_to_name,
+                'reply_to_email' => $config->reply_to_email,
+                'is_active'      => $config->is_active
+            ]
+        ];
+
+        echo json_encode($response);
+    }
+
+    /**
+     * Simpan / Tambah / Update Konfigurasi Email (AJAX)
+     */
+    public function save_config()
+    {
+        $post = $this->input->post();
+        if (!$post) {
+            echo json_encode(['status' => 0, 'msg' => 'Data tidak valid.']);
+            return;
+        }
+
+        $id = isset($post['id']) && !empty($post['id']) ? $post['id'] : null;
+
+        $title        = trim($post['title']);
+        $provider     = trim($post['provider']);
+        $smtp_host    = trim($post['smtp_host']);
+        $smtp_port    = intval($post['smtp_port']);
+        $smtp_user    = trim($post['smtp_user']);
+        $smtp_pass    = trim($post['smtp_pass']);
+        $smtp_crypto  = trim($post['smtp_crypto']);
+        $sender_name  = trim($post['sender_name']);
+        $sender_email = trim($post['sender_email']);
+
+        if (empty($title) || empty($smtp_host) || empty($smtp_user) || empty($sender_email)) {
+            echo json_encode(['status' => 0, 'msg' => 'Harap lengkapi semua bidang wajib (Judul, Host, Username, & Sender Email).']);
+            return;
+        }
+
+        $save_data = [
+            'title'          => $title,
+            'provider'       => !empty($provider) ? $provider : 'custom',
+            'smtp_host'      => $smtp_host,
+            'smtp_port'      => $smtp_port > 0 ? $smtp_port : 587,
+            'smtp_user'      => $smtp_user,
+            'smtp_pass'      => $smtp_pass,
+            'smtp_crypto'    => in_array($smtp_crypto, ['ssl', 'tls', 'none']) ? $smtp_crypto : 'tls',
+            'sender_name'    => !empty($sender_name) ? $sender_name : 'Askara System',
+            'sender_email'   => $sender_email,
+            'reply_to_name'  => !empty($post['reply_to_name']) ? trim($post['reply_to_name']) : NULL,
+            'reply_to_email' => !empty($post['reply_to_email']) ? trim($post['reply_to_email']) : NULL,
+            'is_active'      => isset($post['is_active']) && $post['is_active'] == 1 ? 1 : 0
+        ];
+
+        $res = $this->email_cfg->save($save_data, $id);
+
+        if ($res) {
+            echo json_encode(['status' => 1, 'msg' => 'Konfigurasi email berhasil disimpan.']);
+        } else {
+            echo json_encode(['status' => 0, 'msg' => 'Gagal menyimpan konfigurasi email.']);
+        }
+    }
+
+    /**
+     * Setel Konfigurasi Email sebagai Aktif (AJAX)
+     */
+    public function set_active()
+    {
+        $id = $this->input->post('id');
+        if (!$id) {
+            echo json_encode(['status' => 0, 'msg' => 'ID Konfigurasi tidak valid.']);
+            return;
+        }
+
+        $res = $this->email_cfg->set_active($id);
+        if ($res) {
+            echo json_encode(['status' => 1, 'msg' => 'Konfigurasi email aktif berhasil diubah.']);
+        } else {
+            echo json_encode(['status' => 0, 'msg' => 'Gagal mengubah status aktif.']);
+        }
+    }
+
+    /**
+     * Hapus Konfigurasi Email (AJAX)
+     */
+    public function delete_config()
+    {
+        $id = $this->input->post('id');
+        if (!$id) {
+            echo json_encode(['status' => 0, 'msg' => 'ID Konfigurasi tidak valid.']);
+            return;
+        }
+
+        $res = $this->email_cfg->delete($id);
+        if ($res) {
+            echo json_encode(['status' => 1, 'msg' => 'Konfigurasi email berhasil dihapus.']);
+        } else {
+            echo json_encode(['status' => 0, 'msg' => 'Gagal menghapus konfigurasi email.']);
+        }
+    }
+
+    /**
+     * Pengujian Pengiriman Email (Direct Live Test & Log Status SMTP)
+     */
+    public function test_config()
+    {
+        $post = $this->input->post();
+        if (!$post) {
+            echo json_encode(['status' => 0, 'msg' => 'Data pengujian tidak valid.']);
+            return;
+        }
+
+        $target_email = trim($post['target_email']);
+        if (empty($target_email) || !filter_var($target_email, FILTER_VALIDATE_EMAIL)) {
+            echo json_encode(['status' => 0, 'msg' => 'Alamat email tujuan test tidak valid.']);
+            return;
+        }
+
+        $config_id = isset($post['config_id']) && !empty($post['config_id']) ? $post['config_id'] : null;
+
+        // Ambil data konfigurasi: dari ID jika diset, atau dari input form modal
+        if ($config_id) {
+            $cfg = $this->email_cfg->get_by_id($config_id);
+            if (!$cfg) {
+                echo json_encode(['status' => 0, 'msg' => 'Konfigurasi email tidak ditemukan.']);
+                return;
+            }
+            $smtp_host    = $cfg->smtp_host;
+            $smtp_port    = $cfg->smtp_port;
+            $smtp_user    = $cfg->smtp_user;
+            $decrypted    = $this->encryption->decrypt($cfg->smtp_pass);
+            $smtp_pass    = ($decrypted !== FALSE && $decrypted !== '') ? $decrypted : $cfg->smtp_pass;
+            $smtp_crypto  = $cfg->smtp_crypto;
+            $sender_name  = $cfg->sender_name;
+            $sender_email = $cfg->sender_email;
+            $reply_name   = $cfg->reply_to_name;
+            $reply_email  = $cfg->reply_to_email;
+        } else {
+            // Ambil dari input form
+            $smtp_host    = trim($post['smtp_host']);
+            $smtp_port    = intval($post['smtp_port']);
+            $smtp_user    = trim($post['smtp_user']);
+            $smtp_pass    = trim($post['smtp_pass']);
+            $smtp_crypto  = trim($post['smtp_crypto']);
+            $sender_name  = trim($post['sender_name']);
+            $sender_email = trim($post['sender_email']);
+            $reply_name   = !empty($post['reply_to_name']) ? trim($post['reply_to_name']) : null;
+            $reply_email  = !empty($post['reply_to_email']) ? trim($post['reply_to_email']) : null;
+        }
+
+        if (empty($smtp_host) || empty($smtp_user) || empty($smtp_pass) || empty($sender_email)) {
+            echo json_encode(['status' => 0, 'msg' => 'Pengaturan SMTP & Sender harus diisi lengkap untuk pengujian.']);
+            return;
+        }
+
+        // Clean host dari ssl:// atau tls://
+        $clean_host = str_replace(['ssl://', 'tls://'], '', $smtp_host);
+
+        $config = [
+            'protocol'    => 'smtp',
+            'smtp_host'   => $clean_host,
+            'smtp_port'   => $smtp_port > 0 ? $smtp_port : 465,
+            'smtp_user'   => $smtp_user,
+            'smtp_pass'   => $smtp_pass,
+            'smtp_crypto' => $smtp_crypto ? $smtp_crypto : 'ssl',
+            'mailtype'    => 'html',
+            'charset'     => 'utf-8',
+            'newline'     => "\r\n",
+            'crlf'        => "\r\n",
+            'wordwrap'    => TRUE
+        ];
+
+        $this->load->library('email');
+        $this->email->initialize($config);
+        $this->email->clear();
+
+        $this->email->from($sender_email, !empty($sender_name) ? $sender_name : 'Askara Notification System');
+        if (!empty($reply_email)) {
+            $this->email->reply_to($reply_email, !empty($reply_name) ? $reply_name : $sender_name);
+        }
+        $this->email->to($target_email);
+
+        $subject = "Askara: Test Configuration Server - " . date('d M Y H:i:s');
+        $htmlMessage = '
+        <div style="font-family: Arial, sans-serif; padding: 20px; border: 1px solid #e0e0e0; border-radius: 8px; max-width: 600px; margin: 0 auto; background-color: #ffffff;">
+            <h2 style="color: #2b77d9; margin-top: 0;"><i class="fa fa-check-circle"></i> Uji Coba Email Server Berhasil!</h2>
+            <p>Halo,</p>
+            <p>Jika Anda menerima email ini, berarti pengujian konfigurasi SMTP/Server Email di aplikasi <strong>Askara</strong> telah sukses beroperasi.</p>
+            <table style="width: 100%; border-collapse: collapse; margin-top: 15px; background: #f9f9f9; padding: 10px; border-radius: 5px;">
+                <tr><td style="padding: 6px; font-weight: bold; width: 35%;">Server / Provider:</td><td style="padding: 6px;">'.htmlspecialchars($smtp_host).'</td></tr>
+                <tr><td style="padding: 6px; font-weight: bold;">Port & Crypto:</td><td style="padding: 6px;">'.$smtp_port.' ('.strtoupper($smtp_crypto).')</td></tr>
+                <tr><td style="padding: 6px; font-weight: bold;">Sender Email:</td><td style="padding: 6px;">'.htmlspecialchars($sender_email).'</td></tr>
+                <tr><td style="padding: 6px; font-weight: bold;">Waktu Pengujian:</td><td style="padding: 6px;">'.date('d M Y H:i:s').' WIB</td></tr>
+            </table>
+            <p style="margin-top: 20px; font-size: 12px; color: #888;">Email ini dikirim secara otomatis oleh fitur pengujian master email Askara System.</p>
+        </div>';
+
+        $this->email->subject($subject);
+        $this->email->message($htmlMessage);
+
+        $now = date('Y-m-d H:i:s');
+        if ($this->email->send()) {
+            // Update Status Log jika config_id ada
+            if ($config_id) {
+                $this->email_cfg->update_status($config_id, [
+                    'last_test_at'     => $now,
+                    'last_test_status' => 'success',
+                    'last_success_at'  => $now,
+                    'last_error_msg'   => NULL
+                ]);
+            }
+            echo json_encode([
+                'status' => 1,
+                'msg'    => 'Test email berhasil dikirim ke <strong>' . htmlspecialchars($target_email) . '</strong>! Silakan periksa inbox/spam folder Anda.'
+            ]);
+        } else {
+            $error_msg = $this->email->print_debugger(['headers']);
+            $clean_error = strip_tags($error_msg);
+            if (strpos($clean_error, 'The following SMTP error was encountered:') !== false) {
+                $parts = explode('The following SMTP error was encountered:', $clean_error);
+                $clean_error = 'SMTP Error: ' . trim(end($parts));
+            }
+            if (strlen($clean_error) > 500) {
+                $clean_error = substr($clean_error, 0, 500);
+            }
+
+            if ($config_id) {
+                $this->email_cfg->update_status($config_id, [
+                    'last_test_at'     => $now,
+                    'last_test_status' => 'failed',
+                    'last_error_at'    => $now,
+                    'last_error_msg'   => $clean_error
+                ]);
+            }
+
+            echo json_encode([
+                'status' => 0,
+                'msg'    => 'Pengiriman test email gagal.<br><small class="text-danger font-weight-bold">' . htmlspecialchars($clean_error) . '</small>'
+            ]);
+        }
     }
 
     /**
@@ -144,6 +355,8 @@ class Email_settings extends Admin_Controller
             $statusBadge = '';
             if ($r->status == 'SND') {
                 $statusBadge = '<span class="label label-light-success label-inline font-weight-bold">Sent</span>';
+            } elseif ($r->status == 'PRG') {
+                $statusBadge = '<span class="label label-light-info label-inline font-weight-bold"><i class="fa fa-spinner fa-spin mr-1"></i>Processing</span>';
             } elseif ($r->status == 'FAI') {
                 $statusBadge = '<span class="label label-light-danger label-inline font-weight-bold">Failed</span>';
             } else {
@@ -153,7 +366,9 @@ class Email_settings extends Admin_Controller
             $actionBtn = '<button type="button" class="btn btn-xs btn-light-info btn-icon btn-preview mr-1" data-id="'.$r->id.'" title="Preview Email"><i class="fa fa-eye"></i></button>';
             if ($r->status == 'FAI') {
                 $actionBtn .= '<button type="button" class="btn btn-xs btn-primary btn-resend" data-id="'.$r->id.'" title="Kirim Ulang"><i class="fa fa-redo"></i> Resend</button>';
-            } elseif ($r->status == 'PND') {
+            } elseif ($r->status == 'PRG') {
+                $actionBtn .= '<button type="button" class="btn btn-xs btn-info" disabled><i class="fa fa-spinner fa-spin"></i> Processing</button>';
+            } else {
                 $actionBtn .= '<button type="button" class="btn btn-xs btn-secondary" disabled><i class="fa fa-clock"></i> Pending</button>';
             }
 
@@ -227,7 +442,7 @@ class Email_settings extends Admin_Controller
      */
     public function get_queue_counts()
     {
-        $pending = $this->db->where('status', 'PND')->count_all_results('email_queues');
+        $pending = $this->db->where_in('status', ['PND', 'PRG'])->count_all_results('email_queues');
         $sent    = $this->db->where('status', 'SND')->count_all_results('email_queues');
         $failed  = $this->db->where('status', 'FAI')->count_all_results('email_queues');
         $total   = $this->db->count_all('email_queues');
@@ -269,11 +484,9 @@ class Email_settings extends Admin_Controller
             $old_db = $this->db->get_where('settings', ['setting_name' => 'email_template_html'])->row();
             $full_html = ($old_db) ? $old_db->value : file_get_contents(APPPATH . 'modules/setting/views/email_template.php');
 
-            // Ekstrak CSS
             preg_match('/<style>(.*?)<\/style>/s', $full_html, $css_match);
             $template_css = isset($css_match[1]) ? trim($css_match[1]) : '';
 
-            // Ekstrak Body Content
             preg_match('/<body.*?>(.*?)<\/body>/s', $full_html, $body_match);
             $template_body = isset($body_match[1]) ? trim($body_match[1]) : $full_html;
         }
@@ -293,7 +506,6 @@ class Email_settings extends Admin_Controller
         $template_body = $this->input->post('template_body');
         $template_css  = $this->input->post('template_css');
         
-        // Simpan Variabel Overrides
         $email_vars = $this->input->post('email_vars');
         if (is_array($email_vars)) {
             foreach ($email_vars as $key => $val) {
@@ -302,9 +514,7 @@ class Email_settings extends Admin_Controller
         }
 
         if ($template_body) {
-            // Simpan Body
             $this->_upsert_setting('email_template_body', $template_body);
-            // Simpan CSS
             $this->_upsert_setting('email_template_css', $template_css);
 
             $return = ['status' => 1, 'msg' => 'Template email dan variabel berhasil disimpan.'];
@@ -332,11 +542,9 @@ class Email_settings extends Admin_Controller
     {
         $q = $this->db->get_where('email_queues', ['id' => $id])->row();
         if ($q) {
-            // Get email template body and CSS
             $body_db = $this->db->get_where('settings', ['setting_name' => 'email_template_body'])->row();
             $css_db  = $this->db->get_where('settings', ['setting_name' => 'email_template_css'])->row();
 
-            // Get Email Variable Overrides
             $email_vars = [];
             $vars_keys  = ['email_vars_company_name', 'email_vars_company_address', 'email_vars_company_logo'];
             $vars_db    = $this->db->where_in('setting_name', $vars_keys)->get('settings')->result();
@@ -344,30 +552,24 @@ class Email_settings extends Admin_Controller
                 $email_vars[$v->setting_name] = $v->value;
             }
 
-            // Ambil data perusahaan untuk placeholder dinamis (sebagai fallback)
             $company = $this->db->get_where('companies', ['id_perusahaan' => $q->company_id])->row();
 
             if ($body_db) {
-                // Gunakan template terpisah (Body & CSS)
                 $htmlBody = $body_db->value;
                 $htmlCss = ($css_db) ? $css_db->value : '';
                 $htmlMessage = '<!DOCTYPE html><html><head><meta charset="UTF-8"><style>' . $htmlCss . '</style></head><body class="email-template">' . $htmlBody . '</body></html>';
             } else {
-                // Fallback 1: Template Full HTML dari database (Lama)
                 $old_db = $this->db->get_where('settings', ['setting_name' => 'email_template_html'])->row();
                 if ($old_db) {
                     $htmlMessage = $old_db->value;
                 } else {
-                    // Fallback 2: Bungkus pesan dengan template HTML fisik (Lama)
                     $htmlMessage = $this->load->view('setting/email_template', ['message' => $q->message], true);
                 }
             }
 
-            // Ganti Placeholder Dasar
             $htmlMessage = str_replace('{{content}}', $q->message, $htmlMessage);
             $htmlMessage = str_replace('{{subject}}', $q->subject, $htmlMessage);
 
-            // Tentukan Nilai untuk Placeholder (Prioritas: Overrides > Master Perusahaan)
             $final_name    = (!empty($email_vars['email_vars_company_name'])) ? $email_vars['email_vars_company_name'] : ($company ? $company->nm_perusahaan : '');
             $final_address = (!empty($email_vars['email_vars_company_address'])) ? $email_vars['email_vars_company_address'] : ($company ? $company->alamat : '');
             $final_logo    = '';
@@ -382,7 +584,6 @@ class Email_settings extends Admin_Controller
             $htmlMessage = str_replace('{{company_address}}', $final_address, $htmlMessage);
             $htmlMessage = str_replace('{{company_logo}}', $final_logo, $htmlMessage);
 
-            // Ganti Action URL (Jika kosong, arahkan ke Home)
             $final_url = (!empty($q->action_url)) ? $q->action_url : base_url();
             $htmlMessage = str_replace('{{action_url}}', $final_url, $htmlMessage);
 
