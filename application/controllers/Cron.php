@@ -28,7 +28,7 @@ class Cron extends CI_Controller
         $this->_check_table_and_migrate();
 
         // 0. Mutex / Process Locking menggunakan flock untuk mencegah multiple worker running bersamaan
-        $lock_file = APPPATH . 'cache/email_cron.lock';
+        $lock_file = sys_get_temp_dir() . '/askara_email_cron.lock';
         $fp = @fopen($lock_file, 'c+');
         if ($fp) {
             if (!@flock($fp, LOCK_EX | LOCK_NB)) {
@@ -41,7 +41,10 @@ class Cron extends CI_Controller
         // 0b. Reset antrean status 'PRG' (Processing) yang gantung > 5 menit kembali ke 'PND'
         $five_mins_ago = date('Y-m-d H:i:s', strtotime('-5 minutes'));
         $this->db->where('status', 'PRG');
-        $this->db->where('created_at <', $five_mins_ago);
+        $this->db->group_start();
+        $this->db->where('locked_at <', $five_mins_ago);
+        $this->db->or_where('locked_at IS NULL'); // Handle lama
+        $this->db->group_end();
         $this->db->update('email_queues', ['status' => 'PND']);
 
         // 1. Ambil kandidat antrean pending (batch per 5 email)
@@ -60,7 +63,7 @@ class Cron extends CI_Controller
         $candidate_ids = array_column($candidates, 'id');
         $this->db->where_in('id', $candidate_ids);
         $this->db->where('status', 'PND');
-        $this->db->update('email_queues', ['status' => 'PRG']);
+        $this->db->update('email_queues', ['status' => 'PRG', 'locked_at' => date('Y-m-d H:i:s')]);
 
         if ($this->db->affected_rows() == 0) {
             if ($fp) {
@@ -321,6 +324,7 @@ class Cron extends CI_Controller
               `attempts` int(11) NOT NULL DEFAULT 0,
               `error_msg` text DEFAULT NULL,
               `created_at` datetime NOT NULL DEFAULT CURRENT_TIMESTAMP,
+              `locked_at` datetime DEFAULT NULL,
               `sent_at` datetime DEFAULT NULL,
               PRIMARY KEY (`id`),
               KEY `idx_status` (`status`)
@@ -329,13 +333,19 @@ class Cron extends CI_Controller
         } else {
             // Pastikan kolom status adalah VARCHAR(10) agar mendukung status 'PRG'
             $fields = $this->db->field_data('email_queues');
+            $has_locked_at = false;
             foreach ($fields as $field) {
                 if ($field->name == 'status') {
                     if (strpos(strtolower($field->type), 'enum') !== false || $field->max_length < 10) {
                         $this->db->query("ALTER TABLE `email_queues` MODIFY COLUMN `status` VARCHAR(10) NOT NULL DEFAULT 'PND' COMMENT 'PND=Pending, PRG=Processing, SND=Sent, FAI=Failed'");
                     }
-                    break;
                 }
+                if ($field->name == 'locked_at') {
+                    $has_locked_at = true;
+                }
+            }
+            if (!$has_locked_at) {
+                $this->db->query("ALTER TABLE `email_queues` ADD COLUMN `locked_at` DATETIME NULL DEFAULT NULL AFTER `created_at`");
             }
         }
     }
