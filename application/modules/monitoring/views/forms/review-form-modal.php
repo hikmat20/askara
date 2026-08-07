@@ -10,7 +10,7 @@
             <div class="card-body p-0">
                 <?php if (!empty($form->file_name)) : ?>
                     <?php
-                    $file_path = base_url('directory/FORMS/1/' . $form->file_name);
+                    $file_path = base_url('forms/view_file/' . $form->id);
                     $file_ext = strtolower($form->ext ? $form->ext : pathinfo($form->file_name, PATHINFO_EXTENSION));
                     ?>
 
@@ -27,34 +27,30 @@
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
                         <!-- Excel Preview -->
-                        <div class="p-5 text-center">
-                            <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
-                            <h4>Excel Document</h4>
-                            <p class=""><?= htmlspecialchars($form->file_name); ?></p>
-                            <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download_form) : ?>
-                            <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-success">
-                                <i class="fa fa-download"></i> Download Excel File
-                            </a>
-                            <?php else : ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
-                            <?php endif; ?>
+                        <div class="alert alert-info m-3">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Jika dokumen tidak muncul, pasang ekstensi <a
+                                href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj"
+                                target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda,
+                            atau unduh dokumen secara manual.
                         </div>
+                        <iframe src="<?= base_url('forms/view_file/' . $form->id); ?>"
+                            style="width: 100%; height: 600px; border: none;"
+                            frameborder="0">
+                        </iframe>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
-                        <div class="p-5 text-center">
-                            <i class="fa fa-file-word fa-5x text-primary mb-3"></i>
-                            <h4>Word Document</h4>
-                            <p class=""><?= htmlspecialchars($form->file_name); ?></p>
-                            <p class="">Size: <?= isset($form->size) ? number_format($form->size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download_form) : ?>
-                            <a href="<?= base_url('forms/download/' . $form->id); ?>" class="btn btn-primary">
-                                <i class="fa fa-download"></i> Download Word File
-                            </a>
-                            <?php else : ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
-                            <?php endif; ?>
+                        <div class="alert alert-info m-3">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Jika dokumen tidak muncul, pasang ekstensi <a
+                                href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj"
+                                target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda,
+                            atau unduh dokumen secara manual.
                         </div>
+                        <iframe src="<?= base_url('forms/view_file/' . $form->id); ?>"
+                            style="width: 100%; height: 600px; border: none;"
+                            frameborder="0">
+                        </iframe>
                     <?php else : ?>
                         <!-- Unknown file type -->
                         <div class="p-5 text-center">

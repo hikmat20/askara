@@ -8,10 +8,18 @@
                 </h5>
             </div>
             <div class="card-body p-0">
-                <?php if (!empty($wi->file_name)) : ?>
+                <?php 
+                $allow_download_wi = isset($allow_download_wi) ? $allow_download_wi : false;
+                $display_file_name = !empty($wi->display_file_name) ? $wi->display_file_name : (!empty($wi->file_name) ? $wi->file_name : '');
+                $display_file_path = !empty($wi->display_file_path) ? $wi->display_file_path : (!empty($wi->file_path) ? $wi->file_path : '');
+                $display_ext = !empty($wi->display_ext) ? $wi->display_ext : (!empty($wi->ext) ? $wi->ext : pathinfo($display_file_name, PATHINFO_EXTENSION));
+                $display_size = isset($wi->display_size) ? $wi->display_size : (isset($wi->size) ? $wi->size : null);
+                ?>
+
+                <?php if (!empty($display_file_name)) : ?>
                     <?php 
-                    $file_path = base_url('directory/WI/1/' . $wi->file_name);
-                    $file_ext = strtolower($wi->ext ? $wi->ext : pathinfo($wi->file_name, PATHINFO_EXTENSION));
+                    $file_path = base_url('work_instructions/view_file/' . $wi->id);
+                    $file_ext = strtolower($display_ext);
                     ?>
                     
                     <?php if ($file_ext === '.pdf' || $file_ext === 'pdf') : ?>
@@ -27,41 +35,33 @@
                         </iframe>
                     <?php elseif (in_array($file_ext, ['.xlsx', '.xls', 'xlsx', 'xls'])) : ?>
                         <!-- Excel Preview -->
-                        <div class="p-5 text-center">
-                            <i class="fa fa-file-excel fa-5x text-success mb-3"></i>
-                            <h4>Excel Document</h4>
-                            <p class=""><?= htmlspecialchars($wi->file_name); ?></p>
-                            <p class="">Size: <?= isset($wi->size) ? number_format($wi->size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download_wi) : ?>
-                            <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" class="btn btn-success">
-                                <i class="fa fa-download"></i> Download Excel File
-                            </a>
-                            <?php else: ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
-                            <?php endif; ?>
+                        <div class="alert alert-info m-3">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Jika dokumen tidak muncul, pasang ekstensi <a
+                                href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj"
+                                target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda,
+                            atau unduh dokumen secara manual di bawah.
                         </div>
+                        <iframe src="<?= $file_path; ?>" style="width: 100%; height: 600px; border: none;" frameborder="0">
+                        </iframe>
                     <?php elseif (in_array($file_ext, ['.docx', '.doc', 'docx', 'doc'])) : ?>
                         <!-- Word Preview -->
-                        <div class="p-5 text-center">
-                            <i class="fa fa-file-word fa-5x text-primary mb-3"></i>
-                            <h4>Word Document</h4>
-                            <p class=""><?= htmlspecialchars($wi->file_name); ?></p>
-                            <p class="">Size: <?= isset($wi->size) ? number_format($wi->size) . ' KB' : '-'; ?></p>
-                            <?php if ($allow_download_wi) : ?>
-                            <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" class="btn btn-primary">
-                                <i class="fa fa-download"></i> Download Word File
-                            </a>
-                            <?php else: ?>
-                                <span class="badge badge-secondary"><i class="fa fa-lock"></i> Download Restricted</span>
-                            <?php endif; ?>
+                        <div class="alert alert-info m-3">
+                            <i class="fa fa-info-circle mr-2"></i>
+                            Jika dokumen tidak muncul, pasang ekstensi <a
+                                href="https://chromewebstore.google.com/detail/office-editing-for-docs-s/gbkeegbaiigmenfmjfclcdgdpimamgkj"
+                                target="_blank" class="font-weight-bold text-dark">Office Editing</a> di browser Chrome Anda,
+                            atau unduh dokumen secara manual di bawah.
                         </div>
+                        <iframe src="<?= $file_path; ?>" style="width: 100%; height: 600px; border: none;" frameborder="0">
+                        </iframe>
                     <?php else : ?>
                         <!-- Unknown file type -->
                         <div class="p-5 text-center">
                             <i class="fa fa-file fa-5x text-secondary mb-3"></i>
                             <h4>Document File</h4>
-                            <p class=""><?= htmlspecialchars($wi->file_name); ?></p>
-                            <p class="">Size: <?= isset($wi->size) ? number_format($wi->size) . ' KB' : '-'; ?></p>
+                            <p class=""><?= htmlspecialchars($display_file_name); ?></p>
+                            <p class="">Size: <?= isset($display_size) ? number_format($display_size) . ' KB' : '-'; ?></p>
                             <?php if ($allow_download_wi) : ?>
                             <a href="<?= base_url('work_instructions/download/' . $wi->id); ?>" class="btn btn-secondary">
                                 <i class="fa fa-download"></i> Download File

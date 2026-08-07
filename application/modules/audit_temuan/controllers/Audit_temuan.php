@@ -186,6 +186,13 @@ class Audit_temuan extends Admin_Controller
             $data['pasal_id']   = json_encode($data['pasal_id']);
             $data['pasal_name'] = $ArrPasalName;
 
+            if (isset($data['auditee']) && is_array($data['auditee'])) {
+                $data['auditee'] = json_encode($data['auditee']);
+            }
+            if (isset($data['auditor']) && is_array($data['auditor'])) {
+                $data['auditor'] = json_encode($data['auditor']);
+            }
+
             if (isset($data['id']) && $data['id']) {
                 $data['created_at'] = date('Y-m-d H:i:s');
                 $data['created_by'] = $this->auth->user_id();
@@ -379,4 +386,50 @@ class Audit_temuan extends Admin_Controller
             show_404();
         }
     }
+
+    public function print_pdf($id = null)
+    {
+        if (!$id) {
+            show_404();
+            return;
+        }
+
+        $data = $this->db->get_where('view_audit_temuan', ['id' => $id, 'status' => 1])->row();
+        if (!$data) {
+            show_404();
+            return;
+        }
+
+        $dataStd = $this->db->get_where('view_audit_standard', ['audit_id' => $id, 'status' => '1'])->result();
+        foreach ($dataStd as $std) {
+            $std->findings = $this->db->get_where('view_audit_temuan_details', [
+                'audit_standard_id' => $std->id,
+                'status' => '1'
+            ])->result();
+        }
+        $auditors = $this->db->get_where('audit_auditor_badan_sertifikasi', ['badan_sert_id' => $data->badan_sert_id])->result();
+
+        $viewData = [
+            'data'    => $data,
+            'dataStd' => $dataStd,
+            'auditors' => $auditors,
+        ];
+
+        $html = $this->load->view('audit_temuan/pdf', $viewData, true);
+
+        $mpdf = new \Mpdf\Mpdf([
+            'mode' => 'utf-8',
+            'format' => 'A4',
+            'margin_left' => 15,
+            'margin_right' => 15,
+            'margin_top' => 15,
+            'margin_bottom' => 15,
+            'margin_header' => 0,
+            'margin_footer' => 0,
+        ]);
+        $mpdf->SetTitle('Audit Temuan - ' . $data->company_name);
+        $mpdf->WriteHTML($html);
+        $mpdf->Output('Audit_Temuan_' . $data->company_name . '.pdf', 'I');
+    }
 }
+

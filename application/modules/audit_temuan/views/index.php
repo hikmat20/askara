@@ -29,8 +29,9 @@
 											<td><?= $v->company_name; ?></td>
 											<td class="text-center"><?= $v->name; ?></td>
 											<td class="text-center">
-												<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $v->id; ?>"><i class="fa fa-eye" aria-hidden="true"></i></button>
-												<a href="<?= base_url($this->uri->segment(1) . "/detail/" . $v->id); ?>" class="btn btn-xs btn-icon btn-primary"><i class="fa fa-list" aria-hidden="true"></i></a>
+												<button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $v->id; ?>" title="View"><i class="fa fa-eye" aria-hidden="true"></i></button>
+												<a href="<?= base_url($this->uri->segment(1) . "/detail/" . $v->id); ?>" class="btn btn-xs btn-icon btn-primary" title="Detail"><i class="fa fa-list" aria-hidden="true"></i></a>
+												<a href="<?= base_url($this->uri->segment(1) . "/print_pdf/" . $v->id); ?>" target="_blank" class="btn btn-xs btn-icon btn-danger" title="Print PDF"><i class="fa fa-file-pdf" aria-hidden="true"></i></a>
 											</td>
 										</tr>
 									<?php endforeach; ?>

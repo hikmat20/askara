@@ -75,7 +75,7 @@ class Auth
         $dataCompany    = $company->row();
 
         if ($existComapny == 0) {
-            $this->ci->template->set_message('Inisial Company not found', '');
+            $this->ci->template->set_message('Kode Perusahaan tidak ditemukan. Silakan periksa kembali.', 'error');
             return FALSE;
         }
 
@@ -120,7 +120,7 @@ class Auth
                 $responseKeys = json_decode($response, true);
                 log_message('info', 'reCAPTCHA score: ' . $existUser->username . ' - ' . $responseKeys['score']);
                 if (!$responseKeys["success"]  && floatval($responseKeys['score']) >= $threshold) {
-                    $this->ci->template->set_message('reCAPTCHA verification failed. Please try again.', 'error');
+                    $this->ci->template->set_message('Verifikasi reCAPTCHA gagal. Silakan coba lagi.', 'error');
                     return FALSE;
                 }
 
@@ -148,14 +148,13 @@ class Auth
                     }
                     redirect("/");
                 } else {
-                    $this->ci->template->set_message("The account is not registered with any company", 'error');
+                    $this->ci->template->set_message('Akun Anda tidak terdaftar pada perusahaan mana pun. Silakan hubungi admin.', 'error');
                     return FALSE;
                 }
             }
         }
 
         $this->ci->template->set_message(lang('users_wrong_password'), 'error');
-        $this->ci->template->message();
         return FALSE;
     }
 

@@ -27,3 +27,5 @@ AGENTS.md
 email_cron.sh
 themes/dashboard/views/header_.php
 patch_nginx.sh
+node_modules
+venv

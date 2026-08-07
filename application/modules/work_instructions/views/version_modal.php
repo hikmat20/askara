@@ -84,6 +84,7 @@
 
     <!-- RIGHT SIDE: Version Information (40%) -->
     <div class="col-lg-5">
+        
         <!-- Version Information Card -->
         <div class="card card-custom shadow-sm mb-0">
             <div class="card-header">

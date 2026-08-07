@@ -6,8 +6,8 @@
       <input type="name" name="name" placeholder="Instansi" value="<?= $data->name; ?>" class="form-control form-control-lg required" aria-describedby="helpId">
     </div>
     <div class="form-group">
-      <label for="" class="h6 font-weight-bold mb-5">Description</label>
-      <textarea name="description" placeholder="Cescription" class="form-control form-control-lg" aria-describedby="helpId"><?= $data->description; ?></textarea>
+      <label for="" class="h6 font-weight-bold mb-5">Remarks</label>
+      <textarea name="description" placeholder="Remarks" class="form-control form-control-lg" aria-describedby="helpId"><?= $data->description; ?></textarea>
     </div>
   </div>
 

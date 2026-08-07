@@ -6,28 +6,37 @@
                     <h2 class="mt-5"><i class="<?= $icon; ?> mr-2"></i><?= $title; ?></h2>
                 </div>
                 <div class="card-body">
-                    <!-- Tab Navigation -->
-                    <ul class="nav nav-tabs nav-pills pb-3 border-0" id="myTab" role="tablist">
-                        <li class="nav-item">
-                            <a class="nav-link active" id="reviewer-tab" data-toggle="tab" href="#reviewer" role="tab" aria-controls="reviewer" aria-selected="true">
-                                <span class="nav-icon"><i class="fa fa-user-check"></i></span>
-                                <span class="nav-text">Default Reviewer</span>
-                            </a>
-                        </li>
-                        <li class="nav-item">
-                            <a class="nav-link" id="future-tab" data-toggle="tab" href="#future" role="tab" aria-controls="future" aria-selected="false">
-                                <span class="nav-icon"><i class="fa fa-cogs"></i></span>
-                                <span class="nav-text">Pengaturan Lain</span>
-                            </a>
-                        </li>
-                    </ul>
-
-                    <!-- Tab Content -->
-                    <div class="tab-content mt-5" id="myTabContent">
+                    <form id="form-preferences">
+                    <div class="row">
+                        <div class="col-md-3">
+                            <!-- Tab Navigation -->
+                            <ul class="nav flex-column nav-pills pb-3 border-0" id="myTab" role="tablist">
+                                <li class="nav-item mb-2">
+                                    <a class="nav-link active" id="reviewer-tab" data-toggle="tab" href="#reviewer" role="tab" aria-controls="reviewer" aria-selected="true">
+                                        <span class="nav-icon"><i class="fa fa-user-check"></i></span>
+                                        <span class="nav-text">Default Reviewer</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item mb-2">
+                                    <a class="nav-link" id="recaptcha-tab" data-toggle="tab" href="#recaptcha" role="tab" aria-controls="recaptcha" aria-selected="false">
+                                        <span class="nav-icon"><i class="fa fa-shield-alt"></i></span>
+                                        <span class="nav-text">reCaptcha Key</span>
+                                    </a>
+                                </li>
+                                <li class="nav-item mb-2">
+                                    <a class="nav-link" id="future-tab" data-toggle="tab" href="#future" role="tab" aria-controls="future" aria-selected="false">
+                                        <span class="nav-icon"><i class="fa fa-cogs"></i></span>
+                                        <span class="nav-text">Pengaturan Lain</span>
+                                    </a>
+                                </li>
+                            </ul>
+                        </div>
+                        <div class="col-md-9">
+                            <!-- Tab Content -->
+                            <div class="tab-content" id="myTabContent">
                         
                         <!-- Tab: Default Reviewer -->
                         <div class="tab-pane fade show active" id="reviewer" role="tabpanel" aria-labelledby="reviewer-tab">
-                            <form id="form-preferences">
                                 <div class="form-group row">
                                     <label class="col-form-label col-3">Default Reviewer Procedure</label>
                                     <div class="col-4">
@@ -41,16 +50,36 @@
                                         </select>
                                     </div>
                                 </div>
-                                <hr>
-                                <div class="row">
-                                    <div class="col-3"></div>
-                                    <div class="col-4">
-                                        <button type="button" class="btn btn-primary font-weight-bolder" id="save-preferences">
-                                            <i class="fa fa-save"></i> Save Preferences
-                                        </button>
+                            </div>
+                        
+                        <!-- Tab: reCaptcha -->
+                        <div class="tab-pane fade" id="recaptcha" role="tabpanel" aria-labelledby="recaptcha-tab">
+                            <div class="form-group row">
+                                <label class="col-form-label col-3">Site Key</label>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="recaptcha_site_key" value="<?= isset($settings['recaptcha_site_key']) ? $settings['recaptcha_site_key'] : ''; ?>" placeholder="Masukkan Google reCaptcha Site Key" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text toggle-password" style="cursor: pointer;">
+                                                <i class="fa fa-eye-slash"></i>
+                                            </span>
+                                        </div>
                                     </div>
                                 </div>
-                            </form>
+                            </div>
+                            <div class="form-group row">
+                                <label class="col-form-label col-3">Secret Key</label>
+                                <div class="col-6">
+                                    <div class="input-group">
+                                        <input type="password" class="form-control" name="recaptcha_secret_key" value="<?= isset($settings['recaptcha_secret_key']) ? $settings['recaptcha_secret_key'] : ''; ?>" placeholder="Masukkan Google reCaptcha Secret Key" />
+                                        <div class="input-group-append">
+                                            <span class="input-group-text toggle-password" style="cursor: pointer;">
+                                                <i class="fa fa-eye-slash"></i>
+                                            </span>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                         
                         <!-- Tab: Future Settings -->
@@ -61,7 +90,20 @@
                             </div>
                         </div>
 
+                            </div>
+
+                            <hr>
+                            <div class="row">
+                                <div class="col-3"></div>
+                                <div class="col-9">
+                                    <button type="button" class="btn btn-primary font-weight-bolder" id="save-preferences">
+                                        <i class="fa fa-save"></i> Save Preferences
+                                    </button>
+                                </div>
+                            </div>
+                        </div>
                     </div>
+                    </form>
                 </div>
             </div>
         </div>
@@ -74,6 +116,18 @@
             placeholder: 'Select an option',
             width: '100%',
             allowClear: true
+        });
+
+        $('.toggle-password').click(function() {
+            var icon = $(this).find('i');
+            var input = $(this).closest('.input-group').find('input');
+            if (input.attr('type') == 'password') {
+                input.attr('type', 'text');
+                icon.removeClass('fa-eye-slash').addClass('fa-eye');
+            } else {
+                input.attr('type', 'password');
+                icon.removeClass('fa-eye').addClass('fa-eye-slash');
+            }
         });
 
         $('#save-preferences').click(function(e) {

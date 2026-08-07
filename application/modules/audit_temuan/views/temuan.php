@@ -41,9 +41,7 @@
 										<th>Kategori</th>
 										<th>Proses</th>
 										<th>Auditee</th>
-										<th>Auditor</th>
 										<th width="50">Auditor Internal</th>
-										<th>Konsultan</th>
 										<th width="75">Action</th>
 									</tr>
 								</thead>
@@ -68,14 +66,31 @@
 											<td class="text-left"><?= $v->description; ?></td>
 											<td><?= $cat[$v->category]; ?></td>
 											<td><?= $v->process; ?></td>
-											<td><?= $v->auditee; ?></td>
-											<td><?= $v->auditor_name; ?></td>
+											<td>
+												<?php
+												if ($v->auditee) {
+													$auds = json_decode($v->auditee, true);
+													if (is_array($auds)) {
+														$names = [];
+														foreach ($auds as $a) {
+															$c = $this->db->get_where('audit_auditor_consultant', ['id' => $a])->row();
+															$names[] = $c ? $c->name : $a;
+														}
+														echo htmlspecialchars(implode(', ', $names));
+													} else {
+														echo htmlspecialchars($v->auditee);
+													}
+												} else {
+													echo '-';
+												}
+												?>
+											</td>
 											<td><?= $v->auditor_internal_name; ?></td>
-											<td><?= $v->audit_consultant_name; ?></td>
 											<td class="text-center">
 												<!-- <button type="button" class="btn btn-xs btn-icon btn-info view" data-id="<?= $v->id; ?>"><i class="fa fa-eye" aria-hidden="true"></i></button> -->
-												<button type="button" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $v->id; ?>"><i class="fa fa-edit" aria-hidden="true"></i></button>
-												<button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $v->id; ?>"><i class="fa fa-trash" aria-hidden="true"></i></button>
+												<button type="button" class="btn btn-xs btn-icon btn-warning edit" data-id="<?= $v->id; ?>" title="Edit"><i class="fa fa-edit" aria-hidden="true"></i></button>
+												<button type="button" class="btn btn-xs btn-icon btn-danger delete" data-id="<?= $v->id; ?>" title="Delete"><i class="fa fa-trash" aria-hidden="true"></i></button>
+												<a href="<?= base_url($this->uri->segment(1) . "/print_pdf/$data->id"); ?>" target="_blank" class="btn btn-xs btn-icon btn-primary" title="Print PDF"><i class="fa fa-print" aria-hidden="true"></i></a>
 											</td>
 										</tr>
 									<?php endforeach; ?>
@@ -143,31 +158,48 @@
 							<?php endforeach; ?>
 						</select>
 					</div>
-					<div class="form-group">
+					<div class="form-group mb-3">
 						<label for="" class="h6 font-weight-bold">Auditee <span class="text-danger">*</span></label>
-						<input type="text" name="auditee" id="auditee" class="form-control required" placeholder="Auditee">
+						<table id="tblAuditee" class="table table-bordered table-condensed table-sm mb-2">
+							<thead>
+								<tr>
+									<th width="30" class="text-center">No</th>
+									<th>Name</th>
+									<th width="50" class="text-center">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+						<button type="button" class="btn btn-success btn-sm" id="add-auditee"><i class="fa fa-plus" aria-hidden="true"></i> Add Auditee</button>
 					</div>
-					<div class="form-group">
+					<div class="form-group mb-3">
 						<label for="" class="h6 font-weight-bold">Auditor <span class="text-danger">*</span></label>
-						<select name="auditor" id="auditor" data-allow-clear="true" class="form-select select2 required" data-placeholder="Select Auditor">
-							<option></option>
-							<?php if ($auditors) foreach ($auditors as $k => $v) : ?>
-								<option value="<?= $v->id; ?>"><?= $v->name; ?></option>
-							<?php endforeach; ?>
-						</select>
+						<table id="tblAuditorTemuan" class="table table-bordered table-condensed table-sm mb-2">
+							<thead>
+								<tr>
+									<th width="30" class="text-center">No</th>
+									<th>Name</th>
+									<th width="50" class="text-center">Action</th>
+								</tr>
+							</thead>
+							<tbody>
+							</tbody>
+						</table>
+						<button type="button" class="btn btn-success btn-sm" id="add-auditor-temuan"><i class="fa fa-plus" aria-hidden="true"></i> Add Auditor</button>
 					</div>
-					<div class="form-group">
+					<div class="form-group d-none">
 						<label for="" class="h6 font-weight-bold">Auditor Internal <span class="text-danger">*</span></label>
-						<select name="auditor_internal" id="auditor_internal" data-allow-clear="true" class="form-select select2 required" data-placeholder="Select Auditor">
+						<select name="auditor_internal" id="auditor_internal" data-allow-clear="true" class="form-select select2" data-placeholder="Select Auditor">
 							<option value=""></option>
 							<?php if ($auditorInternal) foreach ($auditorInternal as $k => $v) : ?>
 								<option value="<?= $v->id; ?>"><?= $v->name; ?></option>
 							<?php endforeach; ?>
 						</select>
 					</div>
-					<div class="form-group">
+					<div class="form-group d-none">
 						<label for="" class="h6 font-weight-bold">Konsultan <span class="text-danger">*</span></label>
-						<select name="consultant" id="consultant" data-allow-clear="true" class="form-select select2 required" data-placeholder="Select Auditor">
+						<select name="consultant" id="consultant" data-allow-clear="true" class="form-select select2" data-placeholder="Select Auditor">
 							<option value=""></option>
 							<?php if ($consultant) foreach ($consultant as $k => $v) : ?>
 								<option value="<?= $v->id; ?>"><?= $v->name; ?></option>
@@ -217,17 +249,111 @@
 			placeholder: "Choose one"
 		});
 
+
+
 		// Initialize Summernote once
 		$('#modelId textarea.summernote').summernote({
 			dialogsInBody: true,
 			height: 150
 		});
 
+		let auditors = '<option value=""></option>';
+		<?php if ($auditors) foreach ($auditors as $k => $v) : ?>
+			auditors += `<option value="<?= $v->id; ?>"><?= $v->name; ?></option>`;
+		<?php endforeach; ?>
+
 		/* Tambah Temuan */
 		$(document).on('click', '#add-temuan', function() {
 			$("#modelId").modal('show');
+			$('#tblAuditee tbody').empty();
+			$('#tblAuditorTemuan tbody').empty();
 		});
 
+		$(document).on('click', '#add-auditee', function() {
+			let n = $('#tblAuditee tbody tr').length + 1;
+			let html = `
+				<tr>
+					<td class="text-center number">${n}</td>
+					<td>
+						<input type="text" name="auditee[]" class="form-control required" placeholder="Auditee Name">
+					</td>
+					<td class="text-center">
+						<button type="button" class="btn btn-xs btn-danger btn-icon del-row"><i class="fa fa-trash" aria-hidden="true"></i></button>
+					</td>
+				</tr>`;
+			$('#tblAuditee tbody').append(html);
+			resetNumbering('#tblAuditee');
+		});
+
+		$(document).on('click', '#add-auditor-temuan', function() {
+			let n = $('#tblAuditorTemuan tbody tr').length + 1;
+			let html = `
+				<tr>
+					<td class="text-center number">${n}</td>
+					<td>
+						<select name="auditor[]" class="form-select select2-auditor required" data-placeholder="Select Auditor">
+							${auditors}
+						</select>
+					</td>
+					<td class="text-center">
+						<button type="button" class="btn btn-xs btn-danger btn-icon del-row-auditor"><i class="fa fa-trash" aria-hidden="true"></i></button>
+					</td>
+				</tr>`;
+			$('#tblAuditorTemuan tbody').append(html);
+			$('#tblAuditorTemuan tbody tr:last .select2-auditor').select2({
+				width: "100%",
+				closeOnSelect: true,
+				dropdownParent: $('#modelId .modal-body')
+			}).on('change', updateAuditorOptions);
+			
+			resetNumbering('#tblAuditorTemuan');
+			updateAuditorOptions();
+		});
+
+		$(document).on('click', '.del-row-auditor', function() {
+			$(this).closest('tr').remove();
+			resetNumbering('#tblAuditorTemuan');
+			updateAuditorOptions();
+		});
+
+		function updateAuditorOptions() {
+			setTimeout(function() {
+				let selectedVals = [];
+				$('#tblAuditorTemuan .select2-auditor').each(function() {
+					if($(this).val()) {
+						selectedVals.push($(this).val());
+					}
+				});
+				$('#tblAuditorTemuan .select2-auditor').each(function() {
+					let currentVal = $(this).val();
+					$(this).find('option').each(function() {
+						if($(this).val() && selectedVals.includes($(this).val()) && $(this).val() != currentVal) {
+							$(this).prop('disabled', true);
+						} else {
+							$(this).prop('disabled', false);
+						}
+					});
+					$(this).select2('destroy').select2({
+						width: "100%",
+						closeOnSelect: true,
+						dropdownParent: $('#modelId .modal-body')
+					}).off('change').on('change', updateAuditorOptions);
+				});
+			}, 50);
+		}
+
+		$(document).on('click', '.del-row', function() {
+			const tbody = $(this).closest('tbody');
+			const tableId = '#' + $(this).closest('table').attr('id');
+			$(this).closest('tr').remove();
+			resetNumbering(tableId);
+		});
+
+		function resetNumbering(tableSelector) {
+			$(tableSelector + ' tbody tr').each(function(index) {
+				$(this).find('.number').text(index + 1);
+			});
+		}
 		$(document).on('click', '.edit', function() {
 			const id = $(this).data('id')
 			const url = siteurl + active_controller + 'edit/' + id;

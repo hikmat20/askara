@@ -304,7 +304,9 @@ class Procedures extends Admin_Controller
 						'company_id'      => $this->company,
 						'procedure_id'    => $thisData->id,
 						'revision_number' => $thisData->revision,
-						'description'     => $revision['revision_description'],
+						'revision_date'   => date('Y-m-d'),
+						'description'     => isset($revision['revision_description']) ? $revision['revision_description'] : null,
+						'status'          => '1',
 						'created_by'      => $this->auth->user_id(),
 						'created_at'      => date('Y-m-d H:i:s'),
 					];
@@ -1852,7 +1854,7 @@ class Procedures extends Admin_Controller
 				</tr>
 				<tr>
 				<td>Revisi</td>
-				<td>' . (($allData['procedure']->revision) ?: '~') . '</td>
+				<td>' . (($allData['procedure']->revision)!== null ? $allData['procedure']->revision: '~') . '</td>
 				</tr>
 				<tr>
 				<td>Tgl. Terbit</td>
