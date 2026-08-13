@@ -23,8 +23,10 @@
 
 					<!-- Tab panes -->
 					<div class="tab-content mt-3">
-						<div class="tab-pane fade active show" id="Published" role="tabpanel" aria-labelledby="Published-tab">
-							<table id="example1" class="table table-bordered table-sm table-condensed table-hover datatable">
+						<div class="tab-pane fade active show" id="Published" role="tabpanel"
+							aria-labelledby="Published-tab">
+							<table id="example1"
+								class="table table-bordered table-sm table-condensed table-hover datatable">
 								<thead class="text-center table-light">
 									<tr class="text-center">
 										<th width="3%">No.</th>
@@ -34,20 +36,30 @@
 									</tr>
 								</thead>
 								<tbody>
-									<?php if (isset($data) && $data) :
+									<?php if (isset($data) && $data):
 										$n = 0;
-										foreach ($data as $dt) : $n++; ?>
+										foreach ($data as $dt):
+											$n++; ?>
 											<tr class="">
 												<td><?= $n; ?></td>
 												<td class="text-left"><?= $dt->name; ?></td>
 												<td class=""><?= ($dt->full_name) ?: '~'; ?></td>
 												<td class="text-center">
-													<button type="button" class="btn btn-sm btn-icon rounded-circle btn-success assign" data-id="<?= $dt->id; ?>" title="Assign User"><i class="fa fa-user-tie"></i></button>
-													<button type="button" class="btn btn-sm btn-icon rounded-circle btn-warning edit" data-id="<?= $dt->id; ?>" title="Edit Data"><i class="fa fa-edit"></i></button>
-													<button type="button" class="btn btn-sm btn-icon rounded-circle btn-danger delete" data-id="<?= $dt->id; ?>" title="View Data"><i class="fa fa-trash"></i></button>
+													<button type="button"
+														class="btn btn-sm btn-icon rounded-circle btn-success assign"
+														data-id="<?= $dt->id; ?>" title="Assign User"><i
+															class="fa fa-user-tie"></i></button>
+													<button type="button"
+														class="btn btn-sm btn-icon rounded-circle btn-warning edit"
+														data-id="<?= $dt->id; ?>" title="Edit Data"><i
+															class="fa fa-edit"></i></button>
+													<button type="button"
+														class="btn btn-sm btn-icon rounded-circle btn-danger delete"
+														data-id="<?= $dt->id; ?>" title="View Data"><i
+															class="fa fa-trash"></i></button>
 												</td>
 											</tr>
-									<?php endforeach;
+										<?php endforeach;
 									endif; ?>
 								</tbody>
 							</table>
@@ -60,7 +72,8 @@
 </div>
 
 <!-- Modal -->
-<div class="modal fade" id="modalView" data-backdrop="static" data-keyboard="false" tabindex="-1" aria-labelledby="staticBackdropLabel" aria-hidden="true">
+<div class="modal fade" id="modalView" data-backdrop="static" data-keyboard="false" tabindex="-1"
+	aria-labelledby="staticBackdropLabel" aria-hidden="true">
 	<div class="modal-dialog modal-dialog-centered modal-lg">
 		<div class="modal-content">
 			<div class="modal-header">
@@ -71,15 +84,17 @@
 			</div>
 			<div class="modal-footer justify-content-end">
 				<button type="button" class="btn btn-primary save w-100px"><i class="fa fa-save"></i>Save</button>
-				<button type="button" class="btn btn-danger text-end" onclick="clear($('.modal-body'));setTimeout(()=>{$('.save').removeClass('d-none')},500)" data-dismiss="modal">Close</button>
+				<button type="button" class="btn btn-danger text-end"
+					onclick="clear($('.modal-body'));setTimeout(()=>{$('.save').removeClass('d-none')},500)"
+					data-dismiss="modal">Close</button>
 			</div>
 		</div>
 	</div>
 </div>
 
 <script>
-	$(document).ready(function() {
-		$('button[data-toggle="tab"]').on('shown.bs.tab', function(e) {
+	$(document).ready(function () {
+		$('button[data-toggle="tab"]').on('shown.bs.tab', function (e) {
 			$.fn.dataTable.tables({
 				visible: true,
 				api: true
@@ -94,14 +109,14 @@
 			// info: false
 		});
 
-		$(document).on('click', '#add', function() {
+		$(document).on('click', '#add', function () {
 			const url = siteurl + active_controller + 'add';
 			$('.modal-title').html('Add New Position')
 			$('#modalView').modal('show')
 			$('.modal-body').load(url)
 		})
 
-		$(document).on('click', '.edit', function() {
+		$(document).on('click', '.edit', function () {
 			const id = $(this).data('id')
 			const url = siteurl + active_controller + 'edit/' + id;
 			$('.modal-title').html('Edit Position')
@@ -109,7 +124,7 @@
 			$('.modal-body').load(url)
 		})
 
-		$(document).on('click', '.assign', function() {
+		$(document).on('click', '.assign', function () {
 			const id = $(this).data('id')
 			const url = siteurl + active_controller + 'assign/' + id;
 			$('.modal-title').html('Edit Position')
@@ -118,36 +133,45 @@
 			$('.save').addClass('d-none')
 		})
 
-		$(document).on('click', '.save', function(e) {
-			const name = $('#name')
+		$(document).on('click', '.save', function () {
+			const form = $('#modalView').find('form')
+			const name = form.find('input[name="name"]')
 			validation(name)
 
-			let formdata = new FormData($('#form')[0])
+			if (!name.val() || $.trim(name.val()) === '') {
+				Swal.fire({
+					title: 'Warning!',
+					icon: 'warning',
+					text: 'Position Name tidak boleh kosong!',
+					timer: 2000
+				});
+				return false;
+			}
+
+			let formdata = form.serialize()
 			let btn = $(this)
 			$.ajax({
 				url: siteurl + active_controller + 'save',
 				data: formdata,
 				type: 'POST',
 				dataType: 'JSON',
-				processData: false,
-				contentType: false,
 				cache: false,
-				beforeSend: function() {
+				beforeSend: function () {
 					btn.attr('disabled', true)
 					btn.html('<i class="spinner spinner-border-sm"></i>Loading...')
 				},
-				complete: function() {
+				complete: function () {
 					btn.attr('disabled', false)
 					btn.html('<i class="fa fa-save"></i>Save')
 				},
-				success: function(result) {
+				success: function (result) {
 					if (result.status == 1) {
 						Swal.fire({
 							title: 'Success!',
 							icon: 'success',
 							text: result.msg,
 							timer: 2000
-						}).then(function() {
+						}).then(function () {
 							$('#modalView').modal('hide')
 							clear($('.modal-body'))
 							// $('table#example1 tbody').load(siteurl + active_controller + 'load_data')
@@ -163,7 +187,7 @@
 						})
 					}
 				},
-				error: function(result) {
+				error: function (result) {
 					Swal.fire({
 						title: 'Error!',
 						icon: 'error',
@@ -174,7 +198,7 @@
 			})
 		})
 
-		$(document).on('click', '.choose-user', function(e) {
+		$(document).on('click', '.choose-user', function (e) {
 			const user_id = $(this).data('id')
 			const position = $(this).data('position')
 			let btn = $(this)
@@ -193,22 +217,22 @@
 						},
 						type: 'POST',
 						dataType: 'JSON',
-						beforeSend: function() {
+						beforeSend: function () {
 							btn.attr('disabled', true).removeClass('btn-icon')
 							btn.html('<i class="spinner spinner-border-sm"></i> Loading..')
 						},
-						complete: function() {
+						complete: function () {
 							btn.attr('disabled', false).addClass('btn-icon')
 							btn.html('<i class="fa fa-check"></i>')
 						},
-						success: function(result) {
+						success: function (result) {
 							if (result.status == 1) {
 								Swal.fire({
 									title: 'Success!',
 									icon: 'success',
 									text: result.msg,
 									timer: 2000
-								}).then(function() {
+								}).then(function () {
 									$('#modalView').modal('hide')
 									clear($('.modal-body'))
 									// $('table#example1 tbody').load(siteurl + active_controller + 'load_data')
@@ -224,7 +248,7 @@
 								})
 							}
 						},
-						error: function(result) {
+						error: function (result) {
 							Swal.fire({
 								title: 'Error!',
 								icon: 'error',
@@ -237,7 +261,7 @@
 			})
 		})
 
-		$(document).on('click', '.remove-user', function(e) {
+		$(document).on('click', '.remove-user', function (e) {
 			const user_id = $(this).data('id')
 			const position = $(this).data('position')
 			let btn = $(this)
@@ -256,22 +280,22 @@
 						},
 						type: 'POST',
 						dataType: 'JSON',
-						beforeSend: function() {
+						beforeSend: function () {
 							btn.attr('disabled', true).removeClass('btn-icon')
 							btn.html('<i class="spinner spinner-border-sm"></i> Loading..')
 						},
-						complete: function() {
+						complete: function () {
 							btn.attr('disabled', false).addClass('btn-icon')
 							btn.html('<i class="fa fa-check"></i>')
 						},
-						success: function(result) {
+						success: function (result) {
 							if (result.status == 1) {
 								Swal.fire({
 									title: 'Success!',
 									icon: 'success',
 									text: result.msg,
 									timer: 2000
-								}).then(function() {
+								}).then(function () {
 									$('#modalView').modal('hide')
 									clear($('.modal-body'))
 									// $('table#example1 tbody').load(siteurl + active_controller + 'load_data')
@@ -287,7 +311,7 @@
 								})
 							}
 						},
-						error: function(result) {
+						error: function (result) {
 							Swal.fire({
 								title: 'Error!',
 								icon: 'error',
@@ -300,7 +324,7 @@
 			})
 		})
 
-		$(document).on('click', '.delete', function(e) {
+		$(document).on('click', '.delete', function (e) {
 			const id = $(this).data('id')
 			const btn = $(this)
 			Swal.fire({
@@ -317,20 +341,20 @@
 						},
 						type: 'POST',
 						dataType: 'JSON',
-						beforeSend: function() {
+						beforeSend: function () {
 							btn.attr('disabled', true).html('<i class="spinner spinner-border-sm"></i>')
 						},
-						complete: function() {
+						complete: function () {
 							btn.attr('disabled', false).html('<i class="fa fa-trash"></i>')
 						},
-						success: function(result) {
+						success: function (result) {
 							if (result.status == 1) {
 								Swal.fire({
 									title: 'Success!',
 									icon: 'success',
 									text: result.msg,
 									timer: 2000
-								}).then(function() {
+								}).then(function () {
 									$('#modalView').modal('hide')
 									clear($('.modal-body'))
 									// $('table#example1 tbody').load(siteurl + active_controller + 'load_data')
@@ -346,7 +370,7 @@
 								})
 							}
 						},
-						error: function(result) {
+						error: function (result) {
 							Swal.fire({
 								title: 'Error!',
 								icon: 'error',

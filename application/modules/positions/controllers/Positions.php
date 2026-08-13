@@ -37,6 +37,7 @@ class Positions extends Admin_Controller
     public function save()
     {
         $data       = $this->input->post();
+        
         $this->db->trans_begin();
         if ($data) {
             if (isset($data['id']) && $data['id']) {
