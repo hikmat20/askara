@@ -24,7 +24,9 @@
 									<td><?= $v->name; ?></td>
 									<td class="text-center">
 										<a href="<?= base_url($this->uri->segment(1) . "/edit/" . $v->id); ?>" class="btn btn-xs btn-icon btn-warning" data-toggle="tootltip" title="Edit" data-id="<?= $v->id; ?>"><i class="fa fa-edit" aria-hidden="true"></i></a>
-										<a href="<?= base_url($this->uri->segment(1) . "/audit/" . $v->id); ?>" class="btn btn-xs btn-icon btn-info" data-toggle="tootltip" title="Audit Temuan" data-id="<?= $v->id; ?>"><i class="fa fa-clipboard-check"></i></a>
+										<?php if (!empty($allow_audit_temuan)) : ?>
+											<a href="<?= base_url($this->uri->segment(1) . "/audit/" . $v->id); ?>" class="btn btn-xs btn-icon btn-info" data-toggle="tootltip" title="Audit Temuan" data-id="<?= $v->id; ?>"><i class="fa fa-clipboard-check"></i></a>
+										<?php endif; ?>
 										<button type="button" class="btn btn-xs btn-icon btn-danger delete" data-toggle="tootltip" title="Delete" data-id="<?= $v->id; ?>"><i class="fa fa-trash" aria-hidden="true"></i></button>
 									</td>
 								</tr>

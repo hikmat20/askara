@@ -79,6 +79,7 @@ class Audit_checklist extends Admin_Controller
     {
         $data = $this->db->get_where('view_audit_checklist', ['status' => '1'])->result();
         $this->template->set('data', $data);
+        $this->template->set('allow_audit_temuan', $this->_check_menu_permission('audit_checklist', 'download'));
         $this->template->render('index');
     }
 
@@ -281,6 +282,12 @@ class Audit_checklist extends Admin_Controller
 
     function audit($id)
     {
+        if (!$this->_check_menu_permission('audit_checklist', 'download')) {
+            $this->template->set_message('Anda tidak memiliki izin untuk mengakses Audit Temuan.', 'error');
+            redirect($this->uri->segment(1));
+            return;
+        }
+
         if ($id) {
             $existing = $this->db->get_where('audit_checklist_audit', ['checklist_id' => $id, 'status' => '1'])->row();
             if ($existing) {

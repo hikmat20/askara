@@ -28,7 +28,23 @@ class Admin_Controller extends Base_Controller
         $idt                = $this->identitas_model->find(1);
         $this->user_data    = $this->auth->userdata();
         $this->company      = $this->session->company->id_perusahaan;
-        $this->group_id     = $this->session->group->id_group;
+
+        $currentUserGroup   = $this->db->get_where('user_groups', [
+            'user_id'    => $this->auth->user_id(),
+            'company_id' => $this->company,
+            'default'    => 'Y'
+        ])->row();
+
+        if ($currentUserGroup) {
+            $this->group_id = $currentUserGroup->id_group;
+            if (isset($this->session->group) && $this->session->group->id_group != $currentUserGroup->id_group) {
+                $groupObj = $this->db->get_where('groups', ['id_group' => $currentUserGroup->id_group])->row();
+                $this->session->set_userdata('group', $groupObj);
+            }
+        } else {
+            $this->group_id = isset($this->session->group->id_group) ? $this->session->group->id_group : null;
+        }
+
         $companies          = $this->db->get_where('companies')->result();
         
         $this->form_validation->set_error_delimiters('', '');
@@ -93,11 +109,14 @@ class Admin_Controller extends Base_Controller
     }
     protected function _check_download_permission($menu_link)
     {
+        return $this->_check_menu_permission($menu_link, 'download');
+    }
+
+    protected function _check_menu_permission($menu_link, $action = 'read')
+    {
         if ($this->auth->is_admin() || (isset($this->group_id) && $this->group_id == 1)) {
             return true;
         }
-
-
 
         $permission = $this->db->select('group_menus.*')
             ->from('group_menus')
@@ -108,7 +127,15 @@ class Admin_Controller extends Base_Controller
             ->get()
             ->row();
 
-        return ($permission && $permission->download == '1');
+        if (!$permission) {
+            return false;
+        }
+
+        if ($action === 'any') {
+            return ($permission->read == '1' || $permission->create == '1' || $permission->update == '1');
+        }
+
+        return (isset($permission->$action) && $permission->$action == '1');
     }
 }
 /* End of file Admin_Controller.php */
